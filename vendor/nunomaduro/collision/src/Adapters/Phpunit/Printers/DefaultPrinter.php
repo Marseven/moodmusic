@@ -9,9 +9,11 @@ use NunoMaduro\Collision\Adapters\Phpunit\State;
 use NunoMaduro\Collision\Adapters\Phpunit\Style;
 use NunoMaduro\Collision\Adapters\Phpunit\TestResult;
 use NunoMaduro\Collision\Exceptions\ShouldNotHappen;
+use NunoMaduro\Collision\Exceptions\TestOutcome;
 use Pest\Result;
 use PHPUnit\Event\Code\TestMethod;
 use PHPUnit\Event\Code\Throwable;
+use PHPUnit\Event\Code\ThrowableBuilder;
 use PHPUnit\Event\Test\BeforeFirstTestMethodErrored;
 use PHPUnit\Event\Test\ConsideredRisky;
 use PHPUnit\Event\Test\DeprecationTriggered;
@@ -19,15 +21,18 @@ use PHPUnit\Event\Test\Errored;
 use PHPUnit\Event\Test\Failed;
 use PHPUnit\Event\Test\Finished;
 use PHPUnit\Event\Test\MarkedIncomplete;
+use PHPUnit\Event\Test\NoticeTriggered;
 use PHPUnit\Event\Test\Passed;
+use PHPUnit\Event\Test\PhpDeprecationTriggered;
+use PHPUnit\Event\Test\PhpNoticeTriggered;
 use PHPUnit\Event\Test\PhpunitWarningTriggered;
+use PHPUnit\Event\Test\PhpWarningTriggered;
 use PHPUnit\Event\Test\PreparationStarted;
-use PHPUnit\Event\Test\Prepared;
 use PHPUnit\Event\Test\Skipped;
+use PHPUnit\Event\Test\WarningTriggered;
 use PHPUnit\Event\TestRunner\ExecutionFinished;
 use PHPUnit\Event\TestRunner\ExecutionStarted;
-use PHPUnit\Event\TestRunner\WarningTriggered;
-use PHPUnit\Framework\Exception;
+use PHPUnit\Event\TestRunner\WarningTriggered as TestRunnerWarningTriggered;
 use PHPUnit\Framework\IncompleteTestError;
 use PHPUnit\Framework\SkippedWithMessageException;
 use PHPUnit\TestRunner\TestResult\Facade;
@@ -226,7 +231,7 @@ final class DefaultPrinter
      */
     public function testConsideredRisky(ConsideredRisky $event): void
     {
-        $throwable = Throwable::from(new IncompleteTestError($event->message()));
+        $throwable = ThrowableBuilder::from(new IncompleteTestError($event->message()));
 
         $this->state->add(TestResult::fromTestCase($event->test(), TestResult::RISKY, $throwable));
     }
@@ -234,7 +239,7 @@ final class DefaultPrinter
     /**
      * Listen to the test runner warning triggered.
      */
-    public function testRunnerWarningTriggered(WarningTriggered $event): void
+    public function testRunnerWarningTriggered(TestRunnerWarningTriggered $event): void
     {
         if (! str_starts_with($event->message(), 'No tests found in class')) {
             $this->style->writeWarning($event->message());
@@ -244,9 +249,39 @@ final class DefaultPrinter
     /**
      * Listen to the test runner warning triggered.
      */
+    public function testPhpDeprecationTriggered(PhpDeprecationTriggered $event): void
+    {
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
+
+        $this->state->add(TestResult::fromTestCase($event->test(), TestResult::DEPRECATED, $throwable));
+    }
+
+    /**
+     * Listen to the test runner notice triggered.
+     */
+    public function testPhpNoticeTriggered(PhpNoticeTriggered $event): void
+    {
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
+
+        $this->state->add(TestResult::fromTestCase($event->test(), TestResult::NOTICE, $throwable));
+    }
+
+    /**
+     * Listen to the test php warning triggered event.
+     */
+    public function testPhpWarningTriggered(PhpWarningTriggered $event): void
+    {
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
+
+        $this->state->add(TestResult::fromTestCase($event->test(), TestResult::WARN, $throwable));
+    }
+
+    /**
+     * Listen to the test runner warning triggered.
+     */
     public function testPhpunitWarningTriggered(PhpunitWarningTriggered $event): void
     {
-        $throwable = Throwable::from(new Exception($event->message()));
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
 
         $this->state->add(TestResult::fromTestCase($event->test(), TestResult::WARN, $throwable));
     }
@@ -256,9 +291,29 @@ final class DefaultPrinter
      */
     public function testDeprecationTriggered(DeprecationTriggered $event): void
     {
-        $throwable = Throwable::from(new Exception($event->message()));
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
 
         $this->state->add(TestResult::fromTestCase($event->test(), TestResult::DEPRECATED, $throwable));
+    }
+
+    /**
+     * Listen to the test warning triggered event.
+     */
+    public function testNoticeTriggered(NoticeTriggered $event): void
+    {
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
+
+        $this->state->add(TestResult::fromTestCase($event->test(), TestResult::NOTICE, $throwable));
+    }
+
+    /**
+     * Listen to the test warning triggered event.
+     */
+    public function testWarningTriggered(WarningTriggered $event): void
+    {
+        $throwable = ThrowableBuilder::from(new TestOutcome($event->message()));
+
+        $this->state->add(TestResult::fromTestCase($event->test(), TestResult::WARN, $throwable));
     }
 
     /**
@@ -272,7 +327,7 @@ final class DefaultPrinter
             return;
         }
 
-        $throwable = Throwable::from(new SkippedWithMessageException($event->message()));
+        $throwable = ThrowableBuilder::from(new SkippedWithMessageException($event->message()));
 
         $this->state->add(TestResult::fromTestCase($event->test(), TestResult::SKIPPED, $throwable));
     }
@@ -313,10 +368,7 @@ final class DefaultPrinter
         $failed = class_exists(Result::class) ?
             Result::failed() : (! Facade::result()->wasSuccessful());
 
-        if ($failed) {
-            $onFailure = $result->numberOfTests() !== $result->numberOfTestsRun();
-            $this->style->writeErrorsSummary($this->state, $onFailure);
-        }
+        $this->style->writeErrorsSummary($this->state);
 
         $this->style->writeRecap($this->state, $event->telemetryInfo(), $result);
 
@@ -330,6 +382,6 @@ final class DefaultPrinter
      */
     public function report(\Throwable $throwable): void
     {
-        $this->style->writeError(Throwable::from($throwable));
+        $this->style->writeError(ThrowableBuilder::from($throwable));
     }
 }

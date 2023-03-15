@@ -17,6 +17,7 @@ use function strlen;
 use PHPUnit\Event\EventFacadeIsSealedException;
 use PHPUnit\Event\Facade;
 use PHPUnit\Event\Test\Errored;
+use PHPUnit\Event\Test\PrintedUnexpectedOutput;
 use PHPUnit\Event\TestRunner\ExecutionStarted;
 use PHPUnit\Event\UnknownSubscriberTypeException;
 use PHPUnit\Framework\TestStatus\TestStatus;
@@ -54,8 +55,10 @@ final class ProgressPrinter
 
     public function testRunnerExecutionStarted(ExecutionStarted $event): void
     {
+        $this->numberOfTestsRun   = 0;
         $this->numberOfTests      = $event->testSuite()->count();
         $this->numberOfTestsWidth = strlen((string) $this->numberOfTests);
+        $this->column             = 0;
         $this->maxColumn          = $this->numberOfColumns - strlen('  /  (XXX%)') - (2 * $this->numberOfTestsWidth);
     }
 
@@ -127,6 +130,11 @@ final class ProgressPrinter
         }
     }
 
+    public function testPrintedOutput(PrintedUnexpectedOutput $event): void
+    {
+        $this->printer->print($event->output());
+    }
+
     public function testFinished(): void
     {
         if ($this->status === null) {
@@ -177,6 +185,7 @@ final class ProgressPrinter
             new TestTriggeredPhpunitWarningSubscriber($this),
             new TestTriggeredPhpWarningSubscriber($this),
             new TestTriggeredWarningSubscriber($this),
+            new TestPrintedUnexpectedOutputSubscriber($this),
         );
     }
 

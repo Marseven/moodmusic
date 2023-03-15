@@ -68,7 +68,9 @@ final class AnnotationParser implements Parser
                     break;
 
                 case 'coversDefaultClass':
-                    $result[] = Metadata::coversDefaultClass($values[0]);
+                    foreach ($values as $value) {
+                        $result[] = Metadata::coversDefaultClass($value);
+                    }
 
                     break;
 
@@ -135,7 +137,9 @@ final class AnnotationParser implements Parser
                     break;
 
                 case 'usesDefaultClass':
-                    $result[] = Metadata::usesDefaultClass($values[0]);
+                    foreach ($values as $value) {
+                        $result[] = Metadata::usesDefaultClass($value);
+                    }
 
                     break;
             }
@@ -154,6 +158,7 @@ final class AnnotationParser implements Parser
 
     /**
      * @psalm-param class-string $className
+     * @psalm-param non-empty-string $methodName
      *
      * @throws AnnotationsAreNotSupportedForInternalClassesException
      * @throws InvalidVersionOperatorException
@@ -366,6 +371,7 @@ final class AnnotationParser implements Parser
 
     /**
      * @psalm-param class-string $className
+     * @psalm-param non-empty-string $methodName
      *
      * @throws AnnotationsAreNotSupportedForInternalClassesException
      * @throws InvalidVersionOperatorException
