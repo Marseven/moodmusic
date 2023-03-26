@@ -2,6 +2,20 @@
 
 All notable changes of the PHPUnit 10.0 release series are documented in this file using the [Keep a CHANGELOG](https://keepachangelog.com/) principles.
 
+## [10.0.18] - 2023-03-22
+
+### Fixed
+
+* [#5287](https://github.com/sebastianbergmann/phpunit/issues/5287): Tests from test class with same non-fully qualified class name as another test class are sometimes not discovered
+* [#5288](https://github.com/sebastianbergmann/phpunit/issues/5288): `@dataProvider` annotation rejects previously valid method name style
+
+## [10.0.17] - 2023-03-20
+
+### Changed
+
+* [#5204](https://github.com/sebastianbergmann/phpunit/pull/5204): Register event subscribers where state is already global
+* [#5285](https://github.com/sebastianbergmann/phpunit/issues/5285): Print complete test result (outcome and issues) when `--teamcity` is used
+
 ## [10.0.16] - 2023-03-13
 
 ### Added
@@ -261,6 +275,8 @@ All notable changes of the PHPUnit 10.0 release series are documented in this fi
 * PHP 7.3, PHP 7.4, and PHP 8.0 are no longer supported
 * `phpunit/php-code-coverage` [no longer supports PHPDBG and Xdebug 2](https://github.com/sebastianbergmann/php-code-coverage/blob/10.0.0/ChangeLog.md#1000---2023-02-03)
 
+[10.0.18]: https://github.com/sebastianbergmann/phpunit/compare/10.0.17...10.0.18
+[10.0.17]: https://github.com/sebastianbergmann/phpunit/compare/10.0.16...10.0.17
 [10.0.16]: https://github.com/sebastianbergmann/phpunit/compare/10.0.15...10.0.16
 [10.0.15]: https://github.com/sebastianbergmann/phpunit/compare/10.0.14...10.0.15
 [10.0.14]: https://github.com/sebastianbergmann/phpunit/compare/10.0.13...10.0.14

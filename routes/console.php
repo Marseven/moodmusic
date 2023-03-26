@@ -16,14 +16,4 @@ use Illuminate\Support\Facades\Artisan;
 
 Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
-})->describe('Display an inspiring quote');
-
-Artisan::command('logs:clear', function() {
-
-    exec('rm ' . storage_path('logs/laravel-*'));
-
-    exec('echo "" > ' . storage_path('logs/laravel.log'));
-
-    $this->comment('Logs have been cleared!');
-
-})->describe('Clear log files');
+})->purpose('Display an inspiring quote');
