@@ -814,14 +814,15 @@ if (!function_exists('makeTagSelector')) {
 }
 
 if (!function_exists('makeCheckBox')) {
-function makeCheckBox($name, $selected = false) {
+    function makeCheckBox($name, $selected = false) {
 
-    $selected ? $selected = "checked" : $selected = "";
+        $selected ? $selected = "checked" : $selected = "";
 
-    return "<input type=\"hidden\" name=\"{$name}\" value=\"0\" /><input type=\"checkbox\" name=\"{$name}\" value=\"1\" {$selected}>";
+        return "<input type=\"hidden\" name=\"{$name}\" value=\"0\" /><input type=\"checkbox\" name=\"{$name}\" value=\"1\" {$selected}>";
 
+    }
 }
-}
+
 if (!function_exists('makeActivity')) {
     function makeActivity($host_id, $object_id, $object_type, $action, $events, $collapse = true, $schedule = null)
     {
