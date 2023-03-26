@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:52
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('radio', 'RadioController@index')->name('radio');
 Route::get('radio/categories', 'RadioController@categories')->name('radio.categories');
 Route::get('radio/category/{slug}', 'RadioController@browse')->name('radio.browse.category');

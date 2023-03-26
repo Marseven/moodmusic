@@ -4,7 +4,7 @@
  * Date: 2019-08-01
  * Time: 20:36
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::post('song/autoplay', 'SongController@autoplay')->name('song.autoplay.get');
 Route::get('song/{id}/{slug}', 'SongController@index')->name('song');
 Route::get('download/song/{id}', 'SongController@download')->name('song.download');

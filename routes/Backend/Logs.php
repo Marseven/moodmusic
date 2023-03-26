@@ -4,7 +4,7 @@
  * Date: 2019-07-22
  * Time: 00:27
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'role:admin_system_logs'], function() {
     Route::get('logs', 'LogController@index')->name('log-viewer-index');
     Route::get('logs/{file}', 'LogController@index')->name('log-viewer-file');

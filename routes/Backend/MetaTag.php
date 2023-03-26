@@ -4,7 +4,7 @@
  * Date: 2019-07-21
  * Time: 13:17
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 
 Route::group(['middleware' => 'role:admin_metatags'], function() {
     Route::get('metatags', 'MetaTagController@index')->name('metatags');

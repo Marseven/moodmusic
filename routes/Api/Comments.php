@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 18:10
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::post('comments/get', 'CommentsController@getComments')->name('comments.get');
 Route::post('comments/replies/get', 'CommentsController@getReplies')->name('comments.get.replies');
 

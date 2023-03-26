@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:54
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('homepage', 'HomeController@index')->name('homepage');
 Route::get('community', 'CommunityController@index')->name('community');
 Route::get('discover', 'DiscoverController@index')->name('discover');

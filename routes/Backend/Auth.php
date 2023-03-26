@@ -4,7 +4,7 @@
  * Date: 2019-06-18
  * Time: 13:09
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'role:admin_songs'], function() {
     Route::post('auth/upload/bulk', 'AdminAuthController@upload')->name('upload.bulk');
     Route::post('auth/artist/{artistId}/upload', 'AdminAuthController@upload')->name('artist.upload.bulk');

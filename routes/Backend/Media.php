@@ -4,7 +4,7 @@
  * Date: 2019-07-21
  * Time: 23:03
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'role:admin_media_manager'], function() {
     Route::get('media', 'MediaController@index')->name('media-index');
     Route::get('media/download', 'MediaController@download')->name('media-download');

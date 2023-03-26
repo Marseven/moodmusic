@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:51
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('search/suggest', 'SearchController@suggest')->name('search.suggest');
 Route::get('search/song', 'SearchController@song')->name('search.song');
 Route::get('search/artist', 'SearchController@artist')->name('search.artist');

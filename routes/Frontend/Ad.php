@@ -5,7 +5,7 @@
  * Time: 20:34
  */
 
-use Illuminate\Routing\Route;
+ use Illuminate\Support\Facades\Route;
 
 Route::post('ad/get', 'AdController@get')->name('ad.get');
 Route::post('ad/track', 'AdController@track')->name('ad.track');

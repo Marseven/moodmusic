@@ -3,7 +3,7 @@
  * User profile page
  * Namespaces Frontend
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('user/{id}', 'ProfileController@index')->where('id', '[0-9]+')->name('user');
 Route::get('user/{id}/recent', 'ProfileController@recent')->where('id', '[0-9]+')->name('user.recent');
 Route::get('user/{id}/feed', 'ProfileController@feed')->where('id', '[0-9]+')->name('user.feed');

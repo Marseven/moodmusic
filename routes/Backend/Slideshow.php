@@ -4,7 +4,7 @@
  * Date: 2019-05-24
  * Time: 15:52
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'role:admin_slideshow'], function() {
 
     Route::get('slideshow', 'SlideshowController@index')->name('slideshow.overview');
