@@ -1,6 +1,8 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class EmailsTableSeeder extends Seeder
 {
@@ -12,12 +14,12 @@ class EmailsTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
-        \DB::table('emails')->delete();
-        
-        \DB::table('emails')->insert(array (
-            0 => 
+
+        DB::table('emails')->delete();
+
+        DB::table('emails')->insert(array (
+            0 =>
             array (
                 'id' => 1,
                 'type' => 'resetPassword',
@@ -31,7 +33,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-02 22:35:53',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'type' => 'verifyAccount',
@@ -49,7 +51,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:27:20',
             ),
-            2 => 
+            2 =>
             array (
                 'id' => 3,
                 'type' => 'newUser',
@@ -62,7 +64,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2019-08-24 03:03:33',
             ),
-            3 => 
+            3 =>
             array (
                 'id' => 4,
                 'type' => 'approvedArtist',
@@ -77,7 +79,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:23:07',
             ),
-            4 => 
+            4 =>
             array (
                 'id' => 5,
                 'type' => 'rejectedArtist',
@@ -94,7 +96,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:20:24',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 6,
                 'type' => 'subscribePlaylist',
@@ -105,7 +107,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:24:23',
             ),
-            6 => 
+            6 =>
             array (
                 'id' => 7,
                 'type' => 'shareMedia',
@@ -116,7 +118,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:25:06',
             ),
-            7 => 
+            7 =>
             array (
                 'id' => 8,
                 'type' => 'followUser',
@@ -127,7 +129,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-07 07:25:34',
             ),
-            8 => 
+            8 =>
             array (
                 'id' => 9,
                 'type' => 'newComment',
@@ -152,7 +154,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => '2019-08-20 17:00:00',
                 'updated_at' => '2020-07-15 23:28:31',
             ),
-            9 => 
+            9 =>
             array (
                 'id' => 10,
                 'type' => 'approvedSong',
@@ -168,7 +170,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-15 03:01:27',
             ),
-            10 => 
+            10 =>
             array (
                 'id' => 11,
                 'type' => 'approvedAlbum',
@@ -184,7 +186,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-15 03:01:13',
             ),
-            11 => 
+            11 =>
             array (
                 'id' => 12,
                 'type' => 'rejectedSong',
@@ -203,7 +205,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-15 02:58:15',
             ),
-            12 => 
+            12 =>
             array (
                 'id' => 13,
                 'type' => 'rejectedAlbum',
@@ -222,7 +224,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-15 02:58:00',
             ),
-            13 => 
+            13 =>
             array (
                 'id' => 14,
                 'type' => 'subscriptionReceipt',
@@ -558,7 +560,7 @@ class EmailsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-07-29 09:11:00',
             ),
-            14 => 
+            14 =>
             array (
                 'id' => 15,
                 'type' => 'feedback',
@@ -615,7 +617,7 @@ class EmailsTableSeeder extends Seeder
                     'updated_at' => '2021-01-19 22:11:00',
                 )
         ));
-        
-        
+
+
     }
 }

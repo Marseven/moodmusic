@@ -1,6 +1,8 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class MetatagsTableSeeder extends Seeder
 {
@@ -12,12 +14,12 @@ class MetatagsTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
-        \DB::table('metatags')->delete();
-        
-        \DB::table('metatags')->insert(array (
-            0 => 
+
+        DB::table('metatags')->delete();
+
+        DB::table('metatags')->insert(array (
+            0 =>
             array (
                 'id' => 1,
                 'priority' => 22,
@@ -30,7 +32,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'priority' => 17,
@@ -43,7 +45,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:23:12',
             ),
-            2 => 
+            2 =>
             array (
                 'id' => 4,
                 'priority' => 20,
@@ -56,7 +58,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            3 => 
+            3 =>
             array (
                 'id' => 5,
                 'priority' => 19,
@@ -69,7 +71,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:17:04',
             ),
-            4 => 
+            4 =>
             array (
                 'id' => 6,
                 'priority' => 16,
@@ -82,7 +84,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:23:28',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 7,
                 'priority' => 18,
@@ -95,7 +97,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:22:48',
             ),
-            6 => 
+            6 =>
             array (
                 'id' => 8,
                 'priority' => 21,
@@ -108,7 +110,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            7 => 
+            7 =>
             array (
                 'id' => 10,
                 'priority' => 10,
@@ -121,7 +123,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            8 => 
+            8 =>
             array (
                 'id' => 11,
                 'priority' => 15,
@@ -134,7 +136,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            9 => 
+            9 =>
             array (
                 'id' => 12,
                 'priority' => 9,
@@ -147,7 +149,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            10 => 
+            10 =>
             array (
                 'id' => 13,
                 'priority' => 12,
@@ -160,7 +162,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            11 => 
+            11 =>
             array (
                 'id' => 14,
                 'priority' => 11,
@@ -173,7 +175,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            12 => 
+            12 =>
             array (
                 'id' => 15,
                 'priority' => 13,
@@ -186,7 +188,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            13 => 
+            13 =>
             array (
                 'id' => 16,
                 'priority' => 14,
@@ -199,7 +201,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            14 => 
+            14 =>
             array (
                 'id' => 17,
                 'priority' => 23,
@@ -212,7 +214,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-07-06 00:23:17',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            15 => 
+            15 =>
             array (
                 'id' => 18,
                 'priority' => 8,
@@ -225,7 +227,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 02:30:42',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            16 => 
+            16 =>
             array (
                 'id' => 19,
                 'priority' => 7,
@@ -238,7 +240,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:04:00',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            17 => 
+            17 =>
             array (
                 'id' => 20,
                 'priority' => 1,
@@ -251,7 +253,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:06:13',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            18 => 
+            18 =>
             array (
                 'id' => 21,
                 'priority' => 2,
@@ -264,7 +266,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:07:32',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            19 => 
+            19 =>
             array (
                 'id' => 22,
                 'priority' => 3,
@@ -277,7 +279,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:09:31',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            20 => 
+            20 =>
             array (
                 'id' => 23,
                 'priority' => 4,
@@ -290,7 +292,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:10:51',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            21 => 
+            21 =>
             array (
                 'id' => 24,
                 'priority' => 5,
@@ -303,7 +305,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:11:39',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            22 => 
+            22 =>
             array (
                 'id' => 25,
                 'priority' => 6,
@@ -316,7 +318,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:12:53',
                 'updated_at' => '2020-09-14 03:13:07',
             ),
-            23 => 
+            23 =>
             array (
                 'id' => 26,
                 'priority' => NULL,
@@ -329,7 +331,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:15:18',
                 'updated_at' => '2020-09-14 03:15:18',
             ),
-            24 => 
+            24 =>
             array (
                 'id' => 27,
                 'priority' => NULL,
@@ -342,7 +344,7 @@ class MetatagsTableSeeder extends Seeder
                 'created_at' => '2020-09-14 03:16:39',
                 'updated_at' => '2020-09-14 03:16:39',
             ),
-            25 => 
+            25 =>
             array (
                 'id' => 28,
                 'priority' => NULL,
@@ -382,7 +384,7 @@ class MetatagsTableSeeder extends Seeder
                     'updated_at' => '2020-09-14 03:17:54',
                 ),
         ));
-        
-        
+
+
     }
 }

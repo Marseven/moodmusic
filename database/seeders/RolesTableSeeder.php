@@ -1,6 +1,8 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
 
 class RolesTableSeeder extends Seeder
 {
@@ -12,12 +14,12 @@ class RolesTableSeeder extends Seeder
      */
     public function run()
     {
-        
 
-        \DB::table('roles')->delete();
-        
-        \DB::table('roles')->insert(array (
-            0 => 
+
+        DB::table('roles')->delete();
+
+        DB::table('roles')->insert(array (
+            0 =>
             array (
                 'id' => 1,
                 'name' => 'Administrator',
@@ -25,7 +27,7 @@ class RolesTableSeeder extends Seeder
                 'created_at' => '2019-07-24 17:00:00',
                 'updated_at' => '2020-10-13 08:17:38',
             ),
-            1 => 
+            1 =>
             array (
                 'id' => 2,
                 'name' => 'Moderator',
@@ -33,7 +35,7 @@ class RolesTableSeeder extends Seeder
                 'created_at' => NULL,
                 'updated_at' => '2020-10-13 08:17:21',
             ),
-            2 => 
+            2 =>
             array (
                 'id' => 3,
                 'name' => 'Anywhere Subscription',
@@ -41,7 +43,7 @@ class RolesTableSeeder extends Seeder
                 'created_at' => '2019-07-24 17:00:00',
                 'updated_at' => '2020-10-13 08:16:50',
             ),
-            3 => 
+            3 =>
             array (
                 'id' => 4,
                 'name' => 'Plus Subscription',
@@ -49,7 +51,7 @@ class RolesTableSeeder extends Seeder
                 'created_at' => '2019-07-24 17:00:00',
                 'updated_at' => '2020-10-13 08:16:13',
             ),
-            4 => 
+            4 =>
             array (
                 'id' => 5,
                 'name' => 'Member',
@@ -57,7 +59,7 @@ class RolesTableSeeder extends Seeder
                 'created_at' => '2019-07-24 17:00:00',
                 'updated_at' => '2020-10-13 08:15:22',
             ),
-            5 => 
+            5 =>
             array (
                 'id' => 6,
                 'name' => 'Guest',
@@ -66,7 +68,7 @@ class RolesTableSeeder extends Seeder
                 'updated_at' => '2020-10-13 08:14:31',
             ),
         ));
-        
-        
+
+
     }
 }

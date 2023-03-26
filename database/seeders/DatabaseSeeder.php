@@ -1,4 +1,5 @@
 <?php
+namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 
@@ -14,8 +15,6 @@ class DatabaseSeeder extends Seeder
 
         $this->call(EmailsTableSeeder::class);
         $this->call(MetatagsTableSeeder::class);
-        $this->call(PagesTableSeeder::class);
         $this->call(RolesTableSeeder::class);
-        $this->call(BannersTableSeeder::class);
     }
 }
