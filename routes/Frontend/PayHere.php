@@ -5,7 +5,7 @@
  * Time: 18:10
  */
 
-
+ use Illuminate\Routing\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('subscription/payhere/{id}', '\App\Modules\PayHere\Controller@subscriptionAuthorization')->name('payhere.subscription.authorization');
     Route::get('subscription/payhere/callback/{id}', '\App\Modules\PayHere\Controller@subscriptionCallback')->name('payhere.subscription.callback');

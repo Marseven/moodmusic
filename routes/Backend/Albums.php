@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:58
  */
-
+use Illuminate\Routing\Route;
 
 /*
  * Edit Album

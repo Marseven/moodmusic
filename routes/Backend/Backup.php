@@ -4,7 +4,7 @@
  * Date: 2019-07-22
  * Time: 02:35
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'role:admin_backup'], function() {
     Route::get('backup', 'BackupController@index')->name('backup-list');
     Route::get('backup/download', 'BackupController@download')->name('backup-download');

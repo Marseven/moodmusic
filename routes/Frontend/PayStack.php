@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 18:10
  */
-
+use Illuminate\Routing\Route;
 
 Route::group(['middleware' => 'auth'], function () {
     Route::get('subscription/paystack/{id}', '\App\Modules\PayStack\Controller@subscriptionAuthorization')->name('paystack.subscription.authorization');

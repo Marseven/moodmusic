@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 18:10
  */
-
+use Illuminate\Routing\Route;
 
 Route::group(['middleware' => 'api'], function () {
     Route::get('subscription/paypal/{id}', 'PaypalController@subscription')->name('paypal.subscription');

@@ -4,6 +4,7 @@
  * Date: 2019-08-01
  * Time: 20:33
  */
+use Illuminate\Routing\Route;
 Route::get('podcasts', 'PodcastsController@index')->name('podcasts');
 Route::get('podcasts/regions', 'PodcastsController@browse')->name('podcasts.browse.regions');
 Route::get('podcasts/region/{slug}', 'PodcastsController@browse')->name('podcasts.browse.by.region');

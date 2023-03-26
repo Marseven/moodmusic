@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:57
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'role:admin_posts'], function() {
     Route::get('posts', 'PostsController@index')->name('posts');
     Route::post('posts', 'PostsController@massAction')->name('posts.mass.action');

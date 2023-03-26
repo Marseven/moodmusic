@@ -4,6 +4,7 @@
  * Date: 2019-08-01
  * Time: 20:42
  */
+use Illuminate\Routing\Route;
 Route::post('auth/userInfoValidate', 'AuthController@userInfoValidate')->name('auth.info.validate');
 Route::post('auth/usernameValidate', 'AuthController@usernameValidate')->name('auth.info.validate.username');
 Route::post('auth/signup', 'AuthController@signup')->name('auth.signup');

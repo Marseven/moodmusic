@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:53
  */
-
+use Illuminate\Routing\Route;
 Route::get('song/{id}', 'SongController@index')->name('song');
 Route::get('songs/{ids}', 'SongController@songFromIds')->name('songs.by.ids');
 Route::post('song/autoplay', 'SongController@autoplay')->name('song.autoplay.get');

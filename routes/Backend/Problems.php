@@ -4,7 +4,7 @@
  * Date: 2019-08-08
  * Time: 21:45
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'role:admin_songs'], function() {
     Route::get('problems', 'ProblemsController@index')->name('problems');
     Route::get('problems/{id}', 'ProblemsController@delete')->name('problems.delete');

@@ -5,7 +5,7 @@
  * Time: 09:58
  */
 
-
+ use Illuminate\Routing\Route;
 /*
  * Edit Album
 */

@@ -4,5 +4,6 @@
  * Date: 2019-08-01
  * Time: 20:34
  */
+use Illuminate\Routing\Route;
 Route::get('album/{id}', 'AlbumController@index')->name('album');
 Route::get('album/{id}/related-albums', 'AlbumController@related')->name('album.related');
