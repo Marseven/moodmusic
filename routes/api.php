@@ -1,6 +1,6 @@
 <?php
 
-include('app/Helpers/Helper.php');
+include(__DIR__.'app/Helpers/Helper.php');
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
