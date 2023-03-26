@@ -5,7 +5,7 @@
  * Time: 18:10
  */
 
-
+ use Illuminate\Routing\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('subscription/paypal/{id}', 'PaypalController@subscription')->name('paypal.subscription');
     Route::get('subscription/paypal/success/{id}', 'PaypalController@success')->name('paypal.subscription.success');

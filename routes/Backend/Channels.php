@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:59
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'role:admin_channels'], function() {
     Route::get('channels', 'ChannelsController@index')->name('channels.overview');
     Route::get('channels/add', 'ChannelsController@add')->name('channels.add');

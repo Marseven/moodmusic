@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 09:52
  */
-
+use Illuminate\Routing\Route;
 Route::get('genre/{slug}', 'GenreController@index')->name('genre');
 Route::get('genre/{slug}/songs', 'GenreController@songs')->name('genre.songs');
 Route::get('genre/{slug}/albums', 'GenreController@albums')->name('genre.albums');

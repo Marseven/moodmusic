@@ -4,6 +4,7 @@
  * Date: 2019-08-01
  * Time: 20:37
  */
+use Illuminate\Routing\Route;
 Route::get('/', 'HomeController@index')->name('homepage');
 Route::get('/sign-in', 'HomeController@index')->name('sign-in');
 Route::get('/sign-up', 'HomeController@index')->name('sign-up');

@@ -4,7 +4,7 @@
  * Date: 2012-06-23
  * Time: 14:12
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'auth'], function () {
     /**
      * Use ThrottleMiddleware to set limit the comments user can post per minute

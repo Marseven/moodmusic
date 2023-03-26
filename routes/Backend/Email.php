@@ -4,7 +4,7 @@
  * Date: 2019-06-23
  * Time: 10:00
  */
-
+use Illuminate\Routing\Route;
 Route::group(['middleware' => 'role:admin_email'], function() {
     Route::get('email', 'EmailController@index')->name('email');
     Route::get('email/edit/{id}', 'EmailController@edit')->name('email.edit');

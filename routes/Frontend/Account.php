@@ -5,6 +5,8 @@
  * Time: 20:34
  */
 
+use Illuminate\Routing\Route;
+
 Route::post('reset-password/send', 'AccountController@sendResetPassword')->name('account.send.request.reset.password');
 Route::get('reset-password/{token}', 'AccountController@resetPassword')->name('account.reset.password');
 Route::post('reset-password/new-password', 'AccountController@setNewPassword')->name('account.set.new.password');

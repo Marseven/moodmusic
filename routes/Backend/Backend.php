@@ -4,7 +4,7 @@
  * Date: 2019-05-24
  * Time: 15:52
  */
-
+use Illuminate\Routing\Route;
 /**
  * All route names are prefixed with 'admin.'.
  */
