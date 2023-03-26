@@ -71,7 +71,7 @@ Route::group(['middleware' => 'locale'], function() {
     }
 
 
-    Auth::routes();
+    //Auth::routes();
 });
 
 Auth::routes();
