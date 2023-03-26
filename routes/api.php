@@ -81,7 +81,7 @@ if(app('request')->header('authorization')) {
     });
 } else {
     Route::group(['laroute' => true, 'namespace' => 'App\Http\Controllers\Frontend', 'as' => 'api.'], function () {
-        includeRouteFiles(__DIR__.'/Api/');
+        get_include_path(__DIR__.'/Api/');
         includeModuleAPIRouteFiles();
     });
 }
