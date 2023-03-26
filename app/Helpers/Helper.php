@@ -367,6 +367,7 @@ if (!function_exists('generateUuid')) {
         return substr($uid, 0, $len);
     }
 }
+
 if (!function_exists('randomFolderName')) {
     function randomFolderName($length, $keyspace = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ')
     {
@@ -819,6 +820,7 @@ function makeCheckBox($name, $selected = false) {
     return "<input type=\"hidden\" name=\"{$name}\" value=\"0\" /><input type=\"checkbox\" name=\"{$name}\" value=\"1\" {$selected}>";
 
 }
+
 if (!function_exists('makeActivity')) {
     function makeActivity($host_id, $object_id, $object_type, $action, $events, $collapse = true, $schedule = null)
     {
