@@ -5,7 +5,7 @@
  * Time: 18:10
  */
 
- use Illuminate\Routing\Route;
+ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'api'], function () {
     Route::get('subscription/stripe/{id}', 'StripeController@subscriptionAuthorization')->name('stripe.subscription.authorization');
     Route::post('subscription/stripe/callback', 'StripeController@subscriptionCallback')->name('stripe.subscription.callback');

@@ -5,7 +5,7 @@
  * Time: 18:10
  */
 
- use Illuminate\Routing\Route;
+ use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
     Route::get('subscription/dpo/{id}', '\App\Modules\DPO\Controller@subscriptionAuthorization')->name('dpo.subscription.authorization');
     Route::get('subscription/dpo/callback/{id}', '\App\Modules\DPO\Controller@subscriptionCallback')->name('dpo.subscription.callback');

@@ -5,7 +5,7 @@
  * Time: 09:58
  */
 
- use Illuminate\Routing\Route;
+ use Illuminate\Support\Facades\Route;
 /*
  * Edit Album
 */

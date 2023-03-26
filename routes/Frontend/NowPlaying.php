@@ -3,5 +3,5 @@
  * User profile page
  * Namespaces Frontend
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('queue', 'NowPlayingController@index')->name('queue');

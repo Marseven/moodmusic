@@ -4,7 +4,7 @@
  * Date: 2019-08-08
  * Time: 12:49
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::group(['middleware' => 'auth'], function () {
 
 

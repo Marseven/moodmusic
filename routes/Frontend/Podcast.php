@@ -4,7 +4,7 @@
  * Date: 2019-08-01
  * Time: 20:34
  */
-use Illuminate\Routing\Route;
+use Illuminate\Support\Facades\Route;
 Route::get('podcast/{id}/{slug}', 'PodcastController@index')->name('podcast');
 Route::get('podcast/{id}/{slug}/subscribers', 'PodcastController@subscribers')->name('podcast.subscribers');
 Route::get('podcast/{id}/{slug}/episode/{epid}', 'PodcastController@episode')->name('podcast.episode');

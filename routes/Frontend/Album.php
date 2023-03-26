@@ -5,7 +5,7 @@
  * Time: 20:34
  */
 
-use Illuminate\Routing\Route;
+ use Illuminate\Support\Facades\Route;
 
 Route::get('album/{id}/{slug}', 'AlbumController@index')->name('album');
 Route::get('album/{id}/{slug}/related-albums', 'AlbumController@related')->name('album.related');
