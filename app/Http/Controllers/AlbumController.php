@@ -23,6 +23,7 @@ class AlbumController extends BaseController {
         $this->request = $request;
     }
 
+    //test
 	public function index()
 	{
 		$this->authorize('index', Album::class);

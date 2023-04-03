@@ -10,7 +10,7 @@
     ## if you have installed to a subdirectory, enter the name here also.
     ## Example: for https://site.com enter: "/", for https://site.com/something enter: "/something/"
     ##
-    # RewriteBase /
+    ##RewriteBase /
 
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
