@@ -86,15 +86,12 @@ final class Utils
     public static function chooseHandler(): callable
     {
         $handler = null;
-
-        if (\defined('CURLOPT_CUSTOMREQUEST')) {
-            if (\function_exists('curl_multi_exec') && \function_exists('curl_exec')) {
-                $handler = Proxy::wrapSync(new CurlMultiHandler(), new CurlHandler());
-            } elseif (\function_exists('curl_exec')) {
-                $handler = new CurlHandler();
-            } elseif (\function_exists('curl_multi_exec')) {
-                $handler = new CurlMultiHandler();
-            }
+        if (\function_exists('curl_multi_exec') && \function_exists('curl_exec')) {
+            $handler = Proxy::wrapSync(new CurlMultiHandler(), new CurlHandler());
+        } elseif (\function_exists('curl_exec')) {
+            $handler = new CurlHandler();
+        } elseif (\function_exists('curl_multi_exec')) {
+            $handler = new CurlMultiHandler();
         }
 
         if (\ini_get('allow_url_fopen')) {
@@ -228,20 +225,20 @@ EOT
         }
 
         // Strip port if present.
-        [$host] = \explode(':', $host, 2);
+        if (\strpos($host, ':')) {
+            /** @var string[] $hostParts will never be false because of the checks above */
+            $hostParts = \explode(':', $host, 2);
+            $host = $hostParts[0];
+        }
 
         foreach ($noProxyArray as $area) {
             // Always match on wildcards.
             if ($area === '*') {
                 return true;
-            }
-
-            if (empty($area)) {
+            } elseif (empty($area)) {
                 // Don't match on empty values.
                 continue;
-            }
-
-            if ($area === $host) {
+            } elseif ($area === $host) {
                 // Exact matches.
                 return true;
             }
@@ -328,7 +325,7 @@ EOT
             if ($asciiHost === false) {
                 $errorBitSet = $info['errors'] ?? 0;
 
-                $errorConstants = array_filter(array_keys(get_defined_constants()), static function (string $name): bool {
+                $errorConstants = array_filter(array_keys(get_defined_constants()), static function ($name) {
                     return substr($name, 0, 11) === 'IDNA_ERROR_';
                 });
 

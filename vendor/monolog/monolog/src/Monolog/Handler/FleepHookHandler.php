@@ -13,8 +13,7 @@ namespace Monolog\Handler;
 
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LineFormatter;
-use Monolog\Level;
-use Monolog\LogRecord;
+use Monolog\Logger;
 
 /**
  * Sends logs to Fleep.io using Webhook integrations
@@ -33,7 +32,7 @@ class FleepHookHandler extends SocketHandler
     /**
      * @var string Webhook token (specifies the conversation where logs are sent)
      */
-    protected string $token;
+    protected $token;
 
     /**
      * Construct a new Fleep.io Handler.
@@ -41,19 +40,13 @@ class FleepHookHandler extends SocketHandler
      * For instructions on how to create a new web hook in your conversations
      * see https://fleep.io/integrations/webhooks/
      *
-     * @param  string                    $token Webhook token
-     * @throws MissingExtensionException if OpenSSL is missing
+     * @param  string                    $token  Webhook token
+     * @param  string|int                $level  The minimum logging level at which this handler will be triggered
+     * @param  bool                      $bubble Whether the messages that are handled can bubble up the stack or not
+     * @throws MissingExtensionException
      */
-    public function __construct(
-        string $token,
-        $level = Level::Debug,
-        bool $bubble = true,
-        bool $persistent = false,
-        float $timeout = 0.0,
-        float $writingTimeout = 10.0,
-        ?float $connectionTimeout = null,
-        ?int $chunkSize = null
-    ) {
+    public function __construct(string $token, $level = Logger::DEBUG, bool $bubble = true)
+    {
         if (!extension_loaded('openssl')) {
             throw new MissingExtensionException('The OpenSSL PHP extension is required to use the FleepHookHandler');
         }
@@ -61,16 +54,7 @@ class FleepHookHandler extends SocketHandler
         $this->token = $token;
 
         $connectionString = 'ssl://' . static::FLEEP_HOST . ':443';
-        parent::__construct(
-            $connectionString,
-            $level,
-            $bubble,
-            $persistent,
-            $timeout,
-            $writingTimeout,
-            $connectionTimeout,
-            $chunkSize
-        );
+        parent::__construct($connectionString, $level, $bubble);
     }
 
     /**
@@ -88,16 +72,16 @@ class FleepHookHandler extends SocketHandler
     /**
      * Handles a log record
      */
-    public function write(LogRecord $record): void
+    public function write(array $record): void
     {
         parent::write($record);
         $this->closeSocket();
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function generateDataStream(LogRecord $record): string
+    protected function generateDataStream(array $record): string
     {
         $content = $this->buildContent($record);
 
@@ -121,10 +105,10 @@ class FleepHookHandler extends SocketHandler
     /**
      * Builds the body of API call
      */
-    private function buildContent(LogRecord $record): string
+    private function buildContent(array $record): string
     {
         $dataArray = [
-            'message' => $record->formatted,
+            'message' => $record['formatted'],
         ];
 
         return http_build_query($dataArray);

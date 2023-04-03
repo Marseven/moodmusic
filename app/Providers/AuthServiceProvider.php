@@ -2,25 +2,33 @@
 
 namespace App\Providers;
 
-// use Illuminate\Support\Facades\Gate;
+use App\BackstageRequest;
+use App\Policies\BackstageRequestPolicy;
+use App\Policies\MusicUploadPolicy;
+use App\Policies\TrackCommentPolicy;
+use Common\Comments\Comment;
+use Common\Files\FileEntry;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
 {
     /**
-     * The model to policy mappings for the application.
-     *
-     * @var array<class-string, class-string>
+     * @var array
      */
     protected $policies = [
-        // 'App\Models\Model' => 'App\Policies\ModelPolicy',
+        FileEntry::class => MusicUploadPolicy::class,
+        Comment::class => TrackCommentPolicy::class,
     ];
 
     /**
      * Register any authentication / authorization services.
+     *
+     * @return void
      */
-    public function boot(): void
+    public function boot()
     {
+        $this->registerPolicies();
+
         //
     }
 }

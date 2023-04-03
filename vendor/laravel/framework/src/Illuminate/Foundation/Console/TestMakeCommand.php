@@ -4,12 +4,8 @@ namespace Illuminate\Foundation\Console;
 
 use Illuminate\Console\GeneratorCommand;
 use Illuminate\Support\Str;
-use Symfony\Component\Console\Attribute\AsCommand;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-#[AsCommand(name: 'make:test')]
 class TestMakeCommand extends GeneratorCommand
 {
     /**
@@ -40,11 +36,9 @@ class TestMakeCommand extends GeneratorCommand
      */
     protected function getStub()
     {
-        $suffix = $this->option('unit') ? '.unit.stub' : '.stub';
-
-        return $this->option('pest')
-            ? $this->resolveStubPath('/stubs/pest'.$suffix)
-            : $this->resolveStubPath('/stubs/test'.$suffix);
+        return $this->option('unit')
+                    ? $this->resolveStubPath('/stubs/test.unit.stub')
+                    : $this->resolveStubPath('/stubs/test.stub');
     }
 
     /**
@@ -106,37 +100,7 @@ class TestMakeCommand extends GeneratorCommand
     protected function getOptions()
     {
         return [
-            ['force', 'f', InputOption::VALUE_NONE, 'Create the class even if the test already exists'],
-            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test'],
-            ['pest', 'p', InputOption::VALUE_NONE, 'Create a Pest test'],
+            ['unit', 'u', InputOption::VALUE_NONE, 'Create a unit test.'],
         ];
-    }
-
-    /**
-     * Interact further with the user if they were prompted for missing arguments.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return void
-     */
-    protected function afterPromptingForMissingArguments(InputInterface $input, OutputInterface $output)
-    {
-        if ($this->isReservedName($this->getNameInput()) || $this->didReceiveOptions($input)) {
-            return;
-        }
-
-        $type = $this->components->choice('Which type of test would you like', [
-            'feature',
-            'unit',
-            'pest feature',
-            'pest unit',
-        ], default: 0);
-
-        match ($type) {
-            'feature' => null,
-            'unit' => $input->setOption('unit', true),
-            'pest feature' => $input->setOption('pest', true),
-            'pest unit' => tap($input)->setOption('pest', true)->setOption('unit', true),
-        };
     }
 }

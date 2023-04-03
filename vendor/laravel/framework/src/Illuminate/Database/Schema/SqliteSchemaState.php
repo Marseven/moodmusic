@@ -9,7 +9,7 @@ class SqliteSchemaState extends SchemaState
     /**
      * Dump the database's schema into a file.
      *
-     * @param  \Illuminate\Database\Connection  $connection
+     * @param  \Illuminate\Database\Connection
      * @param  string  $path
      * @return void
      */
@@ -61,12 +61,6 @@ class SqliteSchemaState extends SchemaState
      */
     public function load($path)
     {
-        if ($this->connection->getDatabaseName() === ':memory:') {
-            $this->connection->getPdo()->exec($this->files->get($path));
-
-            return;
-        }
-
         $process = $this->makeProcess($this->baseCommand().' < "${:LARAVEL_LOAD_PATH}"');
 
         $process->mustRun(null, array_merge($this->baseVariables($this->connection->getConfig()), [

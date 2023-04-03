@@ -11,9 +11,8 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Level;
+use Monolog\Logger;
 use Monolog\Formatter\FormatterInterface;
-use Monolog\LogRecord;
 
 /**
  * Handler to only pass log messages when a certain threshold of number of messages is reached.
@@ -28,7 +27,7 @@ use Monolog\LogRecord;
  *   $handler = new SomeHandler(...)
  *
  *   // Pass all warnings to the handler when more than 10 & all error messages when more then 5
- *   $overflow = new OverflowHandler($handler, [Level::Warning->value => 10, Level::Error->value => 5]);
+ *   $overflow = new OverflowHandler($handler, [Logger::WARNING => 10, Logger::ERROR => 5]);
  *
  *   $log->pushHandler($overflow);
  *```
@@ -37,25 +36,38 @@ use Monolog\LogRecord;
  */
 class OverflowHandler extends AbstractHandler implements FormattableHandlerInterface
 {
-    private HandlerInterface $handler;
+    /** @var HandlerInterface */
+    private $handler;
 
-    /** @var array<int, int> */
-    private array $thresholdMap = [];
+    /** @var int[] */
+    private $thresholdMap = [
+        Logger::DEBUG => 0,
+        Logger::INFO => 0,
+        Logger::NOTICE => 0,
+        Logger::WARNING => 0,
+        Logger::ERROR => 0,
+        Logger::CRITICAL => 0,
+        Logger::ALERT => 0,
+        Logger::EMERGENCY => 0,
+    ];
 
     /**
      * Buffer of all messages passed to the handler before the threshold was reached
      *
      * @var mixed[][]
      */
-    private array $buffer = [];
+    private $buffer = [];
 
     /**
-     * @param array<int, int> $thresholdMap Dictionary of log level value => threshold
+     * @param HandlerInterface $handler
+     * @param int[]            $thresholdMap Dictionary of logger level => threshold
+     * @param int|string       $level        The minimum logging level at which this handler will be triggered
+     * @param bool             $bubble
      */
     public function __construct(
         HandlerInterface $handler,
         array $thresholdMap = [],
-        $level = Level::Debug,
+        $level = Logger::DEBUG,
         bool $bubble = true
     ) {
         $this->handler = $handler;
@@ -75,15 +87,18 @@ class OverflowHandler extends AbstractHandler implements FormattableHandlerInter
      * Unless the bubbling is interrupted (by returning true), the Logger class will keep on
      * calling further handlers in the stack with a given log record.
      *
-     * @inheritDoc
+     * @param array $record The record to handle
+     *
+     * @return Boolean true means that this handler handled the record, and that bubbling is not permitted.
+     *                 false means the record was either not processed or that this handler allows bubbling.
      */
-    public function handle(LogRecord $record): bool
+    public function handle(array $record): bool
     {
-        if ($record->level->isLowerThan($this->level)) {
+        if ($record['level'] < $this->level) {
             return false;
         }
 
-        $level = $record->level->value;
+        $level = $record['level'];
 
         if (!isset($this->thresholdMap[$level])) {
             $this->thresholdMap[$level] = 0;
@@ -112,7 +127,7 @@ class OverflowHandler extends AbstractHandler implements FormattableHandlerInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setFormatter(FormatterInterface $formatter): HandlerInterface
     {
@@ -126,7 +141,7 @@ class OverflowHandler extends AbstractHandler implements FormattableHandlerInter
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function getFormatter(): FormatterInterface
     {

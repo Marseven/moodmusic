@@ -26,7 +26,7 @@ use Symfony\Component\HttpKernel\KernelEvents;
  */
 class SurrogateListener implements EventSubscriberInterface
 {
-    private ?SurrogateInterface $surrogate;
+    private $surrogate;
 
     public function __construct(SurrogateInterface $surrogate = null)
     {
@@ -38,7 +38,7 @@ class SurrogateListener implements EventSubscriberInterface
      */
     public function onKernelResponse(ResponseEvent $event)
     {
-        if (!$event->isMainRequest()) {
+        if (!$event->isMasterRequest()) {
             return;
         }
 

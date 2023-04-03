@@ -2,10 +2,8 @@
 declare(strict_types=1);
 namespace ParagonIE\ConstantTime;
 
-use TypeError;
-
 /**
- *  Copyright (c) 2016 - 2022 Paragon Initiative Enterprises.
+ *  Copyright (c) 2016 - 2018 Paragon Initiative Enterprises.
  *  Copyright (c) 2014 Steve "Sc00bz" Thomas (steve at tobtu dot com)
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -48,8 +46,6 @@ abstract class Binary
     public static function safeStrlen(string $str): int
     {
         if (\function_exists('mb_strlen')) {
-            // mb_strlen in PHP 7.x can return false.
-            /** @psalm-suppress RedundantCast */
             return (int) \mb_strlen($str, '8bit');
         } else {
             return \strlen($str);
@@ -64,10 +60,9 @@ abstract class Binary
      * @staticvar boolean $exists
      * @param string $str
      * @param int $start
-     * @param ?int $length
+     * @param int $length
      * @return string
-     *
-     * @throws TypeError
+     * @throws \TypeError
      */
     public static function safeSubstr(
         string $str,

@@ -1,16 +1,18 @@
 <?php
 
-namespace {{ namespace }};
+namespace DummyNamespace;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\InteractsWithQueue;
 
-class {{ class }} implements ShouldQueue
+class DummyClass implements ShouldQueue
 {
     use InteractsWithQueue;
 
     /**
      * Create the event listener.
+     *
+     * @return void
      */
     public function __construct()
     {
@@ -19,8 +21,11 @@ class {{ class }} implements ShouldQueue
 
     /**
      * Handle the event.
+     *
+     * @param  object  $event
+     * @return void
      */
-    public function handle(object $event): void
+    public function handle($event)
     {
         //
     }

@@ -2,9 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Relations\Concerns;
 
-use BackedEnum;
 use Doctrine\Instantiator\Exception\InvalidArgumentException;
-use UnitEnum;
 
 trait InteractsWithDictionary
 {
@@ -21,10 +19,6 @@ trait InteractsWithDictionary
         if (is_object($attribute)) {
             if (method_exists($attribute, '__toString')) {
                 return $attribute->__toString();
-            }
-
-            if ($attribute instanceof UnitEnum) {
-                return $attribute instanceof BackedEnum ? $attribute->value : $attribute->name;
             }
 
             throw new InvalidArgumentException('Model attribute value is an object but does not have a __toString method.');

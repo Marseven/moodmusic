@@ -22,8 +22,10 @@ class NativeCalculator extends Calculator
      * For addition, it is assumed that an extra digit can hold a carry (1) without overflowing.
      * Example: 32-bit: max number 1,999,999,999 (9 digits + carry)
      *          64-bit: max number 1,999,999,999,999,999,999 (18 digits + carry)
+     *
+     * @var int
      */
-    private int $maxDigits;
+    private $maxDigits;
 
     /**
      * Class constructor.
@@ -608,7 +610,7 @@ class NativeCalculator extends Calculator
      * @param string $a The first operand.
      * @param string $b The second operand.
      *
-     * @return array{string, string, int}
+     * @return array{0: string, 1: string, 2: int}
      */
     private function pad(string $a, string $b) : array
     {

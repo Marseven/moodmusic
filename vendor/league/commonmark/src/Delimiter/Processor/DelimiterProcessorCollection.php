@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,18 +17,12 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Delimiter\Processor;
 
-use League\CommonMark\Exception\InvalidArgumentException;
-
 final class DelimiterProcessorCollection implements DelimiterProcessorCollectionInterface
 {
-    /**
-     * @var array<string,DelimiterProcessorInterface>|DelimiterProcessorInterface[]
-     *
-     * @psalm-readonly-allow-private-mutation
-     */
-    private array $processorsByChar = [];
+    /** @var array<string,DelimiterProcessorInterface>|DelimiterProcessorInterface[] */
+    private $processorsByChar = [];
 
-    public function add(DelimiterProcessorInterface $processor): void
+    public function add(DelimiterProcessorInterface $processor)
     {
         $opening = $processor->getOpeningCharacter();
         $closing = $processor->getClosingCharacter();
@@ -53,9 +45,6 @@ final class DelimiterProcessorCollection implements DelimiterProcessorCollection
         return $this->processorsByChar[$char] ?? null;
     }
 
-    /**
-     * @return string[]
-     */
     public function getDelimiterCharacters(): array
     {
         return \array_keys($this->processorsByChar);
@@ -64,7 +53,7 @@ final class DelimiterProcessorCollection implements DelimiterProcessorCollection
     private function addDelimiterProcessorForChar(string $delimiterChar, DelimiterProcessorInterface $processor): void
     {
         if (isset($this->processorsByChar[$delimiterChar])) {
-            throw new InvalidArgumentException(\sprintf('Delim processor for character "%s" already exists', $processor->getOpeningCharacter()));
+            throw new \InvalidArgumentException(\sprintf('Delim processor for character "%s" already exists', $processor->getOpeningCharacter()));
         }
 
         $this->processorsByChar[$delimiterChar] = $processor;
@@ -80,10 +69,5 @@ final class DelimiterProcessorCollection implements DelimiterProcessorCollection
 
         $s->add($new);
         $this->processorsByChar[$opening] = $s;
-    }
-
-    public function count(): int
-    {
-        return \count($this->processorsByChar);
     }
 }

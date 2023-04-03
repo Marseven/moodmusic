@@ -12,7 +12,6 @@
 namespace Monolog\Processor;
 
 use Monolog\ResettableInterface;
-use Monolog\LogRecord;
 
 /**
  * Adds a unique identifier into records
@@ -21,12 +20,8 @@ use Monolog\LogRecord;
  */
 class UidProcessor implements ProcessorInterface, ResettableInterface
 {
-    /** @var non-empty-string */
-    private string $uid;
+    private $uid;
 
-    /**
-     * @param int<1, 32> $length
-     */
     public function __construct(int $length = 7)
     {
         if ($length > 32 || $length < 1) {
@@ -36,12 +31,9 @@ class UidProcessor implements ProcessorInterface, ResettableInterface
         $this->uid = $this->generateUid($length);
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function __invoke(LogRecord $record): LogRecord
+    public function __invoke(array $record): array
     {
-        $record->extra['uid'] = $this->uid;
+        $record['extra']['uid'] = $this->uid;
 
         return $record;
     }
@@ -51,15 +43,11 @@ class UidProcessor implements ProcessorInterface, ResettableInterface
         return $this->uid;
     }
 
-    public function reset(): void
+    public function reset()
     {
         $this->uid = $this->generateUid(strlen($this->uid));
     }
 
-    /**
-     * @param  positive-int     $length
-     * @return non-empty-string
-     */
     private function generateUid(int $length): string
     {
         return substr(bin2hex(random_bytes((int) ceil($length / 2))), 0, $length);

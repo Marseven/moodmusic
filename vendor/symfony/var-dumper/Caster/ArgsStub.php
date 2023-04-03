@@ -20,7 +20,7 @@ use Symfony\Component\VarDumper\Cloner\Stub;
  */
 class ArgsStub extends EnumStub
 {
-    private static array $parameters = [];
+    private static $parameters = [];
 
     public function __construct(array $args, string $function, ?string $class)
     {
@@ -28,7 +28,7 @@ class ArgsStub extends EnumStub
 
         $values = [];
         foreach ($args as $k => $v) {
-            $values[$k] = !\is_scalar($v) && !$v instanceof Stub ? new CutStub($v) : $v;
+            $values[$k] = !is_scalar($v) && !$v instanceof Stub ? new CutStub($v) : $v;
         }
         if (null === $params) {
             parent::__construct($values, false);
@@ -57,7 +57,7 @@ class ArgsStub extends EnumStub
 
         try {
             $r = null !== $class ? new \ReflectionMethod($class, $function) : new \ReflectionFunction($function);
-        } catch (\ReflectionException) {
+        } catch (\ReflectionException $e) {
             return [null, null];
         }
 

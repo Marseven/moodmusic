@@ -24,19 +24,25 @@ interface SessionStorageInterface
     /**
      * Starts the session.
      *
+     * @return bool True if started
+     *
      * @throws \RuntimeException if something goes wrong starting the session
      */
-    public function start(): bool;
+    public function start();
 
     /**
      * Checks if the session is started.
+     *
+     * @return bool True if started, false otherwise
      */
-    public function isStarted(): bool;
+    public function isStarted();
 
     /**
      * Returns the session ID.
+     *
+     * @return string The session ID or empty
      */
-    public function getId(): string;
+    public function getId();
 
     /**
      * Sets the session ID.
@@ -45,8 +51,10 @@ interface SessionStorageInterface
 
     /**
      * Returns the session name.
+     *
+     * @return string The session name
      */
-    public function getName(): string;
+    public function getName();
 
     /**
      * Sets the session name.
@@ -72,15 +80,17 @@ interface SessionStorageInterface
      * Otherwise session data could get lost again for concurrent requests with the
      * new ID. One result could be that you get logged out after just logging in.
      *
-     * @param bool     $destroy  Destroy session when regenerating?
-     * @param int|null $lifetime Sets the cookie lifetime for the session cookie. A null value
-     *                           will leave the system settings unchanged, 0 sets the cookie
-     *                           to expire with browser session. Time is in seconds, and is
-     *                           not a Unix timestamp.
+     * @param bool $destroy  Destroy session when regenerating?
+     * @param int  $lifetime Sets the cookie lifetime for the session cookie. A null value
+     *                       will leave the system settings unchanged, 0 sets the cookie
+     *                       to expire with browser session. Time is in seconds, and is
+     *                       not a Unix timestamp.
+     *
+     * @return bool True if session regenerated, false if error
      *
      * @throws \RuntimeException If an error occurs while regenerating this storage
      */
-    public function regenerate(bool $destroy = false, int $lifetime = null): bool;
+    public function regenerate(bool $destroy = false, int $lifetime = null);
 
     /**
      * Force the session to be saved and closed.
@@ -103,14 +113,19 @@ interface SessionStorageInterface
     /**
      * Gets a SessionBagInterface by name.
      *
+     * @return SessionBagInterface
+     *
      * @throws \InvalidArgumentException If the bag does not exist
      */
-    public function getBag(string $name): SessionBagInterface;
+    public function getBag(string $name);
 
     /**
      * Registers a SessionBagInterface for use.
      */
     public function registerBag(SessionBagInterface $bag);
 
-    public function getMetadataBag(): MetadataBag;
+    /**
+     * @return MetadataBag
+     */
+    public function getMetadataBag();
 }

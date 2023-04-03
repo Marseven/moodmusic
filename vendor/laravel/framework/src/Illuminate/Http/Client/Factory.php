@@ -3,29 +3,56 @@
 namespace Illuminate\Http\Client;
 
 use Closure;
-use GuzzleHttp\Promise\PromiseInterface;
 use GuzzleHttp\Psr7\Response as Psr7Response;
-use GuzzleHttp\TransferStats;
-use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use PHPUnit\Framework\Assert as PHPUnit;
 
 /**
- * @mixin \Illuminate\Http\Client\PendingRequest
+ * @method \Illuminate\Http\Client\PendingRequest accept(string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest acceptJson()
+ * @method \Illuminate\Http\Client\PendingRequest asForm()
+ * @method \Illuminate\Http\Client\PendingRequest asJson()
+ * @method \Illuminate\Http\Client\PendingRequest asMultipart()
+ * @method \Illuminate\Http\Client\PendingRequest async()
+ * @method \Illuminate\Http\Client\PendingRequest attach(string|array $name, string $contents = '', string|null $filename = null, array $headers = [])
+ * @method \Illuminate\Http\Client\PendingRequest baseUrl(string $url)
+ * @method \Illuminate\Http\Client\PendingRequest beforeSending(callable $callback)
+ * @method \Illuminate\Http\Client\PendingRequest bodyFormat(string $format)
+ * @method \Illuminate\Http\Client\PendingRequest contentType(string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest dd()
+ * @method \Illuminate\Http\Client\PendingRequest dump()
+ * @method \Illuminate\Http\Client\PendingRequest retry(int $times, int $sleep = 0)
+ * @method \Illuminate\Http\Client\PendingRequest sink(string|resource $to)
+ * @method \Illuminate\Http\Client\PendingRequest stub(callable $callback)
+ * @method \Illuminate\Http\Client\PendingRequest timeout(int $seconds)
+ * @method \Illuminate\Http\Client\PendingRequest withBasicAuth(string $username, string $password)
+ * @method \Illuminate\Http\Client\PendingRequest withBody(resource|string $content, string $contentType)
+ * @method \Illuminate\Http\Client\PendingRequest withCookies(array $cookies, string $domain)
+ * @method \Illuminate\Http\Client\PendingRequest withDigestAuth(string $username, string $password)
+ * @method \Illuminate\Http\Client\PendingRequest withHeaders(array $headers)
+ * @method \Illuminate\Http\Client\PendingRequest withMiddleware(callable $middleware)
+ * @method \Illuminate\Http\Client\PendingRequest withOptions(array $options)
+ * @method \Illuminate\Http\Client\PendingRequest withToken(string $token, string $type = 'Bearer')
+ * @method \Illuminate\Http\Client\PendingRequest withUserAgent(string $userAgent)
+ * @method \Illuminate\Http\Client\PendingRequest withoutRedirecting()
+ * @method \Illuminate\Http\Client\PendingRequest withoutVerifying()
+ * @method array pool(callable $callback)
+ * @method \Illuminate\Http\Client\Response delete(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response get(string $url, array|string|null $query = null)
+ * @method \Illuminate\Http\Client\Response head(string $url, array|string|null $query = null)
+ * @method \Illuminate\Http\Client\Response patch(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response post(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response put(string $url, array $data = [])
+ * @method \Illuminate\Http\Client\Response send(string $method, string $url, array $options = [])
+ *
+ * @see \Illuminate\Http\Client\PendingRequest
  */
 class Factory
 {
     use Macroable {
         __call as macroCall;
     }
-
-    /**
-     * The event dispatcher implementation.
-     *
-     * @var \Illuminate\Contracts\Events\Dispatcher|null
-     */
-    protected $dispatcher;
 
     /**
      * The stub callables that will handle requests.
@@ -56,29 +83,19 @@ class Factory
     protected $responseSequences = [];
 
     /**
-     * Indicates that an exception should be thrown if any request is not faked.
-     *
-     * @var bool
-     */
-    protected $preventStrayRequests = false;
-
-    /**
      * Create a new factory instance.
      *
-     * @param  \Illuminate\Contracts\Events\Dispatcher|null  $dispatcher
      * @return void
      */
-    public function __construct(Dispatcher $dispatcher = null)
+    public function __construct()
     {
-        $this->dispatcher = $dispatcher;
-
         $this->stubCallbacks = collect();
     }
 
     /**
      * Create a new response instance for use during stubbing.
      *
-     * @param  array|string|null  $body
+     * @param  array|string  $body
      * @param  int  $status
      * @param  array  $headers
      * @return \GuzzleHttp\Promise\PromiseInterface
@@ -93,7 +110,7 @@ class Factory
 
         $response = new Psr7Response($status, $headers, $body);
 
-        return class_exists(\GuzzleHttp\Promise\Create::class)
+        return class_exists(GuzzleHttp\Promise\Create::class)
             ? \GuzzleHttp\Promise\Create::promiseFor($response)
             : \GuzzleHttp\Promise\promise_for($response);
     }
@@ -112,14 +129,12 @@ class Factory
     /**
      * Register a stub callable that will intercept requests and be able to return stub responses.
      *
-     * @param  callable|array|null  $callback
+     * @param  callable|array  $callback
      * @return $this
      */
     public function fake($callback = null)
     {
         $this->record();
-
-        $this->recorded = [];
 
         if (is_null($callback)) {
             $callback = function () {
@@ -136,20 +151,11 @@ class Factory
         }
 
         $this->stubCallbacks = $this->stubCallbacks->merge(collect([
-            function ($request, $options) use ($callback) {
-                $response = $callback instanceof Closure
-                                ? $callback($request, $options)
-                                : $callback;
-
-                if ($response instanceof PromiseInterface) {
-                    $options['on_stats'](new TransferStats(
-                        $request->toPsrRequest(),
-                        $response->wait(),
-                    ));
-                }
-
-                return $response;
-            },
+            $callback instanceof Closure
+                    ? $callback
+                    : function () use ($callback) {
+                        return $callback;
+                    },
         ]));
 
         return $this;
@@ -186,29 +192,6 @@ class Factory
                         ? $callback($request, $options)
                         : $callback;
         });
-    }
-
-    /**
-     * Indicate that an exception should be thrown if any request is not faked.
-     *
-     * @param  bool  $prevent
-     * @return $this
-     */
-    public function preventStrayRequests($prevent = true)
-    {
-        $this->preventStrayRequests = $prevent;
-
-        return $this;
-    }
-
-    /**
-     * Indicate that an exception should not be thrown if any request is not faked.
-     *
-     * @return $this
-     */
-    public function allowStrayRequests()
-    {
-        return $this->preventStrayRequests(false);
     }
 
     /**
@@ -358,16 +341,6 @@ class Factory
     }
 
     /**
-     * Get the current event dispatcher implementation.
-     *
-     * @return \Illuminate\Contracts\Events\Dispatcher|null
-     */
-    public function getDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
      * Execute a method against a new pending request instance.
      *
      * @param  string  $method
@@ -381,7 +354,7 @@ class Factory
         }
 
         return tap($this->newPendingRequest(), function ($request) {
-            $request->stub($this->stubCallbacks)->preventStrayRequests($this->preventStrayRequests);
+            $request->stub($this->stubCallbacks);
         })->{$method}(...$parameters);
     }
 }

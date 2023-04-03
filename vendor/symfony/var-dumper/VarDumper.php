@@ -32,12 +32,9 @@ require_once __DIR__.'/Resources/functions/dump.php';
  */
 class VarDumper
 {
-    /**
-     * @var callable|null
-     */
     private static $handler;
 
-    public static function dump(mixed $var)
+    public static function dump($var)
     {
         if (null === self::$handler) {
             self::register();
@@ -46,11 +43,8 @@ class VarDumper
         return (self::$handler)($var);
     }
 
-    public static function setHandler(callable $callable = null): ?callable
+    public static function setHandler(callable $callable = null)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/var-dumper', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $prevHandler = self::$handler;
 
         // Prevent replacing the handler with expected format as soon as the env var was set:
@@ -77,7 +71,7 @@ class VarDumper
                 $dumper = new CliDumper();
                 break;
             case 'server' === $format:
-            case $format && 'tcp' === parse_url($format, \PHP_URL_SCHEME):
+            case 'tcp' === parse_url($format, \PHP_URL_SCHEME):
                 $host = 'server' === $format ? $_SERVER['VAR_DUMPER_SERVER'] ?? '127.0.0.1:9912' : $format;
                 $dumper = \in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) ? new CliDumper() : new HtmlDumper();
                 $dumper = new ServerDumper($host, $dumper, self::getDefaultContextProviders());
@@ -99,7 +93,7 @@ class VarDumper
     {
         $contextProviders = [];
 
-        if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && class_exists(Request::class)) {
+        if (!\in_array(\PHP_SAPI, ['cli', 'phpdbg'], true) && (class_exists(Request::class))) {
             $requestStack = new RequestStack();
             $requestStack->push(Request::createFromGlobals());
             $contextProviders['request'] = new RequestContextProvider($requestStack);

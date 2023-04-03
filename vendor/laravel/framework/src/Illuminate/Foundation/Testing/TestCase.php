@@ -2,16 +2,14 @@
 
 namespace Illuminate\Foundation\Testing;
 
+use Carbon\Carbon;
 use Carbon\CarbonImmutable;
 use Illuminate\Console\Application as Artisan;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Foundation\Bootstrap\HandleExceptions;
 use Illuminate\Queue\Queue;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Facades\ParallelTesting;
 use Illuminate\Support\Str;
-use Illuminate\View\Component;
 use Mockery;
 use Mockery\Exception\InvalidCountException;
 use PHPUnit\Framework\TestCase as BaseTestCase;
@@ -24,16 +22,16 @@ abstract class TestCase extends BaseTestCase
         Concerns\InteractsWithAuthentication,
         Concerns\InteractsWithConsole,
         Concerns\InteractsWithDatabase,
-        Concerns\InteractsWithDeprecationHandling,
         Concerns\InteractsWithExceptionHandling,
         Concerns\InteractsWithSession,
         Concerns\InteractsWithTime,
-        Concerns\InteractsWithViews;
+        Concerns\InteractsWithViews,
+        Concerns\MocksApplicationServices;
 
     /**
      * The Illuminate application instance.
      *
-     * @var \Illuminate\Foundation\Application
+     * @var \Illuminate\Contracts\Foundation\Application
      */
     protected $app;
 
@@ -81,8 +79,6 @@ abstract class TestCase extends BaseTestCase
      */
     protected function setUp(): void
     {
-        static::$latestResponse = null;
-
         Facade::clearResolvedInstances();
 
         if (! $this->app) {
@@ -129,10 +125,6 @@ abstract class TestCase extends BaseTestCase
             $this->runDatabaseMigrations();
         }
 
-        if (isset($uses[DatabaseTruncation::class])) {
-            $this->truncateDatabaseTables();
-        }
-
         if (isset($uses[DatabaseTransactions::class])) {
             $this->beginDatabaseTransaction();
         }
@@ -149,37 +141,7 @@ abstract class TestCase extends BaseTestCase
             $this->setUpFaker();
         }
 
-        foreach ($uses as $trait) {
-            if (method_exists($this, $method = 'setUp'.class_basename($trait))) {
-                $this->{$method}();
-            }
-
-            if (method_exists($this, $method = 'tearDown'.class_basename($trait))) {
-                $this->beforeApplicationDestroyed(fn () => $this->{$method}());
-            }
-        }
-
         return $uses;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function runTest(): mixed
-    {
-        $result = null;
-
-        try {
-            $result = parent::runTest();
-        } catch (Throwable $e) {
-            if (! is_null(static::$latestResponse)) {
-                static::$latestResponse->transformNotSuccessfulException($e);
-            }
-
-            throw $e;
-        }
-
-        return $result;
     }
 
     /**
@@ -236,40 +198,12 @@ abstract class TestCase extends BaseTestCase
         $this->afterApplicationCreatedCallbacks = [];
         $this->beforeApplicationDestroyedCallbacks = [];
 
-        $this->originalExceptionHandler = null;
-        $this->originalDeprecationHandler = null;
-
         Artisan::forgetBootstrappers();
-        Component::flushCache();
-        Component::forgetComponentsResolver();
-        Component::forgetFactory();
+
         Queue::createPayloadUsing(null);
-        HandleExceptions::forgetApp();
 
         if ($this->callbackException) {
             throw $this->callbackException;
-        }
-    }
-
-    /**
-     * Clean up the testing environment before the next test case.
-     *
-     * @return void
-     */
-    public static function tearDownAfterClass(): void
-    {
-        static::$latestResponse = null;
-
-        foreach ([
-            \PHPUnit\Util\Annotation\Registry::class,
-            \PHPUnit\Metadata\Annotation\Parser\Registry::class,
-        ] as $class) {
-            if (class_exists($class)) {
-                (function () {
-                    $this->classDocBlocks = [];
-                    $this->methodDocBlocks = [];
-                })->call($class::getInstance());
-            }
         }
     }
 

@@ -11,43 +11,42 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Level;
+use Monolog\Logger;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\LogmaticFormatter;
-use Monolog\LogRecord;
 
 /**
  * @author Julien Breux <julien.breux@gmail.com>
  */
 class LogmaticHandler extends SocketHandler
 {
-    private string $logToken;
-
-    private string $hostname;
-
-    private string $appName;
+    /**
+     * @var string
+     */
+    private $logToken;
 
     /**
-     * @param string $token    Log token supplied by Logmatic.
-     * @param string $hostname Host name supplied by Logmatic.
-     * @param string $appName  Application name supplied by Logmatic.
-     * @param bool   $useSSL   Whether or not SSL encryption should be used.
+     * @var string
+     */
+    private $hostname;
+
+    /**
+     * @var string
+     */
+    private $appname;
+
+    /**
+     * @param string     $token    Log token supplied by Logmatic.
+     * @param string     $hostname Host name supplied by Logmatic.
+     * @param string     $appname  Application name supplied by Logmatic.
+     * @param bool       $useSSL   Whether or not SSL encryption should be used.
+     * @param int|string $level    The minimum logging level to trigger this handler.
+     * @param bool       $bubble   Whether or not messages that are handled should bubble up the stack.
      *
      * @throws MissingExtensionException If SSL encryption is set to true and OpenSSL is missing
      */
-    public function __construct(
-        string $token,
-        string $hostname = '',
-        string $appName = '',
-        bool $useSSL = true,
-        $level = Level::Debug,
-        bool $bubble = true,
-        bool $persistent = false,
-        float $timeout = 0.0,
-        float $writingTimeout = 10.0,
-        ?float $connectionTimeout = null,
-        ?int $chunkSize = null
-    ) {
+    public function __construct(string $token, string $hostname = '', string $appname = '', bool $useSSL = true, $level = Logger::DEBUG, bool $bubble = true)
+    {
         if ($useSSL && !extension_loaded('openssl')) {
             throw new MissingExtensionException('The OpenSSL PHP extension is required to use SSL encrypted connection for LogmaticHandler');
         }
@@ -55,42 +54,33 @@ class LogmaticHandler extends SocketHandler
         $endpoint = $useSSL ? 'ssl://api.logmatic.io:10515' : 'api.logmatic.io:10514';
         $endpoint .= '/v1/';
 
-        parent::__construct(
-            $endpoint,
-            $level,
-            $bubble,
-            $persistent,
-            $timeout,
-            $writingTimeout,
-            $connectionTimeout,
-            $chunkSize
-        );
+        parent::__construct($endpoint, $level, $bubble);
 
         $this->logToken = $token;
         $this->hostname = $hostname;
-        $this->appName  = $appName;
+        $this->appname  = $appname;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function generateDataStream(LogRecord $record): string
+    protected function generateDataStream(array $record): string
     {
-        return $this->logToken . ' ' . $record->formatted;
+        return $this->logToken . ' ' . $record['formatted'];
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     protected function getDefaultFormatter(): FormatterInterface
     {
         $formatter = new LogmaticFormatter();
 
-        if ($this->hostname !== '') {
+        if (!empty($this->hostname)) {
             $formatter->setHostname($this->hostname);
         }
-        if ($this->appName !== '') {
-            $formatter->setAppName($this->appName);
+        if (!empty($this->appname)) {
+            $formatter->setAppname($this->appname);
         }
 
         return $formatter;

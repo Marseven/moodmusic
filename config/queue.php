@@ -13,7 +13,7 @@ return [
     |
     */
 
-    'default' => env('QUEUE_CONNECTION', 'sync'),
+    'default' => env('QUEUE_DRIVER', 'sync'),
 
     /*
     |--------------------------------------------------------------------------
@@ -53,12 +53,12 @@ return [
 
         'sqs' => [
             'driver' => 'sqs',
-            'key' => env('AWS_ACCESS_KEY_ID'),
-            'secret' => env('AWS_SECRET_ACCESS_KEY'),
-            'prefix' => env('SQS_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
-            'queue' => env('SQS_QUEUE', 'default'),
-            'suffix' => env('SQS_SUFFIX'),
-            'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
+            'key' => env('SQS_QUEUE_KEY'),
+            'secret' => env('SQS_QUEUE_SECRET'),
+            'prefix' => env('SQS_QUEUE_PREFIX', 'https://sqs.us-east-1.amazonaws.com/your-account-id'),
+            'queue' => env('SQS_QUEUE_NAME', 'your-queue-name'),
+            'suffix' => env('SQS_QUEUE_SUFFIX'),
+            'region' => env('SQS_QUEUE_REGION', 'us-east-1'),
             'after_commit' => false,
         ],
 

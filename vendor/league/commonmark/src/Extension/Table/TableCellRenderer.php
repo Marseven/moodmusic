@@ -15,75 +15,25 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Extension\Table;
 
-use League\CommonMark\Extension\Attributes\Util\AttributesHelper;
-use League\CommonMark\Node\Node;
-use League\CommonMark\Renderer\ChildNodeRendererInterface;
-use League\CommonMark\Renderer\NodeRendererInterface;
-use League\CommonMark\Util\HtmlElement;
-use League\CommonMark\Xml\XmlNodeRendererInterface;
+use League\CommonMark\Block\Element\AbstractBlock;
+use League\CommonMark\Block\Renderer\BlockRendererInterface;
+use League\CommonMark\ElementRendererInterface;
+use League\CommonMark\HtmlElement;
 
-final class TableCellRenderer implements NodeRendererInterface, XmlNodeRendererInterface
+final class TableCellRenderer implements BlockRendererInterface
 {
-    private const DEFAULT_ATTRIBUTES = [
-        TableCell::ALIGN_LEFT   => ['align' => 'left'],
-        TableCell::ALIGN_CENTER => ['align' => 'center'],
-        TableCell::ALIGN_RIGHT  => ['align' => 'right'],
-    ];
-
-    /** @var array<TableCell::ALIGN_*, array<string, string|string[]|bool>> */
-    private array $alignmentAttributes;
-
-    /**
-     * @param array<TableCell::ALIGN_*, array<string, string|string[]|bool>> $alignmentAttributes
-     */
-    public function __construct(array $alignmentAttributes = self::DEFAULT_ATTRIBUTES)
+    public function render(AbstractBlock $block, ElementRendererInterface $htmlRenderer, bool $inTightList = false)
     {
-        $this->alignmentAttributes = $alignmentAttributes;
-    }
-
-    /**
-     * @param TableCell $node
-     *
-     * {@inheritDoc}
-     *
-     * @psalm-suppress MoreSpecificImplementedParamType
-     */
-    public function render(Node $node, ChildNodeRendererInterface $childRenderer): \Stringable
-    {
-        TableCell::assertInstanceOf($node);
-
-        $attrs = $node->data->get('attributes');
-        if (($alignment = $node->getAlign()) !== null) {
-            $attrs = AttributesHelper::mergeAttributes($attrs, $this->alignmentAttributes[$alignment]);
+        if (!$block instanceof TableCell) {
+            throw new \InvalidArgumentException('Incompatible block type: ' . get_class($block));
         }
 
-        $tag = $node->getType() === TableCell::TYPE_HEADER ? 'th' : 'td';
+        $attrs = $block->getData('attributes', []);
 
-        return new HtmlElement($tag, $attrs, $childRenderer->renderNodes($node->children()));
-    }
-
-    public function getXmlTagName(Node $node): string
-    {
-        return 'table_cell';
-    }
-
-    /**
-     * @param TableCell $node
-     *
-     * @return array<string, scalar>
-     *
-     * @psalm-suppress MoreSpecificImplementedParamType
-     */
-    public function getXmlAttributes(Node $node): array
-    {
-        TableCell::assertInstanceOf($node);
-
-        $ret = ['type' => $node->getType()];
-
-        if (($align = $node->getAlign()) !== null) {
-            $ret['align'] = $align;
+        if ($block->align !== null) {
+            $attrs['align'] = $block->align;
         }
 
-        return $ret;
+        return new HtmlElement($block->type, $attrs, $htmlRenderer->renderInlines($block->children()));
     }
 }

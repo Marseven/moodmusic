@@ -98,11 +98,8 @@ abstract class HasOneOrMany extends Relation
     {
         $whereIn = $this->whereInMethod($this->parent, $this->localKey);
 
-        $this->whereInEager(
-            $whereIn,
-            $this->foreignKey,
-            $this->getKeys($models, $this->localKey),
-            $this->getRelationQuery()
+        $this->getRelationQuery()->{$whereIn}(
+            $this->foreignKey, $this->getKeys($models, $this->localKey)
         );
     }
 
@@ -217,7 +214,7 @@ abstract class HasOneOrMany extends Relation
     public function firstOrNew(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->related->newInstance(array_merge($attributes, $values));
+            $instance = $this->related->newInstance($attributes + $values);
 
             $this->setForeignAttributesForCreate($instance);
         }
@@ -235,7 +232,7 @@ abstract class HasOneOrMany extends Relation
     public function firstOrCreate(array $attributes = [], array $values = [])
     {
         if (is_null($instance = $this->where($attributes)->first())) {
-            $instance = $this->create(array_merge($attributes, $values));
+            $instance = $this->create($attributes + $values);
         }
 
         return $instance;
@@ -271,19 +268,6 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Attach a model instance without raising any events to the parent model.
-     *
-     * @param  \Illuminate\Database\Eloquent\Model  $model
-     * @return \Illuminate\Database\Eloquent\Model|false
-     */
-    public function saveQuietly(Model $model)
-    {
-        return Model::withoutEvents(function () use ($model) {
-            return $this->save($model);
-        });
-    }
-
-    /**
      * Attach a collection of models to the parent instance.
      *
      * @param  iterable  $models
@@ -296,19 +280,6 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $models;
-    }
-
-    /**
-     * Attach a collection of models to the parent instance without raising any events to the parent model.
-     *
-     * @param  iterable  $models
-     * @return iterable
-     */
-    public function saveManyQuietly($models)
-    {
-        return Model::withoutEvents(function () use ($models) {
-            return $this->saveMany($models);
-        });
     }
 
     /**
@@ -327,30 +298,6 @@ abstract class HasOneOrMany extends Relation
     }
 
     /**
-     * Create a new instance of the related model without raising any events to the parent model.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function createQuietly(array $attributes = [])
-    {
-        return Model::withoutEvents(fn () => $this->create($attributes));
-    }
-
-    /**
-     * Create a new instance of the related model. Allow mass-assignment.
-     *
-     * @param  array  $attributes
-     * @return \Illuminate\Database\Eloquent\Model
-     */
-    public function forceCreate(array $attributes = [])
-    {
-        $attributes[$this->getForeignKeyName()] = $this->getParentKey();
-
-        return $this->related->forceCreate($attributes);
-    }
-
-    /**
      * Create a Collection of new instances of the related model.
      *
      * @param  iterable  $records
@@ -365,17 +312,6 @@ abstract class HasOneOrMany extends Relation
         }
 
         return $instances;
-    }
-
-    /**
-     * Create a Collection of new instances of the related model without raising any events to the parent model.
-     *
-     * @param  iterable  $records
-     * @return \Illuminate\Database\Eloquent\Collection
-     */
-    public function createManyQuietly(iterable $records)
-    {
-        return Model::withoutEvents(fn () => $this->createMany($records));
     }
 
     /**

@@ -34,8 +34,10 @@ abstract class Calculator
 
     /**
      * The Calculator instance in use.
+     *
+     * @var Calculator|null
      */
-    private static ?Calculator $instance = null;
+    private static $instance;
 
     /**
      * Sets the Calculator instance to use.
@@ -97,7 +99,7 @@ abstract class Calculator
      * @param string $a The first operand.
      * @param string $b The second operand.
      *
-     * @return array{bool, bool, string, string} Whether $a and $b are negative, followed by their digits.
+     * @return array{0: bool, 1: bool, 2: string, 3: string} Whether $a and $b are negative, followed by their digits.
      */
     final protected function init(string $a, string $b) : array
     {
@@ -232,7 +234,7 @@ abstract class Calculator
      * @param string $a The dividend.
      * @param string $b The divisor, must not be zero.
      *
-     * @return array{string, string} An array containing the quotient and remainder.
+     * @return string[] An array containing the quotient and remainder.
      */
     abstract public function divQR(string $a, string $b) : array;
 
@@ -281,7 +283,9 @@ abstract class Calculator
             $modVal = $this->mod($x, $m);
         }
 
-        [$g, $x] = $this->gcdExtended($modVal, $m);
+        $x = '0';
+        $y = '0';
+        $g = $this->gcdExtended($modVal, $m, $x, $y);
 
         if ($g !== '1') {
             return null;
@@ -325,21 +329,24 @@ abstract class Calculator
         return $this->gcd($b, $this->divR($a, $b));
     }
 
-    /**
-     * @return array{string, string, string} GCD, X, Y
-     */
-    private function gcdExtended(string $a, string $b) : array
+    private function gcdExtended(string $a, string $b, string &$x, string &$y) : string
     {
         if ($a === '0') {
-            return [$b, '0', '1'];
+            $x = '0';
+            $y = '1';
+
+            return $b;
         }
 
-        [$gcd, $x1, $y1] = $this->gcdExtended($this->mod($b, $a), $a);
+        $x1 = '0';
+        $y1 = '0';
+
+        $gcd = $this->gcdExtended($this->mod($b, $a), $a, $x1, $y1);
 
         $x = $this->sub($y1, $this->mul($this->divQ($b, $a), $x1));
         $y = $x1;
 
-        return [$gcd, $x, $y];
+        return $gcd;
     }
 
     /**
@@ -486,8 +493,6 @@ abstract class Calculator
      *
      * @throws \InvalidArgumentException  If the rounding mode is invalid.
      * @throws RoundingNecessaryException If RoundingMode::UNNECESSARY is provided but rounding is necessary.
-     *
-     * @psalm-suppress ImpureFunctionCall
      */
     final public function divRound(string $a, string $b, int $roundingMode) : string
     {
@@ -611,9 +616,9 @@ abstract class Calculator
     /**
      * Performs a bitwise operation on a decimal number.
      *
-     * @param 'and'|'or'|'xor' $operator The operator to use.
-     * @param string           $a        The left operand.
-     * @param string           $b        The right operand.
+     * @param string $operator The operator to use, must be "and", "or" or "xor".
+     * @param string $a        The left operand.
+     * @param string $b        The right operand.
      *
      * @return string
      */
@@ -672,6 +677,9 @@ abstract class Calculator
     }
 
     /**
+     * @psalm-suppress InvalidOperand
+     * @see https://github.com/vimeo/psalm/issues/4456
+     *
      * @param string $number A positive, binary number.
      *
      * @return string

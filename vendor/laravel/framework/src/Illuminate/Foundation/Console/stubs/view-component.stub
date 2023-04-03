@@ -1,15 +1,15 @@
 <?php
 
-namespace {{ namespace }};
+namespace DummyNamespace;
 
-use Closure;
 use Illuminate\View\Component;
-use Illuminate\Contracts\View\View;
 
-class {{ class }} extends Component
+class DummyClass extends Component
 {
     /**
      * Create a new component instance.
+     *
+     * @return void
      */
     public function __construct()
     {
@@ -18,9 +18,11 @@ class {{ class }} extends Component
 
     /**
      * Get the view / contents that represent the component.
+     *
+     * @return \Illuminate\Contracts\View\View|\Closure|string
      */
-    public function render(): View|Closure|string
+    public function render()
     {
-        return {{ view }};
+        return DummyView;
     }
 }

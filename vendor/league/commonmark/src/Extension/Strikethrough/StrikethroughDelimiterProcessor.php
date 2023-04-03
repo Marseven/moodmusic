@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -15,7 +13,7 @@ namespace League\CommonMark\Extension\Strikethrough;
 
 use League\CommonMark\Delimiter\DelimiterInterface;
 use League\CommonMark\Delimiter\Processor\DelimiterProcessorInterface;
-use League\CommonMark\Node\Inline\AbstractStringContainer;
+use League\CommonMark\Inline\Element\AbstractStringContainer;
 
 final class StrikethroughDelimiterProcessor implements DelimiterProcessorInterface
 {
@@ -31,25 +29,19 @@ final class StrikethroughDelimiterProcessor implements DelimiterProcessorInterfa
 
     public function getMinLength(): int
     {
-        return 1;
+        return 2;
     }
 
     public function getDelimiterUse(DelimiterInterface $opener, DelimiterInterface $closer): int
     {
-        if ($opener->getLength() > 2 && $closer->getLength() > 2) {
-            return 0;
-        }
+        $min = \min($opener->getLength(), $closer->getLength());
 
-        if ($opener->getLength() !== $closer->getLength()) {
-            return 0;
-        }
-
-        return \min($opener->getLength(), $closer->getLength());
+        return $min >= 2 ? $min : 0;
     }
 
-    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse): void
+    public function process(AbstractStringContainer $opener, AbstractStringContainer $closer, int $delimiterUse)
     {
-        $strikethrough = new Strikethrough(\str_repeat('~', $delimiterUse));
+        $strikethrough = new Strikethrough();
 
         $tmp = $opener->next();
         while ($tmp !== null && $tmp !== $closer) {

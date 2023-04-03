@@ -25,13 +25,13 @@ use Symfony\Component\HttpFoundation\Response;
  *
  * @author Fabien Potencier <fabien@symfony.com>
  *
- * @method Request  getRequest()
- * @method Response getResponse()
+ * @method Request  getRequest()  A Request instance
+ * @method Response getResponse() A Response instance
  */
 class HttpKernelBrowser extends AbstractBrowser
 {
     protected $kernel;
-    private bool $catchExceptions = true;
+    private $catchExceptions = true;
 
     /**
      * @param array $server The server parameters (equivalent of $_SERVER)
@@ -54,13 +54,13 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * @param Request $request
+     * Makes a request.
      *
-     * @return Response
+     * @return Response A Response instance
      */
-    protected function doRequest(object $request)
+    protected function doRequest($request)
     {
-        $response = $this->kernel->handle($request, HttpKernelInterface::MAIN_REQUEST, $this->catchExceptions);
+        $response = $this->kernel->handle($request, HttpKernelInterface::MASTER_REQUEST, $this->catchExceptions);
 
         if ($this->kernel instanceof TerminableInterface) {
             $this->kernel->terminate($request, $response);
@@ -70,11 +70,11 @@ class HttpKernelBrowser extends AbstractBrowser
     }
 
     /**
-     * @param Request $request
+     * Returns the script to execute when the request must be insulated.
      *
      * @return string
      */
-    protected function getScript(object $request)
+    protected function getScript($request)
     {
         $kernel = var_export(serialize($this->kernel), true);
         $request = var_export(serialize($request), true);
@@ -83,7 +83,7 @@ class HttpKernelBrowser extends AbstractBrowser
 
         $requires = '';
         foreach (get_declared_classes() as $class) {
-            if (str_starts_with($class, 'ComposerAutoloaderInit')) {
+            if (0 === strpos($class, 'ComposerAutoloaderInit')) {
                 $r = new \ReflectionClass($class);
                 $file = \dirname($r->getFileName(), 2).'/autoload.php';
                 if (file_exists($file)) {
@@ -123,7 +123,12 @@ echo serialize($response);
 EOF;
     }
 
-    protected function filterRequest(DomRequest $request): Request
+    /**
+     * Converts the BrowserKit request to a HttpKernel request.
+     *
+     * @return Request A Request instance
+     */
+    protected function filterRequest(DomRequest $request)
     {
         $httpRequest = Request::create($request->getUri(), $request->getMethod(), $request->getParameters(), $request->getCookies(), $request->getFiles(), $server = $request->getServer(), $request->getContent());
         if (!isset($server['HTTP_ACCEPT'])) {
@@ -147,8 +152,10 @@ EOF;
      * an invalid UploadedFile is returned with an error set to UPLOAD_ERR_INI_SIZE.
      *
      * @see UploadedFile
+     *
+     * @return array An array with all uploaded files marked as already moved
      */
-    protected function filterFiles(array $files): array
+    protected function filterFiles(array $files)
     {
         $filtered = [];
         foreach ($files as $key => $value) {
@@ -179,9 +186,11 @@ EOF;
     }
 
     /**
-     * @param Response $response
+     * Converts the HttpKernel response to a BrowserKit response.
+     *
+     * @return DomResponse A DomResponse instance
      */
-    protected function filterResponse(object $response): DomResponse
+    protected function filterResponse($response)
     {
         // this is needed to support StreamedResponse
         ob_start();

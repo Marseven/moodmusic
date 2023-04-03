@@ -11,8 +11,7 @@
 
 namespace Monolog\Handler;
 
-use Monolog\Level;
-use Monolog\LogRecord;
+use Monolog\Logger;
 
 /**
  * Inspired on LogEntriesHandler.
@@ -22,27 +21,22 @@ use Monolog\LogRecord;
  */
 class InsightOpsHandler extends SocketHandler
 {
-    protected string $logToken;
+    /**
+     * @var string
+     */
+    protected $logToken;
 
     /**
-     * @param string $token  Log token supplied by InsightOps
-     * @param string $region Region where InsightOps account is hosted. Could be 'us' or 'eu'.
-     * @param bool   $useSSL Whether or not SSL encryption should be used
+     * @param string     $token  Log token supplied by InsightOps
+     * @param string     $region Region where InsightOps account is hosted. Could be 'us' or 'eu'.
+     * @param bool       $useSSL Whether or not SSL encryption should be used
+     * @param string|int $level  The minimum logging level to trigger this handler
+     * @param bool       $bubble Whether or not messages that are handled should bubble up the stack.
      *
      * @throws MissingExtensionException If SSL encryption is set to true and OpenSSL is missing
      */
-    public function __construct(
-        string $token,
-        string $region = 'us',
-        bool $useSSL = true,
-        $level = Level::Debug,
-        bool $bubble = true,
-        bool $persistent = false,
-        float $timeout = 0.0,
-        float $writingTimeout = 10.0,
-        ?float $connectionTimeout = null,
-        ?int $chunkSize = null
-    ) {
+    public function __construct(string $token, string $region = 'us', bool $useSSL = true, $level = Logger::DEBUG, bool $bubble = true)
+    {
         if ($useSSL && !extension_loaded('openssl')) {
             throw new MissingExtensionException('The OpenSSL PHP plugin is required to use SSL encrypted connection for InsightOpsHandler');
         }
@@ -51,24 +45,15 @@ class InsightOpsHandler extends SocketHandler
             ? 'ssl://' . $region . '.data.logs.insight.rapid7.com:443'
             : $region . '.data.logs.insight.rapid7.com:80';
 
-        parent::__construct(
-            $endpoint,
-            $level,
-            $bubble,
-            $persistent,
-            $timeout,
-            $writingTimeout,
-            $connectionTimeout,
-            $chunkSize
-        );
+        parent::__construct($endpoint, $level, $bubble);
         $this->logToken = $token;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function generateDataStream(LogRecord $record): string
+    protected function generateDataStream(array $record): string
     {
-        return $this->logToken . ' ' . $record->formatted;
+        return $this->logToken . ' ' . $record['formatted'];
     }
 }

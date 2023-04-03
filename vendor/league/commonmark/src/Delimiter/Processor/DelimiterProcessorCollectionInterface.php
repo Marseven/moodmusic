@@ -1,7 +1,5 @@
 <?php
 
-declare(strict_types=1);
-
 /*
  * This file is part of the league/commonmark package.
  *
@@ -19,21 +17,25 @@ declare(strict_types=1);
 
 namespace League\CommonMark\Delimiter\Processor;
 
-use League\CommonMark\Exception\InvalidArgumentException;
-
-interface DelimiterProcessorCollectionInterface extends \Countable
+interface DelimiterProcessorCollectionInterface
 {
     /**
      * Add the given delim processor to the collection
      *
      * @param DelimiterProcessorInterface $processor The delim processor to add
      *
-     * @throws InvalidArgumentException Exception will be thrown if attempting to add multiple processors for the same character
+     * @throws \InvalidArgumentException Exception will be thrown if attempting to add multiple processors for the same character
+     *
+     * @return void
      */
-    public function add(DelimiterProcessorInterface $processor): void;
+    public function add(DelimiterProcessorInterface $processor);
 
     /**
      * Returns the delim processor which handles the given character if one exists
+     *
+     * @param string $char
+     *
+     * @return DelimiterProcessorInterface|null
      */
     public function getDelimiterProcessor(string $char): ?DelimiterProcessorInterface;
 

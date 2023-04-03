@@ -22,7 +22,7 @@ use Symfony\Component\HttpKernel\Event\ControllerEvent;
 class RouterDataCollector extends DataCollector
 {
     /**
-     * @var \SplObjectStorage<Request, callable>
+     * @var \SplObjectStorage
      */
     protected $controllers;
 
@@ -32,6 +32,8 @@ class RouterDataCollector extends DataCollector
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @final
      */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
@@ -59,7 +61,7 @@ class RouterDataCollector extends DataCollector
         ];
     }
 
-    protected function guessRoute(Request $request, string|object|array $controller)
+    protected function guessRoute(Request $request, $controller)
     {
         return 'n/a';
     }
@@ -75,22 +77,31 @@ class RouterDataCollector extends DataCollector
     /**
      * @return bool Whether this request will result in a redirect
      */
-    public function getRedirect(): bool
+    public function getRedirect()
     {
         return $this->data['redirect'];
     }
 
-    public function getTargetUrl(): ?string
+    /**
+     * @return string|null The target URL
+     */
+    public function getTargetUrl()
     {
         return $this->data['url'];
     }
 
-    public function getTargetRoute(): ?string
+    /**
+     * @return string|null The target route
+     */
+    public function getTargetRoute()
     {
         return $this->data['route'];
     }
 
-    public function getName(): string
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
     {
         return 'router';
     }

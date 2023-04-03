@@ -3,9 +3,7 @@
 namespace Illuminate\Queue\Console;
 
 use Illuminate\Console\Command;
-use Symfony\Component\Console\Attribute\AsCommand;
 
-#[AsCommand(name: 'queue:forget')]
 class ForgetFailedCommand extends Command
 {
     /**
@@ -30,9 +28,9 @@ class ForgetFailedCommand extends Command
     public function handle()
     {
         if ($this->laravel['queue.failer']->forget($this->argument('id'))) {
-            $this->components->info('Failed job deleted successfully.');
+            $this->info('Failed job deleted successfully!');
         } else {
-            $this->components->error('No failed job matches the given ID.');
+            $this->error('No failed job matches the given ID.');
         }
     }
 }

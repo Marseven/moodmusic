@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2023 Justin Hileman
+ * (c) 2012-2020 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,7 +12,9 @@
 namespace Psy;
 
 use Psy\Exception\BreakException;
+use Psy\Exception\ErrorException;
 use Psy\Exception\ThrowUpException;
+use Psy\Exception\TypeErrorException;
 
 /**
  * The Psy Shell's execution loop scope.
@@ -31,7 +33,7 @@ class ExecutionLoopClosure extends ExecutionClosure
             // Restore execution scope variables
             \extract($__psysh__->getScopeVariables(false));
 
-            while (true) {
+            do {
                 $__psysh__->beforeLoop();
 
                 try {
@@ -58,6 +60,13 @@ class ExecutionLoopClosure extends ExecutionClosure
                         }
 
                         throw $_e;
+                    } catch (\Exception $_e) {
+                        // Clean up on our way out.
+                        if (\ob_get_level() > 0) {
+                            \ob_end_clean();
+                        }
+
+                        throw $_e;
                     } finally {
                         // Won't be needing this anymore
                         \restore_error_handler();
@@ -78,12 +87,16 @@ class ExecutionLoopClosure extends ExecutionClosure
                     $__psysh__->writeException($_e);
 
                     throw $_e;
-                } catch (\Throwable $_e) {
+                } catch (\TypeError $_e) {
+                    $__psysh__->writeException(TypeErrorException::fromTypeError($_e));
+                } catch (\Error $_e) {
+                    $__psysh__->writeException(ErrorException::fromError($_e));
+                } catch (\Exception $_e) {
                     $__psysh__->writeException($_e);
                 }
 
                 $__psysh__->afterLoop();
-            }
+            } while (true);
         });
     }
 }

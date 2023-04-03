@@ -11,8 +11,6 @@
 
 namespace Monolog\Processor;
 
-use Monolog\LogRecord;
-
 /**
  * Adds value of getmypid into records
  *
@@ -20,12 +18,9 @@ use Monolog\LogRecord;
  */
 class ProcessIdProcessor implements ProcessorInterface
 {
-    /**
-     * @inheritDoc
-     */
-    public function __invoke(LogRecord $record): LogRecord
+    public function __invoke(array $record): array
     {
-        $record->extra['process_id'] = getmypid();
+        $record['extra']['process_id'] = getmypid();
 
         return $record;
     }

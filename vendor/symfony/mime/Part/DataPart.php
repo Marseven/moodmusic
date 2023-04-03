@@ -13,67 +13,66 @@ namespace Symfony\Component\Mime\Part;
 
 use Symfony\Component\Mime\Exception\InvalidArgumentException;
 use Symfony\Component\Mime\Header\Headers;
+use Symfony\Component\Mime\MimeTypes;
 
 /**
  * @author Fabien Potencier <fabien@symfony.com>
  */
 class DataPart extends TextPart
 {
-    /** @internal */
-    protected $_parent;
+    private static $mimeTypes;
 
     private $filename;
     private $mediaType;
     private $cid;
+    private $handle;
 
     /**
-     * @param resource|string|File $body Use a File instance to defer loading the file until rendering
+     * @param resource|string $body
      */
     public function __construct($body, string $filename = null, string $contentType = null, string $encoding = null)
     {
-        unset($this->_parent);
-
-        if ($body instanceof File && !$filename) {
-            $filename = $body->getFilename();
+        if (null === $contentType) {
+            $contentType = 'application/octet-stream';
         }
-
-        $contentType ??= $body instanceof File ? $body->getContentType() : 'application/octet-stream';
         [$this->mediaType, $subtype] = explode('/', $contentType);
 
         parent::__construct($body, null, $subtype, $encoding);
 
-        if (null !== $filename) {
-            $this->filename = $filename;
-            $this->setName($filename);
-        }
+        $this->filename = $filename;
+        $this->setName($filename);
         $this->setDisposition('attachment');
     }
 
     public static function fromPath(string $path, string $name = null, string $contentType = null): self
     {
-        return new self(new File($path), $name, $contentType);
-    }
-
-    /**
-     * @return $this
-     */
-    public function asInline(): static
-    {
-        return $this->setDisposition('inline');
-    }
-
-    /**
-     * @return $this
-     */
-    public function setContentId(string $cid): static
-    {
-        if (!str_contains($cid, '@')) {
-            throw new InvalidArgumentException(sprintf('Invalid cid "%s".', $cid));
+        if (null === $contentType) {
+            $ext = strtolower(substr($path, strrpos($path, '.') + 1));
+            if (null === self::$mimeTypes) {
+                self::$mimeTypes = new MimeTypes();
+            }
+            $contentType = self::$mimeTypes->getMimeTypes($ext)[0] ?? 'application/octet-stream';
         }
 
-        $this->cid = $cid;
+        if (false === is_readable($path)) {
+            throw new InvalidArgumentException(sprintf('Path "%s" is not readable.', $path));
+        }
 
-        return $this;
+        if (false === $handle = @fopen($path, 'r', false)) {
+            throw new InvalidArgumentException(sprintf('Unable to open path "%s".', $path));
+        }
+        $p = new self($handle, $name ?: basename($path), $contentType);
+        $p->handle = $handle;
+
+        return $p;
+    }
+
+    /**
+     * @return $this
+     */
+    public function asInline()
+    {
+        return $this->setDisposition('inline');
     }
 
     public function getContentId(): string
@@ -116,22 +115,22 @@ class DataPart extends TextPart
         return $str;
     }
 
-    public function getFilename(): ?string
-    {
-        return $this->filename;
-    }
-
-    public function getContentType(): string
-    {
-        return implode('/', [$this->getMediaType(), $this->getMediaSubtype()]);
-    }
-
     private function generateContentId(): string
     {
         return bin2hex(random_bytes(16)).'@symfony';
     }
 
-    public function __sleep(): array
+    public function __destruct()
+    {
+        if (null !== $this->handle && \is_resource($this->handle)) {
+            fclose($this->handle);
+        }
+    }
+
+    /**
+     * @return array
+     */
+    public function __sleep()
     {
         // converts the body to a string
         parent::__sleep();
@@ -139,6 +138,7 @@ class DataPart extends TextPart
         $this->_parent = [];
         foreach (['body', 'charset', 'subtype', 'disposition', 'name', 'encoding'] as $name) {
             $r = new \ReflectionProperty(TextPart::class, $name);
+            $r->setAccessible(true);
             $this->_parent[$name] = $r->getValue($this);
         }
         $this->_headers = $this->getHeaders();
@@ -149,6 +149,7 @@ class DataPart extends TextPart
     public function __wakeup()
     {
         $r = new \ReflectionProperty(AbstractPart::class, 'headers');
+        $r->setAccessible(true);
         $r->setValue($this, $this->_headers);
         unset($this->_headers);
 
@@ -160,6 +161,7 @@ class DataPart extends TextPart
                 throw new \BadMethodCallException('Cannot unserialize '.__CLASS__);
             }
             $r = new \ReflectionProperty(TextPart::class, $name);
+            $r->setAccessible(true);
             $r->setValue($this, $this->_parent[$name]);
         }
         unset($this->_parent);

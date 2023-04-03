@@ -21,9 +21,9 @@ use Symfony\Component\Console\Exception\InvalidArgumentException;
  */
 class OutputFormatter implements WrappableOutputFormatterInterface
 {
-    private bool $decorated;
-    private array $styles = [];
-    private OutputFormatterStyleStack $styleStack;
+    private $decorated;
+    private $styles = [];
+    private $styleStack;
 
     public function __clone()
     {
@@ -34,11 +34,13 @@ class OutputFormatter implements WrappableOutputFormatterInterface
     }
 
     /**
-     * Escapes "<" and ">" special chars in given text.
+     * Escapes "<" special char in given text.
+     *
+     * @return string Escaped text
      */
-    public static function escape(string $text): string
+    public static function escape(string $text)
     {
-        $text = preg_replace('/([^\\\\]|^)([<>])/', '$1\\\\$2', $text);
+        $text = preg_replace('/([^\\\\]?)</', '$1\\<', $text);
 
         return self::escapeTrailingBackslash($text);
     }
@@ -50,7 +52,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
      */
     public static function escapeTrailingBackslash(string $text): string
     {
-        if (str_ends_with($text, '\\')) {
+        if ('\\' === substr($text, -1)) {
             $len = \strlen($text);
             $text = rtrim($text, '\\');
             $text = str_replace("\0", '', $text);
@@ -81,27 +83,42 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $this->styleStack = new OutputFormatterStyleStack();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDecorated(bool $decorated)
     {
         $this->decorated = $decorated;
     }
 
-    public function isDecorated(): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function isDecorated()
     {
         return $this->decorated;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setStyle(string $name, OutputFormatterStyleInterface $style)
     {
         $this->styles[strtolower($name)] = $style;
     }
 
-    public function hasStyle(string $name): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function hasStyle(string $name)
     {
         return isset($this->styles[strtolower($name)]);
     }
 
-    public function getStyle(string $name): OutputFormatterStyleInterface
+    /**
+     * {@inheritdoc}
+     */
+    public function getStyle(string $name)
     {
         if (!$this->hasStyle($name)) {
             throw new InvalidArgumentException(sprintf('Undefined style: "%s".', $name));
@@ -110,23 +127,24 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         return $this->styles[strtolower($name)];
     }
 
-    public function format(?string $message): ?string
+    /**
+     * {@inheritdoc}
+     */
+    public function format(?string $message)
     {
         return $this->formatAndWrap($message, 0);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function formatAndWrap(?string $message, int $width)
     {
-        if (null === $message) {
-            return '';
-        }
-
         $offset = 0;
         $output = '';
-        $openTagRegex = '[a-z](?:[^\\\\<>]*+ | \\\\.)*';
-        $closeTagRegex = '[a-z][^<>]*+';
+        $tagRegex = '[a-z][^<>]*+';
         $currentLineLength = 0;
-        preg_match_all("#<(($openTagRegex) | /($closeTagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
+        preg_match_all("#<(($tagRegex) | /($tagRegex)?)>#ix", $message, $matches, \PREG_OFFSET_CAPTURE);
         foreach ($matches[0] as $i => $match) {
             $pos = $match[1];
             $text = $match[0];
@@ -140,7 +158,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             $offset = $pos + \strlen($text);
 
             // opening tag?
-            if ($open = '/' !== $text[1]) {
+            if ($open = '/' != $text[1]) {
                 $tag = $matches[1][$i][0];
             } else {
                 $tag = $matches[3][$i][0] ?? '';
@@ -160,10 +178,17 @@ class OutputFormatter implements WrappableOutputFormatterInterface
 
         $output .= $this->applyCurrentStyle(substr($message, $offset), $output, $width, $currentLineLength);
 
-        return strtr($output, ["\0" => '\\', '\\<' => '<', '\\>' => '>']);
+        if (false !== strpos($output, "\0")) {
+            return strtr($output, ["\0" => '\\', '\\<' => '<']);
+        }
+
+        return str_replace('\\<', '<', $output);
     }
 
-    public function getStyleStack(): OutputFormatterStyleStack
+    /**
+     * @return OutputFormatterStyleStack
+     */
+    public function getStyleStack()
     {
         return $this->styleStack;
     }
@@ -191,8 +216,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
             } elseif ('bg' == $match[0]) {
                 $style->setBackground(strtolower($match[1]));
             } elseif ('href' === $match[0]) {
-                $url = preg_replace('{\\\\([<>])}', '$1', $match[1]);
-                $style->setHref($url);
+                $style->setHref($match[1]);
             } elseif ('options' === $match[0]) {
                 preg_match_all('([^,;]+)', strtolower($match[1]), $options);
                 $options = array_shift($options);
@@ -235,7 +259,7 @@ class OutputFormatter implements WrappableOutputFormatterInterface
         $text = $prefix.preg_replace('~([^\\n]{'.$width.'})\\ *~', "\$1\n", $text);
         $text = rtrim($text, "\n").($matches[1] ?? '');
 
-        if (!$currentLineLength && '' !== $current && !str_ends_with($current, "\n")) {
+        if (!$currentLineLength && '' !== $current && "\n" !== substr($current, -1)) {
             $text = "\n".$text;
         }
 

@@ -24,8 +24,8 @@ use Symfony\Component\VarDumper\Dumper\HtmlDumper;
  */
 class HtmlDescriptor implements DumpDescriptorInterface
 {
-    private HtmlDumper $dumper;
-    private bool $initialized = false;
+    private $dumper;
+    private $initialized = false;
 
     public function __construct(HtmlDumper $dumper)
     {
@@ -94,7 +94,7 @@ HTML
 
     private function extractDate(array $context, string $format = 'r'): string
     {
-        return date($format, (int) $context['timestamp']);
+        return date($format, $context['timestamp']);
     }
 
     private function renderTags(array $tags): string

@@ -2,19 +2,19 @@
 
 namespace Illuminate\Translation;
 
-use Closure;
+use Countable;
 use Illuminate\Contracts\Translation\Loader;
 use Illuminate\Contracts\Translation\Translator as TranslatorContract;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\NamespacedItemResolver;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
-use Illuminate\Support\Traits\ReflectsClosures;
 use InvalidArgumentException;
 
 class Translator extends NamespacedItemResolver implements TranslatorContract
 {
-    use Macroable, ReflectsClosures;
+    use Macroable;
 
     /**
      * The loader implementation.
@@ -50,20 +50,6 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      * @var \Illuminate\Translation\MessageSelector
      */
     protected $selector;
-
-    /**
-     * The callable that should be invoked to determine applicable locales.
-     *
-     * @var callable
-     */
-    protected $determineLocalesUsing;
-
-    /**
-     * The custom rendering callbacks for stringable objects.
-     *
-     * @var array
-     */
-    protected $stringableHandlers = [];
 
     /**
      * Create a new translator instance.
@@ -168,7 +154,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         // If the given "number" is actually an array or countable we will simply count the
         // number of elements in an instance. This allows developers to pass an array of
         // items without having to count it on their end first which gives bad syntax.
-        if (is_countable($number)) {
+        if (is_array($number) || $number instanceof Countable) {
             $number = count($number);
         }
 
@@ -209,9 +195,9 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
         if (is_string($line)) {
             return $this->makeReplacements($line, $replace);
         } elseif (is_array($line) && count($line) > 0) {
-            array_walk_recursive($line, function (&$value, $key) use ($replace) {
-                $value = $this->makeReplacements($value, $replace);
-            });
+            foreach ($line as $key => $value) {
+                $line[$key] = $this->makeReplacements($value, $replace);
+            }
 
             return $line;
         }
@@ -230,19 +216,30 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
             return $line;
         }
 
-        $shouldReplace = [];
+        $replace = $this->sortReplacements($replace);
 
         foreach ($replace as $key => $value) {
-            if (is_object($value) && isset($this->stringableHandlers[get_class($value)])) {
-                $value = call_user_func($this->stringableHandlers[get_class($value)], $value);
-            }
-
-            $shouldReplace[':'.Str::ucfirst($key ?? '')] = Str::ucfirst($value ?? '');
-            $shouldReplace[':'.Str::upper($key ?? '')] = Str::upper($value ?? '');
-            $shouldReplace[':'.$key] = $value;
+            $line = str_replace(
+                [':'.$key, ':'.Str::upper($key), ':'.Str::ucfirst($key)],
+                [$value, Str::upper($value), Str::ucfirst($value)],
+                $line
+            );
         }
 
-        return strtr($line, $shouldReplace);
+        return $line;
+    }
+
+    /**
+     * Sort the replacements array.
+     *
+     * @param  array  $replace
+     * @return array
+     */
+    protected function sortReplacements(array $replace)
+    {
+        return (new Collection($replace))->sortBy(function ($value, $key) {
+            return mb_strlen($key) * -1;
+        })->all();
     }
 
     /**
@@ -345,20 +342,7 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
      */
     protected function localeArray($locale)
     {
-        $locales = array_filter([$locale ?: $this->locale, $this->fallback]);
-
-        return call_user_func($this->determineLocalesUsing ?: fn () => $locales, $locales);
-    }
-
-    /**
-     * Specify a callback that should be invoked to determined the applicable locale array.
-     *
-     * @param  callable  $callback
-     * @return void
-     */
-    public function determineLocalesUsing($callback)
-    {
-        $this->determineLocalesUsing = $callback;
+        return array_filter([$locale ?: $this->locale, $this->fallback]);
     }
 
     /**
@@ -463,24 +447,5 @@ class Translator extends NamespacedItemResolver implements TranslatorContract
     public function setLoaded(array $loaded)
     {
         $this->loaded = $loaded;
-    }
-
-    /**
-     * Add a handler to be executed in order to format a given class to a string during translation replacements.
-     *
-     * @param  callable|string  $class
-     * @param  callable|null  $handler
-     * @return void
-     */
-    public function stringable($class, $handler = null)
-    {
-        if ($class instanceof Closure) {
-            [$class, $handler] = [
-                $this->firstClosureParameterType($class),
-                $class,
-            ];
-        }
-
-        $this->stringableHandlers[$class] = $handler;
     }
 }

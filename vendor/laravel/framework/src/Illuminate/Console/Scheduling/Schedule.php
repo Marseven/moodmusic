@@ -4,16 +4,14 @@ namespace Illuminate\Console\Scheduling;
 
 use Closure;
 use DateTimeInterface;
-use Illuminate\Bus\UniqueLock;
 use Illuminate\Console\Application;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Bus\Dispatcher;
-use Illuminate\Contracts\Cache\Repository as Cache;
 use Illuminate\Contracts\Container\BindingResolutionException;
-use Illuminate\Contracts\Queue\ShouldBeUnique;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Queue\CallQueuedClosure;
 use Illuminate\Support\ProcessUtils;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use RuntimeException;
 
@@ -22,17 +20,11 @@ class Schedule
     use Macroable;
 
     const SUNDAY = 0;
-
     const MONDAY = 1;
-
     const TUESDAY = 2;
-
     const WEDNESDAY = 3;
-
     const THURSDAY = 4;
-
     const FRIDAY = 5;
-
     const SATURDAY = 6;
 
     /**
@@ -125,11 +117,7 @@ class Schedule
     public function command($command, array $parameters = [])
     {
         if (class_exists($command)) {
-            $command = Container::getInstance()->make($command);
-
-            return $this->exec(
-                Application::formatCommandString($command->getName()), $parameters,
-            )->description($command->getDescription());
+            $command = Container::getInstance()->make($command)->getName();
         }
 
         return $this->exec(
@@ -178,35 +166,6 @@ class Schedule
             }
 
             $job = CallQueuedClosure::create($job);
-        }
-
-        if ($job instanceof ShouldBeUnique) {
-            return $this->dispatchUniqueJobToQueue($job, $queue, $connection);
-        }
-
-        $this->getDispatcher()->dispatch(
-            $job->onConnection($connection)->onQueue($queue)
-        );
-    }
-
-    /**
-     * Dispatch the given unique job to the queue.
-     *
-     * @param  object  $job
-     * @param  string|null  $queue
-     * @param  string|null  $connection
-     * @return void
-     *
-     * @throws \RuntimeException
-     */
-    protected function dispatchUniqueJobToQueue($job, $queue, $connection)
-    {
-        if (! Container::getInstance()->bound(Cache::class)) {
-            throw new RuntimeException('Cache driver not available. Scheduling unique jobs not supported.');
-        }
-
-        if (! (new UniqueLock(Container::getInstance()->make(Cache::class)))->acquire($job)) {
-            return;
         }
 
         $this->getDispatcher()->dispatch(
@@ -277,11 +236,11 @@ class Schedule
             return ProcessUtils::escapeArgument($value);
         });
 
-        if (str_starts_with($key, '--')) {
+        if (Str::startsWith($key, '--')) {
             $value = $value->map(function ($value) use ($key) {
                 return "{$key}={$value}";
             });
-        } elseif (str_starts_with($key, '-')) {
+        } elseif (Str::startsWith($key, '-')) {
             $value = $value->map(function ($value) use ($key) {
                 return "{$key} {$value}";
             });
@@ -357,7 +316,7 @@ class Schedule
             } catch (BindingResolutionException $e) {
                 throw new RuntimeException(
                     'Unable to resolve the dispatcher from the service container. Please bind it or install the illuminate/bus package.',
-                    is_int($e->getCode()) ? $e->getCode() : 0, $e
+                    $e->getCode(), $e
                 );
             }
         }

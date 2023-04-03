@@ -11,13 +11,11 @@
 
 namespace Monolog\Handler;
 
-use Elastica\Document;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Formatter\ElasticaFormatter;
-use Monolog\Level;
+use Monolog\Logger;
 use Elastica\Client;
 use Elastica\Exception\ExceptionInterface;
-use Monolog\LogRecord;
 
 /**
  * Elastic Search handler
@@ -34,34 +32,26 @@ use Monolog\LogRecord;
  *    $log->pushHandler($handler);
  *
  * @author Jelle Vink <jelle.vink@gmail.com>
- * @phpstan-type Options array{
- *     index: string,
- *     type: string,
- *     ignore_error: bool
- * }
- * @phpstan-type InputOptions array{
- *     index?: string,
- *     type?: string,
- *     ignore_error?: bool
- * }
  */
 class ElasticaHandler extends AbstractProcessingHandler
 {
-    protected Client $client;
+    /**
+     * @var Client
+     */
+    protected $client;
 
     /**
-     * @var mixed[] Handler config options
-     * @phpstan-var Options
+     * @var array Handler config options
      */
-    protected array $options;
+    protected $options = [];
 
     /**
-     * @param Client  $client  Elastica Client object
-     * @param mixed[] $options Handler configuration
-     *
-     * @phpstan-param InputOptions $options
+     * @param Client     $client  Elastica Client object
+     * @param array      $options Handler configuration
+     * @param int|string $level   The minimum logging level at which this handler will be triggered
+     * @param bool       $bubble  Whether the messages that are handled can bubble up the stack or not
      */
-    public function __construct(Client $client, array $options = [], int|string|Level $level = Level::Debug, bool $bubble = true)
+    public function __construct(Client $client, array $options = [], $level = Logger::DEBUG, bool $bubble = true)
     {
         parent::__construct($level, $bubble);
         $this->client = $client;
@@ -76,15 +66,15 @@ class ElasticaHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
-    protected function write(LogRecord $record): void
+    protected function write(array $record): void
     {
-        $this->bulkSend([$record->formatted]);
+        $this->bulkSend([$record['formatted']]);
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function setFormatter(FormatterInterface $formatter): HandlerInterface
     {
@@ -95,18 +85,13 @@ class ElasticaHandler extends AbstractProcessingHandler
         throw new \InvalidArgumentException('ElasticaHandler is only compatible with ElasticaFormatter');
     }
 
-    /**
-     * @return mixed[]
-     *
-     * @phpstan-return Options
-     */
     public function getOptions(): array
     {
         return $this->options;
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getDefaultFormatter(): FormatterInterface
     {
@@ -114,7 +99,7 @@ class ElasticaHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
     public function handleBatch(array $records): void
     {
@@ -124,9 +109,6 @@ class ElasticaHandler extends AbstractProcessingHandler
 
     /**
      * Use Elasticsearch bulk API to send list of documents
-     *
-     * @param Document[] $documents
-     *
      * @throws \RuntimeException
      */
     protected function bulkSend(array $documents): void

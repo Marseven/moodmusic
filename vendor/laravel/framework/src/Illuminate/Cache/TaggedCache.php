@@ -105,7 +105,7 @@ class TaggedCache extends Repository
     /**
      * Fire an event for this cache instance.
      *
-     * @param  \Illuminate\Cache\Events\CacheEvent  $event
+     * @param  string  $event
      * @return void
      */
     protected function event($event)

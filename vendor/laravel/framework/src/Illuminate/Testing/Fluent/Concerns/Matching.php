@@ -48,49 +48,6 @@ trait Matching
     }
 
     /**
-     * Asserts that the property does not match the expected value.
-     *
-     * @param  string  $key
-     * @param  mixed|\Closure  $expected
-     * @return $this
-     */
-    public function whereNot(string $key, $expected): self
-    {
-        $this->has($key);
-
-        $actual = $this->prop($key);
-
-        if ($expected instanceof Closure) {
-            PHPUnit::assertFalse(
-                $expected(is_array($actual) ? Collection::make($actual) : $actual),
-                sprintf('Property [%s] was marked as invalid using a closure.', $this->dotPath($key))
-            );
-
-            return $this;
-        }
-
-        if ($expected instanceof Arrayable) {
-            $expected = $expected->toArray();
-        }
-
-        $this->ensureSorted($expected);
-        $this->ensureSorted($actual);
-
-        PHPUnit::assertNotSame(
-            $expected,
-            $actual,
-            sprintf(
-                'Property [%s] contains a value that should be missing: [%s, %s]',
-                $this->dotPath($key),
-                $key,
-                $expected
-            )
-        );
-
-        return $this;
-    }
-
-    /**
      * Asserts that all properties match their expected values.
      *
      * @param  array  $bindings
@@ -109,7 +66,7 @@ trait Matching
      * Asserts that the property is of the expected type.
      *
      * @param  string  $key
-     * @param  string|array  $expected
+     * @param  string|array $expected
      * @return $this
      */
     public function whereType(string $key, $expected): self
@@ -141,49 +98,6 @@ trait Matching
     {
         foreach ($bindings as $key => $value) {
             $this->whereType($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Asserts that the property contains the expected values.
-     *
-     * @param  string  $key
-     * @param  mixed  $expected
-     * @return $this
-     */
-    public function whereContains(string $key, $expected)
-    {
-        $actual = Collection::make(
-            $this->prop($key) ?? $this->prop()
-        );
-
-        $missing = Collection::make($expected)->reject(function ($search) use ($key, $actual) {
-            if ($actual->containsStrict($key, $search)) {
-                return true;
-            }
-
-            return $actual->containsStrict($search);
-        });
-
-        if ($missing->whereInstanceOf('Closure')->isNotEmpty()) {
-            PHPUnit::assertEmpty(
-                $missing->toArray(),
-                sprintf(
-                    'Property [%s] does not contain a value that passes the truth test within the given closure.',
-                    $key,
-                )
-            );
-        } else {
-            PHPUnit::assertEmpty(
-                $missing->toArray(),
-                sprintf(
-                    'Property [%s] does not contain [%s].',
-                    $key,
-                    implode(', ', array_values($missing->toArray()))
-                )
-            );
         }
 
         return $this;

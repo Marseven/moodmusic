@@ -2,19 +2,9 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Http\Middleware\TrustHosts as Middleware;
+use Common\Core\BaseTrustHosts;
 
-class TrustHosts extends Middleware
+class TrustHosts extends BaseTrustHosts
 {
-    /**
-     * Get the host patterns that should be trusted.
-     *
-     * @return array<int, string|null>
-     */
-    public function hosts(): array
-    {
-        return [
-            $this->allSubdomainsOfApplicationUrl(),
-        ];
-    }
+
 }

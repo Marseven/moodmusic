@@ -28,10 +28,16 @@ use Ramsey\Uuid\UuidInterface;
 class FallbackBuilder implements UuidBuilderInterface
 {
     /**
-     * @param iterable<UuidBuilderInterface> $builders An array of UUID builders
+     * @var BuilderCollection
      */
-    public function __construct(private iterable $builders)
+    private $builders;
+
+    /**
+     * @param BuilderCollection $builders An array of UUID builders
+     */
+    public function __construct(BuilderCollection $builders)
     {
+        $this->builders = $builders;
     }
 
     /**
@@ -49,6 +55,7 @@ class FallbackBuilder implements UuidBuilderInterface
     {
         $lastBuilderException = null;
 
+        /** @var UuidBuilderInterface $builder */
         foreach ($this->builders as $builder) {
             try {
                 return $builder->build($codec, $bytes);

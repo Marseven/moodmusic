@@ -21,6 +21,8 @@ final class RepositoryBuilder
 {
     /**
      * The set of default adapters.
+     *
+     * @var string[]
      */
     private const DEFAULT_ADAPTERS = [
         ServerConstAdapter::class,
@@ -111,7 +113,7 @@ final class RepositoryBuilder
     }
 
     /**
-     * Determine if the given name if of an adapterclass.
+     * Determine if the given name if of an adapaterclass.
      *
      * @param string $name
      *

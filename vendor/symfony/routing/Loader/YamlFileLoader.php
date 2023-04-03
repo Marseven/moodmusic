@@ -36,12 +36,19 @@ class YamlFileLoader extends FileLoader
     private const AVAILABLE_KEYS = [
         'resource', 'type', 'prefix', 'path', 'host', 'schemes', 'methods', 'defaults', 'requirements', 'options', 'condition', 'controller', 'name_prefix', 'trailing_slash_on_root', 'locale', 'format', 'utf8', 'exclude', 'stateless',
     ];
-    private YamlParser $yamlParser;
+    private $yamlParser;
 
     /**
+     * Loads a Yaml file.
+     *
+     * @param string      $file A Yaml file path
+     * @param string|null $type The resource type
+     *
+     * @return RouteCollection A RouteCollection instance
+     *
      * @throws \InvalidArgumentException When a route can't be parsed because YAML is invalid
      */
-    public function load(mixed $file, string $type = null): RouteCollection
+    public function load($file, string $type = null)
     {
         $path = $this->locator->locate($file);
 
@@ -53,7 +60,9 @@ class YamlFileLoader extends FileLoader
             throw new \InvalidArgumentException(sprintf('File "%s" not found.', $path));
         }
 
-        $this->yamlParser ??= new YamlParser();
+        if (null === $this->yamlParser) {
+            $this->yamlParser = new YamlParser();
+        }
 
         try {
             $parsedConfig = $this->yamlParser->parseFile($path, Yaml::PARSE_CONSTANT);
@@ -75,24 +84,6 @@ class YamlFileLoader extends FileLoader
         }
 
         foreach ($parsedConfig as $name => $config) {
-            if (str_starts_with($name, 'when@')) {
-                if (!$this->env || 'when@'.$this->env !== $name) {
-                    continue;
-                }
-
-                foreach ($config as $name => $config) {
-                    $this->validate($config, $name.'" when "@'.$this->env, $path);
-
-                    if (isset($config['resource'])) {
-                        $this->parseImport($collection, $config, $path, $file);
-                    } else {
-                        $this->parseRoute($collection, $name, $config, $path);
-                    }
-                }
-
-                continue;
-            }
-
             $this->validate($config, $name, $path);
 
             if (isset($config['resource'])) {
@@ -105,30 +96,23 @@ class YamlFileLoader extends FileLoader
         return $collection;
     }
 
-    public function supports(mixed $resource, string $type = null): bool
+    /**
+     * {@inheritdoc}
+     */
+    public function supports($resource, string $type = null)
     {
         return \is_string($resource) && \in_array(pathinfo($resource, \PATHINFO_EXTENSION), ['yml', 'yaml'], true) && (!$type || 'yaml' === $type);
     }
 
     /**
      * Parses a route and adds it to the RouteCollection.
+     *
+     * @param string $name   Route name
+     * @param array  $config Route definition
+     * @param string $path   Full path of the YAML file being processed
      */
     protected function parseRoute(RouteCollection $collection, string $name, array $config, string $path)
     {
-        if (isset($config['alias'])) {
-            $alias = $collection->addAlias($name, $config['alias']);
-            $deprecation = $config['deprecated'] ?? null;
-            if (null !== $deprecation) {
-                $alias->setDeprecated(
-                    $deprecation['package'],
-                    $deprecation['version'],
-                    $deprecation['message'] ?? ''
-                );
-            }
-
-            return;
-        }
-
         $defaults = $config['defaults'] ?? [];
         $requirements = $config['requirements'] ?? [];
         $options = $config['options'] ?? [];
@@ -170,6 +154,10 @@ class YamlFileLoader extends FileLoader
 
     /**
      * Parses an import and adds the routes in the resource to the RouteCollection.
+     *
+     * @param array  $config Route definition
+     * @param string $path   Full path of the YAML file being processed
+     * @param string $file   Loaded file name
      */
     protected function parseImport(RouteCollection $collection, array $config, string $path, string $file)
     {
@@ -238,18 +226,19 @@ class YamlFileLoader extends FileLoader
     }
 
     /**
+     * Validates the route configuration.
+     *
+     * @param array  $config A resource config
+     * @param string $name   The config key
+     * @param string $path   The loaded file path
+     *
      * @throws \InvalidArgumentException If one of the provided config keys is not supported,
      *                                   something is missing or the combination is nonsense
      */
-    protected function validate(mixed $config, string $name, string $path)
+    protected function validate($config, string $name, string $path)
     {
         if (!\is_array($config)) {
             throw new \InvalidArgumentException(sprintf('The definition of "%s" in "%s" must be a YAML array.', $name, $path));
-        }
-        if (isset($config['alias'])) {
-            $this->validateAlias($config, $name, $path);
-
-            return;
         }
         if ($extraKeys = array_diff(array_keys($config), self::AVAILABLE_KEYS)) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" contains unsupported keys for "%s": "%s". Expected one of: "%s".', $path, $name, implode('", "', $extraKeys), implode('", "', self::AVAILABLE_KEYS)));
@@ -268,29 +257,6 @@ class YamlFileLoader extends FileLoader
         }
         if (isset($config['stateless']) && isset($config['defaults']['_stateless'])) {
             throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify both the "stateless" key and the defaults key "_stateless" for "%s".', $path, $name));
-        }
-    }
-
-    /**
-     * @throws \InvalidArgumentException If one of the provided config keys is not supported,
-     *                                   something is missing or the combination is nonsense
-     */
-    private function validateAlias(array $config, string $name, string $path): void
-    {
-        foreach ($config as $key => $value) {
-            if (!\in_array($key, ['alias', 'deprecated'], true)) {
-                throw new \InvalidArgumentException(sprintf('The routing file "%s" must not specify other keys than "alias" and "deprecated" for "%s".', $path, $name));
-            }
-
-            if ('deprecated' === $key) {
-                if (!isset($value['package'])) {
-                    throw new \InvalidArgumentException(sprintf('The routing file "%s" must specify the attribute "package" of the "deprecated" option for "%s".', $path, $name));
-                }
-
-                if (!isset($value['version'])) {
-                    throw new \InvalidArgumentException(sprintf('The routing file "%s" must specify the attribute "version" of the "deprecated" option for "%s".', $path, $name));
-                }
-            }
         }
     }
 }

@@ -2,9 +2,7 @@
 
 namespace Illuminate\Database\Eloquent\Factories;
 
-use Countable;
-
-class Sequence implements Countable
+class Sequence
 {
     /**
      * The sequence of return values.
@@ -18,19 +16,19 @@ class Sequence implements Countable
      *
      * @var int
      */
-    public $count;
+    protected $count;
 
     /**
-     * The current index of the sequence iteration.
+     * The current index of the sequence.
      *
      * @var int
      */
-    public $index = 0;
+    protected $index = 0;
 
     /**
      * Create a new sequence instance.
      *
-     * @param  mixed  ...$sequence
+     * @param  array  $sequence
      * @return void
      */
     public function __construct(...$sequence)
@@ -40,23 +38,17 @@ class Sequence implements Countable
     }
 
     /**
-     * Get the current count of the sequence items.
-     *
-     * @return int
-     */
-    public function count(): int
-    {
-        return $this->count;
-    }
-
-    /**
      * Get the next value in the sequence.
      *
      * @return mixed
      */
     public function __invoke()
     {
-        return tap(value($this->sequence[$this->index % $this->count], $this), function () {
+        if ($this->index >= $this->count) {
+            $this->index = 0;
+        }
+
+        return tap(value($this->sequence[$this->index]), function () {
             $this->index = $this->index + 1;
         });
     }

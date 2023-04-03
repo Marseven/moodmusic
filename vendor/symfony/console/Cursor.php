@@ -18,112 +18,79 @@ use Symfony\Component\Console\Output\OutputInterface;
  */
 final class Cursor
 {
-    private OutputInterface $output;
+    private $output;
     private $input;
 
-    /**
-     * @param resource|null $input
-     */
     public function __construct(OutputInterface $output, $input = null)
     {
         $this->output = $output;
         $this->input = $input ?? (\defined('STDIN') ? \STDIN : fopen('php://input', 'r+'));
     }
 
-    /**
-     * @return $this
-     */
-    public function moveUp(int $lines = 1): static
+    public function moveUp(int $lines = 1): self
     {
         $this->output->write(sprintf("\x1b[%dA", $lines));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function moveDown(int $lines = 1): static
+    public function moveDown(int $lines = 1): self
     {
         $this->output->write(sprintf("\x1b[%dB", $lines));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function moveRight(int $columns = 1): static
+    public function moveRight(int $columns = 1): self
     {
         $this->output->write(sprintf("\x1b[%dC", $columns));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function moveLeft(int $columns = 1): static
+    public function moveLeft(int $columns = 1): self
     {
         $this->output->write(sprintf("\x1b[%dD", $columns));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function moveToColumn(int $column): static
+    public function moveToColumn(int $column): self
     {
         $this->output->write(sprintf("\x1b[%dG", $column));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function moveToPosition(int $column, int $row): static
+    public function moveToPosition(int $column, int $row): self
     {
         $this->output->write(sprintf("\x1b[%d;%dH", $row + 1, $column));
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function savePosition(): static
+    public function savePosition(): self
     {
         $this->output->write("\x1b7");
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function restorePosition(): static
+    public function restorePosition(): self
     {
         $this->output->write("\x1b8");
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function hide(): static
+    public function hide(): self
     {
         $this->output->write("\x1b[?25l");
 
         return $this;
     }
 
-    /**
-     * @return $this
-     */
-    public function show(): static
+    public function show(): self
     {
         $this->output->write("\x1b[?25h\x1b[?0c");
 
@@ -132,10 +99,8 @@ final class Cursor
 
     /**
      * Clears all the output from the current line.
-     *
-     * @return $this
      */
-    public function clearLine(): static
+    public function clearLine(): self
     {
         $this->output->write("\x1b[2K");
 
@@ -154,10 +119,8 @@ final class Cursor
 
     /**
      * Clears all the output from the cursors' current position to the end of the screen.
-     *
-     * @return $this
      */
-    public function clearOutput(): static
+    public function clearOutput(): self
     {
         $this->output->write("\x1b[0J");
 
@@ -166,10 +129,8 @@ final class Cursor
 
     /**
      * Clears the entire screen.
-     *
-     * @return $this
      */
-    public function clearScreen(): static
+    public function clearScreen(): self
     {
         $this->output->write("\x1b[2J");
 
@@ -183,7 +144,11 @@ final class Cursor
     {
         static $isTtySupported;
 
-        if (!$isTtySupported ??= '/' === \DIRECTORY_SEPARATOR && stream_isatty(\STDOUT)) {
+        if (null === $isTtySupported && \function_exists('proc_open')) {
+            $isTtySupported = (bool) @proc_open('echo 1 >/dev/null', [['file', '/dev/tty', 'r'], ['file', '/dev/tty', 'w'], ['file', '/dev/tty', 'w']], $pipes);
+        }
+
+        if (!$isTtySupported) {
             return [1, 1];
         }
 

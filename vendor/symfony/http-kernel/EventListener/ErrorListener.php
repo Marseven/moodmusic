@@ -12,13 +12,13 @@
 namespace Symfony\Component\HttpKernel\EventListener;
 
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Debug\Exception\FlattenException as LegacyFlattenException;
 use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\Event\ControllerArgumentsEvent;
 use Symfony\Component\HttpKernel\Event\ExceptionEvent;
 use Symfony\Component\HttpKernel\Event\ResponseEvent;
-use Symfony\Component\HttpKernel\Exception\HttpException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\HttpKernel\KernelEvents;
@@ -32,49 +32,19 @@ class ErrorListener implements EventSubscriberInterface
     protected $controller;
     protected $logger;
     protected $debug;
-    /**
-     * @var array<class-string, array{log_level: string|null, status_code: int<100,599>|null}>
-     */
-    protected $exceptionsMapping;
 
-    /**
-     * @param array<class-string, array{log_level: string|null, status_code: int<100,599>|null}> $exceptionsMapping
-     */
-    public function __construct(string|object|array|null $controller, LoggerInterface $logger = null, bool $debug = false, array $exceptionsMapping = [])
+    public function __construct($controller, LoggerInterface $logger = null, bool $debug = false)
     {
         $this->controller = $controller;
         $this->logger = $logger;
         $this->debug = $debug;
-        $this->exceptionsMapping = $exceptionsMapping;
     }
 
     public function logKernelException(ExceptionEvent $event)
     {
-        $throwable = $event->getThrowable();
-        $logLevel = null;
+        $e = FlattenException::createFromThrowable($event->getThrowable());
 
-        foreach ($this->exceptionsMapping as $class => $config) {
-            if ($throwable instanceof $class && $config['log_level']) {
-                $logLevel = $config['log_level'];
-                break;
-            }
-        }
-
-        foreach ($this->exceptionsMapping as $class => $config) {
-            if (!$throwable instanceof $class || !$config['status_code']) {
-                continue;
-            }
-            if (!$throwable instanceof HttpExceptionInterface || $throwable->getStatusCode() !== $config['status_code']) {
-                $headers = $throwable instanceof HttpExceptionInterface ? $throwable->getHeaders() : [];
-                $throwable = new HttpException($config['status_code'], $throwable->getMessage(), $throwable, $headers);
-                $event->setThrowable($throwable);
-            }
-            break;
-        }
-
-        $e = FlattenException::createFromThrowable($throwable);
-
-        $this->logException($throwable, sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()), $logLevel);
+        $this->logException($event->getThrowable(), sprintf('Uncaught PHP Exception %s: "%s" at %s line %s', $e->getClass(), $e->getMessage(), $e->getFile(), $e->getLine()));
     }
 
     public function onKernelException(ExceptionEvent $event)
@@ -83,8 +53,8 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
-        $throwable = $event->getThrowable();
-        $request = $this->duplicateRequest($throwable, $event->getRequest());
+        $exception = $event->getThrowable();
+        $request = $this->duplicateRequest($exception, $event->getRequest());
 
         try {
             $response = $event->getKernel()->handle($request, HttpKernelInterface::SUB_REQUEST, false);
@@ -95,13 +65,14 @@ class ErrorListener implements EventSubscriberInterface
 
             $prev = $e;
             do {
-                if ($throwable === $wrapper = $prev) {
+                if ($exception === $wrapper = $prev) {
                     throw $e;
                 }
             } while ($prev = $wrapper->getPrevious());
 
             $prev = new \ReflectionProperty($wrapper instanceof \Exception ? \Exception::class : \Error::class, 'previous');
-            $prev->setValue($wrapper, $throwable);
+            $prev->setAccessible(true);
+            $prev->setValue($wrapper, $exception);
 
             throw $e;
         }
@@ -128,10 +99,10 @@ class ErrorListener implements EventSubscriberInterface
             return;
         }
 
-        $r = new \ReflectionFunction($event->getController()(...));
+        $r = new \ReflectionFunction(\Closure::fromCallable($event->getController()));
         $r = $r->getParameters()[$k] ?? null;
 
-        if ($r && (!($r = $r->getType()) instanceof \ReflectionNamedType || FlattenException::class === $r->getName())) {
+        if ($r && (!($r = $r->getType()) instanceof \ReflectionNamedType || \in_array($r->getName(), [FlattenException::class, LegacyFlattenException::class], true))) {
             $arguments = $event->getArguments();
             $arguments[$k] = FlattenException::createFromThrowable($e);
             $event->setArguments($arguments);
@@ -153,12 +124,10 @@ class ErrorListener implements EventSubscriberInterface
     /**
      * Logs an exception.
      */
-    protected function logException(\Throwable $exception, string $message, string $logLevel = null): void
+    protected function logException(\Throwable $exception, string $message): void
     {
         if (null !== $this->logger) {
-            if (null !== $logLevel) {
-                $this->logger->log($logLevel, $message, ['exception' => $exception]);
-            } elseif (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
+            if (!$exception instanceof HttpExceptionInterface || $exception->getStatusCode() >= 500) {
                 $this->logger->critical($message, ['exception' => $exception]);
             } else {
                 $this->logger->error($message, ['exception' => $exception]);

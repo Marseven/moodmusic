@@ -11,8 +11,6 @@
 
 namespace Monolog\Handler\FingersCrossed;
 
-use Monolog\LogRecord;
-
 /**
  * Interface for activation strategies for the FingersCrossedHandler.
  *
@@ -23,5 +21,5 @@ interface ActivationStrategyInterface
     /**
      * Returns whether the given record activates the handler.
      */
-    public function isHandlerActivated(LogRecord $record): bool;
+    public function isHandlerActivated(array $record): bool;
 }

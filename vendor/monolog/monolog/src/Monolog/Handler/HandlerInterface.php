@@ -11,8 +11,6 @@
 
 namespace Monolog\Handler;
 
-use Monolog\LogRecord;
-
 /**
  * Interface that all Monolog Handlers must implement
  *
@@ -29,9 +27,11 @@ interface HandlerInterface
      * is no guarantee that handle() will not be called, and isHandling() might not be called
      * for a given record.
      *
-     * @param LogRecord $record Partial log record having only a level initialized
+     * @param array $record Partial log record containing only a level key
+     *
+     * @return bool
      */
-    public function isHandling(LogRecord $record): bool;
+    public function isHandling(array $record): bool;
 
     /**
      * Handles a record.
@@ -43,16 +43,16 @@ interface HandlerInterface
      * Unless the bubbling is interrupted (by returning true), the Logger class will keep on
      * calling further handlers in the stack with a given log record.
      *
-     * @param  LogRecord $record The record to handle
-     * @return bool      true means that this handler handled the record, and that bubbling is not permitted.
-     *                          false means the record was either not processed or that this handler allows bubbling.
+     * @param  array $record The record to handle
+     * @return bool  true means that this handler handled the record, and that bubbling is not permitted.
+     *                      false means the record was either not processed or that this handler allows bubbling.
      */
-    public function handle(LogRecord $record): bool;
+    public function handle(array $record): bool;
 
     /**
      * Handles a set of records at once.
      *
-     * @param array<LogRecord> $records The records to handle
+     * @param array $records The records to handle (an array of record arrays)
      */
     public function handleBatch(array $records): void;
 

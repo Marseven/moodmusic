@@ -23,22 +23,18 @@ interface DebugLoggerInterface
     /**
      * Returns an array of logs.
      *
-     * @return array<array{
-     *     channel: ?string,
-     *     context: array<string, mixed>,
-     *     message: string,
-     *     priority: int,
-     *     priorityName: string,
-     *     timestamp: int,
-     *     timestamp_rfc3339: string,
-     * }>
+     * A log is an array with the following mandatory keys:
+     * timestamp, message, priority, and priorityName.
+     * It can also have an optional context key containing an array.
+     *
+     * @return array An array of logs
      */
     public function getLogs(Request $request = null);
 
     /**
      * Returns the number of errors.
      *
-     * @return int
+     * @return int The number of errors
      */
     public function countErrors(Request $request = null);
 

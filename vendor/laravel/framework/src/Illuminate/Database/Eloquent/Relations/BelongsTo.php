@@ -51,6 +51,7 @@ class BelongsTo extends Relation
      * @param  string  $foreignKey
      * @param  string  $ownerKey
      * @param  string  $relationName
+     *
      * @return void
      */
     public function __construct(Builder $query, Model $child, $foreignKey, $ownerKey, $relationName)
@@ -113,7 +114,7 @@ class BelongsTo extends Relation
 
         $whereIn = $this->whereInMethod($this->related, $this->ownerKey);
 
-        $this->whereInEager($whereIn, $key, $this->getEagerModelKeys($models));
+        $this->query->{$whereIn}($key, $this->getEagerModelKeys($models));
     }
 
     /**
@@ -198,7 +199,7 @@ class BelongsTo extends Relation
     /**
      * Associate the model instance to the given parent.
      *
-     * @param  \Illuminate\Database\Eloquent\Model|int|string|null  $model
+     * @param  \Illuminate\Database\Eloquent\Model|int|string  $model
      * @return \Illuminate\Database\Eloquent\Model
      */
     public function associate($model)

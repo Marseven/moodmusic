@@ -24,8 +24,8 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
  */
 class TimeDataCollector extends DataCollector implements LateDataCollectorInterface
 {
-    private ?KernelInterface $kernel;
-    private ?Stopwatch $stopwatch;
+    protected $kernel;
+    protected $stopwatch;
 
     public function __construct(KernelInterface $kernel = null, Stopwatch $stopwatch = null)
     {
@@ -33,6 +33,9 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         $this->stopwatch = $stopwatch;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function collect(Request $request, Response $response, \Throwable $exception = null)
     {
         if (null !== $this->kernel) {
@@ -42,20 +45,28 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         }
 
         $this->data = [
-            'token' => $request->attributes->get('_stopwatch_token'),
+            'token' => $response->headers->get('X-Debug-Token'),
             'start_time' => $startTime * 1000,
             'events' => [],
             'stopwatch_installed' => class_exists(Stopwatch::class, false),
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function reset()
     {
         $this->data = [];
 
-        $this->stopwatch?->reset();
+        if (null !== $this->stopwatch) {
+            $this->stopwatch->reset();
+        }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function lateCollect()
     {
         if (null !== $this->stopwatch && isset($this->data['token'])) {
@@ -65,6 +76,8 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     }
 
     /**
+     * Sets the request events.
+     *
      * @param StopwatchEvent[] $events The request events
      */
     public function setEvents(array $events)
@@ -77,17 +90,21 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
     }
 
     /**
-     * @return StopwatchEvent[]
+     * Gets the request events.
+     *
+     * @return StopwatchEvent[] The request events
      */
-    public function getEvents(): array
+    public function getEvents()
     {
         return $this->data['events'];
     }
 
     /**
      * Gets the request elapsed time.
+     *
+     * @return float The elapsed time
      */
-    public function getDuration(): float
+    public function getDuration()
     {
         if (!isset($this->data['events']['__section__'])) {
             return 0;
@@ -102,8 +119,10 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
      * Gets the initialization time.
      *
      * This is the time spent until the beginning of the request handling.
+     *
+     * @return float The elapsed time
      */
-    public function getInitTime(): float
+    public function getInitTime()
     {
         if (!isset($this->data['events']['__section__'])) {
             return 0;
@@ -112,17 +131,28 @@ class TimeDataCollector extends DataCollector implements LateDataCollectorInterf
         return $this->data['events']['__section__']->getOrigin() - $this->getStartTime();
     }
 
-    public function getStartTime(): float
+    /**
+     * Gets the request time.
+     *
+     * @return float
+     */
+    public function getStartTime()
     {
         return $this->data['start_time'];
     }
 
-    public function isStopwatchInstalled(): bool
+    /**
+     * @return bool whether or not the stopwatch component is installed
+     */
+    public function isStopwatchInstalled()
     {
         return $this->data['stopwatch_installed'];
     }
 
-    public function getName(): string
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
     {
         return 'time';
     }

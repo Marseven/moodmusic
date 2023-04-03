@@ -2,16 +2,22 @@
 
 namespace App\Http\Middleware;
 
-use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken as Middleware;
+use Common\Core\BaseVerifyCsrfToken;
 
-class VerifyCsrfToken extends Middleware
+class VerifyCsrfToken extends BaseVerifyCsrfToken
 {
     /**
      * The URIs that should be excluded from CSRF verification.
      *
-     * @var array<int, string>
+     * @var array
      */
     protected $except = [
-        //
+        'secure/auth/login',
+        'secure/auth/register',
+        'secure/auth/logout',
+        'secure/auth/password/email',
+        'secure/update/run',
+        'secure/track/plays/*/log',
+        'secure/player/tracks'
     ];
 }

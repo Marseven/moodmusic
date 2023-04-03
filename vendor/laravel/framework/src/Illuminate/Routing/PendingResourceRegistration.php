@@ -149,12 +149,6 @@ class PendingResourceRegistration
      */
     public function middleware($middleware)
     {
-        $middleware = Arr::wrap($middleware);
-
-        foreach ($middleware as $key => $value) {
-            $middleware[$key] = (string) $value;
-        }
-
         $this->options['middleware'] = $middleware;
 
         return $this;
@@ -223,19 +217,6 @@ class PendingResourceRegistration
     public function scoped(array $fields = [])
     {
         $this->options['bindingFields'] = $fields;
-
-        return $this;
-    }
-
-    /**
-     * Define which routes should allow "trashed" models to be retrieved when resolving implicit model bindings.
-     *
-     * @param  array  $methods
-     * @return \Illuminate\Routing\PendingResourceRegistration
-     */
-    public function withTrashed(array $methods = [])
-    {
-        $this->options['trashed'] = $methods;
 
         return $this;
     }

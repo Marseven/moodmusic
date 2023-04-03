@@ -2,13 +2,14 @@
 
 namespace Illuminate\Support;
 
+use Countable;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Contracts\Support\Jsonable;
 use Illuminate\Contracts\Support\MessageBag as MessageBagContract;
 use Illuminate\Contracts\Support\MessageProvider;
 use JsonSerializable;
 
-class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, MessageProvider
+class MessageBag implements Arrayable, Countable, Jsonable, JsonSerializable, MessageBagContract, MessageProvider
 {
     /**
      * All of the registered messages.
@@ -139,7 +140,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     /**
      * Determine if messages exist for any of the given keys.
      *
-     * @param  array|string|null  $keys
+     * @param  array|string  $keys
      * @return bool
      */
     public function hasAny($keys = [])
@@ -193,7 +194,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
             );
         }
 
-        if (str_contains($key, '*')) {
+        if (Str::contains($key, '*')) {
             return $this->getMessagesForWildcardKey($key, $format);
         }
 
@@ -251,19 +252,6 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
     }
 
     /**
-     * Remove a message from the message bag.
-     *
-     * @param  string  $key
-     * @return $this
-     */
-    public function forget($key)
-    {
-        unset($this->messages[$key]);
-
-        return $this;
-    }
-
-    /**
      * Format an array of messages.
      *
      * @param  array  $messages
@@ -273,10 +261,6 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      */
     protected function transform($messages, $format, $messageKey)
     {
-        if ($format == ':message') {
-            return (array) $messages;
-        }
-
         return collect((array) $messages)
             ->map(function ($message) use ($format, $messageKey) {
                 // We will simply spin through the given messages and transform each one
@@ -385,7 +369,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @return int
      */
-    public function count(): int
+    public function count()
     {
         return count($this->messages, COUNT_RECURSIVE) - count($this->messages);
     }
@@ -405,7 +389,7 @@ class MessageBag implements Jsonable, JsonSerializable, MessageBagContract, Mess
      *
      * @return array
      */
-    public function jsonSerialize(): array
+    public function jsonSerialize()
     {
         return $this->toArray();
     }

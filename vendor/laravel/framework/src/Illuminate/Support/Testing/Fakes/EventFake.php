@@ -5,36 +5,27 @@ namespace Illuminate\Support\Testing\Fakes;
 use Closure;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 use ReflectionFunction;
 
-class EventFake implements Dispatcher, Fake
+class EventFake implements Dispatcher
 {
-    use ForwardsCalls, ReflectsClosures;
+    use ReflectsClosures;
 
     /**
      * The original event dispatcher.
      *
      * @var \Illuminate\Contracts\Events\Dispatcher
      */
-    public $dispatcher;
+    protected $dispatcher;
 
     /**
      * The event types that should be intercepted instead of dispatched.
      *
      * @var array
      */
-    protected $eventsToFake = [];
-
-    /**
-     * The event types that should be dispatched instead of intercepted.
-     *
-     * @var array
-     */
-    protected $eventsToDispatch = [];
+    protected $eventsToFake;
 
     /**
      * All of the events that have been intercepted keyed by type.
@@ -58,26 +49,10 @@ class EventFake implements Dispatcher, Fake
     }
 
     /**
-     * Specify the events that should be dispatched instead of faked.
-     *
-     * @param  array|string  $eventsToDispatch
-     * @return $this
-     */
-    public function except($eventsToDispatch)
-    {
-        $this->eventsToDispatch = array_merge(
-            $this->eventsToDispatch,
-            Arr::wrap($eventsToDispatch)
-        );
-
-        return $this;
-    }
-
-    /**
      * Assert if an event has a listener attached to it.
      *
      * @param  string  $expectedEvent
-     * @param  string|array  $expectedListener
+     * @param  string  $expectedListener
      * @return void
      */
     public function assertListening($expectedEvent, $expectedListener)
@@ -86,23 +61,9 @@ class EventFake implements Dispatcher, Fake
             $actualListener = (new ReflectionFunction($listenerClosure))
                         ->getStaticVariables()['listener'];
 
-            $normalizedListener = $expectedListener;
-
-            if (is_string($actualListener) && Str::contains($actualListener, '@')) {
-                $actualListener = Str::parseCallback($actualListener);
-
-                if (is_string($expectedListener)) {
-                    if (Str::contains($expectedListener, '@')) {
-                        $normalizedListener = Str::parseCallback($expectedListener);
-                    } else {
-                        $normalizedListener = [$expectedListener, 'handle'];
-                    }
-                }
-            }
-
-            if ($actualListener === $normalizedListener ||
+            if ($actualListener === $expectedListener ||
                 ($actualListener instanceof Closure &&
-                $normalizedListener === Closure::class)) {
+                $expectedListener === Closure::class)) {
                 PHPUnit::assertTrue(true);
 
                 return;
@@ -206,11 +167,13 @@ class EventFake implements Dispatcher, Fake
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: function () {
+            return true;
+        };
 
-        return collect($this->events[$event])->filter(
-            fn ($arguments) => $callback(...$arguments)
-        );
+        return collect($this->events[$event])->filter(function ($arguments) use ($callback) {
+            return $callback(...$arguments);
+        });
     }
 
     /**
@@ -309,10 +272,6 @@ class EventFake implements Dispatcher, Fake
      */
     protected function shouldFakeEvent($eventName, $payload)
     {
-        if ($this->shouldDispatchEvent($eventName, $payload)) {
-            return false;
-        }
-
         if (empty($this->eventsToFake)) {
             return true;
         }
@@ -322,28 +281,6 @@ class EventFake implements Dispatcher, Fake
                 return $event instanceof Closure
                             ? $event($eventName, $payload)
                             : $event === $eventName;
-            })
-            ->isNotEmpty();
-    }
-
-    /**
-     * Determine whether an event should be dispatched or not.
-     *
-     * @param  string  $eventName
-     * @param  mixed  $payload
-     * @return bool
-     */
-    protected function shouldDispatchEvent($eventName, $payload)
-    {
-        if (empty($this->eventsToDispatch)) {
-            return false;
-        }
-
-        return collect($this->eventsToDispatch)
-            ->filter(function ($event) use ($eventName, $payload) {
-                return $event instanceof Closure
-                    ? $event($eventName, $payload)
-                    : $event === $eventName;
             })
             ->isNotEmpty();
     }
@@ -379,17 +316,5 @@ class EventFake implements Dispatcher, Fake
     public function until($event, $payload = [])
     {
         return $this->dispatch($event, $payload, true);
-    }
-
-    /**
-     * Handle dynamic method calls to the dispatcher.
-     *
-     * @param  string  $method
-     * @param  array  $parameters
-     * @return mixed
-     */
-    public function __call($method, $parameters)
-    {
-        return $this->forwardCallTo($this->dispatcher, $method, $parameters);
     }
 }

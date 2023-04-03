@@ -44,10 +44,12 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
-    public function getCommandDocument(Command $command, bool $short = false): \DOMDocument
+    public function getCommandDocument(Command $command): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($commandXML = $dom->createElement('command'));
+
+        $command->mergeApplicationDefinition(false);
 
         $commandXML->setAttribute('id', $command->getName());
         $commandXML->setAttribute('name', $command->getName());
@@ -55,31 +57,23 @@ class XmlDescriptor extends Descriptor
 
         $commandXML->appendChild($usagesXML = $dom->createElement('usages'));
 
+        foreach (array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()) as $usage) {
+            $usagesXML->appendChild($dom->createElement('usage', $usage));
+        }
+
         $commandXML->appendChild($descriptionXML = $dom->createElement('description'));
         $descriptionXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getDescription())));
 
-        if ($short) {
-            foreach ($command->getAliases() as $usage) {
-                $usagesXML->appendChild($dom->createElement('usage', $usage));
-            }
-        } else {
-            $command->mergeApplicationDefinition(false);
+        $commandXML->appendChild($helpXML = $dom->createElement('help'));
+        $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
 
-            foreach (array_merge([$command->getSynopsis()], $command->getAliases(), $command->getUsages()) as $usage) {
-                $usagesXML->appendChild($dom->createElement('usage', $usage));
-            }
-
-            $commandXML->appendChild($helpXML = $dom->createElement('help'));
-            $helpXML->appendChild($dom->createTextNode(str_replace("\n", "\n ", $command->getProcessedHelp())));
-
-            $definitionXML = $this->getInputDefinitionDocument($command->getDefinition());
-            $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
-        }
+        $definitionXML = $this->getInputDefinitionDocument($command->getDefinition());
+        $this->appendDocument($commandXML, $definitionXML->getElementsByTagName('definition')->item(0));
 
         return $dom;
     }
 
-    public function getApplicationDocument(Application $application, string $namespace = null, bool $short = false): \DOMDocument
+    public function getApplicationDocument(Application $application, string $namespace = null): \DOMDocument
     {
         $dom = new \DOMDocument('1.0', 'UTF-8');
         $dom->appendChild($rootXml = $dom->createElement('symfony'));
@@ -100,7 +94,7 @@ class XmlDescriptor extends Descriptor
         }
 
         foreach ($description->getCommands() as $command) {
-            $this->appendDocument($commandsXML, $this->getCommandDocument($command, $short));
+            $this->appendDocument($commandsXML, $this->getCommandDocument($command));
         }
 
         if (!$namespace) {
@@ -120,29 +114,44 @@ class XmlDescriptor extends Descriptor
         return $dom;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function describeInputArgument(InputArgument $argument, array $options = [])
     {
         $this->writeDocument($this->getInputArgumentDocument($argument));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function describeInputOption(InputOption $option, array $options = [])
     {
         $this->writeDocument($this->getInputOptionDocument($option));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function describeInputDefinition(InputDefinition $definition, array $options = [])
     {
         $this->writeDocument($this->getInputDefinitionDocument($definition));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function describeCommand(Command $command, array $options = [])
     {
-        $this->writeDocument($this->getCommandDocument($command, $options['short'] ?? false));
+        $this->writeDocument($this->getCommandDocument($command));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     protected function describeApplication(Application $application, array $options = [])
     {
-        $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null, $options['short'] ?? false));
+        $this->writeDocument($this->getApplicationDocument($application, $options['namespace'] ?? null));
     }
 
     /**
@@ -214,17 +223,6 @@ class XmlDescriptor extends Descriptor
                     $defaultXML->appendChild($dom->createTextNode($default));
                 }
             }
-        }
-
-        if ($option->isNegatable()) {
-            $dom->appendChild($objectXML = $dom->createElement('option'));
-            $objectXML->setAttribute('name', '--no-'.$option->getName());
-            $objectXML->setAttribute('shortcut', '');
-            $objectXML->setAttribute('accept_value', 0);
-            $objectXML->setAttribute('is_value_required', 0);
-            $objectXML->setAttribute('is_multiple', 0);
-            $objectXML->appendChild($descriptionXML = $dom->createElement('description'));
-            $descriptionXML->appendChild($dom->createTextNode('Negate the "--'.$option->getName().'" option'));
         }
 
         return $dom;

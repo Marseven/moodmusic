@@ -6,9 +6,9 @@ use Closure;
 use Illuminate\Bus\Events\BatchDispatched;
 use Illuminate\Contracts\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher as EventDispatcher;
+use Illuminate\Queue\SerializableClosure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Laravel\SerializableClosure\SerializableClosure;
 use Throwable;
 
 class PendingBatch
@@ -57,16 +57,12 @@ class PendingBatch
     /**
      * Add jobs to the batch.
      *
-     * @param  iterable|object|array  $jobs
+     * @param  array  $jobs
      * @return $this
      */
     public function add($jobs)
     {
-        $jobs = is_iterable($jobs) ? $jobs : Arr::wrap($jobs);
-
-        foreach ($jobs as $job) {
-            $this->jobs->push($job);
-        }
+        $this->jobs->push($jobs);
 
         return $this;
     }
@@ -229,20 +225,6 @@ class PendingBatch
     }
 
     /**
-     * Add additional data into the batch's options array.
-     *
-     * @param  string  $key
-     * @param  mixed  $value
-     * @return $this
-     */
-    public function withOption(string $key, $value)
-    {
-        $this->options[$key] = $value;
-
-        return $this;
-    }
-
-    /**
      * Dispatch the batch.
      *
      * @return \Illuminate\Bus\Batch
@@ -270,50 +252,5 @@ class PendingBatch
         );
 
         return $batch;
-    }
-
-    /**
-     * Dispatch the batch after the response is sent to the browser.
-     *
-     * @return \Illuminate\Bus\Batch
-     */
-    public function dispatchAfterResponse()
-    {
-        $repository = $this->container->make(BatchRepository::class);
-
-        $batch = $repository->store($this);
-
-        if ($batch) {
-            $this->container->terminating(function () use ($batch) {
-                $this->dispatchExistingBatch($batch);
-            });
-        }
-
-        return $batch;
-    }
-
-    /**
-     * Dispatch an existing batch.
-     *
-     * @param  \Illuminate\Bus\Batch  $batch
-     * @return void
-     *
-     * @throws \Throwable
-     */
-    protected function dispatchExistingBatch($batch)
-    {
-        try {
-            $batch = $batch->add($this->jobs);
-        } catch (Throwable $e) {
-            if (isset($batch)) {
-                $batch->delete();
-            }
-
-            throw $e;
-        }
-
-        $this->container->make(EventDispatcher::class)->dispatch(
-            new BatchDispatched($batch)
-        );
     }
 }

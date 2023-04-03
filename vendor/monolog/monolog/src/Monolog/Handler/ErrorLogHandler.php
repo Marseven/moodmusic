@@ -13,9 +13,7 @@ namespace Monolog\Handler;
 
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\FormatterInterface;
-use Monolog\Level;
-use Monolog\Utils;
-use Monolog\LogRecord;
+use Monolog\Logger;
 
 /**
  * Stores to PHP error_log() handler.
@@ -27,16 +25,16 @@ class ErrorLogHandler extends AbstractProcessingHandler
     public const OPERATING_SYSTEM = 0;
     public const SAPI = 4;
 
-    protected int $messageType;
-    protected bool $expandNewlines;
+    protected $messageType;
+    protected $expandNewlines;
 
     /**
-     * @param int  $messageType    Says where the error should go.
-     * @param bool $expandNewlines If set to true, newlines in the message will be expanded to be take multiple log entries
-     *
-     * @throws \InvalidArgumentException If an unsupported message type is set
+     * @param int        $messageType    Says where the error should go.
+     * @param int|string $level          The minimum logging level at which this handler will be triggered
+     * @param bool       $bubble         Whether the messages that are handled can bubble up the stack or not
+     * @param bool       $expandNewlines If set to true, newlines in the message will be expanded to be take multiple log entries
      */
-    public function __construct(int $messageType = self::OPERATING_SYSTEM, int|string|Level $level = Level::Debug, bool $bubble = true, bool $expandNewlines = false)
+    public function __construct(int $messageType = self::OPERATING_SYSTEM, $level = Logger::DEBUG, bool $bubble = true, bool $expandNewlines = false)
     {
         parent::__construct($level, $bubble);
 
@@ -51,7 +49,7 @@ class ErrorLogHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @return int[] With all available types
+     * @return array With all available types
      */
     public static function getAvailableTypes(): array
     {
@@ -62,7 +60,7 @@ class ErrorLogHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritDoc
+     * {@inheritDoc}
      */
     protected function getDefaultFormatter(): FormatterInterface
     {
@@ -70,22 +68,17 @@ class ErrorLogHandler extends AbstractProcessingHandler
     }
 
     /**
-     * @inheritDoc
+     * {@inheritdoc}
      */
-    protected function write(LogRecord $record): void
+    protected function write(array $record): void
     {
         if (!$this->expandNewlines) {
-            error_log((string) $record->formatted, $this->messageType);
+            error_log((string) $record['formatted'], $this->messageType);
 
             return;
         }
 
-        $lines = preg_split('{[\r\n]+}', (string) $record->formatted);
-        if ($lines === false) {
-            $pcreErrorCode = preg_last_error();
-
-            throw new \RuntimeException('Failed to preg_split formatted string: ' . $pcreErrorCode . ' / '. Utils::pcreLastErrorMessage($pcreErrorCode));
-        }
+        $lines = preg_split('{[\r\n]+}', (string) $record['formatted']);
         foreach ($lines as $line) {
             error_log($line, $this->messageType);
         }

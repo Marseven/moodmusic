@@ -7,14 +7,13 @@ use Exception;
 use Illuminate\Contracts\Notifications\Dispatcher as NotificationDispatcher;
 use Illuminate\Contracts\Notifications\Factory as NotificationFactory;
 use Illuminate\Contracts\Translation\HasLocalePreference;
-use Illuminate\Notifications\AnonymousNotifiable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
 use Illuminate\Support\Traits\ReflectsClosures;
 use PHPUnit\Framework\Assert as PHPUnit;
 
-class NotificationFake implements Fake, NotificationDispatcher, NotificationFactory
+class NotificationFake implements NotificationDispatcher, NotificationFactory
 {
     use Macroable, ReflectsClosures;
 
@@ -31,20 +30,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
      * @var string|null
      */
     public $locale;
-
-    /**
-     * Assert if a notification was sent on-demand based on a truth-test callback.
-     *
-     * @param  string|\Closure  $notification
-     * @param  callable|null  $callback
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function assertSentOnDemand($notification, $callback = null)
-    {
-        $this->assertSentTo(new AnonymousNotifiable, $notification, $callback);
-    }
 
     /**
      * Assert if a notification was sent based on a truth-test callback.
@@ -82,18 +67,6 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             $this->sent($notifiable, $notification, $callback)->count() > 0,
             "The expected [{$notification}] notification was not sent."
         );
-    }
-
-    /**
-     * Assert if a notification was sent on-demand a number of times.
-     *
-     * @param  string  $notification
-     * @param  int  $times
-     * @return void
-     */
-    public function assertSentOnDemandTimes($notification, $times = 1)
-    {
-        return $this->assertSentToTimes(new AnonymousNotifiable, $notification, $times);
     }
 
     /**
@@ -159,65 +132,23 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
     }
 
     /**
-     * Assert that no notifications were sent to the given notifiable.
-     *
-     * @param  mixed  $notifiable
-     * @return void
-     *
-     * @throws \Exception
-     */
-    public function assertNothingSentTo($notifiable)
-    {
-        if (is_array($notifiable) || $notifiable instanceof Collection) {
-            if (count($notifiable) === 0) {
-                throw new Exception('No notifiable given.');
-            }
-
-            foreach ($notifiable as $singleNotifiable) {
-                $this->assertNothingSentTo($singleNotifiable);
-            }
-
-            return;
-        }
-
-        PHPUnit::assertEmpty(
-            $this->notifications[get_class($notifiable)][$notifiable->getKey()] ?? [],
-            'Notifications were sent unexpectedly.',
-        );
-    }
-
-    /**
      * Assert the total amount of times a notification was sent.
      *
-     * @param  string  $notification
      * @param  int  $expectedCount
+     * @param  string  $notification
      * @return void
      */
-    public function assertSentTimes($notification, $expectedCount)
+    public function assertTimesSent($expectedCount, $notification)
     {
         $actualCount = collect($this->notifications)
             ->flatten(1)
-            ->reduce(fn ($count, $sent) => $count + count($sent[$notification] ?? []), 0);
+            ->reduce(function ($count, $sent) use ($notification) {
+                return $count + count($sent[$notification] ?? []);
+            }, 0);
 
         PHPUnit::assertSame(
             $expectedCount, $actualCount,
             "Expected [{$notification}] to be sent {$expectedCount} times, but was sent {$actualCount} times."
-        );
-    }
-
-    /**
-     * Assert the total count of notification that were sent.
-     *
-     * @param  int  $expectedCount
-     * @return void
-     */
-    public function assertCount($expectedCount)
-    {
-        $actualCount = collect($this->notifications)->flatten(3)->count();
-
-        PHPUnit::assertSame(
-            $expectedCount, $actualCount,
-            "Expected {$expectedCount} notifications to be sent, but {$actualCount} were sent."
         );
     }
 
@@ -235,13 +166,15 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
             return collect();
         }
 
-        $callback = $callback ?: fn () => true;
+        $callback = $callback ?: function () {
+            return true;
+        };
 
         $notifications = collect($this->notificationsFor($notifiable, $notification));
 
-        return $notifications->filter(
-            fn ($arguments) => $callback(...array_values($arguments))
-        )->pluck('notification');
+        return $notifications->filter(function ($arguments) use ($callback) {
+            return $callback(...array_values($arguments));
+        })->pluck('notification');
     }
 
     /**
@@ -299,22 +232,9 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
                 $notification->id = Str::uuid()->toString();
             }
 
-            $notifiableChannels = $channels ?: $notification->via($notifiable);
-
-            if (method_exists($notification, 'shouldSend')) {
-                $notifiableChannels = array_filter(
-                    $notifiableChannels,
-                    fn ($channel) => $notification->shouldSend($notifiable, $channel) !== false
-                );
-
-                if (empty($notifiableChannels)) {
-                    continue;
-                }
-            }
-
             $this->notifications[get_class($notifiable)][$notifiable->getKey()][get_class($notification)][] = [
                 'notification' => $notification,
-                'channels' => $notifiableChannels,
+                'channels' => $channels ?: $notification->via($notifiable),
                 'notifiable' => $notifiable,
                 'locale' => $notification->locale ?? $this->locale ?? value(function () use ($notifiable) {
                     if ($notifiable instanceof HasLocalePreference) {
@@ -347,15 +267,5 @@ class NotificationFake implements Fake, NotificationDispatcher, NotificationFact
         $this->locale = $locale;
 
         return $this;
-    }
-
-    /**
-     * Get the notifications that have been sent.
-     *
-     * @return array
-     */
-    public function sentNotifications()
-    {
-        return $this->notifications;
     }
 }

@@ -121,10 +121,10 @@ class CompiledRouteCollection extends AbstractRouteCollection
             if ($result = $matcher->matchRequest($trimmedRequest)) {
                 $route = $this->getByName($result['_route']);
             }
-        } catch (ResourceNotFoundException|MethodNotAllowedException $e) {
+        } catch (ResourceNotFoundException | MethodNotAllowedException $e) {
             try {
                 return $this->routes->match($request);
-            } catch (NotFoundHttpException) {
+            } catch (NotFoundHttpException $e) {
                 //
             }
         }
@@ -136,7 +136,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
                 if (! $dynamicRoute->isFallback) {
                     $route = $dynamicRoute;
                 }
-            } catch (NotFoundHttpException|MethodNotAllowedHttpException) {
+            } catch (NotFoundHttpException | MethodNotAllowedHttpException $e) {
                 //
             }
         }
@@ -152,7 +152,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
      */
     protected function requestWithoutTrailingSlash(Request $request)
     {
-        $trimmedRequest = $request->duplicate();
+        $trimmedRequest = Request::createFromBase($request);
 
         $parts = explode('?', $request->server->get('REQUEST_URI'), 2);
 
@@ -252,7 +252,11 @@ class CompiledRouteCollection extends AbstractRouteCollection
             })
             ->map(function (Collection $routes) {
                 return $routes->mapWithKeys(function (Route $route) {
-                    return [$route->getDomain().$route->uri => $route];
+                    if ($domain = $route->getDomain()) {
+                        return [$domain.'/'.$route->uri => $route];
+                    }
+
+                    return [$route->uri => $route];
                 })->all();
             })
             ->all();
@@ -298,8 +302,7 @@ class CompiledRouteCollection extends AbstractRouteCollection
             ->setDefaults($attributes['defaults'])
             ->setWheres($attributes['wheres'])
             ->setBindingFields($attributes['bindingFields'])
-            ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null)
-            ->withTrashed($attributes['withTrashed'] ?? false);
+            ->block($attributes['lockSeconds'] ?? null, $attributes['waitSeconds'] ?? null);
     }
 
     /**

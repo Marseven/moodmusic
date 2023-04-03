@@ -11,8 +11,6 @@
 
 namespace Monolog\Processor;
 
-use Monolog\LogRecord;
-
 /**
  * Adds a tags array into record
  *
@@ -20,20 +18,13 @@ use Monolog\LogRecord;
  */
 class TagProcessor implements ProcessorInterface
 {
-    /** @var string[] */
-    private array $tags;
+    private $tags;
 
-    /**
-     * @param string[] $tags
-     */
     public function __construct(array $tags = [])
     {
         $this->setTags($tags);
     }
 
-    /**
-     * @param string[] $tags
-     */
     public function addTags(array $tags = []): self
     {
         $this->tags = array_merge($this->tags, $tags);
@@ -41,9 +32,6 @@ class TagProcessor implements ProcessorInterface
         return $this;
     }
 
-    /**
-     * @param string[] $tags
-     */
     public function setTags(array $tags = []): self
     {
         $this->tags = $tags;
@@ -51,12 +39,9 @@ class TagProcessor implements ProcessorInterface
         return $this;
     }
 
-    /**
-     * @inheritDoc
-     */
-    public function __invoke(LogRecord $record): LogRecord
+    public function __invoke(array $record): array
     {
-        $record->extra['tags'] = $this->tags;
+        $record['extra']['tags'] = $this->tags;
 
         return $record;
     }
