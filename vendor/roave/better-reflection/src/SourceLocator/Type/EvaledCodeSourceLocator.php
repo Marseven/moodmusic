@@ -12,21 +12,15 @@ use Roave\BetterReflection\SourceLocator\Exception\InvalidFileLocation;
 use Roave\BetterReflection\SourceLocator\Located\EvaledLocatedSource;
 use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
 use Roave\BetterReflection\SourceLocator\SourceStubber\SourceStubber;
-use function class_exists;
-use function file_exists;
-use function interface_exists;
-use function trait_exists;
+use Roave\BetterReflection\Util\ClassExistenceChecker;
+
+use function is_file;
 
 final class EvaledCodeSourceLocator extends AbstractSourceLocator
 {
-    /** @var SourceStubber */
-    private $stubber;
-
-    public function __construct(Locator $astLocator, SourceStubber $stubber)
+    public function __construct(Locator $astLocator, private SourceStubber $stubber)
     {
         parent::__construct($astLocator);
-
-        $this->stubber = $stubber;
     }
 
     /**
@@ -35,7 +29,7 @@ final class EvaledCodeSourceLocator extends AbstractSourceLocator
      * @throws InvalidArgumentException
      * @throws InvalidFileLocation
      */
-    protected function createLocatedSource(Identifier $identifier) : ?LocatedSource
+    protected function createLocatedSource(Identifier $identifier): LocatedSource|null
     {
         $classReflection = $this->getInternalReflectionClass($identifier);
 
@@ -49,25 +43,26 @@ final class EvaledCodeSourceLocator extends AbstractSourceLocator
             return null;
         }
 
-        return new EvaledLocatedSource($stubData->getStub());
+        return new EvaledLocatedSource($stubData->getStub(), $classReflection->getName());
     }
 
-    private function getInternalReflectionClass(Identifier $identifier) : ?ReflectionClass
+    private function getInternalReflectionClass(Identifier $identifier): ReflectionClass|null
     {
         if (! $identifier->isClass()) {
             return null;
         }
 
+        /** @psalm-var class-string|trait-string $name */
         $name = $identifier->getName();
 
-        if (! (class_exists($name, false) || interface_exists($name, false) || trait_exists($name, false))) {
+        if (! ClassExistenceChecker::exists($name)) {
             return null; // not an available internal class
         }
 
         $reflection = new ReflectionClass($name);
         $sourceFile = $reflection->getFileName();
 
-        return $sourceFile && file_exists($sourceFile)
+        return $sourceFile && is_file($sourceFile)
             ? null : $reflection;
     }
 }

@@ -15,7 +15,9 @@ class AddColumnsToProfileLinksTable extends Migration
     {
         Schema::table('profile_links', function (Blueprint $table) {
             $table->string('linkeable_type')->index()->after('user_id');
-            $table->renameColumn('user_id', 'linkeable_id');
+            if ( ! Schema::hasColumn('profile_links', 'linkeable_id')) {
+                $table->renameColumn('user_id', 'linkeable_id');
+            }
         });
     }
 

@@ -2,70 +2,63 @@
 
 use App;
 use App\Actions\Track\DeleteTracks;
+use App\Artist;
+use App\Genre;
 use App\Http\Requests\ModifyTracks;
 use App\Services\Tracks\CrupdateTrack;
-use App\Services\Tracks\PaginateModelComments;
 use App\Services\Tracks\PaginateTracks;
 use App\Track;
 use Arr;
 use Common\Core\BaseController;
-use Common\Settings\Settings;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Http\Request;
 
-class TrackController extends BaseController {
-
-	/**
-	 * @var Track
-	 */
-	private $track;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(Track $track, Request $request)
-	{
-		$this->track = $track;
-        $this->request = $request;
+class TrackController extends BaseController
+{
+    public function __construct(
+        protected Track $track,
+        protected Request $request,
+    ) {
     }
 
-	public function index()
-	{
+    public function index()
+    {
         $this->authorize('index', Track::class);
 
-	    $pagination = App(PaginateTracks::class)->execute($this->request->all());
+        $pagination = App(PaginateTracks::class)->execute(
+            $this->request->all(),
+        );
 
         $pagination->makeVisible(['views', 'updated_at', 'plays']);
 
-	    return $this->success(['pagination' => $pagination]);
-	}
+        return $this->success(['pagination' => $pagination]);
+    }
 
-	public function show(Track $track)
-	{
+    public function show(Track $track)
+    {
         $this->authorize('show', $track);
 
-        if ($this->request->get('defaultRelations') || defined('SHOULD_PRERENDER')) {
-            $load = ['tags', 'genres', 'artists', 'fullAlbum', 'comments'];
-            $loadCount = ['plays', 'reposts', 'likes'];
+        $params = $this->request->all();
+        if (
+            $this->request->get('defaultRelations') ||
+            defined('SHOULD_PRERENDER')
+        ) {
+            $load = ['tags', 'genres', 'artists', 'fullAlbum'];
+            $loadCount = ['reposts', 'likes'];
         } else {
-            $params = $this->request->all();
             $load = array_filter(explode(',', Arr::get($params, 'with', '')));
-            $loadCount = array_filter(explode(',', Arr::get($params, 'withCount', '')));
+            $loadCount = array_filter(
+                explode(',', Arr::get($params, 'withCount', '')),
+            );
         }
 
-        $response = ['track' => $track];
         foreach ($load as $relation) {
             if ($relation === 'fullAlbum') {
-                $track->load(['album' => function(BelongsTo $builder) {
-                    return $builder->with(['artists', 'tracks.artists']);
-                }]);
-            } else if ($relation === 'comments') {
-                if (app(Settings::class)->get('player.track_comments')) {
-                    $track->loadCount('comments');
-                    $response['comments'] = app(PaginateModelComments::class)->execute($track);
-                }
+                $track->load([
+                    'album' => function (BelongsTo $builder) {
+                        return $builder->with(['artists', 'tracks.artists']);
+                    },
+                ]);
             } else {
                 $track->load($relation);
             }
@@ -79,43 +72,60 @@ class TrackController extends BaseController {
 
         $track->makeVisible('description');
 
-	    return $this->success($response);
-	}
-
-    public function store(ModifyTracks $validate)
-    {
-        $this->authorize('store', Track::class);
-
-        $track = app(CrupdateTrack::class)
-            ->execute($this->request->all(), null, $this->request->get('album'));
+        if (Arr::get($params, 'forEditing')) {
+            $track->setHidden([]);
+            $track->setRelation(
+                'artists',
+                $track->artists->map(
+                    fn(Artist $artist) => $artist->toNormalizedArray(),
+                ),
+            );
+            $track->setRelation(
+                'genres',
+                $track->genres->map(
+                    fn(Genre $genre) => $genre->toNormalizedArray(),
+                ),
+            );
+        }
 
         return $this->success(['track' => $track]);
     }
 
-    public function update(int $id, ModifyTracks $validate)
+    public function store(ModifyTracks $request)
+    {
+        $this->authorize('store', Track::class);
+
+        $track = app(CrupdateTrack::class)->execute(
+            $request->all(),
+            null,
+            $request->get('album'),
+        );
+
+        return $this->success(['track' => $track]);
+    }
+
+    public function update(int $id, ModifyTracks $request)
     {
         $track = $this->track->findOrFail($id);
 
         $this->authorize('update', $track);
 
-        $track = app(CrupdateTrack::class)
-            ->execute($this->request->all(), $track, $this->request->get('album'));
+        $track = app(CrupdateTrack::class)->execute(
+            $request->all(),
+            $track,
+            $request->get('album'),
+        );
 
         return $this->success(['track' => $track]);
     }
 
-	public function destroy()
-	{
-		$trackIds = $this->request->get('ids');
-	    $this->authorize('destroy', [Track::class, $trackIds]);
-
-        $this->validate($this->request, [
-            'ids'   => 'required|array',
-            'ids.*' => 'required|integer'
-        ]);
+    public function destroy(string $ids)
+    {
+        $trackIds = explode(',', $ids);
+        $this->authorize('destroy', [Track::class, $trackIds]);
 
         app(DeleteTracks::class)->execute($trackIds);
 
-	    return $this->success();
-	}
+        return $this->success();
+    }
 }

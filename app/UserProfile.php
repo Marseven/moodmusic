@@ -18,21 +18,4 @@ class UserProfile extends Model
         'created_at',
         'updated_at',
     ];
-
-    public function getHeaderColorsAttribute($value)
-    {
-        if ($value) {
-            return json_decode($value, true);
-        } else {
-            return [];
-        }
-    }
-
-    public function setHeaderColorsAttribute($value)
-    {
-        if ( ! is_string($value)) {
-            $value = json_encode($value);
-        }
-        $this->attributes['header_colors'] = $value;
-    }
 }

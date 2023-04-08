@@ -8,7 +8,6 @@
 // PHP Libevent extension documentation:
 // https://php.net/libevent
 
-
 // Event flags
 
 /**
@@ -62,7 +61,6 @@ define('EV_SIGNAL', 8);
  */
 define('EV_PERSIST', 16);
 
-
 // Event loop modes
 
 /**
@@ -82,17 +80,16 @@ define('EVLOOP_ONCE', 1);
  */
 define('EVLOOP_NONBLOCK', 2);
 
-
 // Buffered event error codes (second argument in buffer's error-callback)
 
 /**
- * An event occured during a read operation on the
+ * An event occurred during a read operation on the
  * bufferevent. See the other flags for which event it was.
  */
 define('EVBUFFER_READ', 1);
 
 /**
- * An event occured during a write operation on the bufferevent.
+ * An event occurred during a write operation on the bufferevent.
  * See the other flags for which event it was.
  */
 define('EVBUFFER_WRITE', 2);
@@ -113,9 +110,6 @@ define('EVBUFFER_ERROR', 32);
  */
 define('EVBUFFER_TIMEOUT', 64);
 
-
-
-
 /**
  * <p>Create and initialize new event base</p>
  *
@@ -125,7 +119,7 @@ define('EVBUFFER_TIMEOUT', 64);
  *
  * @return resource|false returns valid event base resource on success or FALSE on error.
  */
-function event_base_new(){}
+function event_base_new() {}
 
 /**
  * <p>Destroy event base</p>
@@ -210,7 +204,7 @@ function event_base_loopbreak($event_base) {}
  * Valid event base resource.
  * </p>
  * @param int $timeout [optional] <p>
- * Optional timeout parameter (in microseconds). If lower then 1,
+ * Optional timeout parameter (in microseconds). If lower than 1,
  * the event_base stops looping without a delay.
  * </p>
  *
@@ -250,7 +244,6 @@ function event_base_set($event, $base) {}
  */
 function event_base_priority_init($event_base, $npriorities) {}
 
-
 /**
  * <p>Creates and returns a new event resource.</p>
  * <p>(PECL libevent >= 0.0.1)</p>
@@ -280,7 +273,7 @@ function event_free($event) {}
  * <p>Schedules the execution of the non-pending event (makes it pending in it's
  * configured base) when the event specified in {@link event_set}() occurs or in
  * at least the time specified by the timeout argument. If timeout was not specified,
- * not timeout is set. The event must be already initalized by
+ * not timeout is set. The event must be already initialized by
  * {@link event_set}() and {@link event_base_set}() functions.
  * If the event already has a timeout set,
  * it is replaced by the new one.</p>
@@ -344,7 +337,7 @@ function event_add($event, $timeout = -1) {}
  * The additional flag EV_PERSIST makes the event to persist until {@link event_del}() is
  * called, otherwise the callback is invoked only once.
  * </p>
- * @param callback $callback <p>
+ * @param callable $callback <p>
  * Callback function to be called when the matching event occurs.
  * </p>
  * @param mixed $arg [optional] <p>
@@ -370,7 +363,6 @@ function event_set($event, $fd, $events, $callback, $arg = null) {}
  */
 function event_del($event) {}
 
-
 /**
  * <p>Create new buffered event</p>
  * <p>(PECL libevent >= 0.0.1)</p>
@@ -393,9 +385,9 @@ function event_del($event) {}
  * @link https://php.net/event_buffer_new
  *
  * @param resource      $stream  Valid PHP stream resource. Must be castable to file descriptor.
- * @param callback|null $readcb  Callback to invoke where there is data to read, or NULL if no callback is desired.
- * @param callback|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
- * @param callback      $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
+ * @param callable|null $readcb  Callback to invoke where there is data to read, or NULL if no callback is desired.
+ * @param callable|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
+ * @param callable      $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
  * @param mixed         $arg     An argument that will be passed to each of the callbacks (optional).
  *
  * @return resource|false returns new buffered event resource on success or FALSE on error.
@@ -600,15 +592,14 @@ function event_buffer_fd_set($bevent, $fd) {}
  * @link https://php.net/event_buffer_set_callback
  *
  * @param resource $bevent Valid buffered event resource.
- * @param callback|null $readcb Callback to invoke where there is data to read, or NULL if no callback is desired.
- * @param callback|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
- * @param callback $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
+ * @param callable|null $readcb Callback to invoke where there is data to read, or NULL if no callback is desired.
+ * @param callable|null $writecb Callback to invoke where the descriptor is ready for writing, or NULL if no callback is desired.
+ * @param callable $errorcb Callback to invoke where there is an error on the descriptor, cannot be NULL.
  * @param mixed $arg An argument that will be passed to each of the callbacks (optional).
  *
  * @return bool returns TRUE on success or FALSE on error.
  */
 function event_buffer_set_callback($bevent, $readcb, $writecb, $errorcb, $arg = null) {}
-
 
 /**
  * <p>Alias of {@link event_new}().</p>
@@ -645,7 +636,7 @@ function event_timer_new() {}
  * @param resource $event <p>
  * Valid event resource.
  * </p>
- * @param callback $callback <p>
+ * @param callable $callback <p>
  * Callback function to be called when the matching event occurs.
  * </p>
  * @param mixed $arg [optional] <p>
@@ -693,6 +684,4 @@ function event_timer_add($event, $timeout = -1) {}
  */
 function event_timer_del($event) {}
 
-
 // End of PECL libevent v.0.0.4
-

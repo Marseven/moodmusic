@@ -5,47 +5,47 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\Adapter;
 
 use ReflectionNamedType as CoreReflectionNamedType;
-use Roave\BetterReflection\Reflection\ReflectionType as BetterReflectionType;
+use Roave\BetterReflection\Reflection\ReflectionNamedType as BetterReflectionNamedType;
 
-class ReflectionNamedType extends CoreReflectionNamedType
+use function strtolower;
+
+/** @psalm-suppress MissingImmutableAnnotation */
+final class ReflectionNamedType extends CoreReflectionNamedType
 {
-    /** @var BetterReflectionType */
-    private $betterReflectionType;
-
-    public function __construct(BetterReflectionType $betterReflectionType)
+    public function __construct(private BetterReflectionNamedType $betterReflectionType, private bool $allowsNull)
     {
-        $this->betterReflectionType = $betterReflectionType;
     }
 
-    public static function fromReturnTypeOrNull(?BetterReflectionType $betterReflectionType) : ?self
-    {
-        if ($betterReflectionType === null) {
-            return null;
-        }
-
-        return new self($betterReflectionType);
-    }
-
-    public function getName() : string
+    public function getName(): string
     {
         return $this->betterReflectionType->getName();
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
-        return $this->betterReflectionType->__toString();
+        $type = strtolower($this->betterReflectionType->getName());
+
+        if (
+            ! $this->allowsNull
+            || $type === 'mixed'
+            || $type === 'null'
+        ) {
+            return $this->betterReflectionType->__toString();
+        }
+
+        return '?' . $this->betterReflectionType->__toString();
     }
 
-    public function allowsNull() : bool
+    public function allowsNull(): bool
     {
-        return $this->betterReflectionType->allowsNull();
+        return $this->allowsNull;
     }
 
-    public function isBuiltin() : bool
+    public function isBuiltin(): bool
     {
-        $type = (string) $this->betterReflectionType;
+        $type = strtolower($this->betterReflectionType->getName());
 
-        if ($type === 'self' || $type === 'parent') {
+        if ($type === 'self' || $type === 'parent' || $type === 'static') {
             return false;
         }
 

@@ -2,12 +2,11 @@
 
 namespace Common\Admin\Analytics;
 
-use Common\Admin\Analytics\Actions\GetAnalyticsData;
-use Common\Admin\Analytics\Actions\GetDemoAnalyticsData;
-use Common\Admin\Analytics\Actions\GetGoogleAnalyticsData;
-use Common\Admin\Analytics\Actions\GetNullAnalyticsData;
+use Common\Admin\Analytics\Actions\BuildAnalyticsReport;
+use Common\Admin\Analytics\Actions\BuildDemoAnalyticsReport;
+use Common\Admin\Analytics\Actions\BuildGoogleAnalyticsReport;
+use Common\Admin\Analytics\Actions\BuildNullAnalyticsReport;
 use Illuminate\Support\ServiceProvider;
-use Spatie\Analytics\Exceptions\InvalidConfiguration;
 
 class AnalyticsServiceProvider extends ServiceProvider
 {
@@ -18,24 +17,21 @@ class AnalyticsServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(GetAnalyticsData::class, function () {
+        $this->app->singleton(BuildAnalyticsReport::class, function () {
             if (config('common.site.demo')) {
-                return new GetDemoAnalyticsData();
+                return new BuildDemoAnalyticsReport();
             } else {
                 return $this->getGoogleAnalyticsData();
             }
         });
     }
 
-    /**
-     * @return GetGoogleAnalyticsData|GetNullAnalyticsData
-     */
     private function getGoogleAnalyticsData()
     {
         try {
-            return $this->app->make(GetGoogleAnalyticsData::class);
-        } catch (InvalidConfiguration $e) {
-            return new GetNullAnalyticsData();
+            return new BuildGoogleAnalyticsReport();
+        } catch (\Exception $e) {
+            return new BuildNullAnalyticsReport();
         }
     }
 }

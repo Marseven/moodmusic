@@ -1,65 +1,80 @@
 <?php
-declare(strict_types=1);
 
 namespace StubTests\Model;
 
+use Exception;
+use phpDocumentor\Reflection\DocBlock\Tags\PropertyRead;
+use phpDocumentor\Reflection\DocBlockFactory;
 use PhpParser\Node\Stmt\Class_;
 use ReflectionClass;
-use ReflectionClassConstant;
-use ReflectionException;
-use ReflectionMethod;
+use RuntimeException;
 use stdClass;
+use function array_key_exists;
+use function assert;
+use function count;
 
 class PHPClass extends BasePHPClass
 {
+    /**
+     * @var false|string|null
+     */
     public $parentClass;
     public $interfaces = [];
 
+    /** @var PHPProperty[] */
+    public $properties = [];
+
     /**
-     * @param ReflectionClass $clazz
-     * @return $this
+     * @param ReflectionClass $reflectionObject
+     * @return static
      */
-    public function readObjectFromReflection($clazz): self
+    public function readObjectFromReflection($reflectionObject)
     {
-        try {
-            $reflectionClass = new ReflectionClass($clazz);
-            $this->name = $reflectionClass->getName();
-            $parentClass = $reflectionClass->getParentClass();
-            if ($parentClass !== false) {
-                $this->parentClass = $reflectionClass->getParentClass()->getName();
+        $this->name = $reflectionObject->getName();
+        $parent = $reflectionObject->getParentClass();
+        if ($parent !== false) {
+            $this->parentClass = $parent->getName();
+        }
+        $this->interfaces = $reflectionObject->getInterfaceNames();
+        $this->isFinal = $reflectionObject->isFinal();
+        foreach ($reflectionObject->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $this->name) {
+                continue;
             }
-            $this->interfaces = $reflectionClass->getInterfaceNames();
+            $parsedMethod = (new PHPMethod())->readObjectFromReflection($method);
+            $this->addMethod($parsedMethod);
+        }
 
-            /**@var ReflectionMethod $method */
-            foreach ($reflectionClass->getMethods() as $method) {
-                if ($method->getDeclaringClass()->getName() !== $this->name) {
-                    continue;
-                }
-                $this->methods[$method->name] = (new PHPMethod())->readObjectFromReflection($method);
-            }
-
-            /**@var ReflectionClassConstant $constant */
-            foreach ($reflectionClass->getReflectionConstants() as $constant) {
+        if (method_exists($reflectionObject, 'getReflectionConstants')) {
+            foreach ($reflectionObject->getReflectionConstants() as $constant) {
                 if ($constant->getDeclaringClass()->getName() !== $this->name) {
                     continue;
                 }
-                $this->constants[$constant->name] = (new PHPConst())->readObjectFromReflection($constant);
+                $parsedConstant = (new PHPConst())->readObjectFromReflection($constant);
+                $this->addConstant($parsedConstant);
             }
-        } catch (ReflectionException $ex) {
-            $this->parseError = $ex;
+        }
+
+        foreach ($reflectionObject->getProperties() as $property) {
+            if ($property->getDeclaringClass()->getName() !== $this->name) {
+                continue;
+            }
+            $parsedProperty = (new PHPProperty())->readObjectFromReflection($property);
+            $this->addProperty($parsedProperty);
         }
         return $this;
     }
 
     /**
      * @param Class_ $node
-     * @return $this
+     * @return static
      */
-    public function readObjectFromStubNode($node): self
+    public function readObjectFromStubNode($node)
     {
-        $this->name = $this->getFQN($node);
-        $this->collectLinks($node);
-        $this->collectSinceDeprecatedVersions($node);
+        $this->name = self::getFQN($node);
+        $this->isFinal = $node->isFinal();
+        $this->availableVersionsRangeFromAttribute = self::findAvailableVersionsRangeFromAttribute($node->attrGroups);
+        $this->collectTags($node);
         if (!empty($node->extends)) {
             $this->parentClass = '';
             foreach ($node->extends->parts as $part) {
@@ -76,31 +91,62 @@ class PHPClass extends BasePHPClass
                 $this->interfaces[] = ltrim($interfaceFQN, "\\");
             }
         }
+        foreach ($node->getProperties() as $property) {
+            $parsedProperty = (new PHPProperty($this->name))->readObjectFromStubNode($property);
+            $this->addProperty($parsedProperty);
+        }
+        if ($node->getDocComment() !== null) {
+            $docBlock = DocBlockFactory::createInstance()->create($node->getDocComment()->getText());
+            /** @var PropertyRead[] $properties */
+            $properties = array_merge(
+                $docBlock->getTagsByName('property-read'),
+                $docBlock->getTagsByName('property')
+            );
+            foreach ($properties as $property) {
+                $propertyName = $property->getVariableName();
+                assert($propertyName !== '', "@property name is empty in class $this->name");
+                $newProperty = new PHPProperty($this->name);
+                $newProperty->is_static = false;
+                $newProperty->access = 'public';
+                $newProperty->name = $propertyName;
+                $newProperty->parentName = $this->name;
+                $newProperty->typesFromSignature = self::convertParsedTypeToArray($property->getType());
+                assert(
+                    !array_key_exists($propertyName, $this->properties),
+                    "Property '$propertyName' is already declared in class '$this->name'"
+                );
+                $this->properties[$propertyName] = $newProperty;
+            }
+        }
 
         return $this;
     }
 
-    public function readMutedProblems($jsonData): void
+    /**
+     * @param stdClass|array $jsonData
+     * @throws Exception
+     */
+    public function readMutedProblems($jsonData)
     {
-        /**@var stdClass $class */
         foreach ($jsonData as $class) {
             if ($class->name === $this->name) {
                 if (!empty($class->problems)) {
-                    /**@var stdClass $problem */
                     foreach ($class->problems as $problem) {
-                        switch ($problem) {
+                        switch ($problem->description) {
                             case 'wrong parent':
-                                $this->mutedProblems[] = StubProblemType::WRONG_PARENT;
+                                $this->mutedProblems[StubProblemType::WRONG_PARENT] = $problem->versions;
                                 break;
                             case 'wrong interface':
-                                $this->mutedProblems[] = StubProblemType::WRONG_INTERFACE;
+                                $this->mutedProblems[StubProblemType::WRONG_INTERFACE] = $problem->versions;
                                 break;
                             case 'missing class':
-                                $this->mutedProblems[] = StubProblemType::STUB_IS_MISSED;
+                                $this->mutedProblems[StubProblemType::STUB_IS_MISSED] = $problem->versions;
+                                break;
+                            case 'has wrong final modifier':
+                                $this->mutedProblems[StubProblemType::WRONG_FINAL_MODIFIER] = $problem->versions;
                                 break;
                             default:
-                                $this->mutedProblems[] = -1;
-                                break;
+                                throw new Exception("Unexpected value $problem->description");
                         }
                     }
                 }
@@ -117,5 +163,38 @@ class PHPClass extends BasePHPClass
                 return;
             }
         }
+    }
+
+    public function addProperty(PHPProperty $parsedProperty)
+    {
+        if (isset($parsedProperty->name)) {
+            if (array_key_exists($parsedProperty->name, $this->properties)) {
+                $amount = count(array_filter(
+                    $this->properties,
+                    function (PHPProperty $nextProperty) use ($parsedProperty) {
+                        return $nextProperty->name === $parsedProperty->name;
+                    }
+                ));
+                $this->properties[$parsedProperty->name . '_duplicated_' . $amount] = $parsedProperty;
+            } else {
+                $this->properties[$parsedProperty->name] = $parsedProperty;
+            }
+        }
+    }
+
+    /**
+     * @return PHPProperty|null
+     * @throws RuntimeException
+     */
+    public function getProperty($propertyName)
+    {
+        $properties = array_filter($this->properties, function (PHPProperty $property) use ($propertyName) {
+            return $property->name === $propertyName && $property->duplicateOtherElement === false
+                && BasePHPElement::entitySuitsCurrentPhpVersion($property);
+        });
+        if (empty($properties)) {
+            throw new RuntimeException("Property $propertyName not found in stubs for set language version");
+        }
+        return array_pop($properties);
     }
 }

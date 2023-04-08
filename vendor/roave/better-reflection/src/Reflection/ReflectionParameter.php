@@ -9,58 +9,38 @@ use Exception;
 use InvalidArgumentException;
 use LogicException;
 use OutOfBoundsException;
-use phpDocumentor\Reflection\Type;
 use PhpParser\Node;
-use PhpParser\Node\NullableType;
 use PhpParser\Node\Param as ParamNode;
-use PhpParser\Node\Stmt\Namespace_;
+use Roave\BetterReflection\NodeCompiler\CompiledValue;
 use Roave\BetterReflection\NodeCompiler\CompileNodeToValue;
 use Roave\BetterReflection\NodeCompiler\CompilerContext;
+use Roave\BetterReflection\NodeCompiler\Exception\UnableToCompileNode;
+use Roave\BetterReflection\Reflection\Attribute\ReflectionAttributeHelper;
 use Roave\BetterReflection\Reflection\Exception\Uncloneable;
 use Roave\BetterReflection\Reflection\StringCast\ReflectionParameterStringCast;
-use Roave\BetterReflection\Reflector\ClassReflector;
 use Roave\BetterReflection\Reflector\Reflector;
-use Roave\BetterReflection\TypesFinder\FindParameterType;
-use Roave\BetterReflection\Util\CalculateReflectionColum;
-use RuntimeException;
+use Roave\BetterReflection\Util\CalculateReflectionColumn;
+
 use function assert;
 use function count;
-use function get_class;
-use function in_array;
 use function is_array;
 use function is_object;
 use function is_string;
 use function sprintf;
-use function strtolower;
 
 class ReflectionParameter
 {
-    /** @var ParamNode */
-    private $node;
+    private bool $isOptional;
 
-    /** @var Namespace_|null */
-    private $declaringNamespace;
+    private CompiledValue|null $compiledDefaultValue = null;
 
-    /** @var ReflectionFunctionAbstract */
-    private $function;
-
-    /** @var int */
-    private $parameterIndex;
-
-    /** @var scalar|array<scalar>|null */
-    private $defaultValue;
-
-    /** @var bool */
-    private $isDefaultValueConstant = false;
-
-    /** @var string|null */
-    private $defaultValueConstantName;
-
-    /** @var Reflector */
-    private $reflector;
-
-    private function __construct()
-    {
+    private function __construct(
+        private Reflector $reflector,
+        private ParamNode $node,
+        private ReflectionMethod|ReflectionFunction $function,
+        private int $parameterIndex,
+    ) {
+        $this->isOptional = $this->detectIsOptional();
     }
 
     /**
@@ -71,37 +51,55 @@ class ReflectionParameter
     public static function createFromClassNameAndMethod(
         string $className,
         string $methodName,
-        string $parameterName
-    ) : self {
-        return ReflectionClass::createFromName($className)
+        string $parameterName,
+    ): self {
+        $parameter = ReflectionClass::createFromName($className)
             ->getMethod($methodName)
             ->getParameter($parameterName);
+
+        if ($parameter === null) {
+            throw new OutOfBoundsException(sprintf('Could not find parameter: %s', $parameterName));
+        }
+
+        return $parameter;
     }
 
     /**
      * Create a reflection of a parameter using an instance
      *
-     * @param object $instance
-     *
      * @throws OutOfBoundsException
      */
     public static function createFromClassInstanceAndMethod(
-        $instance,
+        object $instance,
         string $methodName,
-        string $parameterName
-    ) : self {
-        return ReflectionClass::createFromInstance($instance)
+        string $parameterName,
+    ): self {
+        $parameter = ReflectionClass::createFromInstance($instance)
             ->getMethod($methodName)
             ->getParameter($parameterName);
+
+        if ($parameter === null) {
+            throw new OutOfBoundsException(sprintf('Could not find parameter: %s', $parameterName));
+        }
+
+        return $parameter;
     }
 
     /**
      * Create a reflection of a parameter using a closure
+     *
+     * @throws OutOfBoundsException
      */
-    public static function createFromClosure(Closure $closure, string $parameterName) : ReflectionParameter
+    public static function createFromClosure(Closure $closure, string $parameterName): ReflectionParameter
     {
-        return ReflectionFunction::createFromClosure($closure)
+        $parameter = ReflectionFunction::createFromClosure($closure)
             ->getParameter($parameterName);
+
+        if ($parameter === null) {
+            throw new OutOfBoundsException(sprintf('Could not find parameter: %s', $parameterName));
+        }
+
+        return $parameter;
     }
 
     /**
@@ -117,28 +115,37 @@ class ReflectionParameter
      * @throws Exception
      * @throws InvalidArgumentException
      */
-    public static function createFromSpec($spec, string $parameterName) : self
+    public static function createFromSpec(array|string|Closure $spec, string $parameterName): self
     {
-        if (is_array($spec) && count($spec) === 2 && is_string($spec[1])) {
-            if (is_object($spec[0])) {
-                return self::createFromClassInstanceAndMethod($spec[0], $spec[1], $parameterName);
+        try {
+            if (is_array($spec) && count($spec) === 2 && is_string($spec[1])) {
+                if (is_object($spec[0])) {
+                    return self::createFromClassInstanceAndMethod($spec[0], $spec[1], $parameterName);
+                }
+
+                return self::createFromClassNameAndMethod($spec[0], $spec[1], $parameterName);
             }
 
-            return self::createFromClassNameAndMethod($spec[0], $spec[1], $parameterName);
-        }
+            if (is_string($spec)) {
+                $parameter = ReflectionFunction::createFromName($spec)->getParameter($parameterName);
+                if ($parameter === null) {
+                    throw new OutOfBoundsException(sprintf('Could not find parameter: %s', $parameterName));
+                }
 
-        if (is_string($spec)) {
-            return ReflectionFunction::createFromName($spec)->getParameter($parameterName);
-        }
+                return $parameter;
+            }
 
-        if ($spec instanceof Closure) {
-            return self::createFromClosure($spec, $parameterName);
+            if ($spec instanceof Closure) {
+                return self::createFromClosure($spec, $parameterName);
+            }
+        } catch (OutOfBoundsException $e) {
+            throw new InvalidArgumentException('Could not create reflection from the spec given', previous: $e);
         }
 
         throw new InvalidArgumentException('Could not create reflection from the spec given');
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return ReflectionParameterStringCast::toString($this);
     }
@@ -146,90 +153,45 @@ class ReflectionParameter
     /**
      * @internal
      *
-     * @param ParamNode       $node               Node has to be processed by the PhpParser\NodeVisitor\NameResolver
-     * @param Namespace_|null $declaringNamespace namespace of the declaring function/method
+     * @param ParamNode $node Node has to be processed by the PhpParser\NodeVisitor\NameResolver
      */
     public static function createFromNode(
         Reflector $reflector,
         ParamNode $node,
-        ?Namespace_ $declaringNamespace,
-        ReflectionFunctionAbstract $function,
-        int $parameterIndex
-    ) : self {
-        $param                     = new self();
-        $param->reflector          = $reflector;
-        $param->node               = $node;
-        $param->declaringNamespace = $declaringNamespace;
-        $param->function           = $function;
-        $param->parameterIndex     = $parameterIndex;
-
-        return $param;
+        ReflectionMethod|ReflectionFunction $function,
+        int $parameterIndex,
+    ): self {
+        return new self(
+            $reflector,
+            $node,
+            $function,
+            $parameterIndex,
+        );
     }
 
-    private function parseDefaultValueNode() : void
+    /** @throws LogicException */
+    private function getCompiledDefaultValue(): CompiledValue
     {
         if (! $this->isDefaultValueAvailable()) {
             throw new LogicException('This parameter does not have a default value available');
         }
 
-        $defaultValueNode = $this->node->default;
-
-        if ($defaultValueNode instanceof Node\Expr\ClassConstFetch) {
-            assert($defaultValueNode->class instanceof Node\Name);
-            $className = $defaultValueNode->class->toString();
-
-            if ($className === 'self' || $className === 'static') {
-                assert($defaultValueNode->name instanceof Node\Identifier);
-                $constantName = $defaultValueNode->name->name;
-                $className    = $this->findParentClassDeclaringConstant($constantName);
-            }
-
-            $this->isDefaultValueConstant = true;
-            assert($defaultValueNode->name instanceof Node\Identifier);
-            $this->defaultValueConstantName = $className . '::' . $defaultValueNode->name->name;
+        if ($this->compiledDefaultValue === null) {
+            $this->compiledDefaultValue = (new CompileNodeToValue())->__invoke(
+                $this->node->default,
+                new CompilerContext($this->reflector, $this),
+            );
         }
 
-        if ($defaultValueNode instanceof Node\Expr\ConstFetch
-            && ! in_array(strtolower($defaultValueNode->name->parts[0]), ['true', 'false', 'null'], true)) {
-            $this->isDefaultValueConstant   = true;
-            $this->defaultValueConstantName = $defaultValueNode->name->parts[0];
-            $this->defaultValue             = null;
-
-            return;
-        }
-
-        $this->defaultValue = (new CompileNodeToValue())->__invoke(
-            $defaultValueNode,
-            new CompilerContext($this->reflector, $this->getDeclaringClass())
-        );
-    }
-
-    /**
-     * @throws LogicException
-     */
-    private function findParentClassDeclaringConstant(string $constantName) : string
-    {
-        $method = $this->function;
-        assert($method instanceof ReflectionMethod);
-        $class = $method->getDeclaringClass();
-
-        do {
-            if ($class->hasConstant($constantName)) {
-                return $class->getName();
-            }
-
-            $class = $class->getParentClass();
-        } while ($class);
-
-        // note: this code is theoretically unreachable, so don't expect any coverage on it
-        throw new LogicException(sprintf('Failed to find parent class of constant "%s".', $constantName));
+        return $this->compiledDefaultValue;
     }
 
     /**
      * Get the name of the parameter.
      */
-    public function getName() : string
+    public function getName(): string
     {
+        assert($this->node->var instanceof Node\Expr\Variable);
         assert(is_string($this->node->var->name));
 
         return $this->node->var->name;
@@ -238,7 +200,7 @@ class ReflectionParameter
     /**
      * Get the function (or method) that declared this parameter.
      */
-    public function getDeclaringFunction() : ReflectionFunctionAbstract
+    public function getDeclaringFunction(): ReflectionMethod|ReflectionFunction
     {
         return $this->function;
     }
@@ -249,10 +211,19 @@ class ReflectionParameter
      *
      * This will return null if the declaring function is not a method.
      */
-    public function getDeclaringClass() : ?ReflectionClass
+    public function getDeclaringClass(): ReflectionClass|null
     {
         if ($this->function instanceof ReflectionMethod) {
             return $this->function->getDeclaringClass();
+        }
+
+        return null;
+    }
+
+    public function getImplementingClass(): ReflectionClass|null
+    {
+        if ($this->function instanceof ReflectionMethod) {
+            return $this->function->getImplementingClass();
         }
 
         return null;
@@ -267,9 +238,9 @@ class ReflectionParameter
      *
      * @example someMethod($foo = 'foo', $bar)
      */
-    public function isOptional() : bool
+    public function isOptional(): bool
     {
-        return ((bool) $this->node->isOptional) || $this->isVariadic();
+        return $this->isOptional;
     }
 
     /**
@@ -280,8 +251,9 @@ class ReflectionParameter
      * $foo parameter isOptional() == false, but isDefaultValueAvailable == true
      *
      * @example someMethod($foo = 'foo', $bar)
+     * @psalm-assert-if-true Node\Expr $this->node->default
      */
-    public function isDefaultValueAvailable() : bool
+    public function isDefaultValueAvailable(): bool
     {
         return $this->node->default !== null;
     }
@@ -292,69 +264,34 @@ class ReflectionParameter
      * @return scalar|array<scalar>|null
      *
      * @throws LogicException
+     * @throws UnableToCompileNode
      */
-    public function getDefaultValue()
+    public function getDefaultValue(): string|int|float|bool|array|null
     {
-        $this->parseDefaultValueNode();
+        /** @psalm-var scalar|array<scalar>|null $value */
+        $value = $this->getCompiledDefaultValue()->value;
 
-        return $this->defaultValue;
+        return $value;
     }
 
     /**
      * Does this method allow null for a parameter?
      */
-    public function allowsNull() : bool
+    public function allowsNull(): bool
     {
-        if (! $this->hasType()) {
+        $type = $this->getType();
+
+        if ($type === null) {
             return true;
         }
 
-        if ($this->node->type instanceof NullableType) {
-            return true;
-        }
-
-        if (! $this->isDefaultValueAvailable()) {
-            return false;
-        }
-
-        return $this->getDefaultValue() === null;
-    }
-
-    /**
-     * Get the DocBlock type hints as an array of strings.
-     *
-     * @return string[]
-     */
-    public function getDocBlockTypeStrings() : array
-    {
-        $stringTypes = [];
-
-        foreach ($this->getDocBlockTypes() as $type) {
-            $stringTypes[] = (string) $type;
-        }
-
-        return $stringTypes;
-    }
-
-    /**
-     * Get the types defined in the DocBlocks. This returns an array because
-     * the parameter may have multiple (compound) types specified (for example
-     * when you type hint pipe-separated "string|null", in which case this
-     * would return an array of Type objects, one for string, one for null.
-     *
-     * @see getTypeHint()
-     *
-     * @return Type[]
-     */
-    public function getDocBlockTypes() : array
-    {
-        return (new FindParameterType())->__invoke($this->function, $this->declaringNamespace, $this->node);
+        return $type->allowsNull();
     }
 
     /**
      * Find the position of the parameter, left to right, starting at zero.
      */
-    public function getPosition() : int
+    public function getPosition(): int
     {
         return $this->parameterIndex;
     }
@@ -365,7 +302,7 @@ class ReflectionParameter
      *
      * (note: this has nothing to do with DocBlocks).
      */
-    public function getType() : ?ReflectionType
+    public function getType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null
     {
         $type = $this->node->type;
 
@@ -373,11 +310,11 @@ class ReflectionParameter
             return null;
         }
 
-        if ($type instanceof NullableType) {
-            $type = $type->type;
-        }
+        assert($type instanceof Node\Identifier || $type instanceof Node\Name || $type instanceof Node\NullableType || $type instanceof Node\UnionType || $type instanceof Node\IntersectionType);
 
-        return ReflectionType::createFromTypeAndReflector((string) $type, $this->allowsNull(), $this->reflector);
+        $allowsNull = $this->isDefaultValueAvailable() && $this->getDefaultValue() === null && ! $this->isDefaultValueConstant();
+
+        return ReflectionType::createFromNode($this->reflector, $this, $type, $allowsNull);
     }
 
     /**
@@ -385,47 +322,69 @@ class ReflectionParameter
      *
      * (note: this has nothing to do with DocBlocks).
      */
-    public function hasType() : bool
+    public function hasType(): bool
     {
         return $this->node->type !== null;
     }
 
     /**
-     * Set the parameter type declaration.
-     */
-    public function setType(string $newParameterType) : void
-    {
-        $this->node->type = new Node\Name($newParameterType);
-    }
-
-    /**
-     * Remove the parameter type declaration completely.
-     */
-    public function removeType() : void
-    {
-        $this->node->type = null;
-    }
-
-    /**
      * Is this parameter an array?
      */
-    public function isArray() : bool
+    public function isArray(): bool
     {
-        return strtolower((string) $this->getType()) === 'array';
+        return $this->isType($this->getType(), 'array');
     }
 
     /**
      * Is this parameter a callable?
      */
-    public function isCallable() : bool
+    public function isCallable(): bool
     {
-        return strtolower((string) $this->getType()) === 'callable';
+        return $this->isType($this->getType(), 'callable');
+    }
+
+    /**
+     * For isArray() and isCallable().
+     */
+    private function isType(ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|null $typeReflection, string $type): bool
+    {
+        if ($typeReflection === null) {
+            return false;
+        }
+
+        if ($typeReflection instanceof ReflectionIntersectionType) {
+            return false;
+        }
+
+        $isOneOfAllowedTypes = static function (ReflectionNamedType $namedType, string ...$types): bool {
+            foreach ($types as $type) {
+                if ($namedType->getName() === $type) {
+                    return true;
+                }
+            }
+
+            return false;
+        };
+
+        if ($typeReflection instanceof ReflectionUnionType) {
+            $unionTypes = $typeReflection->getTypes();
+
+            foreach ($unionTypes as $unionType) {
+                if (! $isOneOfAllowedTypes($unionType, $type, 'null')) {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        return $isOneOfAllowedTypes($typeReflection, $type);
     }
 
     /**
      * Is this parameter a variadic (denoted by ...$param).
      */
-    public function isVariadic() : bool
+    public function isVariadic(): bool
     {
         return $this->node->variadic;
     }
@@ -433,91 +392,100 @@ class ReflectionParameter
     /**
      * Is this parameter passed by reference (denoted by &$param).
      */
-    public function isPassedByReference() : bool
+    public function isPassedByReference(): bool
     {
         return $this->node->byRef;
     }
 
-    public function canBePassedByValue() : bool
+    public function canBePassedByValue(): bool
     {
         return ! $this->isPassedByReference();
     }
 
-    public function isDefaultValueConstant() : bool
+    public function isPromoted(): bool
     {
-        $this->parseDefaultValueNode();
-
-        return $this->isDefaultValueConstant;
+        return $this->node->flags !== 0;
     }
 
-    /**
-     * @throws LogicException
-     */
-    public function getDefaultValueConstantName() : string
+    /** @throws LogicException */
+    public function isDefaultValueConstant(): bool
     {
-        $this->parseDefaultValueNode();
-        if (! $this->isDefaultValueConstant()) {
+        return $this->getCompiledDefaultValue()->constantName !== null;
+    }
+
+    /** @throws LogicException */
+    public function getDefaultValueConstantName(): string
+    {
+        $compiledDefaultValue = $this->getCompiledDefaultValue();
+
+        if ($compiledDefaultValue->constantName === null) {
             throw new LogicException('This parameter is not a constant default value, so cannot have a constant name');
         }
 
-        return $this->defaultValueConstantName;
+        return $compiledDefaultValue->constantName;
     }
 
     /**
      * Gets a ReflectionClass for the type hint (returns null if not a class)
-     *
-     * @throws RuntimeException
      */
-    public function getClass() : ?ReflectionClass
+    public function getClass(): ReflectionClass|null
     {
-        $className = $this->getClassName();
+        $type = $this->getType();
 
-        if ($className === null) {
+        if ($type === null) {
             return null;
         }
 
-        if (! $this->reflector instanceof ClassReflector) {
-            throw new RuntimeException(sprintf(
-                'Unable to reflect class type because we were not given a "%s", but a "%s" instead',
-                ClassReflector::class,
-                get_class($this->reflector)
-            ));
+        if ($type instanceof ReflectionIntersectionType) {
+            return null;
         }
 
-        return $this->reflector->reflect($className);
+        if ($type instanceof ReflectionUnionType) {
+            foreach ($type->getTypes() as $innerType) {
+                $innerTypeClass = $this->getClassFromNamedType($innerType);
+                if ($innerTypeClass !== null) {
+                    return $innerTypeClass;
+                }
+            }
+
+            return null;
+        }
+
+        return $this->getClassFromNamedType($type);
     }
 
-    private function getClassName() : ?string
+    private function getClassFromNamedType(ReflectionNamedType $namedType): ReflectionClass|null
     {
-        if (! $this->hasType()) {
+        try {
+            return $namedType->getClass();
+        } catch (LogicException) {
             return null;
         }
+    }
 
-        $type = $this->getType();
-        assert($type instanceof ReflectionType);
-        $typeHint = (string) $type;
-
-        if ($typeHint === 'self') {
-            $declaringClass = $this->getDeclaringClass();
-            assert($declaringClass instanceof ReflectionClass);
-
-            return $declaringClass->getName();
+    private function detectIsOptional(): bool
+    {
+        if ($this->node->variadic) {
+            return true;
         }
 
-        if ($typeHint === 'parent') {
-            $declaringClass = $this->getDeclaringClass();
-            assert($declaringClass instanceof ReflectionClass);
-            $parentClass = $declaringClass->getParentClass();
-            assert($parentClass instanceof ReflectionClass);
-
-            return $parentClass->getName();
+        if ($this->node->default === null) {
+            return false;
         }
 
-        if ($type->isBuiltin()) {
-            return null;
+        foreach ($this->function->getAst()->getParams() as $otherParameterIndex => $otherParameterNode) {
+            if ($otherParameterIndex <= $this->parameterIndex) {
+                continue;
+            }
+
+            // When we find next parameter that does not have a default or is not variadic,
+            // it means current parameter cannot be optional EVEN if it has a default value
+            if ($otherParameterNode->default === null && ! $otherParameterNode->variadic) {
+                return false;
+            }
         }
 
-        return $typeHint;
+        return true;
     }
 
     /**
@@ -530,18 +498,40 @@ class ReflectionParameter
         throw Uncloneable::fromClass(self::class);
     }
 
-    public function getStartColumn() : int
+    public function getStartColumn(): int
     {
-        return CalculateReflectionColum::getStartColumn($this->function->getLocatedSource()->getSource(), $this->node);
+        return CalculateReflectionColumn::getStartColumn($this->function->getLocatedSource()->getSource(), $this->node);
     }
 
-    public function getEndColumn() : int
+    public function getEndColumn(): int
     {
-        return CalculateReflectionColum::getEndColumn($this->function->getLocatedSource()->getSource(), $this->node);
+        return CalculateReflectionColumn::getEndColumn($this->function->getLocatedSource()->getSource(), $this->node);
     }
 
-    public function getAst() : ParamNode
+    public function getAst(): ParamNode
     {
         return $this->node;
+    }
+
+    /** @return list<ReflectionAttribute> */
+    public function getAttributes(): array
+    {
+        return ReflectionAttributeHelper::createAttributes($this->reflector, $this);
+    }
+
+    /** @return list<ReflectionAttribute> */
+    public function getAttributesByName(string $name): array
+    {
+        return ReflectionAttributeHelper::filterAttributesByName($this->getAttributes(), $name);
+    }
+
+    /**
+     * @param class-string $className
+     *
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributesByInstance(string $className): array
+    {
+        return ReflectionAttributeHelper::filterAttributesByInstance($this->getAttributes(), $className);
     }
 }

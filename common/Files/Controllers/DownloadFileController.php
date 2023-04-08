@@ -5,40 +5,26 @@ use Common\Files\FileEntry;
 use Common\Files\Response\DownloadFilesResponse;
 use Common\Files\Response\FileResponseFactory;
 use Illuminate\Http\Request;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class DownloadFileController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var FileEntry
-     */
-    protected $fileEntry;
-
-    /**
-     * @var FileResponseFactory
-     */
-    protected $fileResponseFactory;
-
-    public function __construct(Request $request, FileEntry $fileEntry, FileResponseFactory $fileResponseFactory)
-    {
-        $this->request = $request;
-        $this->fileEntry = $fileEntry;
-        $this->fileResponseFactory = $fileResponseFactory;
+    public function __construct(
+        protected Request $request,
+        protected FileEntry $fileEntry,
+        protected FileResponseFactory $fileResponseFactory,
+    ) {
     }
 
-    public function download()
+    public function download(string $hashes)
     {
-        $hashes = explode(',', $this->request->get('hashes'));
-        $ids = array_map(function($hash) {
+        $hashes = explode(',', $hashes);
+        $ids = array_map(function ($hash) {
             return $this->fileEntry->decodeHash($hash);
         }, $hashes);
         $ids = array_filter($ids);
 
-        if ( ! $ids) {
+        if (!$ids) {
             abort(404, 'No entry hashes provided.');
         }
 

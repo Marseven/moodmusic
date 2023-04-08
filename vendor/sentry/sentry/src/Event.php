@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Sentry;
 
-use Jean85\PrettyVersions;
 use Sentry\Context\OsContext;
 use Sentry\Context\RuntimeContext;
+use Sentry\Profiling\Profile;
 use Sentry\Tracing\Span;
 
 /**
@@ -51,6 +51,11 @@ final class Event
     private $transaction;
 
     /**
+     * @var CheckIn|null The check in data
+     */
+    private $checkIn;
+
+    /**
      * @var string|null The name of the server (e.g. the host name)
      */
     private $serverName;
@@ -71,7 +76,7 @@ final class Event
     private $messageFormatted;
 
     /**
-     * @var mixed[] The parameters to use to format the message
+     * @var string[] The parameters to use to format the message
      */
     private $messageParams = [];
 
@@ -146,6 +151,14 @@ final class Event
     private $stacktrace;
 
     /**
+     * A place to stash data which is needed at some point in the SDK's
+     * event processing pipeline but which shouldn't get sent to Sentry.
+     *
+     * @var array<string, mixed>
+     */
+    private $sdkMetadata = [];
+
+    /**
      * @var string The Sentry SDK identifier
      */
     private $sdkIdentifier = Client::SDK_IDENTIFIER;
@@ -153,18 +166,22 @@ final class Event
     /**
      * @var string The Sentry SDK version
      */
-    private $sdkVersion;
+    private $sdkVersion = Client::SDK_VERSION;
 
     /**
      * @var EventType The type of the Event
      */
     private $type;
 
+    /**
+     * @var Profile|null The profile data
+     */
+    private $profile;
+
     private function __construct(?EventId $eventId, EventType $eventType)
     {
         $this->id = $eventId ?? EventId::generate();
         $this->timestamp = microtime(true);
-        $this->sdkVersion = PrettyVersions::getVersion('sentry/sentry')->getPrettyVersion();
         $this->type = $eventType;
     }
 
@@ -175,7 +192,7 @@ final class Event
      */
     public static function createEvent(?EventId $eventId = null): self
     {
-        return new self($eventId, EventType::default());
+        return new self($eventId, EventType::event());
     }
 
     /**
@@ -186,6 +203,11 @@ final class Event
     public static function createTransaction(EventId $eventId = null): self
     {
         return new self($eventId, EventType::transaction());
+    }
+
+    public static function createCheckIn(?EventId $eventId = null): self
+    {
+        return new self($eventId, EventType::checkIn());
     }
 
     /**
@@ -310,6 +332,16 @@ final class Event
         $this->transaction = $transaction;
     }
 
+    public function setCheckIn(?CheckIn $checkIn): void
+    {
+        $this->checkIn = $checkIn;
+    }
+
+    public function getCheckIn(): ?CheckIn
+    {
+        return $this->checkIn;
+    }
+
     /**
      * Gets the name of the server.
      */
@@ -376,7 +408,7 @@ final class Event
      * Sets the error message.
      *
      * @param string      $message   The message
-     * @param mixed[]     $params    The parameters to use to format the message
+     * @param string[]    $params    The parameters to use to format the message
      * @param string|null $formatted The formatted message
      */
     public function setMessage(string $message, array $params = [], ?string $formatted = null): void
@@ -487,6 +519,27 @@ final class Event
     public function setTags(array $tags): void
     {
         $this->tags = $tags;
+    }
+
+    /**
+     * Sets or updates a tag in this event.
+     *
+     * @param string $key   The key that uniquely identifies the tag
+     * @param string $value The value
+     */
+    public function setTag(string $key, string $value): void
+    {
+        $this->tags[$key] = $value;
+    }
+
+    /**
+     * Removes a given tag from the event.
+     *
+     * @param string $key The key that uniquely identifies the tag
+     */
+    public function removeTag(string $key): void
+    {
+        unset($this->tags[$key]);
     }
 
     /**
@@ -653,6 +706,37 @@ final class Event
     }
 
     /**
+     * Sets the SDK metadata with the given name.
+     *
+     * @param string $name The name that uniquely identifies the SDK metadata
+     * @param mixed  $data The data of the SDK metadata
+     */
+    public function setSdkMetadata(string $name, $data): void
+    {
+        $this->sdkMetadata[$name] = $data;
+    }
+
+    /**
+     * Gets the SDK metadata.
+     *
+     * @return mixed
+     *
+     * @psalm-template T of string|null
+     *
+     * @psalm-param T $name
+     *
+     * @psalm-return (T is string ? mixed : array<string, mixed>|null)
+     */
+    public function getSdkMetadata(?string $name = null)
+    {
+        if (null !== $name) {
+            return $this->sdkMetadata[$name] ?? null;
+        }
+
+        return $this->sdkMetadata;
+    }
+
+    /**
      * Gets a timestamp representing when the measuring of a transaction started.
      */
     public function getStartTimestamp(): ?float
@@ -688,5 +772,26 @@ final class Event
     public function setSpans(array $spans): void
     {
         $this->spans = $spans;
+    }
+
+    public function setProfile(?Profile $profile): void
+    {
+        $this->profile = $profile;
+    }
+
+    public function getProfile(): ?Profile
+    {
+        return $this->profile;
+    }
+
+    public function getTraceId(): ?string
+    {
+        $traceId = $this->getContexts()['trace']['trace_id'];
+
+        if (\is_string($traceId) && !empty($traceId)) {
+            return $traceId;
+        }
+
+        return null;
     }
 }

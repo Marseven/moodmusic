@@ -1,22 +1,22 @@
 <?php
 
-
 namespace Parle;
 
+use JetBrains\PhpStorm\Immutable;
 
 class Stack
 {
     /* Properties */
     /**
      * @var bool Whether the stack is empty, readonly.
-     * @property-read
      */
-    public $empty = TRUE;
+    #[Immutable]
+    public $empty = true;
 
     /**
      * @var int Stack size, readonly.
-     * @property-read
      */
+    #[Immutable]
     public $size = 0;
 
     /**
@@ -31,13 +31,13 @@ class Stack
      * @link https://php.net/manual/en/parle-stack.pop.php
      * @return void
      */
-    public function pop() : void {}
+    public function pop(): void {}
 
     /**
      * Push an item into the stack
      *
      * @link https://php.net/manual/en/parle-stack.push.php
-     * @param $item mixed Variable to be pushed.
+     * @param mixed $item Variable to be pushed.
      * @return void
      */
     public function push($item) {}

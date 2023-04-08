@@ -23,7 +23,7 @@ class RenameTrackUserTableToLikedTracks extends Migration
         });
 
         Schema::table('likes', function (Blueprint $table) {
-            $table->string('likeable_type', 20)->default('App\Track')->after('likeable_id');
+            $table->string('likeable_type', 20)->default(addslashes(Track::class))->after('likeable_id');
             $table->dropIndex('track_user_track_id_user_id_unique');
             $table->unique(['likeable_id', 'likeable_type', 'user_id']);
         });

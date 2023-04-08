@@ -2,31 +2,17 @@
 
 namespace Common\Files\Controllers;
 
+use Common\Core\BaseController;
 use Common\Files\Actions\Deletion\RestoreEntries;
 use Common\Files\FileEntry;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Common\Core\BaseController;
 
 class RestoreDeletedEntriesController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @param Request $request
-     */
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request = $request;
     }
 
-    /**
-     * @param RestoreEntries $action
-     * @return JsonResponse
-     */
     public function restore(RestoreEntries $action)
     {
         $this->validate($this->request, [

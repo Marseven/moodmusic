@@ -11,18 +11,8 @@ class FileEntryCreated
      */
     public $fileEntry;
 
-    /**
-     * @var array
-     */
-    public $params;
-
-    /**
-     * @param FileEntry $fileEntry
-     * @param array $params
-     */
-    public function __construct(FileEntry $fileEntry, $params = [])
+    public function __construct(FileEntry $fileEntry)
     {
         $this->fileEntry = $fileEntry;
-        $this->params = $params;
     }
 }

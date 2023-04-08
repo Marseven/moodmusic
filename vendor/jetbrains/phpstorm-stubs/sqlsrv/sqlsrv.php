@@ -49,7 +49,7 @@ define('SQLSRV_ERR_ALL', 2);
  * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
  */
-define('SQLSRV_LOG_SYSTEM_ALL',-1);
+define('SQLSRV_LOG_SYSTEM_ALL', -1);
 
 /**
  * Turns logging off.
@@ -262,7 +262,7 @@ define('SQLSRV_ENC_BINARY', 'binary');
  *
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
  */
-define('SQLSRV_ENC_CHAR','char');
+define('SQLSRV_ENC_CHAR', 'char');
 
 /**
  * The column is not nullable.
@@ -322,6 +322,16 @@ define('SQLSRV_SQLTYPE_BIGINT', -5);
  */
 define('SQLSRV_SQLTYPE_BIT', -7);
 /**
+ * char.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_CHAR', 1);
+/**
  * datetime.
  *
  * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
@@ -331,6 +341,16 @@ define('SQLSRV_SQLTYPE_BIT', -7);
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
  */
 define('SQLSRV_SQLTYPE_DATETIME', 25177693);
+/**
+ * decimal.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_DECIMAL', 3);
 /**
  * float.
  *
@@ -372,6 +392,16 @@ define('SQLSRV_SQLTYPE_INT', 4);
  */
 define('SQLSRV_SQLTYPE_MONEY', 33564163);
 /**
+ * nchar.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_NCHAR', -8);
+/**
  * ntext.
  *
  * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
@@ -381,6 +411,26 @@ define('SQLSRV_SQLTYPE_MONEY', 33564163);
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
  */
 define('SQLSRV_SQLTYPE_NTEXT', -10);
+/**
+ * numeric.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_NUMERIC', 2);
+/**
+ * nvarchar.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_NVARCHAR', -9);
 /**
  * text.
  *
@@ -471,6 +521,26 @@ define('SQLSRV_SQLTYPE_UDT', -151);
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
  */
 define('SQLSRV_SQLTYPE_UNIQUEIDENTIFIER', -11);
+/**
+ * varbinary.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_VARBINARY', -3);
+/**
+ * varchar.
+ *
+ * <br />Used when calling {@link sqlsrv_query() sqlsrv_query} or
+ *{@link sqlsrv_prepare() sqlsrv_prepare} to specify the SQL Server data type of a parameter.<br />
+ *
+ * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
+ * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ */
+define('SQLSRV_SQLTYPE_VARCHAR', 12);
 /**
  * xml.
  *
@@ -858,7 +928,6 @@ define('SQLSRV_CURSOR_KEYSET', 'keyset');
  */
 define('SQLSRV_CURSOR_CLIENT_BUFFERED', 'buffered');
 
-
 /**
  * Creates and opens a connection.
  *
@@ -890,7 +959,7 @@ define('SQLSRV_CURSOR_CLIENT_BUFFERED', 'buffered');
  * See {@link http://msdn.microsoft.com/en-us/library/ff628167.aspx Connection Options} for a list of the supported keys for the array.
  * @return resource|false A PHP connection resource. If a connection cannot be successfully created and opened, false is returned.
  */
-function sqlsrv_connect($server_name, $connection_info = array()){}
+function sqlsrv_connect($server_name, $connection_info = []) {}
 
 /**
  * Closes a connection. Frees all resources associated with the connection.
@@ -905,10 +974,10 @@ function sqlsrv_connect($server_name, $connection_info = array()){}
  * @param resource|null $conn The connection to be closed.
  * @return bool The Boolean value true unless the function is called with an invalid parameter. If the function is called with an invalid parameter, false is returned.
  */
-function sqlsrv_close($conn){}
+function sqlsrv_close($conn) {}
 
 /**
- * Commits a transaction.
+ * Commits a transaction that was begun with sqlsrv_begin_transaction.
  *
  * <br />Commits the current transaction on the specified connection and returns the connection to the auto-commit mode.
  * The current transaction includes all statements on the specified connection that were executed after the call to
@@ -926,10 +995,10 @@ function sqlsrv_close($conn){}
  * @param resource $conn The connection on which the transaction is active.
  * @return bool A Boolean value: true if the transaction was successfully committed. Otherwise, false.
  */
-function sqlsrv_commit($conn){}
+function sqlsrv_commit($conn) {}
 
 /**
- * Begins a transaction.
+ * Begins a database transaction.
  *
  * <br />Begins a transaction on a specified connection. The current transaction includes all statements on the specified
  * connection that were executed after the call to sqlsrv_begin_transaction and before any calls to sqlsrv_rollback or
@@ -953,10 +1022,10 @@ function sqlsrv_commit($conn){}
  * @param resource $conn The connection with which the transaction is associated.
  * @return bool A Boolean value: true if the transaction was successfully begun. Otherwise, false.
  */
-function sqlsrv_begin_transaction($conn){}
+function sqlsrv_begin_transaction($conn) {}
 
 /**
- * Rolls back a transaction.
+ * Rolls back a transaction that was begun with {@see sqlsrv_begin_transaction}.
  *
  * <br />Rolls back the current transaction on the specified connection and returns the connection to the auto-commit mode.
  * The current transaction includes all statements on the specified connection that were executed after the call to
@@ -977,7 +1046,7 @@ function sqlsrv_begin_transaction($conn){}
  * @param resource $conn The connection on which the transaction is active.
  * @return bool A Boolean value: true if the transaction was successfully rolled back. Otherwise, false.
  */
-function sqlsrv_rollback($conn){}
+function sqlsrv_rollback($conn) {}
 
 /**
  * Returns error and/or warning information about the last operation.
@@ -1030,10 +1099,10 @@ function sqlsrv_rollback($conn){}
  *
  * If no errors or warnings occur, null is returned.<br />
  */
-function sqlsrv_errors($errorsAndOrWarnings = SQLSRV_ERR_ALL){}
+function sqlsrv_errors($errorsAndOrWarnings = SQLSRV_ERR_ALL) {}
 
 /**
- * Changes error handling and logging configurations.
+ * Changes the driver error handling and logging configurations.
  *
  * <br />Changes the settings for error handling and logging options.<br />
  *
@@ -1059,7 +1128,7 @@ function sqlsrv_errors($errorsAndOrWarnings = SQLSRV_ERR_ALL){}
  * <li>false (0)</li></ul>
  * @return bool If sqlsrv_configure is called with an unsupported setting or value, the function returns false. Otherwise, the function returns true.
  */
-function sqlsrv_configure($setting, $value){}
+function sqlsrv_configure($setting, $value) {}
 
 /**
  * Returns the current value of the specified configuration setting.
@@ -1072,9 +1141,9 @@ function sqlsrv_configure($setting, $value){}
  * Additional Information at {@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}<br />
  * @link https://docs.microsoft.com/en-us/sql/connect/php/sqlsrv-get-config
  * @param string $setting The configuration setting for which the value is returned.
- * @return mixed The value of the setting specified by the $setting parameter. If an invalid setting is specified, false is returned and an error is added to the error collection.
+ * @return mixed|false The value of the setting specified by the $setting parameter. If an invalid setting is specified, false is returned and an error is added to the error collection.
  */
-function sqlsrv_get_config($setting){}
+function sqlsrv_get_config($setting) {}
 
 /**
  * Prepares a Transact-SQL query without executing it. Implicitly binds parameters.
@@ -1141,10 +1210,10 @@ function sqlsrv_get_config($setting){}
  * <li>SQLSRV_CURSOR_CLIENT_BUFFERED</li></ul>
  * @return resource|false A statement resource. If the statement resource cannot be created, false is returned.
  */
-function sqlsrv_prepare($conn, $tsql, $params=array(), $options=array()){}
+function sqlsrv_prepare($conn, $tsql, $params = [], $options = []) {}
 
 /**
- * Executes a prepared statement.
+ * Executes a statement prepared with {@see sqlsrv_prepare}
  *
  * <br />Executes a previously prepared statement. See {@link sqlsrv_prepare() sqlsrv_prepare} for information on preparing a statement
  * for execution.<br />
@@ -1160,7 +1229,7 @@ function sqlsrv_prepare($conn, $tsql, $params=array(), $options=array()){}
  * statement resource, see {@link sqlsrv_prepare() sqlsrv_prepare}.
  * @return bool A Boolean value: true if the statement was successfully executed. Otherwise, false.
  */
-function sqlsrv_execute($stmt){}
+function sqlsrv_execute($stmt) {}
 
 /**
  * Prepares and executes a Transact-SQL query.
@@ -1215,10 +1284,10 @@ function sqlsrv_execute($stmt){}
  * <li>SQLSRV_CURSOR_CLIENT_BUFFERED</li></ul>
  * @return resource|false A statement resource. If the statement cannot be created and/or executed, false is returned.
  */
-function sqlsrv_query($conn, $tsql, $params=array(), $options=array()){}
+function sqlsrv_query($conn, $tsql, $params = [], $options = []) {}
 
 /**
- * Makes the next row of data available for reading.
+ * Makes the next row in a result set available for reading.
  *
  * <br />Makes the next row of a result set available for reading. Use {@link sqlsrv_get_field() sqlsrv_get_field} to read fields of
  * the row.<br />
@@ -1240,7 +1309,7 @@ function sqlsrv_query($conn, $tsql, $params=array(), $options=array()){}
  * @return bool|null If the next row of the result set was successfully retrieved, true is returned. If there are
  * no more results in the result set, null is returned. If an error occurred, false is returned.
  */
-function sqlsrv_fetch($stmt, $row=null, $offset=null){}
+function sqlsrv_fetch($stmt, $row = null, $offset = null) {}
 
 /**
  * Retrieves a field in the current row by index. The PHP return type can be specified.
@@ -1275,7 +1344,7 @@ function sqlsrv_fetch($stmt, $row=null, $offset=null){}
  * information about specifying PHP data types,
  * see {@link http://msdn.microsoft.com/en-us/library/cc296208.aspx How to: Specify PHP Data Types}.
  */
-function sqlsrv_get_field($stmt, $field_index, $get_as_type){}
+function sqlsrv_get_field($stmt, $field_index, $get_as_type = null) {}
 
 /**
  * Retrieves the next row of data as a numerically indexed array, an associative array, or both.
@@ -1323,7 +1392,7 @@ function sqlsrv_get_field($stmt, $field_index, $get_as_type){}
  * retrieve. The first record in the result set is 0.
  * @return array|null|false If a row of data is retrieved, an array is returned. If there are no more rows to retrieve, null is returned. If an error occurs, false is returned.
  */
-function sqlsrv_fetch_array($stmt, $fetch_type = null, $row=null, $offset=null){}
+function sqlsrv_fetch_array($stmt, $fetch_type = null, $row = null, $offset = null) {}
 
 /**
  * Retrieves the next row of data as an object.
@@ -1356,7 +1425,7 @@ function sqlsrv_fetch_array($stmt, $fetch_type = null, $row=null, $offset=null){
  * The data type of a value in the returned object will be the default PHP data type. For information on default PHP data
  * types, see {@link http://msdn.microsoft.com/en-us/library/cc296193.aspx Default PHP Data Types}.<br />
  */
-function sqlsrv_fetch_object($stmt, $class_name=null, $ctor_params=null, $row=null, $offset=null){}
+function sqlsrv_fetch_object($stmt, $class_name = null, $ctor_params = null, $row = null, $offset = null) {}
 
 /**
  * Detects if a result set has one or more rows.
@@ -1370,10 +1439,10 @@ function sqlsrv_fetch_object($stmt, $class_name=null, $ctor_params=null, $row=nu
  * @return bool If there are rows in the result set, the return value will be true. If there are no rows, or if the
  * function call fails, the return value will be false.
  */
-function sqlsrv_has_rows($stmt){}
+function sqlsrv_has_rows($stmt) {}
 
 /**
- * Retrieves the number of fields in an active result set.
+ * Retrieves the number of fields (columns) on a statemen.
  *
  * <br />Retrieves the number of fields in an active result set. Note that sqlsrv_num_fields can be called on any
  * prepared statement, before or after execution.<br />
@@ -1386,10 +1455,10 @@ function sqlsrv_has_rows($stmt){}
  * @return int|false An integer value that represents the number of fields in the active result set. If an error occurs,
  * the Boolean value false is returned.
  */
-function sqlsrv_num_fields($stmt){}
+function sqlsrv_num_fields($stmt) {}
 
 /**
- * Makes the next result available for processing.
+ * Makes the next result of the specified statement active.
  *
  * <br />Makes the next result (result set, row count, or output parameter) of the specified statement active.<br />
  *
@@ -1404,10 +1473,10 @@ function sqlsrv_num_fields($stmt){}
  * @return bool|null If the next result was successfully made active, the Boolean value true is returned. If an error occurred in
  * making the next result active, false is returned. If no more results are available, null is returned.
  */
-function sqlsrv_next_result($stmt){}
+function sqlsrv_next_result($stmt) {}
 
 /**
- * Reports the number of rows in a result set.
+ * Retrieves the number of rows in a result set.
  *
  * <br />sqlsrv_num_rows requires a client-side, static, or keyset cursor, and will return false if you use a forward cursor
  * or a dynamic cursor. (A forward cursor is the default.) For more information about cursors, see
@@ -1421,7 +1490,7 @@ function sqlsrv_next_result($stmt){}
  * @param resource $stmt The result set for which to count the rows.
  * @return int|false False if there was an error calculating the number of rows. Otherwise, returns the number of rows in the result set.
  */
-function sqlsrv_num_rows($stmt){}
+function sqlsrv_num_rows($stmt) {}
 
 /**
  * Returns the number of modified rows.
@@ -1437,7 +1506,7 @@ function sqlsrv_num_rows($stmt){}
  * modified, zero (0) is returned. If no information about the number of modified rows is available, negative one (-1)
  * is returned. If an error occurred in retrieving the number of modified rows, false is returned.
  */
-function sqlsrv_rows_affected($stmt){}
+function sqlsrv_rows_affected($stmt) {}
 
 /**
  * Provides information about the client.
@@ -1455,10 +1524,10 @@ function sqlsrv_rows_affected($stmt){}
  * <li>DriverVer - SQL Server Native Client DLL version: 10.50.xxx (Microsoft Drivers for PHP for SQL Server version 2.0)</li>
  * <li>ExtensionVer - php_sqlsrv.dll version: 2.0.xxxx.x(Microsoft Drivers for PHP for SQL Server version 2.0)</li></ul>
  */
-function sqlsrv_client_info($conn){}
+function sqlsrv_client_info($conn) {}
 
 /**
- * Provides information about the server.
+ * Returns information about the server.
  *
  * <br />Returns information about the server. A connection must be established before calling this function.<br />
  *
@@ -1471,7 +1540,7 @@ function sqlsrv_client_info($conn){}
  * <li>SQLServerVersion - The version of SQL Server.</li>
  * <li>SQLServerName - The name of the server.</li></ul>
  */
-function sqlsrv_server_info($conn){}
+function sqlsrv_server_info($conn) {}
 
 /**
  * Cancels a statement; discards any pending results for the statement.
@@ -1491,7 +1560,7 @@ function sqlsrv_server_info($conn){}
  * @param resource $stmt The statement to be canceled.
  * @return bool A Boolean value: true if the operation was successful. Otherwise, false.
  */
-function sqlsrv_cancel($stmt){}
+function sqlsrv_cancel($stmt) {}
 
 /**
  * Closes a statement. Frees all resources associated with the statement.
@@ -1512,7 +1581,7 @@ function sqlsrv_cancel($stmt){}
  * @return bool The Boolean value true unless the function is called with an invalid parameter. If the function is
  * called with an invalid parameter, false is returned.
  */
-function sqlsrv_free_stmt($stmt){}
+function sqlsrv_free_stmt($stmt) {}
 
 /**
  * Returns field metadata.
@@ -1536,14 +1605,14 @@ function sqlsrv_free_stmt($stmt){}
  * Number of bytes for fields of binary type (binary(n), varbinary(n), UDT). NULL for other SQL Server data types.</li>
  * <li>Precision - The precision for types of variable precision (real, numeric, decimal, datetime2, datetimeoffset, and
  * time). NULL for other SQL Server data types.</li>
- * Scale - The scale for types of variable scale (numeric, decimal, datetime2, datetimeoffset, and time). NULL for other
+ * <li>Scale - The scale for types of variable scale (numeric, decimal, datetime2, datetimeoffset, and time). NULL for other
  * SQL Server data types.</li>
  * <li>Nullable - An enumerated value indicating whether the column is nullable (SQLSRV_NULLABLE_YES), the column is not
  * nullable (SQLSRV_NULLABLE_NO), or it is not known if the column is nullable (SQLSRV_NULLABLE_UNKNOWN).</li></ul>
  * See the {@link http://msdn.microsoft.com/en-us/library/cc296197.aspx function documentation} for more information on
  * the keys for each sub-array.
  */
-function sqlsrv_field_metadata($stmt){}
+function sqlsrv_field_metadata($stmt) {}
 
 /**
  * Sends up to eight kilobytes (8 KB) of data to the server with each call to the function.
@@ -1562,7 +1631,7 @@ function sqlsrv_field_metadata($stmt){}
  * @param resource $stmt A statement resource corresponding to an executed statement.
  * @return bool Boolean : true if there is more data to be sent. Otherwise, false.
  */
-function sqlsrv_send_stream_data($stmt){}
+function sqlsrv_send_stream_data($stmt) {}
 
 /**
  * Specifies the encoding of a stream of data from the server.
@@ -1577,18 +1646,21 @@ function sqlsrv_send_stream_data($stmt){}
  *
  * Additional Information at:
  * <ul>
- * <li>{@link http://msdn.microsoft.com/en-us/library/cc296208.aspx How to: Specify PHP Data Types}</li></li>
+ * <li>{@link http://msdn.microsoft.com/en-us/library/cc296208.aspx How to: Specify PHP Data Types}</li>
  * <li>{@link http://msdn.microsoft.com/en-us/library/cc296163.aspx How to: Retrieve Character Data as a Stream Using the SQLSRV Driver.}</li>
  * <li>{@link http://msdn.microsoft.com/en-us/library/cc626307.aspx How to: Send and Retrieve UTF-8 Data Using Built-In UTF-8 Support.}</li>
- * <li>{@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}</li></ui>
+ * <li>{@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}</li>
+ * </ul>
  *
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ *
  * @param string $encoding The encoding to use for the stream. The valid options are SQLSRV_ENC_BINARY, SQLSRV_ENC_CHAR
  * or "UTF-8".
+ *
  * @return int Value to use in any place that accepts a SQLSRV_PHPTYPE_* constant to represent a PHP stream with the
  * given encoding.
  */
-function SQLSRV_PHPTYPE_STREAM($encoding){}
+function SQLSRV_PHPTYPE_STREAM($encoding) {}
 
 /**
  * Specifies the encoding of a string being received form the server.
@@ -1603,18 +1675,21 @@ function SQLSRV_PHPTYPE_STREAM($encoding){}
  *
  * Additional Information at:
  * <ul>
- * <li>{@link http://msdn.microsoft.com/en-us/library/cc296208.aspx How to: Specify PHP Data Types}</li></li>
+ * <li>{@link http://msdn.microsoft.com/en-us/library/cc296208.aspx How to: Specify PHP Data Types}</li>
  * <li>{@link http://msdn.microsoft.com/en-us/library/cc296163.aspx How to: Retrieve Character Data as a Stream Using the SQLSRV Driver.}</li>
  * <li>{@link http://msdn.microsoft.com/en-us/library/cc626307.aspx How to: Send and Retrieve UTF-8 Data Using Built-In UTF-8 Support.}</li>
- * <li>{@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}</li></ui>
+ * <li>{@link http://msdn.microsoft.com/en-us/library/cc296152.aspx SQLSRV Driver API Reference}</li>
+ * </ul>
  *
  * @link https://docs.microsoft.com/en-us/sql/connect/php/constants-microsoft-drivers-for-php-for-sql-server
+ *
  * @param string $encoding The encoding to use for the stream. The valid options are SQLSRV_ENC_BINARY, SQLSRV_ENC_CHAR
  * or "UTF-8".
+ *
  * @return int Value to use in any place that accepts a SQLSRV_PHPTYPE_* constant to represent a PHP string with the
  * given encoding.
  */
-function SQLSRV_PHPTYPE_STRING($encoding){}
+function SQLSRV_PHPTYPE_STRING($encoding) {}
 
 /**
  * Specifies a SQL Server binary field.
@@ -1627,7 +1702,7 @@ function SQLSRV_PHPTYPE_STRING($encoding){}
  * @param int $byteCount Must be between 1 and 8000.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the 'binary' data type.
  */
-function SQLSRV_SQLTYPE_BINARY($byteCount){}
+function SQLSRV_SQLTYPE_BINARY($byteCount) {}
 
 /**
  * Specifies a SQL Server varbinary field.
@@ -1640,7 +1715,7 @@ function SQLSRV_SQLTYPE_BINARY($byteCount){}
  * @param int|string $byteCount Must be between 1 and 8000 or 'max'.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the varbinary data type.
  */
-function SQLSRV_SQLTYPE_VARBINARY($byteCount){}
+function SQLSRV_SQLTYPE_VARBINARY($byteCount) {}
 
 /**
  * Specifies a SQL Server varchar filed.
@@ -1655,7 +1730,6 @@ function SQLSRV_SQLTYPE_VARBINARY($byteCount){}
  *
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the varchar data type.
  */
-
 function SQLSRV_SQLTYPE_VARCHAR($charCount) {}
 
 /**
@@ -1669,7 +1743,7 @@ function SQLSRV_SQLTYPE_VARCHAR($charCount) {}
  * @param int $charCount Must be between 1 and 8000.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the char data type.
  */
-function SQLSRV_SQLTYPE_CHAR($charCount){}
+function SQLSRV_SQLTYPE_CHAR($charCount) {}
 
 /**
  * Specifies a SQL Server nchar field.
@@ -1682,7 +1756,7 @@ function SQLSRV_SQLTYPE_CHAR($charCount){}
  * @param int $charCount Must be between 1 and 4000.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the nchar data type.
  */
-function SQLSRV_SQLTYPE_NCHAR($charCount){}
+function SQLSRV_SQLTYPE_NCHAR($charCount) {}
 
 /**
  * Specifies a SQL Server nvarchar field.
@@ -1695,7 +1769,7 @@ function SQLSRV_SQLTYPE_NCHAR($charCount){}
  * @param int|string $charCount Must be between 1 and 4000 or 'max'.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the nvarchar data type.
  */
-function SQLSRV_SQLTYPE_NVARCHAR($charCount){}
+function SQLSRV_SQLTYPE_NVARCHAR($charCount) {}
 
 /**
  * Specifies a SQL Server decimal field.
@@ -1709,7 +1783,7 @@ function SQLSRV_SQLTYPE_NVARCHAR($charCount){}
  * @param int $scale Must be between 1 and $precision.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the decimal data type.
  */
-function SQLSRV_SQLTYPE_DECIMAL($precision, $scale){}
+function SQLSRV_SQLTYPE_DECIMAL($precision, $scale) {}
 
 /**
  * Specifies a SQL Server numeric field.
@@ -1723,5 +1797,4 @@ function SQLSRV_SQLTYPE_DECIMAL($precision, $scale){}
  * @param int $scale Must be between 1 and $precision.
  * @return int Value to use in any place that accepts a SQLSRV_SQLTYPE_* constant to represent the numeric data type.
  */
-function SQLSRV_SQLTYPE_NUMERIC($precision, $scale){}
-
+function SQLSRV_SQLTYPE_NUMERIC($precision, $scale) {}

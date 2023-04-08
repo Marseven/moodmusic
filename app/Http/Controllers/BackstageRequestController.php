@@ -8,28 +8,17 @@ use App\BackstageRequest;
 use App\Http\Requests\CrupdateBackstageRequestRequest;
 use App\Notifications\BackstageRequestWasHandled;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use Common\Files\FileEntry;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class BackstageRequestController extends BaseController
 {
-    /**
-     * @var BackstageRequest
-     */
-    private $backstageRequest;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(BackstageRequest $backstageRequest, Request $request)
-    {
-        $this->backstageRequest = $backstageRequest;
-        $this->request = $request;
+    public function __construct(
+        protected BackstageRequest $backstageRequest,
+        protected Request $request,
+    ) {
     }
 
     public function index(): Response
@@ -37,15 +26,11 @@ class BackstageRequestController extends BaseController
         $userId = $this->request->get('userId');
         $this->authorize('index', [BackstageRequest::class, $userId]);
 
-        $paginator = (new Paginator($this->backstageRequest, $this->request->all()))
+        $builder = $this->backstageRequest
             ->with(['user', 'artist'])
-            ->setDefaultOrderColumns("FIELD(status, 'pending', 'approved', 'denied') ASC");
+            ->orderByRaw("FIELD(status, 'pending', 'approved', 'denied') ASC");
 
-        $paginator->filterColumns = ['type', 'status', 'created_at', 'requester' => function(Builder $builder, $userId) {
-            if ($userId) {
-                $builder->where('user_id', $userId);
-            }
-        }];
+        $paginator = new Datasource($builder, $this->request->all());
 
         $pagination = $paginator->paginate();
 
@@ -56,12 +41,14 @@ class BackstageRequestController extends BaseController
     {
         $this->authorize('show', $backstageRequest);
 
-        $backstageRequest->load(['user', 'artist']);
+        $backstageRequest->load(['user.social_profiles', 'artist']);
 
         $request = $backstageRequest->toArray();
 
-        if (isset($request['data']['passportScanEntryId'])) {
-            $request['data']['passportScanEntry'] = FileEntry::find($request['data']['passportScanEntryId']);
+        if (isset($request['data']['passport_scan_id'])) {
+            $request['data']['passport_scan_entry'] = FileEntry::find(
+                $request['data']['passport_scan_id'],
+            );
         }
 
         return $this->success(['request' => $request]);
@@ -71,16 +58,23 @@ class BackstageRequestController extends BaseController
     {
         $this->authorize('store', BackstageRequest::class);
 
-        $backstageRequest = app(CrupdateBackstageRequest::class)->execute($request->all());
+        $backstageRequest = app(CrupdateBackstageRequest::class)->execute(
+            $request->all(),
+        );
 
         return $this->success(['request' => $backstageRequest]);
     }
 
-    public function update(BackstageRequest $backstageRequest, CrupdateBackstageRequestRequest $request): Response
-    {
+    public function update(
+        BackstageRequest $backstageRequest,
+        CrupdateBackstageRequestRequest $request,
+    ): Response {
         $this->authorize('store', $backstageRequest);
 
-        $backstageRequest = app(CrupdateBackstageRequest::class)->execute($request->all(), $backstageRequest);
+        $backstageRequest = app(CrupdateBackstageRequest::class)->execute(
+            $request->all(),
+            $backstageRequest,
+        );
 
         return $this->success(['request' => $backstageRequest]);
     }
@@ -88,7 +82,10 @@ class BackstageRequestController extends BaseController
     public function destroy(string $ids): Response
     {
         $backstageRequestIds = explode(',', $ids);
-        $this->authorize('store', [BackstageRequest::class, $backstageRequestIds]);
+        $this->authorize('store', [
+            BackstageRequest::class,
+            $backstageRequestIds,
+        ]);
 
         $this->backstageRequest->whereIn('id', $backstageRequestIds)->delete();
 
@@ -99,8 +96,10 @@ class BackstageRequestController extends BaseController
     {
         $this->authorize('handle', BackstageRequest::class);
 
-        $backstageRequest = App(ApproveBackstageRequest::class)
-            ->execute($backstageRequest, $this->request->all());
+        $backstageRequest = App(ApproveBackstageRequest::class)->execute(
+            $backstageRequest,
+            $this->request->all(),
+        );
 
         return $this->success(['request' => $backstageRequest]);
     }
@@ -111,7 +110,12 @@ class BackstageRequestController extends BaseController
 
         $backstageRequest->fill(['status' => 'denied'])->save();
 
-        $backstageRequest->user->notify(new BackstageRequestWasHandled($backstageRequest, $actionParams['notes'] ?? null));
+        $backstageRequest->user->notify(
+            new BackstageRequestWasHandled(
+                $backstageRequest,
+                $actionParams['notes'] ?? null,
+            ),
+        );
 
         return $this->success(['request' => $backstageRequest]);
     }

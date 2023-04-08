@@ -31,9 +31,4 @@ class PermissionTableSeeder extends Seeder
         // delete legacy permissions
         app(Permission::class)->whereNull('group')->delete();
     }
-
-    public static function __callStatic($name, $arguments)
-    {
-        // TODO: Implement __callStatic() method.
-    }
 }

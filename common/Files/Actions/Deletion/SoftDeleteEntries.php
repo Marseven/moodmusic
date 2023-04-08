@@ -4,45 +4,34 @@ namespace Common\Files\Actions\Deletion;
 
 use Common\Files\Events\FileEntriesDeleted;
 use Common\Files\FileEntry;
-use Illuminate\Support\Collection;
 use Common\Files\Traits\LoadsAllChildEntries;
+use Illuminate\Support\Collection;
 
 class SoftDeleteEntries
 {
     use LoadsAllChildEntries;
 
-    /**
-     * @var FileEntry
-     */
-    protected $entry;
-
-    /**
-     * @param FileEntry $entry
-     */
-    public function __construct(FileEntry $entry)
+    public function __construct(protected FileEntry $entry)
     {
-        $this->entry = $entry;
     }
 
-    /**
-     * @param Collection|array $entryIds
-     * @return void
-     */
-    public function execute($entryIds)
+    public function execute(Collection|array $entryIds): void
     {
-        collect($entryIds)->chunk(50)->each(function($ids) {
-            $entries = $this->entry->withTrashed()->whereIn('id', $ids)->get();
-            $this->delete($entries);
-        });
+        collect($entryIds)
+            ->chunk(50)
+            ->each(function ($ids) {
+                $entries = $this->entry
+                    ->withTrashed()
+                    ->whereIn('id', $ids)
+                    ->get();
+                $this->delete($entries);
+            });
     }
 
     /**
      * Move specified entries to "trash".
-     *
-     * @param Collection $entries
-     * @return void
      */
-    protected function delete(Collection $entries)
+    protected function delete(Collection|array $entries): void
     {
         $entries = $this->loadChildEntries($entries);
         $this->entry->whereIn('id', $entries->pluck('id'))->delete();

@@ -2,14 +2,15 @@
 
 use Auth;
 use Common\Core\BaseFormRequest;
-use Validator;
+use Illuminate\Validation\Rule;
 
 class ModifyPlaylist extends BaseFormRequest
 {
-
-    public function messages() {
+    public function messages()
+    {
         return [
-            'unique_name' => 'You have already created a playlist with this name.'
+            "name.unique" =>
+                "You have already created a playlist with this name.",
         ];
     }
 
@@ -20,20 +21,22 @@ class ModifyPlaylist extends BaseFormRequest
      */
     public function rules()
     {
-        Validator::extend('uniqueName', function ($attribute, $value) {
-            $playlist = $this->route('playlist');
-            return !$playlist || $playlist->owner_id === Auth::id();
-        });
-
-        $rules =  [
-            'name' => 'string|min:3|max:255|unique_name',
-            'description' => 'min:20|max:170|nullable',
-            'public' => 'boolean',
-            'collaborative' => 'boolean',
+        $rules = [
+            "name" => [
+                "string",
+                "min:3",
+                "max:250",
+                Rule::unique("playlists", "name")
+                    ->where("owner_id", Auth::id())
+                    ->ignore($this->route("playlist")->id ?? null),
+            ],
+            "description" => "min:20|max:170|nullable",
+            "public" => "boolean",
+            "collaborative" => "boolean",
         ];
 
-        if ($this->method() === 'POST') {
-            $rules['name'] = 'required|' . $rules['name'];
+        if ($this->method() === "POST") {
+            array_unshift($rules['name'], 'required');
         }
 
         return $rules;

@@ -3,23 +3,43 @@
 namespace StubTests\Model;
 
 use PhpParser\Node\Expr\FuncCall;
+use function in_array;
+use function is_float;
+use function is_resource;
+use function is_string;
 
 class PHPDefineConstant extends PHPConst
 {
     /**
-     * @param array $constant
-     * @return $this
+     * @param array $reflectionObject
+     * @return static
      */
-    public function readObjectFromReflection($constant)
+    public function readObjectFromReflection($reflectionObject)
     {
-        $this->name = utf8_encode($constant[0]);
-        $this->value = is_resource($constant[1]) ? 'PHPSTORM_RESOURCE' : utf8_encode($constant[1]);
+        if (is_string($reflectionObject[0])) {
+            $this->name = utf8_encode($reflectionObject[0]);
+        } else {
+            $this->name = $reflectionObject[0];
+        }
+        $constantValue = $reflectionObject[1];
+        if ($constantValue !== null) {
+            if (is_resource($constantValue)) {
+                $this->value = 'PHPSTORM_RESOURCE';
+            } elseif (is_string($constantValue) || is_float($constantValue)) {
+                $this->value = utf8_encode((string)$constantValue);
+            } else {
+                $this->value = $constantValue;
+            }
+        } else {
+            $this->value = null;
+        }
+        $this->visibility = 'public';
         return $this;
     }
 
     /**
      * @param FuncCall $node
-     * @return $this
+     * @return static
      */
     public function readObjectFromStubNode($node)
     {
@@ -29,8 +49,8 @@ class PHPDefineConstant extends PHPConst
         }
         $this->name = $constName;
         $this->value = $this->getConstValue($node->args[1]);
-        $this->collectLinks($node);
-        $this->collectSinceDeprecatedVersions($node);
+        $this->visibility = 'public';
+        $this->collectTags($node);
         return $this;
     }
 }

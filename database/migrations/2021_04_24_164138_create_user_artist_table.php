@@ -13,6 +13,7 @@ class CreateUserArtistTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('user_artist')) return;
         Schema::create('user_artist', function (Blueprint $table) {
             $table->id();
             $table->bigInteger('user_id')->unsigned()->index();

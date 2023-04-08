@@ -7,19 +7,14 @@ use Illuminate\Http\Middleware\TrustHosts as Middleware;
 
 class BaseTrustHosts extends Middleware
 {
-    /**
-     * Get the host patterns that should be trusted.
-     *
-     * @return array
-     */
-    public function hosts()
+    public function hosts(): array
     {
         return [
             $this->allSubdomainsOfApplicationUrl(),
         ];
     }
 
-    protected function shouldSpecifyTrustedHosts()
+    protected function shouldSpecifyTrustedHosts(): bool
     {
         // allow custom domain validation
         if (request()->path() === CustomDomainController::VALIDATE_CUSTOM_DOMAIN_PATH) {

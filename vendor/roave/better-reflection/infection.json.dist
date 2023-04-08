@@ -1,0 +1,19 @@
+{
+    "source": {
+        "directories": [
+            "src"
+        ]
+    },
+    "bootstrap": "./infection.bootstrap.php",
+    "logs": {
+        "text": "php:\/\/stderr",
+        "stryker": {
+            "report": "/^\\d\\.\\d\\.x$/"
+        }
+    },
+    "mutators": {
+        "@default": true
+    },
+    "minMsi": 97,
+    "minCoveredMsi": 98
+}

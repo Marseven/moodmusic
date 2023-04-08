@@ -5,9 +5,9 @@
  * @param int $length The length of the random string that should be returned in bytes.
  * @return string Returns a string containing the requested number of cryptographically secure random bytes.
  * @since 7.0
- * @throws Exception if it was not possible to gather sufficient entropy.
+ * @throws Exception if an appropriate source of randomness cannot be found.
  */
-function random_bytes ($length) {}
+function random_bytes(int $length): string {}
 
 /**
  * Generates cryptographically secure pseudo-random integers
@@ -16,6 +16,6 @@ function random_bytes ($length) {}
  * @param int $max The highest value to be returned, which must be less than or equal to PHP_INT_MAX.
  * @return int Returns a cryptographically secure random integer in the range min to max, inclusive.
  * @since 7.0
- * @throws Exception if it was not possible to gather sufficient entropy.
+ * @throws Exception if an appropriate source of randomness cannot be found.
  */
-function random_int ($min, $max) {}
+function random_int(int $min, int $max): int {}

@@ -17,27 +17,40 @@ class SpotifyCredentialsValidator implements SettingsValidator
     public function fails($values)
     {
         try {
-            $this->authorize(Arr::get($values, 'spotify_id'), Arr::get($values, 'spotify_secret'));
+            $this->authorize(
+                Arr::get($values, 'spotify_id'),
+                Arr::get($values, 'spotify_secret'),
+            );
         } catch (ClientException $e) {
-            $errResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+            $errResponse = json_decode(
+                $e
+                    ->getResponse()
+                    ->getBody()
+                    ->getContents(),
+                true,
+            );
             return $this->getMessage($errResponse);
         }
     }
 
-    /**
-     * @param array $errResponse
-     * @return array
-     */
-    private function getMessage($errResponse)
+    private function getMessage(array $errResponse): array
     {
         if ($errResponse['error'] === 'invalid_client') {
             if (Str::contains($errResponse['error_description'], 'secret')) {
-                return ['spotify_secret' => 'This Spotify Secret is not valid.'];
+                return [
+                    'server.spotify_secret' =>
+                        'This Spotify Secret is not valid.',
+                ];
             } else {
-                return ['spotify_id' => 'This Spotify ID is not invalid.'];
+                return [
+                    'server.spotify_id' => 'This Spotify ID is not invalid.',
+                ];
             }
         } else {
-            return ['spotify_group' => 'Could not validate spotify credentials, please try again later.'];
+            return [
+                'spotify_group' =>
+                    'Could not validate spotify credentials, please try again later.',
+            ];
         }
     }
 }

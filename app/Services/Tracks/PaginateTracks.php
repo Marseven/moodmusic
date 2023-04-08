@@ -4,13 +4,13 @@ namespace App\Services\Tracks;
 
 use App\Genre;
 use App\Track;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use Illuminate\Pagination\AbstractPaginator;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Str;
 
 class PaginateTracks
 {
-    public function execute(array $params, Genre $genre = null)
+    public function execute(array $params, Genre $genre = null): AbstractPaginator
     {
         if ($genre) {
             $builder = $genre->tracks();
@@ -18,17 +18,18 @@ class PaginateTracks
             $builder = Track::query();
         }
 
-        $paginator = (new Paginator($builder, $params))
+        $builder
             ->with('album')
-            ->with('artists')
-            ->withCount('plays');
+            ->with('artists');
 
-        $order = $paginator->getOrder();
-        if ($order['col'] === 'popularity') {
-            $paginator->dontSort = true;
-            $paginator->query()->orderByPopularity($order['dir']);
+        $datasource = new Datasource($builder, $params);
+        $order = $datasource->getOrder();
+
+        if (Str::endsWith($order['col'], 'popularity')) {
+            $datasource->order = false;
+            $builder->orderByPopularity($order['dir']);
         }
 
-        return $paginator->paginate();
+        return $datasource->paginate();
     }
 }

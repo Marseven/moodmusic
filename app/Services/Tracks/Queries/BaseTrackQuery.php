@@ -11,41 +11,28 @@ abstract class BaseTrackQuery
 {
     const ORDER_DIR = 'desc';
 
-    /**
-     * @var array
-     */
-    private $params;
-
-    /**
-     * @param array $params
-     */
-    public function __construct($params)
+    public function __construct(protected array $params)
     {
-        $this->params = $params;
     }
 
-    /**
-     * @param int $modelId
-     * @return Builder
-     */
-    abstract public function get($modelId);
+    abstract public function get(int $modelId): Builder;
 
-    /**
-     * @return Builder
-     */
-    protected function baseQuery()
+    protected function baseQuery(): Builder
     {
         $order = $this->getOrder();
 
         return app(Track::class)
-            ->with(['artists', 'album' => function(BelongsTo $q) {
-                return $q->select('id', 'name', 'image');
-            }])
+            ->with([
+                'artists',
+                'album' => function (BelongsTo $q) {
+                    return $q->select('id', 'name', 'image');
+                },
+            ])
             ->orderBy($order['col'], $order['dir'])
             ->orderBy('tracks.id', 'desc');
     }
 
-    public function getOrder()
+    public function getOrder(): array
     {
         return [
             'col' => Arr::get($this->params, 'orderBy') ?: static::ORDER_COL,

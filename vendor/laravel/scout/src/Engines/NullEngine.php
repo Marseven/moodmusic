@@ -4,6 +4,7 @@ namespace Laravel\Scout\Engines;
 
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Collection as BaseCollection;
+use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
 
 class NullEngine extends Engine
@@ -79,6 +80,19 @@ class NullEngine extends Engine
     }
 
     /**
+     * Map the given results to instances of the given model via a lazy collection.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @param  mixed  $results
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyMap(Builder $builder, $results, $model)
+    {
+        return LazyCollection::make();
+    }
+
+    /**
      * Get the total count from a raw result returned by the engine.
      *
      * @param  mixed  $results
@@ -98,5 +112,28 @@ class NullEngine extends Engine
     public function flush($model)
     {
         //
+    }
+
+    /**
+     * Create a search index.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return mixed
+     */
+    public function createIndex($name, array $options = [])
+    {
+        return [];
+    }
+
+    /**
+     * Delete a search index.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function deleteIndex($name)
+    {
+        return [];
     }
 }

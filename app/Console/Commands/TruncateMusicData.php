@@ -12,34 +12,26 @@ class TruncateMusicData extends Command
 {
     use ConfirmableTrait;
 
-    /**
-     * @var string
-     */
     protected $signature = 'music:truncate {--force : Force the operation to run when in production.}';
 
-    /**
-     * @var string
-     */
     protected $description = 'Truncate all music data on the site.';
 
-    /**
-     * Execute the console command.
-     *
-     * @return mixed
-     */
+    protected array $tablesToKeep = ['migrations', 'products', 'prices'];
+
     public function handle()
     {
-        if ( ! $this->confirmToProceed()) {
+        if (!$this->confirmToProceed()) {
             return;
         }
 
-        $tableNames = Schema::getConnection()->getDoctrineSchemaManager()->listTableNames();
+        $tableNames = Schema::getConnection()
+            ->getDoctrineSchemaManager()
+            ->listTableNames();
 
         foreach ($tableNames as $name) {
-            if ($name == 'migrations') {
-                continue;
+            if (!in_array($name, $this->tablesToKeep)) {
+                DB::table($name)->truncate();
             }
-            DB::table($name)->truncate();
         }
 
         Storage::deleteDirectory('waves');

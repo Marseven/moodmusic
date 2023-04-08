@@ -2,19 +2,26 @@
 
 namespace Sentry\Laravel;
 
+use DateTimeInterface;
 use Monolog\DateTimeImmutable;
 use Monolog\Logger;
+use Monolog\LogRecord;
 use Monolog\Formatter\LineFormatter;
 use Monolog\Formatter\FormatterInterface;
 use Monolog\Handler\AbstractProcessingHandler;
 use Sentry\Breadcrumb;
 use Sentry\Event;
+use Sentry\Monolog\CompatibilityProcessingHandlerTrait;
 use Sentry\Severity;
-use Sentry\State\Hub;
+use Sentry\State\HubInterface;
 use Sentry\State\Scope;
+use Throwable;
+use TypeError;
 
 class SentryHandler extends AbstractProcessingHandler
 {
+    use CompatibilityProcessingHandlerTrait;
+
     /**
      * @var string the current application environment (staging|preprod|prod)
      */
@@ -27,7 +34,7 @@ class SentryHandler extends AbstractProcessingHandler
     protected $release;
 
     /**
-     * @var Hub the hub object that sends the message to the server
+     * @var HubInterface the hub object that sends the message to the server
      */
     protected $hub;
 
@@ -51,13 +58,13 @@ class SentryHandler extends AbstractProcessingHandler
     private $useFormattedMessage;
 
     /**
-     * @param Hub  $hub
-     * @param int  $level  The minimum logging level at which this handler will be triggered
-     * @param bool $bubble Whether the messages that are handled can bubble up the stack or not
-     * @param bool $reportExceptions
-     * @param bool $useFormattedMessage
+     * @param HubInterface $hub
+     * @param int          $level  The minimum logging level at which this handler will be triggered
+     * @param bool         $bubble Whether the messages that are handled can bubble up the stack or not
+     * @param bool         $reportExceptions
+     * @param bool         $useFormattedMessage
      */
-    public function __construct(Hub $hub, $level = Logger::DEBUG, bool $bubble = true, bool $reportExceptions = true, bool $useFormattedMessage = false)
+    public function __construct(HubInterface $hub, $level = Logger::DEBUG, bool $bubble = true, bool $reportExceptions = true, bool $useFormattedMessage = false)
     {
         parent::__construct($level, $bubble);
 
@@ -89,7 +96,7 @@ class SentryHandler extends AbstractProcessingHandler
         $record = array_reduce(
             $records,
             function ($highest, $record) {
-                if ($record['level'] > $highest['level']) {
+                if ($highest === null || $record['level'] > $highest['level']) {
                     return $record;
                 }
 
@@ -143,77 +150,56 @@ class SentryHandler extends AbstractProcessingHandler
      *
      * @return \Sentry\Severity
      */
-    protected function getLogLevel($logLevel)
+    protected function getLogLevel(int $logLevel): Severity
     {
-        switch ($logLevel) {
-            case Logger::DEBUG:
-                return Severity::debug();
-            case Logger::NOTICE:
-            case Logger::INFO:
-                return Severity::info();
-            case Logger::WARNING:
-                return Severity::warning();
-            case Logger::ERROR:
-                return Severity::error();
-            case Logger::ALERT:
-            case Logger::EMERGENCY:
-            case Logger::CRITICAL:
-                return Severity::fatal();
-        }
+        return $this->getSeverityFromLevel($logLevel);
     }
 
     /**
      * {@inheritdoc}
      * @suppress PhanTypeMismatchArgument
      */
-    protected function write(array $record): void
+    protected function doWrite($record): void
     {
-        $isException = isset($record['context']['exception']) && $record['context']['exception'] instanceof \Throwable;
+        $exception = $record['context']['exception'] ?? null;
+        $isException = $exception instanceof Throwable;
+        unset($record['context']['exception']);
 
         if (!$this->reportExceptions && $isException) {
             return;
         }
 
         $this->hub->withScope(
-            function (Scope $scope) use ($record, $isException) {
-                if (!empty($record['context']['extra'])) {
-                    foreach ($record['context']['extra'] as $key => $tag) {
-                        $scope->setExtra($key, $tag);
-                    }
-                    unset($record['context']['extra']);
+            function (Scope $scope) use ($record, $isException, $exception) {
+                $context = !empty($record['context']) && is_array($record['context'])
+                    ? $record['context']
+                    : [];
+
+                if (!empty($context)) {
+                    $this->consumeContextAndApplyToScope($scope, $context);
                 }
 
-                if (!empty($record['context']['tags'])) {
-                    foreach ($record['context']['tags'] as $key => $tag) {
-                        $scope->setTag($key, $tag);
-                    }
-                    unset($record['context']['tags']);
-                }
-
-                if (!empty($record['extra'])) {
+                if (!empty($record['extra']) && is_array($record['extra'])) {
                     foreach ($record['extra'] as $key => $extra) {
                         $scope->setExtra($key, $extra);
                     }
                 }
 
-                if (!empty($record['context']['fingerprint'])) {
-                    $scope->setFingerprint($record['context']['fingerprint']);
-                    unset($record['context']['fingerprint']);
-                }
+                $logger = !empty($context['logger']) && is_string($context['logger'])
+                    ? $context['logger']
+                    : null;
+                unset($context['logger']);
 
-                if (!empty($record['context']['user'])) {
-                    $scope->setUser((array)$record['context']['user'], true);
-                    unset($record['context']['user']);
+                // At this point we consumed everything we could from the context
+                // what remains we add as `log_context` to the event as a whole
+                if (!empty($context)) {
+                    $scope->setExtra('log_context', $context);
                 }
 
                 $scope->addEventProcessor(
-                    function (Event $event) use ($record) {
-                        if (!empty($record['context']['logger'])) {
-                            $event->setLogger($record['context']['logger']);
-                            unset($record['context']['logger']);
-                        } else {
-                            $event->setLogger($record['channel']);
-                        }
+                    function (Event $event) use ($record, $logger) {
+                        $event->setLevel($this->getLogLevel($record['level']));
+                        $event->setLogger($logger ?? $record['channel']);
 
                         if (!empty($this->environment) && !$event->getEnvironment()) {
                             $event->setEnvironment($this->environment);
@@ -223,7 +209,7 @@ class SentryHandler extends AbstractProcessingHandler
                             $event->setRelease($this->release);
                         }
 
-                        if (isset($record['datetime']) && $record['datetime'] instanceof DateTimeImmutable) {
+                        if (isset($record['datetime']) && $record['datetime'] instanceof DateTimeInterface) {
                             $event->setTimestamp($record['datetime']->getTimestamp());
                         }
 
@@ -232,13 +218,12 @@ class SentryHandler extends AbstractProcessingHandler
                 );
 
                 if ($isException) {
-                    $this->hub->captureException($record['context']['exception']);
+                    $this->hub->captureException($exception);
                 } else {
                     $this->hub->captureMessage(
                         $this->useFormattedMessage || empty($record['message'])
                             ? $record['formatted']
-                            : $record['message'],
-                        $this->getLogLevel($record['level'])
+                            : $record['message']
                     );
                 }
             }
@@ -305,5 +290,66 @@ class SentryHandler extends AbstractProcessingHandler
         $this->hub->addBreadcrumb($crumb);
 
         return $this;
+    }
+
+    /**
+     * Consumes the context and applies it to the scope.
+     *
+     * @param \Sentry\State\Scope $scope
+     * @param array               $context
+     *
+     * @return void
+     */
+    private function consumeContextAndApplyToScope(Scope $scope, array &$context): void
+    {
+        if (!empty($context['extra']) && is_array($context['extra'])) {
+            foreach ($context['extra'] as $key => $value) {
+                $scope->setExtra($key, $value);
+            }
+
+            unset($context['extra']);
+        }
+
+        if (!empty($context['tags']) && is_array($context['tags'])) {
+            foreach ($context['tags'] as $tag => $value) {
+                // Ignore tags with a value that is not a string or can be casted to a string
+                if (!$this->valueCanBeString($value)) {
+                    continue;
+                }
+
+                $scope->setTag($tag, (string)$value);
+            }
+
+            unset($context['tags']);
+        }
+
+        if (!empty($context['fingerprint']) && is_array($context['fingerprint'])) {
+            $scope->setFingerprint($context['fingerprint']);
+
+            unset($context['fingerprint']);
+        }
+
+        if (!empty($context['user']) && is_array($context['user'])) {
+            try {
+                $scope->setUser($context['user']);
+
+                unset($context['user']);
+            } catch (TypeError $e) {
+                // In some cases the context can be invalid, in that case we ignore it and
+                // choose to not send it to Sentry in favor of not breaking the application
+            }
+        }
+    }
+
+    /**
+     * Check if the value passed can be cast to a string.
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    private function valueCanBeString($value): bool
+    {
+        return is_string($value) || is_scalar($value) || (is_object($value) && method_exists($value, '__toString'));
     }
 }

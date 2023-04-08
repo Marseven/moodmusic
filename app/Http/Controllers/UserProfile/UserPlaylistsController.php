@@ -2,29 +2,19 @@
 
 use App;
 use App\Playlist;
+use App\Services\Playlists\PaginatePlaylists;
 use App\User;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 class UserPlaylistsController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Playlist
-     */
-    private $playlist;
-
-    public function __construct(Request $request, Playlist $playlist)
-    {
-        $this->request = $request;
-        $this->playlist = $playlist;
-
+    public function __construct(
+        protected Request $request,
+        protected Playlist $playlist,
+    ) {
         $this->middleware('auth', ['only' => ['follow', 'unfollow']]);
     }
 
@@ -32,13 +22,10 @@ class UserPlaylistsController extends BaseController
     {
         $this->authorize('show', $user);
 
-        $query = $user
-            ->playlists()
-            ->with('editors');
-
-        $pagination = (new Paginator($query, $this->request->all()))
-            ->setParam('perPage', request('perPage') ?? 20)
-            ->paginate();
+        $pagination = app(PaginatePlaylists::class)->execute(
+            array_merge($this->request->all(), ['compact' => true]),
+            $user->playlists(),
+        );
 
         return $this->success(['pagination' => $pagination]);
     }
@@ -49,19 +36,28 @@ class UserPlaylistsController extends BaseController
 
         $this->authorize('show', $playlist);
 
-        $this->request->user()->playlists()->sync([$id], false);
+        $this->request
+            ->user()
+            ->playlists()
+            ->sync([$id], false);
 
         return $this->success();
     }
 
     public function unfollow(int $id): Response
     {
-        $playlist = $this->request->user()->playlists()->find($id);
+        $playlist = $this->request
+            ->user()
+            ->playlists()
+            ->find($id);
 
         $this->authorize('show', $playlist);
 
         if ($playlist) {
-            $this->request->user()->playlists()->detach($id);
+            $this->request
+                ->user()
+                ->playlists()
+                ->detach($id);
         }
 
         return $this->success();

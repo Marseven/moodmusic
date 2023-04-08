@@ -5,8 +5,8 @@ namespace Common\Settings\Validators;
 interface SettingsValidator
 {
     /**
-     * @param array $settings
+     * @param array $values
      * @return null|array
      */
-    public function fails($settings);
+    public function fails($values);
 }

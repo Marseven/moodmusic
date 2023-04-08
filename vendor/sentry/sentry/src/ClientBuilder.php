@@ -4,13 +4,10 @@ declare(strict_types=1);
 
 namespace Sentry;
 
-use Http\Client\HttpAsyncClient;
 use Http\Discovery\Psr17FactoryDiscovery;
-use Jean85\PrettyVersions;
 use Psr\Log\LoggerInterface;
 use Sentry\HttpClient\HttpClientFactory;
 use Sentry\Serializer\RepresentationSerializerInterface;
-use Sentry\Serializer\Serializer;
 use Sentry\Serializer\SerializerInterface;
 use Sentry\Transport\DefaultTransportFactory;
 use Sentry\Transport\TransportFactoryInterface;
@@ -39,11 +36,6 @@ final class ClientBuilder implements ClientBuilderInterface
     private $transport;
 
     /**
-     * @var HttpAsyncClient|null The HTTP client
-     */
-    private $httpClient;
-
-    /**
      * @var SerializerInterface|null The serializer to be injected in the client
      */
     private $serializer;
@@ -66,7 +58,7 @@ final class ClientBuilder implements ClientBuilderInterface
     /**
      * @var string The SDK version of the Client
      */
-    private $sdkVersion;
+    private $sdkVersion = Client::SDK_VERSION;
 
     /**
      * Class constructor.
@@ -76,7 +68,6 @@ final class ClientBuilder implements ClientBuilderInterface
     public function __construct(Options $options = null)
     {
         $this->options = $options ?? new Options();
-        $this->sdkVersion = PrettyVersions::getVersion('sentry/sentry')->getPrettyVersion();
     }
 
     /**
@@ -84,7 +75,7 @@ final class ClientBuilder implements ClientBuilderInterface
      */
     public static function create(array $options = []): ClientBuilderInterface
     {
-        return new static(new Options($options));
+        return new self(new Options($options));
     }
 
     /**
@@ -186,10 +177,10 @@ final class ClientBuilder implements ClientBuilderInterface
     {
         $streamFactory = Psr17FactoryDiscovery::findStreamFactory();
         $httpClientFactory = new HttpClientFactory(
-            Psr17FactoryDiscovery::findUrlFactory(),
-            Psr17FactoryDiscovery::findResponseFactory(),
+            null,
+            null,
             $streamFactory,
-            $this->httpClient,
+            null,
             $this->sdkIdentifier,
             $this->sdkVersion
         );

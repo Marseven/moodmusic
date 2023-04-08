@@ -9,9 +9,14 @@ use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\PrettyPrinter\Standard as CodePrinter;
 use Roave\BetterReflection\Reflection\ReflectionClass;
 
+/**
+ * @deprecated
+ *
+ * @psalm-suppress DeprecatedInterface
+ */
 final class PhpParserPrinter implements ClassPrinterInterface
 {
-    public function __invoke(ReflectionClass $classInfo) : string
+    public function __invoke(ReflectionClass $classInfo): string
     {
         $nodes = [];
 

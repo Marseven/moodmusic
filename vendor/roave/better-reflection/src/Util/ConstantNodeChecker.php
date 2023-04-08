@@ -6,18 +6,17 @@ namespace Roave\BetterReflection\Util;
 
 use PhpParser\Node;
 use Roave\BetterReflection\Reflection\Exception\InvalidConstantNode;
+
 use function count;
 use function in_array;
 
-/**
- * @internal
- */
+/** @internal */
 final class ConstantNodeChecker
 {
-    /**
-     * @throws InvalidConstantNode
-     */
-    public static function assertValidDefineFunctionCall(Node\Expr\FuncCall $node) : void
+    private const DEFINE_ARGUMENTS_COUNTS = [2, 3];
+
+    /** @throws InvalidConstantNode */
+    public static function assertValidDefineFunctionCall(Node\Expr\FuncCall $node): void
     {
         if (! ($node->name instanceof Node\Name)) {
             throw InvalidConstantNode::create($node);
@@ -27,17 +26,21 @@ final class ConstantNodeChecker
             throw InvalidConstantNode::create($node);
         }
 
-        if (! in_array(count($node->args), [2, 3], true)) {
+        if (! in_array(count($node->args), self::DEFINE_ARGUMENTS_COUNTS, true)) {
             throw InvalidConstantNode::create($node);
         }
 
-        if (! ($node->args[0]->value instanceof Node\Scalar\String_)) {
+        if (! ($node->args[0] instanceof Node\Arg) || ! ($node->args[0]->value instanceof Node\Scalar\String_)) {
+            throw InvalidConstantNode::create($node);
+        }
+
+        if (! ($node->args[1] instanceof Node\Arg)) {
             throw InvalidConstantNode::create($node);
         }
 
         $valueNode = $node->args[1]->value;
 
-        if ($valueNode instanceof Node\Expr\FuncCall) {
+        if ($valueNode instanceof Node\Expr\FuncCall && ! ($valueNode->name instanceof Node\Name && $valueNode->name->toLowerString() === 'constant')) {
             throw InvalidConstantNode::create($node);
         }
 

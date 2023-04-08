@@ -66,8 +66,6 @@ class ArtistBio {
      */
     private function getFromWikipedia($name)
     {
-        // TODO: maybe add spotify bio and bio images provider, can scrape the site
-
         $lang = $this->settings->get('wikipedia_language', 'en');
         $url  = $this->makeWikipediaApiUrl($name, $lang);
 

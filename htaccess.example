@@ -1,3 +1,10 @@
+<FilesMatch "(?i)\.(php|php3?|phtml)$">
+    Require all denied
+</FilesMatch>
+<FilesMatch "index.php">
+    Require all granted
+</FilesMatch>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
@@ -14,3 +21,7 @@
     RewriteCond %{REQUEST_URI} !^public
     RewriteRule ^(.*)$ public/$1 [L]
 </IfModule>
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# php -- END cPanel-generated handler, do not edit
+

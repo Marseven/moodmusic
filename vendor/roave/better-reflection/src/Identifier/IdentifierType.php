@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Identifier;
 
 use InvalidArgumentException;
-use Roave\BetterReflection\Reflection\Reflection;
 use Roave\BetterReflection\Reflection\ReflectionClass;
 use Roave\BetterReflection\Reflection\ReflectionConstant;
 use Roave\BetterReflection\Reflection\ReflectionFunction;
+
 use function array_key_exists;
 use function sprintf;
 
@@ -24,58 +24,37 @@ class IdentifierType
         self::IDENTIFIER_CONSTANT => null,
     ];
 
-    /** @var string */
-    private $name;
+    private string $name;
 
     public function __construct(string $type = self::IDENTIFIER_CLASS)
     {
         if (! array_key_exists($type, self::VALID_TYPES)) {
             throw new InvalidArgumentException(sprintf(
                 '%s is not a valid identifier type',
-                $type
+                $type,
             ));
         }
 
         $this->name = $type;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function isClass() : bool
+    public function isClass(): bool
     {
         return $this->name === self::IDENTIFIER_CLASS;
     }
 
-    public function isFunction() : bool
+    public function isFunction(): bool
     {
         return $this->name === self::IDENTIFIER_FUNCTION;
     }
 
-    public function isConstant() : bool
+    public function isConstant(): bool
     {
         return $this->name === self::IDENTIFIER_CONSTANT;
-    }
-
-    /**
-     * Check to see if a reflector is of a valid type specified by this identifier.
-     */
-    public function isMatchingReflector(Reflection $reflector) : bool
-    {
-        if ($this->name === self::IDENTIFIER_CLASS) {
-            return $reflector instanceof ReflectionClass;
-        }
-
-        if ($this->name === self::IDENTIFIER_FUNCTION) {
-            return $reflector instanceof ReflectionFunction;
-        }
-
-        if ($this->name === self::IDENTIFIER_CONSTANT) {
-            return $reflector instanceof ReflectionConstant;
-        }
-
-        return false;
     }
 }

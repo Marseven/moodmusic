@@ -10,12 +10,15 @@ class ChannelPolicy extends BasePolicy
 {
     public function index(?User $user, $userId = null)
     {
-        return $this->userOrGuestHasPermission($user, 'channels.view') || $user->id === (int) $userId;
+        return $user->hasPermission('channels.view') ||
+            $user->id === (int) $userId;
     }
 
     public function show(?User $user, Channel $channel)
     {
-        return $this->userOrGuestHasPermission($user, 'channels.view') || $this->userOrGuestHasPermission($user, 'music.view') || $channel->user_id === $user->id;
+        return $user->hasPermission('channels.view') ||
+            $user->hasPermission('music.view') ||
+            $channel->user_id === $user->id;
     }
 
     public function store(User $user)
@@ -25,7 +28,8 @@ class ChannelPolicy extends BasePolicy
 
     public function update(User $user, Channel $channel)
     {
-        return $user->hasPermission('channels.update') || $channel->user_id === $user->id;
+        return $user->hasPermission('channels.update') ||
+            $channel->user_id === $user->id;
     }
 
     public function destroy(User $user, $channelIds)

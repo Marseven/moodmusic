@@ -10,6 +10,7 @@ use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\Exception\InvalidFileLocation;
 use Roave\BetterReflection\SourceLocator\FileChecker;
 use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
+
 use function file_get_contents;
 
 /**
@@ -22,19 +23,12 @@ use function file_get_contents;
  */
 class SingleFileSourceLocator extends AbstractSourceLocator
 {
-    /** @var string */
-    private $fileName;
-
-    /**
-     * @throws InvalidFileLocation
-     */
-    public function __construct(string $fileName, Locator $astLocator)
+    /** @throws InvalidFileLocation */
+    public function __construct(private string $fileName, Locator $astLocator)
     {
         FileChecker::assertReadableFile($fileName);
 
         parent::__construct($astLocator);
-
-        $this->fileName = $fileName;
     }
 
     /**
@@ -43,11 +37,12 @@ class SingleFileSourceLocator extends AbstractSourceLocator
      * @throws InvalidArgumentException
      * @throws InvalidFileLocation
      */
-    protected function createLocatedSource(Identifier $identifier) : ?LocatedSource
+    protected function createLocatedSource(Identifier $identifier): LocatedSource|null
     {
         return new LocatedSource(
             file_get_contents($this->fileName),
-            $this->fileName
+            $identifier->getName(),
+            $this->fileName,
         );
     }
 }

@@ -5,12 +5,16 @@ namespace Algolia\AlgoliaSearch;
 use Algolia\AlgoliaSearch\Config\RecommendationConfig;
 use Algolia\AlgoliaSearch\RequestOptions\RequestOptions;
 use Algolia\AlgoliaSearch\RetryStrategy\ApiWrapper;
+use Algolia\AlgoliaSearch\RetryStrategy\ApiWrapperInterface;
 use Algolia\AlgoliaSearch\RetryStrategy\ClusterHosts;
 
+/**
+ * @deprecated Please use Algolia\AlgoliaSearch\PersonalizationClient instead
+ */
 final class RecommendationClient
 {
     /**
-     * @var \Algolia\AlgoliaSearch\RetryStrategy\ApiWrapper
+     * @var ApiWrapperInterface
      */
     private $api;
 
@@ -22,7 +26,7 @@ final class RecommendationClient
     /**
      * RecommendationClient constructor.
      */
-    public function __construct(ApiWrapper $api, RecommendationConfig $config)
+    public function __construct(ApiWrapperInterface $api, RecommendationConfig $config)
     {
         $this->api = $api;
         $this->config = $config;

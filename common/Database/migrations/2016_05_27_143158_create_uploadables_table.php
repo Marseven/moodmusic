@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateUploadablesTable extends Migration
 {
@@ -18,7 +18,7 @@ class CreateUploadablesTable extends Migration
             $table->unsignedInteger('uploadable_id');
             $table->string('uploadable_type', 60);
 
-            $table->unique(['upload_id', 'uploadable_id', 'uploadable_type']);
+            $table->unique(['upload_id', 'uploadable_id', 'uploadable_type'], 'uploadable_unique');
         });
     }
 

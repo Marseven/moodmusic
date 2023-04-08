@@ -3,15 +3,15 @@
 namespace App\Services\Genres;
 
 use App\Genre;
-use Common\Database\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Common\Database\Datasource\Datasource;
+use Illuminate\Pagination\AbstractPaginator;
 
 class PaginateGenres
 {
-    public function execute(array $params): LengthAwarePaginator
+    public function execute(array $params): AbstractPaginator
     {
-        $paginator = (new Paginator(Genre::query(), $params));
+        $datasource = new Datasource(Genre::query(), $params);
 
-        return $paginator->paginate();
+        return $datasource->paginate();
     }
 }

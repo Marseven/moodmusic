@@ -6,7 +6,8 @@ namespace Roave\BetterReflection\Identifier;
 
 use Roave\BetterReflection\Identifier\Exception\InvalidIdentifierName;
 use Roave\BetterReflection\Reflection\ReflectionClass;
-use Roave\BetterReflection\Reflection\ReflectionFunctionAbstract;
+use Roave\BetterReflection\Reflection\ReflectionFunction;
+
 use function ltrim;
 use function preg_match;
 use function strpos;
@@ -17,21 +18,14 @@ class Identifier
 
     private const VALID_NAME_REGEXP = '/([a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)(\\\\[a-zA-Z_\x7f-\xff][a-zA-Z0-9_\x7f-\xff]*)*/';
 
-    /** @var string */
-    private $name;
+    private string $name;
 
-    /** @var IdentifierType */
-    private $type;
-
-    /**
-     * @throws InvalidIdentifierName
-     */
-    public function __construct(string $name, IdentifierType $type)
+    /** @throws InvalidIdentifierName */
+    public function __construct(string $name, private IdentifierType $type)
     {
-        $this->type = $type;
-
-        if ($name === self::WILDCARD
-            || $name === ReflectionFunctionAbstract::CLOSURE_NAME
+        if (
+            $name === self::WILDCARD
+            || $name === ReflectionFunction::CLOSURE_NAME
             || strpos($name, ReflectionClass::ANONYMOUS_CLASS_NAME_PREFIX) === 0
         ) {
             $this->name = $name;
@@ -48,27 +42,27 @@ class Identifier
         $this->name = $name;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getType() : IdentifierType
+    public function getType(): IdentifierType
     {
         return $this->type;
     }
 
-    public function isClass() : bool
+    public function isClass(): bool
     {
         return $this->type->isClass();
     }
 
-    public function isFunction() : bool
+    public function isFunction(): bool
     {
         return $this->type->isFunction();
     }
 
-    public function isConstant() : bool
+    public function isConstant(): bool
     {
         return $this->type->isConstant();
     }

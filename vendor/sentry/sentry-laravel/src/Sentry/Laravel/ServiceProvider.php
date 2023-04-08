@@ -2,17 +2,22 @@
 
 namespace Sentry\Laravel;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Foundation\Application as Laravel;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Log\LogManager;
-use Laravel\Lumen\Application as Lumen;
+use RuntimeException;
 use Sentry\ClientBuilder;
 use Sentry\ClientBuilderInterface;
 use Sentry\Integration as SdkIntegration;
+use Sentry\Laravel\Console\PublishCommand;
+use Sentry\Laravel\Console\TestCommand;
 use Sentry\Laravel\Http\LaravelRequestFetcher;
 use Sentry\Laravel\Http\SetRequestIpMiddleware;
 use Sentry\Laravel\Http\SetRequestMiddleware;
+use Sentry\Laravel\Tracing\ServiceProvider as TracingServiceProvider;
 use Sentry\SentrySdk;
 use Sentry\State\Hub;
 use Sentry\State\HubInterface;
@@ -22,16 +27,26 @@ class ServiceProvider extends BaseServiceProvider
     /**
      * List of configuration options that are Laravel specific and should not be sent to the base PHP SDK.
      */
-    private const LARAVEL_SPECIFIC_OPTIONS = [
-        // We do not want these settings to hit the PHP SDK because it's Laravel specific and the SDK will throw errors
+    protected const LARAVEL_SPECIFIC_OPTIONS = [
+        // We do not want these settings to hit the PHP SDK because they are Laravel specific and the PHP SDK will throw errors
         'tracing',
         'breadcrumbs',
         // We resolve the integrations through the container later, so we initially do not pass it to the SDK yet
         'integrations',
         // This is kept for backwards compatibility and can be dropped in a future breaking release
         'breadcrumbs.sql_bindings',
-        // The base namespace for controllers to strip of the beginning of controller class names
+
+        // This config option is no longer in use but to prevent errors when upgrading we leave it here to be discarded
         'controllers_base_namespace',
+    ];
+
+    /**
+     * List of features that are provided by the SDK.
+     */
+    protected const FEATURES = [
+        Features\CacheIntegration::class,
+        Features\ConsoleIntegration::class,
+        Features\LivewirePackageIntegration::class,
     ];
 
     /**
@@ -44,10 +59,9 @@ class ServiceProvider extends BaseServiceProvider
         if ($this->hasDsnSet()) {
             $this->bindEvents();
 
-            if ($this->app instanceof Lumen) {
-                $this->app->middleware(SetRequestMiddleware::class);
-                $this->app->middleware(SetRequestIpMiddleware::class);
-            } elseif ($this->app->bound(HttpKernelInterface::class)) {
+            $this->setupFeatures();
+
+            if ($this->app->bound(HttpKernelInterface::class)) {
                 /** @var \Illuminate\Foundation\Http\Kernel $httpKernel */
                 $httpKernel = $this->app->make(HttpKernelInterface::class);
 
@@ -74,13 +88,9 @@ class ServiceProvider extends BaseServiceProvider
      */
     public function register(): void
     {
-        if ($this->app instanceof Lumen) {
-            $this->app->configure(static::$abstract);
-        }
-
         $this->mergeConfigFrom(__DIR__ . '/../../../config/sentry.php', static::$abstract);
 
-        $this->configureAndRegisterClient($this->getUserConfig());
+        $this->configureAndRegisterClient();
 
         if (($logManager = $this->app->make('log')) instanceof LogManager) {
             $logManager->extend('sentry', function ($app, array $config) {
@@ -98,14 +108,39 @@ class ServiceProvider extends BaseServiceProvider
 
         $handler = new EventHandler($this->app, $userConfig);
 
-        $handler->subscribe();
+        try {
+            /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
+            $dispatcher = $this->app->make(Dispatcher::class);
 
-        if ($this->app->bound('queue')) {
-            $handler->subscribeQueueEvents($this->app->queue);
+            $handler->subscribe($dispatcher);
+
+            if ($this->app->bound('octane')) {
+                $handler->subscribeOctaneEvents($dispatcher);
+            }
+
+            if ($this->app->bound('queue')) {
+                $handler->subscribeQueueEvents($dispatcher);
+            }
+
+            if (isset($userConfig['send_default_pii']) && $userConfig['send_default_pii'] !== false) {
+                $handler->subscribeAuthEvents($dispatcher);
+            }
+        } catch (BindingResolutionException $e) {
+            // If we cannot resolve the event dispatcher we also cannot listen to events
         }
+    }
 
-        if (isset($userConfig['send_default_pii']) && $userConfig['send_default_pii'] !== false) {
-            $handler->subscribeAuthEvents();
+    /**
+     * Setup the default SDK features.
+     */
+    protected function setupFeatures(): void
+    {
+        foreach (self::FEATURES as $feature) {
+            try {
+                $this->app->make($feature)->boot();
+            } catch (\Throwable $e) {
+                // Ensure that features do not break the whole application
+            }
         }
     }
 
@@ -116,7 +151,7 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->commands([
             TestCommand::class,
-            PublishConfigCommand::class,
+            PublishCommand::class,
         ]);
     }
 
@@ -125,23 +160,17 @@ class ServiceProvider extends BaseServiceProvider
      */
     protected function configureAndRegisterClient(): void
     {
-        $userConfig = $this->getUserConfig();
-
-        if (isset($userConfig['controllers_base_namespace'])) {
-            Integration::setControllersBaseNamespace($userConfig['controllers_base_namespace']);
-        }
-
         $this->app->bind(ClientBuilderInterface::class, function () {
-            $basePath = base_path();
+            $basePath   = base_path();
             $userConfig = $this->getUserConfig();
 
-            foreach (self::LARAVEL_SPECIFIC_OPTIONS as $laravelSpecificOptionName) {
+            foreach (static::LARAVEL_SPECIFIC_OPTIONS as $laravelSpecificOptionName) {
                 unset($userConfig[$laravelSpecificOptionName]);
             }
 
             $options = \array_merge(
                 [
-                    'prefixes' => [$basePath],
+                    'prefixes'       => [$basePath],
                     'in_app_exclude' => ["{$basePath}/vendor"],
                 ],
                 $userConfig
@@ -198,7 +227,7 @@ class ServiceProvider extends BaseServiceProvider
                     });
 
                     $integrations[] = new SdkIntegration\RequestIntegration(
-                        new LaravelRequestFetcher($this->app)
+                        new LaravelRequestFetcher
                     );
                 }
 
@@ -228,21 +257,40 @@ class ServiceProvider extends BaseServiceProvider
             new Integration\ExceptionContextIntegration,
         ];
 
-        $userIntegrations = $this->getUserConfig()['integrations'] ?? [];
+        $userConfig = $this->getUserConfig();
 
-        foreach ($userIntegrations as $userIntegration) {
+        $integrationsToResolve = array_merge($userConfig['integrations'] ?? []);
+
+        $enableDefaultTracingIntegrations = $userConfig['tracing']['default_integrations'] ?? true;
+
+        if ($enableDefaultTracingIntegrations) {
+            $integrationsToResolve = array_merge($integrationsToResolve, TracingServiceProvider::DEFAULT_INTEGRATIONS);
+        }
+
+        foreach ($integrationsToResolve as $userIntegration) {
             if ($userIntegration instanceof SdkIntegration\IntegrationInterface) {
                 $integrations[] = $userIntegration;
             } elseif (\is_string($userIntegration)) {
                 $resolvedIntegration = $this->app->make($userIntegration);
 
-                if (!($resolvedIntegration instanceof SdkIntegration\IntegrationInterface)) {
-                    throw new \RuntimeException('Sentry integrations should a instance of `\Sentry\Integration\IntegrationInterface`.');
+                if (!$resolvedIntegration instanceof SdkIntegration\IntegrationInterface) {
+                    throw new RuntimeException(
+                        sprintf(
+                            'Sentry integrations must be an instance of `%s` got `%s`.',
+                            SdkIntegration\IntegrationInterface::class,
+                            get_class($resolvedIntegration)
+                        )
+                    );
                 }
 
                 $integrations[] = $resolvedIntegration;
             } else {
-                throw new \RuntimeException('Sentry integrations should either be a container reference or a instance of `\Sentry\Integration\IntegrationInterface`.');
+                throw new RuntimeException(
+                    sprintf(
+                        'Sentry integrations must either be a valid container reference or an instance of `%s`.',
+                        SdkIntegration\IntegrationInterface::class
+                    )
+                );
             }
         }
 

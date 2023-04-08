@@ -8,22 +8,27 @@ class RolePolicy
 {
     use HandlesAuthorization;
 
-    public function index(User $user)
+    public function index(User $user): bool
     {
         return $user->hasPermission('roles.view');
     }
 
-    public function store(User $user)
+    public function show(User $user): bool
+    {
+        return $user->hasPermission('roles.show');
+    }
+
+    public function store(User $user): bool
     {
         return $user->hasPermission('roles.create');
     }
 
-    public function update(User $user)
+    public function update(User $user): bool
     {
         return $user->hasPermission('roles.update');
     }
 
-    public function destroy(User $user, Role $role)
+    public function destroy(User $user, Role $role): bool
     {
         return !$role->internal && $user->hasPermission('roles.delete');
     }

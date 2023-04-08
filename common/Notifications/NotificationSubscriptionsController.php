@@ -2,66 +2,39 @@
 
 namespace Common\Notifications;
 
-use Auth;
+use App\User;
 use Common\Core\BaseController;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Http\Request;
-use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 
 class NotificationSubscriptionsController extends BaseController
 {
-    /**
-     * @var Filesystem
-     */
-    private $fs;
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @param Filesystem $fs
-     * @param Request $request
-     */
-    public function __construct(
-        Filesystem $fs,
-        Request $request
-    ) {
-        $this->fs = $fs;
-        $this->request = $request;
+    public function __construct()
+    {
+        $this->middleware(['auth']);
     }
 
-    /**
-     * @param int $userId
-     * @return Response
-     */
-    public function index($userId)
+    public function index(User $user): JsonResponse
     {
-        $this->authorize('index', [NotificationSubscription::class, $userId]);
-
         $response = $this->getConfig();
-        $subs =  Auth::user()->notificationSubscriptions;
+        $subs = $user->notificationSubscriptions;
         $response['user_selections'] = $subs;
 
         return $this->success($response);
     }
 
-    /**
-     * @param int $userId
-     * @return Response
-     */
-    public function update($userId)
+    public function update(User $user): JsonResponse
     {
-        $this->authorize('update', [NotificationSubscription::class, $userId]);
-
-        $this->validate($this->request, [
+        $this->validate(request(), [
             'selections' => 'present|array',
             'selections.*.notif_id' => 'required|string',
             'selections.*.channels' => 'required|array',
         ]);
 
-        foreach ($this->request->get('selections') as $selection) {
-            $subscription = Auth::user()->notificationSubscriptions()->firstOrNew(['notif_id' => $selection['notif_id']]);
+        foreach (request()->get('selections') as $selection) {
+            $subscription = $user
+                ->notificationSubscriptions()
+                ->firstOrNew(['notif_id' => $selection['notif_id']]);
             $newChannels = $subscription['channels'];
             // can update state of all channels at once or only a single channel
             foreach ($selection['channels'] as $newChannel => $isSubscribed) {
@@ -75,6 +48,8 @@ class NotificationSubscriptionsController extends BaseController
 
     private function getConfig()
     {
-        return $this->fs->getRequire(resource_path('defaults/notification-settings.php'));
+        return app(Filesystem::class)->getRequire(
+            resource_path('defaults/notification-settings.php'),
+        );
     }
 }

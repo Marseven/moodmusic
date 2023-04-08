@@ -12,7 +12,7 @@ class PlaylistTrackQuery extends BaseTrackQuery
     const ORDER_COL = 'position';
     const ORDER_DIR = 'asc';
 
-    public function get($playlistId, $params = [])
+    public function get(int $playlistId, $params = []): Builder
     {
         return $this->baseQuery()
             ->join('playlist_track', 'tracks.id', '=', 'playlist_track.track_id')

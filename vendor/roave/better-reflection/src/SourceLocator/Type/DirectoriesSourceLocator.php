@@ -13,33 +13,27 @@ use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Ast\Locator;
 use Roave\BetterReflection\SourceLocator\Exception\InvalidDirectory;
 use Roave\BetterReflection\SourceLocator\Exception\InvalidFileInfo;
+
 use function array_map;
-use function array_values;
 use function is_dir;
-use function is_string;
 
 /**
  * This source locator recursively loads all php files in an entire directory or multiple directories.
  */
 class DirectoriesSourceLocator implements SourceLocator
 {
-    /** @var AggregateSourceLocator */
-    private $aggregateSourceLocator;
+    private AggregateSourceLocator $aggregateSourceLocator;
 
     /**
-     * @param string[] $directories directories to scan
+     * @param list<string> $directories directories to scan
      *
      * @throws InvalidDirectory
      * @throws InvalidFileInfo
      */
     public function __construct(array $directories, Locator $astLocator)
     {
-        $this->aggregateSourceLocator = new AggregateSourceLocator(array_values(array_map(
-            static function ($directory) use ($astLocator) : FileIteratorSourceLocator {
-                if (! is_string($directory)) {
-                    throw InvalidDirectory::fromNonStringValue($directory);
-                }
-
+        $this->aggregateSourceLocator = new AggregateSourceLocator(array_map(
+            static function (string $directory) use ($astLocator): FileIteratorSourceLocator {
                 if (! is_dir($directory)) {
                     throw InvalidDirectory::fromNonDirectory($directory);
                 }
@@ -47,16 +41,16 @@ class DirectoriesSourceLocator implements SourceLocator
                 return new FileIteratorSourceLocator(
                     new RecursiveIteratorIterator(new RecursiveDirectoryIterator(
                         $directory,
-                        RecursiveDirectoryIterator::SKIP_DOTS
+                        RecursiveDirectoryIterator::SKIP_DOTS,
                     )),
-                    $astLocator
+                    $astLocator,
                 );
             },
-            $directories
-        )));
+            $directories,
+        ));
     }
 
-    public function locateIdentifier(Reflector $reflector, Identifier $identifier) : ?Reflection
+    public function locateIdentifier(Reflector $reflector, Identifier $identifier): Reflection|null
     {
         return $this->aggregateSourceLocator->locateIdentifier($reflector, $identifier);
     }
@@ -64,7 +58,7 @@ class DirectoriesSourceLocator implements SourceLocator
     /**
      * {@inheritDoc}
      */
-    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType) : array
+    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
     {
         return $this->aggregateSourceLocator->locateIdentifiersByType($reflector, $identifierType);
     }

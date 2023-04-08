@@ -4,9 +4,11 @@ namespace Doctrine\DBAL\Driver\PDO\PgSQL;
 
 use Doctrine\DBAL\Driver\AbstractPostgreSQLDriver;
 use Doctrine\DBAL\Driver\PDO\Connection;
+use Doctrine\DBAL\Driver\PDO\Exception;
+use Doctrine\Deprecations\Deprecation;
 use PDO;
-
-use function defined;
+use PDOException;
+use SensitiveParameter;
 
 final class Driver extends AbstractPostgreSQLDriver
 {
@@ -15,32 +17,40 @@ final class Driver extends AbstractPostgreSQLDriver
      *
      * @return Connection
      */
-    public function connect(array $params)
-    {
+    public function connect(
+        #[SensitiveParameter]
+        array $params
+    ) {
         $driverOptions = $params['driverOptions'] ?? [];
 
         if (! empty($params['persistent'])) {
             $driverOptions[PDO::ATTR_PERSISTENT] = true;
         }
 
-        $connection = new Connection(
-            $this->_constructPdoDsn($params),
-            $params['user'] ?? '',
-            $params['password'] ?? '',
-            $driverOptions,
-        );
+        $safeParams = $params;
+        unset($safeParams['password'], $safeParams['url']);
 
-        if (
-            defined('PDO::PGSQL_ATTR_DISABLE_PREPARES')
-            && (! isset($driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES])
-                || $driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES] === true
-            )
-        ) {
-            $connection->getWrappedConnection()->setAttribute(PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
+        try {
+            $pdo = new PDO(
+                $this->constructPdoDsn($safeParams),
+                $params['user'] ?? '',
+                $params['password'] ?? '',
+                $driverOptions,
+            );
+        } catch (PDOException $exception) {
+            throw Exception::new($exception);
         }
 
+        if (
+            ! isset($driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES])
+            || $driverOptions[PDO::PGSQL_ATTR_DISABLE_PREPARES] === true
+        ) {
+            $pdo->setAttribute(PDO::PGSQL_ATTR_DISABLE_PREPARES, true);
+        }
+
+        $connection = new Connection($pdo);
+
         /* defining client_encoding via SET NAMES to avoid inconsistent DSN support
-         * - the 'client_encoding' connection param only works with postgres >= 9.1
          * - passing client_encoding via the 'options' param breaks pgbouncer support
          */
         if (isset($params['charset'])) {
@@ -53,11 +63,9 @@ final class Driver extends AbstractPostgreSQLDriver
     /**
      * Constructs the Postgres PDO DSN.
      *
-     * @param mixed[] $params
-     *
-     * @return string The DSN.
+     * @param array<string, mixed> $params
      */
-    private function _constructPdoDsn(array $params)
+    private function constructPdoDsn(array $params): string
     {
         $dsn = 'pgsql:';
 
@@ -72,11 +80,25 @@ final class Driver extends AbstractPostgreSQLDriver
         if (isset($params['dbname'])) {
             $dsn .= 'dbname=' . $params['dbname'] . ';';
         } elseif (isset($params['default_dbname'])) {
+            Deprecation::trigger(
+                'doctrine/dbal',
+                'https://github.com/doctrine/dbal/pull/5705',
+                'The "default_dbname" connection parameter is deprecated. Use "dbname" instead.',
+            );
+
             $dsn .= 'dbname=' . $params['default_dbname'] . ';';
         } else {
+            if (isset($params['user']) && $params['user'] !== 'postgres') {
+                Deprecation::trigger(
+                    'doctrine/dbal',
+                    'https://github.com/doctrine/dbal/pull/5705',
+                    'Relying on the DBAL connecting to the "postgres" database by default is deprecated.'
+                        . ' Unless you want to have the server determine the default database for the connection,'
+                        . ' specify the database name explicitly.',
+                );
+            }
+
             // Used for temporary connections to allow operations like dropping the database currently connected to.
-            // Connecting without an explicit database does not work, therefore "postgres" database is used
-            // as it is mostly present in every server setup.
             $dsn .= 'dbname=postgres;';
         }
 

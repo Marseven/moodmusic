@@ -8,12 +8,15 @@ use Gate;
 
 class DeleteEntries
 {
-    public function execute(array $params)
+    public function execute(array $params, $authorize = true): void
     {
-        $entryIds = $params['entryIds'] ?? $this->idsFromPaths($params['paths']);
+        $entryIds =
+            $params['entryIds'] ?? $this->idsFromPaths($params['paths']);
 
         if (count($entryIds)) {
-            Gate::authorize('destroy', [FileEntry::class, $entryIds]);
+            if ($authorize) {
+                Gate::authorize('destroy', [FileEntry::class, $entryIds]);
+            }
 
             if (Arr::get($params, 'soft')) {
                 app(SoftDeleteEntries::class)->execute($entryIds);
@@ -25,12 +28,13 @@ class DeleteEntries
 
     private function idsFromPaths(array $paths): array
     {
-        $filenames = array_map(function($path) {
+        $filenames = array_map(function ($path) {
             return basename($path);
         }, $paths);
 
         return app(FileEntry::class)
             ->whereIn('file_name', $filenames)
-            ->pluck('id')->toArray();
+            ->pluck('id')
+            ->toArray();
     }
 }

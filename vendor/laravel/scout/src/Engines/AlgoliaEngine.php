@@ -3,8 +3,11 @@
 namespace Laravel\Scout\Engines;
 
 use Algolia\AlgoliaSearch\SearchClient as Algolia;
+use Exception;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\LazyCollection;
 use Laravel\Scout\Builder;
+use Laravel\Scout\Jobs\RemoveableScoutCollection;
 
 class AlgoliaEngine extends Engine
 {
@@ -61,9 +64,9 @@ class AlgoliaEngine extends Engine
             }
 
             return array_merge(
-                ['objectID' => $model->getScoutKey()],
                 $searchableData,
-                $model->scoutMetadata()
+                $model->scoutMetadata(),
+                ['objectID' => $model->getScoutKey()],
             );
         })->filter()->values()->all();
 
@@ -80,13 +83,17 @@ class AlgoliaEngine extends Engine
      */
     public function delete($models)
     {
+        if ($models->isEmpty()) {
+            return;
+        }
+
         $index = $this->algolia->initIndex($models->first()->searchableAs());
 
-        $index->deleteObjects(
-            $models->map(function ($model) {
-                return $model->getScoutKey();
-            })->values()->all()
-        );
+        $keys = $models instanceof RemoveableScoutCollection
+            ? $models->pluck($models->first()->getUnqualifiedScoutKeyName())
+            : $models->map->getScoutKey();
+
+        $index->deleteObjects($keys->all());
     }
 
     /**
@@ -133,6 +140,8 @@ class AlgoliaEngine extends Engine
             $builder->index ?: $builder->model->searchableAs()
         );
 
+        $options = array_merge($builder->options, $options);
+
         if ($builder->callback) {
             return call_user_func(
                 $builder->callback,
@@ -153,9 +162,15 @@ class AlgoliaEngine extends Engine
      */
     protected function filters(Builder $builder)
     {
-        return collect($builder->wheres)->map(function ($value, $key) {
+        $wheres = collect($builder->wheres)->map(function ($value, $key) {
             return $key.'='.$value;
-        })->values()->all();
+        })->values();
+
+        return $wheres->merge(collect($builder->whereIns)->map(function ($values, $key) {
+            return collect($values)->map(function ($value) use ($key) {
+                return $key.'='.$value;
+            })->all();
+        })->values())->values()->all();
     }
 
     /**
@@ -184,11 +199,38 @@ class AlgoliaEngine extends Engine
         }
 
         $objectIds = collect($results['hits'])->pluck('objectID')->values()->all();
+
         $objectIdPositions = array_flip($objectIds);
 
         return $model->getScoutModelsByIds(
+            $builder, $objectIds
+        )->filter(function ($model) use ($objectIds) {
+            return in_array($model->getScoutKey(), $objectIds);
+        })->sortBy(function ($model) use ($objectIdPositions) {
+            return $objectIdPositions[$model->getScoutKey()];
+        })->values();
+    }
+
+    /**
+     * Map the given results to instances of the given model via a lazy collection.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @param  mixed  $results
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function lazyMap(Builder $builder, $results, $model)
+    {
+        if (count($results['hits']) === 0) {
+            return LazyCollection::make($model->newCollection());
+        }
+
+        $objectIds = collect($results['hits'])->pluck('objectID')->values()->all();
+        $objectIdPositions = array_flip($objectIds);
+
+        return $model->queryScoutModelsByIds(
                 $builder, $objectIds
-            )->filter(function ($model) use ($objectIds) {
+            )->cursor()->filter(function ($model) use ($objectIds) {
                 return in_array($model->getScoutKey(), $objectIds);
             })->sortBy(function ($model) use ($objectIdPositions) {
                 return $objectIdPositions[$model->getScoutKey()];
@@ -217,6 +259,31 @@ class AlgoliaEngine extends Engine
         $index = $this->algolia->initIndex($model->searchableAs());
 
         $index->clearObjects();
+    }
+
+    /**
+     * Create a search index.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return mixed
+     *
+     * @throws \Exception
+     */
+    public function createIndex($name, array $options = [])
+    {
+        throw new Exception('Algolia indexes are created automatically upon adding objects.');
+    }
+
+    /**
+     * Delete a search index.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    public function deleteIndex($name)
+    {
+        return $this->algolia->initIndex($name)->delete();
     }
 
     /**

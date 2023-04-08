@@ -1,66 +1,48 @@
 <?php namespace Common\Settings;
 
-use Artisan;
-use Cache;
 use Common\Core\AppUrl;
 use Common\Core\BaseController;
 use Common\Settings\Events\SettingsSaved;
+use Common\Settings\Mail\ConnectGmailAccountController;
 use Exception;
-use File;
-use Illuminate\Cache\Console\ClearCommand;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Arr;
-use Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\File;
+use Illuminate\Support\Str;
 use ReflectionClass;
 
-class SettingsController extends BaseController {
-
-    /**
-     * @var Settings
-     */
-    private $settings;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var DotEnvEditor
-     */
-    private $dotEnv;
-
-    /**
-     * @param Request $request
-     * @param Settings $settings
-     * @param DotEnvEditor $dotEnv
-     */
-    public function __construct(Request $request, Settings $settings, DotEnvEditor $dotEnv)
-    {
-        $this->request  = $request;
-        $this->settings = $settings;
-        $this->dotEnv = $dotEnv;
+class SettingsController extends BaseController
+{
+    public function __construct(
+        protected Request $request,
+        protected Settings $settings,
+        protected DotEnvEditor $dotEnv
+    ) {
     }
 
-    /**
-     * @return array
-     */
     public function index()
     {
         $this->authorize('index', Setting::class);
         $envSettings = $this->dotEnv->load('.env');
         $envSettings['newAppUrl'] = app(AppUrl::class)->newAppUrl;
+        $envSettings[
+            'connectedGmailAccount'
+        ] = ConnectGmailAccountController::getConnectedEmail();
+
+        // inputs on frontend can't be bound to null
+        foreach ($envSettings as $key => $value) {
+            if ($value === null) {
+                $envSettings[$key] = '';
+            }
+        }
 
         return [
             'server' => $envSettings,
-            'client' => $this->settings->all(true),
+            'client' => $this->settings->getUnflattened(true),
         ];
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function persist()
     {
         $this->authorize('update', Setting::class);
@@ -69,11 +51,14 @@ class SettingsController extends BaseController {
         $serverSettings = $this->cleanValues($this->request->get('server'));
 
         // need to handle files before validating
-        // TODO: maybe refactor this, if need to handle
-        // something else besides google analytics certificate
         $this->handleFiles();
 
-        if ($errResponse = $this->validateSettings($serverSettings, $clientSettings)) {
+        if (
+            $errResponse = $this->validateSettings(
+                $serverSettings,
+                $clientSettings,
+            )
+        ) {
             return $errResponse;
         }
 
@@ -84,7 +69,7 @@ class SettingsController extends BaseController {
         if ($clientSettings) {
             $this->settings->save($clientSettings);
         }
-        
+
         Cache::flush();
 
         event(new SettingsSaved($clientSettings, $serverSettings));
@@ -92,13 +77,11 @@ class SettingsController extends BaseController {
         return $this->success();
     }
 
-    /**
-     * @param string $config
-     * @return array
-     */
-    private function cleanValues($config)
+    private function cleanValues(string|null $config): array
     {
-        if ( ! $config) return [];
+        if (!$config) {
+            return [];
+        }
         $config = json_decode($config, true);
         foreach ($config as $key => $value) {
             $config[$key] = is_string($value) ? trim($value) : $value;
@@ -108,44 +91,51 @@ class SettingsController extends BaseController {
 
     private function handleFiles()
     {
-        $files = $this->request->file('files');
+        $files = $this->request->allFiles();
 
         // store google analytics certificate file
         if ($certificateFile = Arr::get($files, 'certificate')) {
-            File::put(storage_path('laravel-analytics/certificate.json'), file_get_contents($certificateFile));
+            File::put(
+                storage_path('laravel-analytics/certificate.json'),
+                file_get_contents($certificateFile),
+            );
         }
     }
 
-    /**
-     * @param array $serverSettings
-     * @param array $clientSettings
-     * @return JsonResponse
-     */
-    private function validateSettings($serverSettings, $clientSettings)
-    {
+    private function validateSettings(
+        array $serverSettings,
+        array $clientSettings
+    ) {
         // flatten "client" and "server" arrays into single array
         $values = array_merge(
             $serverSettings ?: [],
             $clientSettings ?: [],
-            $this->request->file('files', [])
+            $this->request->allFiles(),
         );
         $keys = array_keys($values);
         $validators = config('common.setting-validators');
 
         foreach ($validators as $validator) {
-            if (empty(array_intersect($validator::KEYS, $keys))) continue;
+            if (empty(array_intersect($validator::KEYS, $keys))) {
+                continue;
+            }
 
             try {
                 if ($messages = app($validator)->fails($values)) {
-                    return $this->error(__('Could not persist settings.'), $messages);
+                    return $this->error(
+                        __('Could not persist settings.'),
+                        $messages,
+                    );
                 }
-            // catch and display any generic error that might occur
+                // catch and display any generic error that might occur
             } catch (Exception $e) {
                 // Common\Settings\Validators\GoogleLoginValidator => GoogleLoginValidator
                 $class = (new ReflectionClass($validator))->getShortName();
                 // GoogleLoginValidator => google-login-validator => google => google_group
                 $groupName = explode('-', Str::kebab($class))[0] . '_group';
-                return $this->error(__('Could not persist settings.'), [$groupName => Str::limit($e->getMessage(), 200)]);
+                return $this->error(__('Could not persist settings.'), [
+                    $groupName => Str::limit($e->getMessage(), 200),
+                ]);
             }
         }
     }

@@ -16,7 +16,9 @@ class FileEntryPivot extends MorphPivot
      */
     public function getPermissionsAttribute($value)
     {
-        if ( ! $value) return [];
+        if (!$value) {
+            return [];
+        }
 
         if (is_string($value)) {
             return json_decode($value, true);

@@ -4,105 +4,90 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection;
 
-use Roave\BetterReflection\Reflection\Exception\ClassDoesNotExist;
-use Roave\BetterReflection\Reflection\Exception\ReflectionTypeDoesNotPointToAClassAlikeType;
-use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
+use PhpParser\Node\Identifier;
+use PhpParser\Node\IntersectionType;
+use PhpParser\Node\Name;
+use PhpParser\Node\NullableType;
+use PhpParser\Node\UnionType;
 use Roave\BetterReflection\Reflector\Reflector;
-use function array_key_exists;
-use function ltrim;
-use function strtolower;
 
-class ReflectionType
+abstract class ReflectionType
 {
-    private const BUILT_IN_TYPES = [
-        'int'      => null,
-        'float'    => null,
-        'string'   => null,
-        'bool'     => null,
-        'callable' => null,
-        'self'     => null,
-        'parent'   => null,
-        'array'    => null,
-        'iterable' => null,
-        'object'   => null,
-        'void'     => null,
-    ];
-
-    /** @var string */
-    private $type;
-
-    /** @var bool */
-    private $allowsNull;
-
-    /** @var Reflector */
-    private $reflector;
-
-    private function __construct()
-    {
+    protected function __construct(
+        protected Reflector $reflector,
+        protected ReflectionParameter|ReflectionMethod|ReflectionFunction|ReflectionEnum|ReflectionProperty $owner,
+    ) {
     }
 
-    public static function createFromTypeAndReflector(
-        string $type,
-        bool $allowsNull,
-        Reflector $classReflector
-    ) : self {
-        $reflectionType = new self();
-
-        $reflectionType->type       = ltrim($type, '\\');
-        $reflectionType->allowsNull = $allowsNull;
-        $reflectionType->reflector  = $classReflector;
-
-        return $reflectionType;
-    }
-
-    /**
-     * Does the parameter allow null?
-     */
-    public function allowsNull() : bool
-    {
-        return $this->allowsNull;
-    }
-
-    /**
-     * Checks if it is a built-in type (i.e., it's not an object...)
-     *
-     * @see https://php.net/manual/en/reflectiontype.isbuiltin.php
-     */
-    public function isBuiltin() : bool
-    {
-        return array_key_exists(strtolower($this->type), self::BUILT_IN_TYPES);
-    }
-
-    /**
-     * @throws IdentifierNotFound The target type could not be resolved.
-     * @throws ReflectionTypeDoesNotPointToAClassAlikeType The type is not pointing to a class-alike symbol.
-     * @throws ClassDoesNotExist The target type is not a class.
-     */
-    public function targetReflectionClass() : ReflectionClass
-    {
-        if ($this->isBuiltin()) {
-            throw ReflectionTypeDoesNotPointToAClassAlikeType::for($this);
+    /** @internal */
+    public static function createFromNode(
+        Reflector $reflector,
+        ReflectionParameter|ReflectionMethod|ReflectionFunction|ReflectionEnum|ReflectionProperty $owner,
+        Identifier|Name|NullableType|UnionType|IntersectionType $type,
+        bool $allowsNull = false,
+    ): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType {
+        if ($type instanceof NullableType) {
+            $type       = $type->type;
+            $allowsNull = true;
         }
 
-        $reflectionClass = $this->reflector->reflect($this->type);
+        if ($type instanceof Identifier || $type instanceof Name) {
+            if (
+                $type->toLowerString() === 'null'
+                || $type->toLowerString() === 'mixed'
+                || ! $allowsNull
+            ) {
+                return new ReflectionNamedType($reflector, $owner, $type);
+            }
 
-        if (! $reflectionClass instanceof ReflectionClass) {
-            throw ClassDoesNotExist::forDifferentReflectionType($reflectionClass);
+            return new ReflectionUnionType(
+                $reflector,
+                $owner,
+                new UnionType([$type, new Identifier('null')]),
+            );
         }
 
-        return $reflectionClass;
+        if ($type instanceof IntersectionType) {
+            return new ReflectionIntersectionType($reflector, $owner, $type);
+        }
+
+        if (! $allowsNull) {
+            return new ReflectionUnionType($reflector, $owner, $type);
+        }
+
+        $hasNull = false;
+        foreach ($type->types as $innerUnionType) {
+            if (! $innerUnionType instanceof Identifier || $innerUnionType->toLowerString() !== 'null') {
+                continue;
+            }
+
+            $hasNull = true;
+            break;
+        }
+
+        if ($hasNull) {
+            return new ReflectionUnionType($reflector, $owner, $type);
+        }
+
+        $types   = $type->types;
+        $types[] = new Identifier('null');
+
+        return new ReflectionUnionType($reflector, $owner, new UnionType($types));
     }
 
-    public function getName() : string
+    /** @internal */
+    public function getOwner(): ReflectionParameter|ReflectionMethod|ReflectionFunction|ReflectionEnum|ReflectionProperty
     {
-        return $this->type;
+        return $this->owner;
     }
+
+    /**
+     * Does the type allow null?
+     */
+    abstract public function allowsNull(): bool;
 
     /**
      * Convert this string type to a string
      */
-    public function __toString() : string
-    {
-        return $this->type;
-    }
+    abstract public function __toString(): string;
 }

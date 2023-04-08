@@ -1,20 +1,26 @@
 <?php
 
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\ReturnTypeContract as TypeContract;
+use JetBrains\PhpStorm\Pure;
+
 /**
  * Gets time of last page modification
  * @link https://php.net/manual/en/function.getlastmod.php
- * @return int the time of the last modification of the current
+ * @return int|false the time of the last modification of the current
  * page. The value returned is a Unix timestamp, suitable for
  * feeding to date. Returns false on error.
- * @since 4.0
- * @since 5.0
  */
-function getlastmod () {}
+#[Pure(true)]
+function getlastmod(): int|false {}
 
 /**
  * Decodes data encoded with MIME base64
  * @link https://php.net/manual/en/function.base64-decode.php
- * @param string $data <p>
+ * @param string $string <p>
  * The encoded data.
  * </p>
  * @param bool $strict [optional] <p>
@@ -23,49 +29,47 @@ function getlastmod () {}
  * </p>
  * @return string|false the original data or false on failure. The returned data may be
  * binary.
- * @since 4.0
- * @since 5.0
  */
-function base64_decode ($data, $strict = null) {}
+#[Pure]
+function base64_decode(string $string, bool $strict = false): string|false {}
 
 /**
  * Encodes data with MIME base64
  * @link https://php.net/manual/en/function.base64-encode.php
- * @param string $data <p>
+ * @param string $string <p>
  * The data to encode.
  * </p>
  * @return string The encoded data, as a string.
- * @since 4.0
- * @since 5.0
  */
-function base64_encode ($data) {}
+#[Pure]
+function base64_encode(string $string): string {}
 
 /**
  * Uuencode a string
  * @link https://php.net/manual/en/function.convert-uuencode.php
- * @param string $data <p>
+ * @param string $string <p>
  * The data to be encoded.
  * </p>
  * @return string the uuencoded data.
- * @since 5.0
  */
-function convert_uuencode ($data) {}
+#[Pure]
+function convert_uuencode(string $string): string {}
 
 /**
  * Decode a uuencoded string
  * @link https://php.net/manual/en/function.convert-uudecode.php
- * @param string $data <p>
+ * @param string $string <p>
  * The uuencoded data.
  * </p>
- * @return string the decoded data as a string.
- * @since 5.0
+ * @return string|false the decoded data as a string.
  */
-function convert_uudecode ($data) {}
+#[Pure]
+function convert_uudecode(string $string): string|false {}
 
 /**
  * Absolute value
  * @link https://php.net/manual/en/function.abs.php
- * @param mixed $number <p>
+ * @param int|float $num <p>
  * The numeric value to process
  * </p>
  * @return float|int The absolute value of number. If the
@@ -73,48 +77,46 @@ function convert_uudecode ($data) {}
  * of type float, the return type is also float,
  * otherwise it is integer (as float usually has a
  * bigger value range than integer).
- * @since 4.0
- * @since 5.0
  */
-function abs ($number) {}
+#[Pure]
+function abs(int|float $num): int|float {}
 
 /**
  * Round fractions up
  * @link https://php.net/manual/en/function.ceil.php
- * @param float $value <p>
+ * @param int|float $num <p>
  * The value to round
  * </p>
  * @return float|false value rounded up to the next highest
  * integer.
  * The return value of ceil is still of type
- * float as the value range of float is 
+ * float as the value range of float is
  * usually bigger than that of integer.
- * @since 4.0
- * @since 5.0
  */
-function ceil ($value) {}
-
+#[Pure]
+#[LanguageLevelTypeAware(["8.0" => "float"], default: "float|false")]
+function ceil(int|float $num) {}
 /**
  * Round fractions down
  * @link https://php.net/manual/en/function.floor.php
- * @param float $value <p>
+ * @param int|float $num <p>
  * The numeric value to round
  * </p>
  * @return float|false value rounded to the next lowest integer.
  * The return value of floor is still of type
- * float because the value range of float is 
+ * float because the value range of float is
  * usually bigger than that of integer.
- * @since 4.0
- * @since 5.0
  */
-function floor ($value) {}
+#[Pure]
+#[LanguageLevelTypeAware(["8.0" => "float"], default: "float|false")]
+function floor(int|float $num) {}
 
 /**
  * Returns the rounded value of val to specified precision (number of digits after the decimal point).
  * precision can also be negative or zero (default).
  * Note: PHP doesn't handle strings like "12,300.2" correctly by default. See converting from strings.
  * @link https://php.net/manual/en/function.round.php
- * @param float $val <p>
+ * @param int|float $num <p>
  * The value to round
  * </p>
  * @param int $precision [optional] <p>
@@ -126,95 +128,87 @@ function floor ($value) {}
  * PHP_ROUND_HALF_EVEN, or
  * PHP_ROUND_HALF_ODD.
  * </p>
- * @return float|false The rounded value
- * @since 4.0
- * @since 5.0
+ * @return float The rounded value
  */
-function round ($val, $precision = 0, $mode = PHP_ROUND_HALF_UP) {}
+#[Pure]
+function round(int|float $num, int $precision = 0, int $mode = PHP_ROUND_HALF_UP): float {}
 
 /**
  * Sine
  * @link https://php.net/manual/en/function.sin.php
- * @param float $arg <p>
+ * @param float $num <p>
  * A value in radians
  * </p>
  * @return float The sine of arg
- * @since 4.0
- * @since 5.0
  */
-function sin ($arg) {}
+#[Pure]
+function sin(float $num): float {}
 
 /**
  * Cosine
  * @link https://php.net/manual/en/function.cos.php
- * @param float $arg <p>
- * An angle in radians 
+ * @param float $num <p>
+ * An angle in radians
  * </p>
  * @return float The cosine of arg
- * @since 4.0
- * @since 5.0
  */
-function cos ($arg) {}
+#[Pure]
+function cos(float $num): float {}
 
 /**
  * Tangent
  * @link https://php.net/manual/en/function.tan.php
- * @param float $arg <p>
- * The argument to process in radians 
+ * @param float $num <p>
+ * The argument to process in radians
  * </p>
  * @return float The tangent of arg
- * @since 4.0
- * @since 5.0
  */
-function tan ($arg) {}
+#[Pure]
+function tan(float $num): float {}
 
 /**
  * Arc sine
  * @link https://php.net/manual/en/function.asin.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The arc sine of arg in radians
- * @since 4.0
- * @since 5.0
  */
-function asin ($arg) {}
+#[Pure]
+function asin(float $num): float {}
 
 /**
  * Arc cosine
  * @link https://php.net/manual/en/function.acos.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The arc cosine of arg in radians.
- * @since 4.0
- * @since 5.0
  */
-function acos ($arg) {}
+#[Pure]
+function acos(float $num): float {}
 
 /**
  * Arc tangent
  * @link https://php.net/manual/en/function.atan.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The arc tangent of arg in radians.
- * @since 4.0
- * @since 5.0
  */
-function atan ($arg) {}
+#[Pure]
+function atan(float $num): float {}
 
 /**
  * Inverse hyperbolic tangent
  * @link https://php.net/manual/en/function.atanh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float Inverse hyperbolic tangent of arg
- * @since 4.1
- * @since 5.0
  */
-function atanh ($arg) {}
+#[Pure]
+function atanh(float $num): float {}
 
 /**
  * Arc tangent of two variables
@@ -225,233 +219,215 @@ function atanh ($arg) {}
  * @param float $x <p>
  * Divisor parameter
  * </p>
- * @return float The arc tangent of y/x 
+ * @return float The arc tangent of y/x
  * in radians.
- * @since 4.0
- * @since 5.0
  */
-function atan2 ($y, $x) {}
+#[Pure]
+function atan2(float $y, float $x): float {}
 
 /**
  * Hyperbolic sine
  * @link https://php.net/manual/en/function.sinh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The hyperbolic sine of arg
- * @since 4.1
- * @since 5.0
  */
-function sinh ($arg) {}
+#[Pure]
+function sinh(float $num): float {}
 
 /**
  * Hyperbolic cosine
  * @link https://php.net/manual/en/function.cosh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The hyperbolic cosine of arg
- * @since 4.1
- * @since 5.0
  */
-function cosh ($arg) {}
+#[Pure]
+function cosh(float $num): float {}
 
 /**
  * Hyperbolic tangent
  * @link https://php.net/manual/en/function.tanh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The hyperbolic tangent of arg
- * @since 4.1
- * @since 5.0
  */
-function tanh ($arg) {}
+#[Pure]
+function tanh(float $num): float {}
 
 /**
  * Inverse hyperbolic sine
  * @link https://php.net/manual/en/function.asinh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The inverse hyperbolic sine of arg
- * @since 4.1
- * @since 5.0
  */
-function asinh ($arg) {}
+#[Pure]
+function asinh(float $num): float {}
 
 /**
  * Inverse hyperbolic cosine
  * @link https://php.net/manual/en/function.acosh.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The value to process
  * </p>
  * @return float The inverse hyperbolic cosine of arg
- * @since 4.1
- * @since 5.0
  */
-function acosh ($arg) {}
+#[Pure]
+function acosh(float $num): float {}
 
 /**
  * Returns exp(number) - 1, computed in a way that is accurate even
- * @since 4.1
- * @since 5.0
-   when the value of number is close to zero
+ * when the value of number is close to zero
  * @link https://php.net/manual/en/function.expm1.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float 'e' to the power of arg minus one
  */
-function expm1 ($arg) {}
+#[Pure]
+function expm1(float $num): float {}
 
 /**
  * Returns log(1 + number), computed in a way that is accurate even when
- * @since 4.1
- * @since 5.0
-   the value of number is close to zero
+ * the value of number is close to zero
  * @link https://php.net/manual/en/function.log1p.php
- * @param float $number <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float log(1 + number)
  */
-function log1p ($number) {}
+#[Pure]
+function log1p(float $num): float {}
 
 /**
  * Get value of pi
  * @link https://php.net/manual/en/function.pi.php
  * @return float The value of pi as float.
- * @since 4.0
- * @since 5.0
  */
-function pi () {}
+#[Pure]
+function pi(): float {}
 
 /**
  * Finds whether a value is a legal finite number
  * @link https://php.net/manual/en/function.is-finite.php
- * @param float $val <p>
+ * @param float $num <p>
  * The value to check
  * </p>
  * @return bool true if val is a legal finite
  * number within the allowed range for a PHP float on this platform,
  * else false.
- * @since 4.2
- * @since 5.0
  */
-function is_finite ($val) {}
+#[Pure]
+function is_finite(float $num): bool {}
 
 /**
  * Finds whether a value is not a number
  * @link https://php.net/manual/en/function.is-nan.php
- * @param float $val <p>
+ * @param float $num <p>
  * The value to check
  * </p>
  * @return bool true if val is 'not a number',
  * else false.
- * @since 4.2
- * @since 5.0
  */
-function is_nan ($val) {}
+#[Pure]
+function is_nan(float $num): bool {}
 
 /**
  * Integer division
  * @link https://php.net/manual/en/function.intdiv.php
- * @param $dividend <p>Number to be divided.</p>
- * @param $divisor <p>Number which divides the <b><i>dividend</i></b></p>
- * @return int <p>
- * If divisor is 0, a {@link DivisionByZeroError} exception is thrown.
- * If the <b><i>dividend</i></b> is <b>PHP_INT_MIN</b> and the <b><i>divisor</i></b> is -1,
- * then an {@link ArithmeticError} exception is thrown.
- * </p>
+ * @param int $num1 <p>Number to be divided.</p>
+ * @param int $num2 <p>Number which divides the <b><i>dividend</i></b></p>
+ * @return int
  * @since 7.0
+ * @throws DivisionByZeroError <p>if divisor is 0</p>
+ * @throws ArithmeticError <p>if the <b><i>dividend</i></b> is <b>PHP_INT_MIN</b> and the <b><i>divisor</i></b> is -1</p>
  */
-function intdiv ($dividend,  $divisor) {}
+#[Pure]
+function intdiv(int $num1, int $num2): int {}
 
 /**
  * Finds whether a value is infinite
  * @link https://php.net/manual/en/function.is-infinite.php
- * @param float $val <p>
+ * @param float $num <p>
  * The value to check
  * </p>
  * @return bool true if val is infinite, else false.
- * @since 4.2
- * @since 5.0
  */
-function is_infinite ($val) {}
+#[Pure]
+function is_infinite(float $num): bool {}
 
 /**
  * Exponential expression
  * @link https://php.net/manual/en/function.pow.php
- * @param int|float $base <p>
+ * @param mixed $num <p>
  * The base to use
  * </p>
- * @param int|float $exp <p>
+ * @param mixed $exponent <p>
  * The exponent
  * </p>
- * @return int|float base raised to the power of exp.
+ * @return object|int|float base raised to the power of exp.
  * If the result can be represented as integer it will be returned as type
  * integer, else it will be returned as type float.
  * If the power cannot be computed false will be returned instead.
- * @since 4.0
- * @since 5.0
  */
-function pow ($base, $exp) {}
+#[Pure]
+function pow(mixed $num, mixed $exponent): object|int|float {}
 
 /**
  * Calculates the exponent of <constant>e</constant>
  * @link https://php.net/manual/en/function.exp.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float 'e' raised to the power of arg
- * @since 4.0
- * @since 5.0
  */
-function exp ($arg) {}
+#[Pure]
+function exp(float $num): float {}
 
 /**
  * Natural logarithm
  * @link https://php.net/manual/en/function.log.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The value to calculate the logarithm for
  * </p>
  * @param float $base [optional] <p>
- * The optional logarithmic base to use 
+ * The optional logarithmic base to use
  * (defaults to 'e' and so to the natural logarithm).
  * </p>
- * @return float The logarithm of arg to 
+ * @return float The logarithm of arg to
  * base, if given, or the
  * natural logarithm.
- * @since 4.0
- * @since 5.0
  */
-function log ($arg, $base = null) {}
+#[Pure]
+function log(float $num, float $base = M_E): float {}
 
 /**
  * Base-10 logarithm
  * @link https://php.net/manual/en/function.log10.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The base-10 logarithm of arg
- * @since 4.0
- * @since 5.0
  */
-function log10 ($arg) {}
+#[Pure]
+function log10(float $num): float {}
 
 /**
  * Square root
  * @link https://php.net/manual/en/function.sqrt.php
- * @param float $arg <p>
+ * @param float $num <p>
  * The argument to process
  * </p>
  * @return float The square root of arg
  * or the special value NAN for negative numbers.
- * @since 4.0
- * @since 5.0
  */
-function sqrt ($arg) {}
+#[Pure]
+function sqrt(float $num): float {}
 
 /**
  * Calculate the length of the hypotenuse of a right-angle triangle
@@ -463,34 +439,31 @@ function sqrt ($arg) {}
  * Length of second side
  * </p>
  * @return float Calculated length of the hypotenuse
- * @since 4.1
- * @since 5.0
  */
-function hypot ($x, $y) {}
+#[Pure]
+function hypot(float $x, float $y): float {}
 
 /**
  * Converts the number in degrees to the radian equivalent
  * @link https://php.net/manual/en/function.deg2rad.php
- * @param float $number <p>
- * Angular value in degrees 
+ * @param float $num <p>
+ * Angular value in degrees
  * </p>
  * @return float The radian equivalent of number
- * @since 4.0
- * @since 5.0
  */
-function deg2rad ($number) {}
+#[Pure]
+function deg2rad(float $num): float {}
 
 /**
  * Converts the radian number to the equivalent number in degrees
  * @link https://php.net/manual/en/function.rad2deg.php
- * @param float $number <p>
+ * @param float $num <p>
  * A radian value
  * </p>
  * @return float The equivalent of number in degrees
- * @since 4.0
- * @since 5.0
  */
-function rad2deg ($number) {}
+#[Pure]
+function rad2deg(float $num): float {}
 
 /**
  * Binary to decimal
@@ -499,10 +472,9 @@ function rad2deg ($number) {}
  * The binary string to convert
  * </p>
  * @return int|float The decimal value of binary_string
- * @since 4.0
- * @since 5.0
  */
-function bindec ($binary_string) {}
+#[Pure]
+function bindec(string $binary_string): int|float {}
 
 /**
  * Hexadecimal to decimal
@@ -511,10 +483,9 @@ function bindec ($binary_string) {}
  * The hexadecimal string to convert
  * </p>
  * @return int|float The decimal representation of hex_string
- * @since 4.0
- * @since 5.0
  */
-function hexdec ($hex_string) {}
+#[Pure]
+function hexdec(string $hex_string): int|float {}
 
 /**
  * Octal to decimal
@@ -523,15 +494,14 @@ function hexdec ($hex_string) {}
  * The octal string to convert
  * </p>
  * @return int|float The decimal representation of octal_string
- * @since 4.0
- * @since 5.0
  */
-function octdec ($octal_string) {}
+#[Pure]
+function octdec(string $octal_string): int|float {}
 
 /**
  * Decimal to binary
  * @link https://php.net/manual/en/function.decbin.php
- * @param int $number <p>
+ * @param int $num <p>
  * Decimal value to convert
  * </p>
  * <table>
@@ -643,139 +613,143 @@ function octdec ($octal_string) {}
  * </tr>
  * </table>
  * @return string Binary string representation of number
- * @since 4.0
- * @since 5.0
  */
-function decbin ($number) {}
+#[Pure]
+function decbin(int $num): string {}
 
 /**
  * Decimal to octal
  * @link https://php.net/manual/en/function.decoct.php
- * @param int $number <p>
+ * @param int $num <p>
  * Decimal value to convert
  * </p>
  * @return string Octal string representation of number
- * @since 4.0
- * @since 5.0
  */
-function decoct ($number) {}
+#[Pure]
+function decoct(int $num): string {}
 
 /**
  * Decimal to hexadecimal
  * @link https://php.net/manual/en/function.dechex.php
- * @param int $number <p>
+ * @param int $num <p>
  * Decimal value to convert
  * </p>
  * @return string Hexadecimal string representation of number
- * @since 4.0
- * @since 5.0
  */
-function dechex ($number) {}
+#[Pure]
+function dechex(int $num): string {}
 
 /**
  * Convert a number between arbitrary bases
  * @link https://php.net/manual/en/function.base-convert.php
- * @param string $number <p>
+ * @param string $num <p>
  * The number to convert
  * </p>
- * @param int $frombase <p>
+ * @param int $from_base <p>
  * The base number is in
  * </p>
- * @param int $tobase <p>
+ * @param int $to_base <p>
  * The base to convert number to
  * </p>
  * @return string number converted to base tobase
- * @since 4.0
- * @since 5.0
  */
-function base_convert ($number, $frombase, $tobase) {}
+#[Pure]
+function base_convert(string $num, int $from_base, int $to_base): string {}
 
 /**
  * Format a number with grouped thousands
  * @link https://php.net/manual/en/function.number-format.php
- * @param float $number <p>
+ * @param float $num <p>
  * The number being formatted.
  * </p>
  * @param int $decimals [optional] <p>
  * Sets the number of decimal points.
  * </p>
- * @param string $dec_point [optional]
- * @param string $thousands_sep [optional]
+ * @param string|null $decimal_separator [optional]
+ * @param string|null $thousands_separator [optional]
  * @return string A formatted version of number.
- * @since 4.0
- * @since 5.0
  */
-function number_format ($number , $decimals = 0 , $dec_point = '.' , $thousands_sep = ',' ) {}
+#[Pure]
+function number_format(float $num, int $decimals = 0, ?string $decimal_separator = '.', ?string $thousands_separator = ','): string {}
 
 /**
  * Returns the floating point remainder (modulo) of the division
- * @since 4.2
- * @since 5.0
-  of the arguments
+ * of the arguments
  * @link https://php.net/manual/en/function.fmod.php
- * @param float $x <p>
+ * @param float $num1 <p>
  * The dividend
  * </p>
- * @param float $y <p>
+ * @param float $num2 <p>
  * The divisor
  * </p>
- * @return float The floating point remainder of 
+ * @return float The floating point remainder of
  * x/y
  */
-function fmod ($x, $y) {}
+#[Pure]
+function fmod(float $num1, float $num2): float {}
+
+/**
+ * Performs a floating-point division under
+ * IEEE 754 semantics. Division by zero is considered well-defined and
+ * will return one of Inf, -Inf or NaN.
+ * @param float $num1
+ * @param float $num2
+ * @return float
+ * @since 8.0
+ */
+#[Pure]
+function fdiv(float $num1, float $num2): float {}
 
 /**
  * Converts a packed internet address to a human readable representation
  * @link https://php.net/manual/en/function.inet-ntop.php
- * @param string $in_addr <p>
+ * @param string $ip <p>
  * A 32bit IPv4, or 128bit IPv6 address.
  * </p>
  * @return string|false a string representation of the address or false on failure.
- * @since 5.1
  */
-function inet_ntop ($in_addr) {}
+#[Pure]
+function inet_ntop(string $ip): string|false {}
 
 /**
  * Converts a human readable IP address to its packed in_addr representation
  * @link https://php.net/manual/en/function.inet-pton.php
- * @param string $address <p>
+ * @param string $ip <p>
  * A human readable IPv4 or IPv6 address.
  * </p>
- * @return string the in_addr representation of the given
+ * @return string|false the in_addr representation of the given
  * address
- * @since 5.1
  */
-function inet_pton ($address) {}
+#[Pure]
+function inet_pton(string $ip): string|false {}
 
 /**
- * Converts a string containing an (IPv4) Internet Protocol dotted address into a proper address
+ * Converts a string containing an (IPv4) Internet Protocol dotted address into a long integer
  * @link https://php.net/manual/en/function.ip2long.php
- * @param string $ip_address <p>
+ * @param string $ip <p>
  * A standard format address.
  * </p>
  * @return int|false the IPv4 address or false if ip_address
  * is invalid.
- * @since 4.0
- * @since 5.0
  */
-function ip2long ($ip_address) {}
+#[Pure]
+function ip2long(string $ip): int|false {}
 
 /**
- * Converts an (IPv4) Internet network address into a string in Internet standard dotted format
+ * Converts an long integer address into a string in (IPv4) internet standard dotted format
  * @link https://php.net/manual/en/function.long2ip.php
- * @param string|int $proper_address <p>
+ * @param int $ip <p>
  * A proper address representation.
  * </p>
- * @return string the Internet IP address as a string.
- * @since 4.0
- * @since 5.0
+ * @return string|false the Internet IP address as a string.
  */
-function long2ip ($proper_address) {}
+#[Pure]
+function long2ip(int $ip): string|false {}
 
 /**
  * Gets the value of an environment variable
  * @link https://php.net/manual/en/function.getenv.php
- * @param string $varname [optional] <p>
+ * @param string|null $name <p>
  * The variable name.
  * </p>
  * @param bool $local_only [optional] <p>
@@ -784,62 +758,63 @@ function long2ip ($proper_address) {}
  * @return string|array|false the value of the environment variable
  * varname or an associative array with all environment variables if no variable name
  * is provided, or false on an error.
- * @since 4.0
- * @since 5.5.38 The local_only parameter has been added.
- * @since 5.6.24 The local_only parameter has been added.
- * @since 7.0.9 The local_only parameter has been added.
- * @since 7.1 The varname parameter was made optional.
  */
-function getenv ($varname = null, $local_only = false) {}
+#[Pure(true)]
+function getenv(
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.0')] $varname,
+    #[PhpStormStubsElementAvailable(from: '7.1')] ?string $name = null,
+    #[PhpStormStubsElementAvailable(from: '5.6')] bool $local_only = false
+): array|string|false {}
 
 /**
  * Sets the value of an environment variable
  * @link https://php.net/manual/en/function.putenv.php
- * @param string $setting <p>
+ * @param string $assignment <p>
  * The setting, like "FOO=BAR"
  * </p>
  * @return bool true on success or false on failure.
- * @since 4.0
- * @since 5.0
  */
-function putenv ($setting) {}
+function putenv(string $assignment): bool {}
 
 /**
  * Gets options from the command line argument list
  * @link https://php.net/manual/en/function.getopt.php
- * @param string $options Each character in this string will be used as option characters and
+ * @param string $short_options Each character in this string will be used as option characters and
  * matched against options passed to the script starting with a single
  * hyphen (-).
  * For example, an option string "x" recognizes an
  * option -x.
  * Only a-z, A-Z and 0-9 are allowed.
- * @param array $longopts [optional] An array of options. Each element in this array will be used as option
+ * @param array $long_options An array of options. Each element in this array will be used as option
  * strings and matched against options passed to the script starting with
  * two hyphens (--).
  * For example, an longopts element "opt" recognizes an
  * option --opt.
  * Prior to PHP5.3.0 this parameter was only available on few systems
- * @param int $optind If the optind parameter is present, then the index where argument parsing stopped will be written to this variable.
- * @return array This function will return an array of option / argument pairs or false on
+ * @param int &$rest_index [optional] If the optind parameter is present, then the index where argument parsing stopped will be written to this variable.
+ * @return string[]|false[]|false This function will return an array of option / argument pairs or false on
  * failure.
- * @since 4.3
- * @since 5.0
  */
-function getopt ($options, array $longopts = null, &$optind = null) {}
+function getopt(
+    string $short_options,
+    array $long_options = [],
+    #[PhpStormStubsElementAvailable(from: '7.1')] &$rest_index
+): array|false {}
 
 /**
  * Gets system load average
  * @link https://php.net/manual/en/function.sys-getloadavg.php
- * @return array an array with three samples (last 1, 5 and 15
+ * @return array|false an array with three samples (last 1, 5 and 15
  * minutes).
  * @since 5.1.3
  */
-function sys_getloadavg () {}
+#[Pure(true)]
+function sys_getloadavg(): array|false {}
 
 /**
  * Return current Unix timestamp with microseconds
  * @link https://php.net/manual/en/function.microtime.php
- * @param bool $get_as_float [optional] <p>
+ * @param bool $as_float [optional] <p>
  * When called without the optional argument, this function returns the string
  * "msec sec" where sec is the current time measured in the number of
  * seconds since the Unix Epoch (0:00:00 January 1, 1970 GMT), and
@@ -851,15 +826,14 @@ function sys_getloadavg () {}
  * true then a float (in seconds) is returned.
  * </p>
  * @return string|float
- * @since 4.0
- * @since 5.0
  */
-function microtime ($get_as_float = null) {}
+#[Pure(true)]
+function microtime(#[TypeContract(true: "float", false: "string")] bool $as_float = false): string|float {}
 
 /**
  * Get current time
  * @link https://php.net/manual/en/function.gettimeofday.php
- * @param bool $return_float [optional] <p>
+ * @param bool $as_float [optional] <p>
  * When set to true, a float instead of an array is returned.
  * </p>
  * @return int[]|float By default an array is returned. If return_float
@@ -871,24 +845,23 @@ function microtime ($get_as_float = null) {}
  * "usec" - microseconds
  * "minuteswest" - minutes west of Greenwich
  * "dsttime" - type of dst correction
- * @since 4.0
- * @since 5.0
  */
-function gettimeofday ($return_float = null) {}
+#[Pure(true)]
+#[ArrayShape(["sec" => "int", "usec" => "int", "minuteswest" => "int", "dsttime" => "int"])]
+function gettimeofday(#[TypeContract(true: "float", false: "int[]")] bool $as_float = false): array|float {}
 
 /**
  * Gets the current resource usages
  * @link https://php.net/manual/en/function.getrusage.php
- * @param int $who [optional] <p>
+ * @param int $mode <p>
  * If who is 1, getrusage will be called with
  * RUSAGE_CHILDREN.
  * </p>
- * @return array an associative array containing the data returned from the system
+ * @return array|false an associative array containing the data returned from the system
  * call. All entries are accessible by using their documented field names.
- * @since 4.0
- * @since 5.0
  */
-function getrusage ($who = null) {}
+#[Pure(true)]
+function getrusage(int $mode = 0): array|false {}
 
 /**
  * Generate a unique ID
@@ -909,33 +882,30 @@ function getrusage ($who = null) {}
  * of the return value, which should make the results more unique.
  * </p>
  * @return string the unique identifier, as a string.
- * @since 4.0
- * @since 5.0
  */
-function uniqid ($prefix = "", $more_entropy = false) {}
+function uniqid(string $prefix = "", bool $more_entropy = false): string {}
 
 /**
  * Convert a quoted-printable string to an 8 bit string
  * @link https://php.net/manual/en/function.quoted-printable-decode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The input string.
  * </p>
  * @return string the 8-bit binary string.
- * @since 4.0
- * @since 5.0
  */
-function quoted_printable_decode ($str) {}
+#[Pure]
+function quoted_printable_decode(string $string): string {}
 
 /**
  * Convert a 8 bit string to a quoted-printable string
  * @link https://php.net/manual/en/function.quoted-printable-encode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The input string.
  * </p>
  * @return string the encoded string.
- * @since 5.3
  */
-function quoted_printable_encode ($str) {}
+#[Pure]
+function quoted_printable_encode(string $string): string {}
 
 /**
  * Convert from one Cyrillic character set to another
@@ -950,20 +920,22 @@ function quoted_printable_encode ($str) {}
  * The target Cyrillic character set, as a single character.
  * </p>
  * @return string the converted string.
- * @since 4.0
- * @since 5.0
- * @deprecated 7.4
+ * @removed 8.0
+ * @see mb_convert_string()
+ * @see iconv()
+ * @see UConverter
  */
-function convert_cyr_string ($str, $from, $to) {}
+#[Pure]
+#[Deprecated(since: '7.4', reason: 'Us mb_convert_string(), iconv() or UConverter instead.')]
+function convert_cyr_string(string $str, string $from, string $to): string {}
 
 /**
  * Gets the name of the owner of the current PHP script
  * @link https://php.net/manual/en/function.get-current-user.php
  * @return string the username as a string.
- * @since 4.0
- * @since 5.0
  */
-function get_current_user () {}
+#[Pure(true)]
+function get_current_user(): string {}
 
 /**
  * Limits the maximum execution time
@@ -972,11 +944,9 @@ function get_current_user () {}
  * The maximum execution time, in seconds. If set to zero, no time limit
  * is imposed.
  * </p>
- * @return bool Returns TRUE on success, or FALSE on failure. 
- * @since 4.0
- * @since 5.0
+ * @return bool Returns TRUE on success, or FALSE on failure.
  */
-function set_time_limit ($seconds) {}
+function set_time_limit(int $seconds): bool {}
 
 /**
  * Gets the value of a PHP configuration option
@@ -984,63 +954,57 @@ function set_time_limit ($seconds) {}
  * @param string $option <p>
  * The configuration option name.
  * </p>
- * @return string the current value of the PHP configuration variable specified by
+ * @return array|string|false the current value of the PHP configuration variable specified by
  * option, or false if an error occurs.
- * @since 4.0
- * @since 5.0
  */
-function get_cfg_var ($option) {}
+#[Pure]
+function get_cfg_var(string $option): array|string|false {}
 
 /**
- * &Alias; <function>set_magic_quotes_runtime</function>
+ * Alias:
+ * {@see set_magic_quotes_runtime}
  * @link https://php.net/manual/en/function.magic-quotes-runtime.php
- * @deprecated 5.3
- * @param $new_setting
- * @since 4.0
- * @since 5.0
+ * @param bool $new_setting
+ * @removed 7.0
  */
-function magic_quotes_runtime ($new_setting) {}
+#[Deprecated(since: '5.3')]
+function magic_quotes_runtime(bool $new_setting) {}
 
 /**
  * Sets the current active configuration setting of magic_quotes_runtime
  * @link https://php.net/manual/en/function.set-magic-quotes-runtime.php
- * @deprecated 5.3
  * @param bool $new_setting <p>
  * false for off, true for on.
  * </p>
  * @return bool true on success or false on failure.
- * @deprecated 5.4 This function has been DEPRECATED as of PHP 5.4.0. Raises an E_CORE_ERROR.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
  */
-function set_magic_quotes_runtime ($new_setting) {}
+#[Deprecated(reason: "This function has been DEPRECATED as of PHP 5.4.0. Raises an E_CORE_ERROR", since: "5.3")]
+function set_magic_quotes_runtime(bool $new_setting): bool {}
 
 /**
  * Gets the current configuration setting of magic quotes gpc
  * @link https://php.net/manual/en/function.get-magic-quotes-gpc.php
  * @return int 0 if magic quotes gpc are off, 1 otherwise.
- * @since 4.0
- * @since 5.0
- * @deprecated 7.4
+ * @removed 8.0
  */
-function get_magic_quotes_gpc () {}
+#[Deprecated(since: '7.4')]
+function get_magic_quotes_gpc(): int {}
 
 /**
  * Gets the current active configuration setting of magic_quotes_runtime
  * @link https://php.net/manual/en/function.get-magic-quotes-runtime.php
  * @return int 0 if magic quotes runtime is off, 1 otherwise.
- * @since 4.0
- * @since 5.0
- * @deprecated 7.4
  */
-function get_magic_quotes_runtime () {}
+#[Deprecated(since: '7.4')]
+function get_magic_quotes_runtime(): int {}
 
 /**
  * Import GET/POST/Cookie variables into the global scope
  * @link https://php.net/manual/en/function.import-request-variables.php
  * @param string $types <p>
  * Using the types parameter, you can specify
- * which request variables to import. You can use 'G', 'P' and 'C' 
+ * which request variables to import. You can use 'G', 'P' and 'C'
  * characters respectively for GET, POST and Cookie. These characters are
  * not case sensitive, so you can also use any combination of 'g', 'p'
  * and 'c'. POST includes the POST uploaded file information.
@@ -1066,20 +1030,19 @@ function get_magic_quotes_runtime () {}
  * not displayed using the default error reporting level.
  * </p>
  * @return bool true on success or false on failure.
- * @deprecated 5.3 This function has been DEPRECATED as of PHP 5.3.0 and REMOVED as of PHP 5.4.0.
- * @since 4.1
- * @since 5.0
+ * @removed 5.4
  */
-function import_request_variables ($types, $prefix = null) {}
+#[Deprecated(reason: "This function has been DEPRECATED as of PHP 5.3.0", since: "5.3")]
+function import_request_variables(string $types, $prefix = null): bool {}
 
 /**
- * Send an error message somewhere
+ * Send an error message to the defined error handling routines
  * @link https://php.net/manual/en/function.error-log.php
  * @param string $message <p>
  * The error message that should be logged.
  * </p>
- * @param int $message_type [optional] <p>
- * Says where the error should go. The possible message types are as 
+ * @param int $message_type <p>
+ * Says where the error should go. The possible message types are as
  * follows:
  * </p>
  * <p>
@@ -1113,7 +1076,7 @@ function import_request_variables ($types, $prefix = null) {}
  * <td>3</td>
  * <td>
  * message is appended to the file
- * destination. A newline is not automatically 
+ * destination. A newline is not automatically
  * added to the end of the message string.
  * </td>
  * </tr>
@@ -1126,18 +1089,16 @@ function import_request_variables ($types, $prefix = null) {}
  * </tr>
  * </table>
  * </p>
- * @param string $destination [optional] <p>
- * The destination. Its meaning depends on the 
+ * @param string|null $destination [optional] <p>
+ * The destination. Its meaning depends on the
  * message_type parameter as described above.
  * </p>
- * @param string $extra_headers [optional] <p>
+ * @param string|null $additional_headers [optional] <p>
  * The extra headers. It's used when the message_type
  * parameter is set to 1.
- * This message type uses the same internal function as 
+ * This message type uses the same internal function as
  * mail does.
  * </p>
  * @return bool true on success or false on failure.
- * @since 4.0
- * @since 5.0
  */
-function error_log ($message, $message_type = null, $destination = null, $extra_headers = null) {}
+function error_log(string $message, int $message_type = 0, ?string $destination, ?string $additional_headers): bool {}

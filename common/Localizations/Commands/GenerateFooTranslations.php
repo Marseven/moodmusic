@@ -36,21 +36,29 @@ class GenerateFooTranslations extends Command
      */
     public function handle()
     {
-        if ($existing = app(LocalizationsRepository::class)->getByNameOrCode('foo')) {
-            app(LocalizationsRepository::class)->delete($existing['model']['id']);
+        if (
+            $existing = app(LocalizationsRepository::class)->getByNameOrCode(
+                'foo',
+            )
+        ) {
+            app(LocalizationsRepository::class)->delete($existing->id);
         }
         $localization = app(LocalizationsRepository::class)->create([
             'name' => 'Foo',
             'language' => 'foo',
         ]);
+        $localization->loadLines();
 
+        $translatedLines = [];
         $count = 1;
-        foreach ($localization['lines'] as $key => $line) {
-            $localization['lines'][$key] = "Foo Bar $count";
+        foreach ($localization->lines as $key => $line) {
+            $translatedLines[$key] = "Foo Bar $count";
             $count++;
         }
 
-        app(LocalizationsRepository::class)->update($localization['model']['id'], ['lines' => $localization['lines']]);
+        app(LocalizationsRepository::class)->update($localization['id'], [
+            'lines' => $translatedLines,
+        ]);
 
         $this->info('Localization created');
     }

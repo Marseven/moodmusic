@@ -1,7 +1,7 @@
 <?php
 
-if (version_compare(PHP_VERSION, '7.3') === -1) {
-    exit('You need at least PHP '.'7.3'.' to install this application.');
+if (version_compare(PHP_VERSION, '8.0') === -1) {
+    exit('You need at least PHP '.'8.0'.' to install this application.');
 }
 
 // if not installed yet, redirect to public dir

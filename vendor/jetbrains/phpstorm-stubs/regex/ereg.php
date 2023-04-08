@@ -1,18 +1,18 @@
 <?php
 
 // Start of ereg v.
+use JetBrains\PhpStorm\Deprecated;
 
 /**
  * Regular expression match
  * @link https://php.net/manual/en/function.ereg.php
- * @deprecated 5.3 Use preg_match() instead
  * @param string $pattern <p>
  * Case sensitive regular expression.
  * </p>
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array $regs [optional] <p>
+ * @param null|array &$regs [optional] <p>
  * If matches are found for parenthesized substrings of
  * <i>pattern</i> and the function is called with the
  * third argument <i>regs</i>, the matches will be stored
@@ -32,15 +32,15 @@
  * <p>
  * If the optional parameter <i>regs</i> was not passed or
  * the length of the matched string is 0, this function returns 1.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
+ * @see preg_match()
  */
-function ereg ($pattern, $string, array &$regs = null) {}
+#[Deprecated(reason: "Use preg_match() instead", since: "5.3")]
+function ereg($pattern, $string, ?array &$regs = null) {}
 
 /**
  * Replace regular expression
  * @link https://php.net/manual/en/function.ereg-replace.php
- * @deprecated 5.3 Use preg_replace() instead
  * @param string $pattern <p>
  * A POSIX extended regular expression.
  * </p>
@@ -58,22 +58,22 @@ function ereg ($pattern, $string, array &$regs = null) {}
  * </p>
  * @return string The modified string is returned. If no matches are found in
  * <i>string</i>, then it will be returned unchanged.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
+ * @see preg_replace()
  */
-function ereg_replace ($pattern, $replacement, $string) {}
+#[Deprecated(reason: "Use preg_replace() instead", since: "5.3")]
+function ereg_replace($pattern, $replacement, $string) {}
 
 /**
  * Case insensitive regular expression match
  * @link https://php.net/manual/en/function.eregi.php
- * @deprecated 5.3 Use preg_match() instead
  * @param string $pattern <p>
  * Case insensitive regular expression.
  * </p>
  * @param string $string <p>
  * The input string.
  * </p>
- * @param array $regs [optional] <p>
+ * @param null|array &$regs [optional] <p>
  * If matches are found for parenthesized substrings of
  * <i>pattern</i> and the function is called with the
  * third argument <i>regs</i>, the matches will be stored
@@ -92,15 +92,15 @@ function ereg_replace ($pattern, $replacement, $string) {}
  * <p>
  * If the optional parameter <i>regs</i> was not passed or
  * the length of the matched string is 0, this function returns 1.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
+ * @see preg_match()
  */
-function eregi ($pattern, $string, array &$regs = null) {}
+#[Deprecated(reason: "Use preg_match() instead", since: "5.3")]
+function eregi($pattern, $string, array &$regs = null) {}
 
 /**
  * Replace regular expression case insensitive
  * @link https://php.net/manual/en/function.eregi-replace.php
- * @deprecated 5.3 Use preg_replace() instead
  * @param string $pattern <p>
  * A POSIX extended regular expression.
  * </p>
@@ -118,15 +118,15 @@ function eregi ($pattern, $string, array &$regs = null) {}
  * </p>
  * @return string The modified string is returned. If no matches are found in
  * <i>string</i>, then it will be returned unchanged.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
+ * @see preg_replace()
  */
-function eregi_replace ($pattern, $replacement, $string) {}
+#[Deprecated(reason: "Use preg_replace() instead", since: "5.3")]
+function eregi_replace($pattern, $replacement, $string) {}
 
 /**
  * Split string into array by regular expression
  * @link https://php.net/manual/en/function.split.php
- * @deprecated 5.3 Use preg_split() instead
  * @param string $pattern <p>
  * Case sensitive regular expression.
  * </p>
@@ -161,15 +161,15 @@ function eregi_replace ($pattern, $replacement, $string) {}
  * only one element will be returned. Of course, this is also true if
  * <i>string</i> is empty. If an error occurs,
  * <b>split</b> returns <b>FALSE</b>.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
+ * @see preg_split()
  */
-function split ($pattern, $string, $limit = -1) {}
+#[Deprecated(reason: "Use preg_split() instead", since: "5.3")]
+function split($pattern, $string, $limit = -1) {}
 
 /**
  * Split string into array by regular expression case insensitive
  * @link https://php.net/manual/en/function.spliti.php
- * @deprecated 5.3 Use preg_split() with the 'i' modifier instead
  * @param string $pattern <p>
  * Case insensitive regular expression.
  * </p>
@@ -204,15 +204,15 @@ function split ($pattern, $string, $limit = -1) {}
  * only one element will be returned. Of course, this is also true if
  * <i>string</i> is empty. If an error occurs,
  * <b>spliti</b> returns <b>FALSE</b>.
- * @since 4.0.1
- * @since 5.0
+ * @removed 7.0
+ * @see preg_split()
  */
-function spliti ($pattern, $string, $limit = -1) {}
+#[Deprecated(reason: "Use preg_split() instead", since: "5.3")]
+function spliti($pattern, $string, $limit = -1) {}
 
 /**
  * Make regular expression for case insensitive match
  * @link https://php.net/manual/en/function.sql-regcase.php
- * @deprecated 5.3
  * @param string $string <p>
  * The input string.
  * </p>
@@ -221,10 +221,9 @@ function spliti ($pattern, $string, $limit = -1) {}
  * <i>string</i> with each alphabetic character converted to
  * a bracket expression; this bracket expression contains that character's
  * uppercase and lowercase form. Other characters remain unchanged.
- * @since 4.0
- * @since 5.0
+ * @removed 7.0
  */
-function sql_regcase ($string) {}
+#[Deprecated(since: '5.3')]
+function sql_regcase($string) {}
 
 // End of ereg v.
-?>

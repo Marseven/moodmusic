@@ -5,31 +5,38 @@ namespace App\Http\Controllers;
 use App\User;
 use App\UserProfile;
 use Auth;
+use Common\Auth\Events\UserAvatarChanged;
 use Common\Core\BaseController;
 use Illuminate\Http\Request;
 
 class UserProfileController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request = $request;
     }
 
     public function show(User $user)
     {
-        $user->load('profile', 'links')
-            ->loadCount(['followers', 'followedUsers'])
+        $relations = array_merge(
+            array_filter(explode(',', $this->request->get('with', ''))),
+            ['profile', 'links'],
+        );
+        $loadCount = array_merge(
+            array_filter(explode(',', $this->request->get('withCount', ''))),
+            ['followers', 'followedUsers'],
+        );
+
+        $user
+            ->load($relations)
+            ->loadCount($loadCount)
             ->setGravatarSize(220);
 
-        if ( ! $user->getRelation('profile')) {
-            $user->setRelation('profile', new UserProfile([
-                'header_colors' => ['#a5d6a7', '#90caf9']
-            ]));
+        if ($user->id === Auth::id()) {
+            $user->load(['tokens']);
+        }
+
+        if (!$user->getRelation('profile')) {
+            $user->setRelation('profile', new UserProfile());
         }
 
         $this->authorize('show', $user);
@@ -37,23 +44,39 @@ class UserProfileController extends BaseController
         $options = [
             'prerender' => [
                 'view' => 'user.show',
-                'config' => 'user.show'
-            ]
+                'config' => 'user.show',
+            ],
         ];
 
-        return $this->success([
-            'user' => $user,
-        ], 200, $options);
+        return $this->success(
+            [
+                'user' => $user,
+            ],
+            200,
+            $options,
+        );
     }
 
     public function update()
     {
         $user = Auth::user();
         $this->authorize('update', $user);
-        $user->fill($this->request->get('user'))->save();
+
+        $userData = $this->request->get('user');
+
         $profileData = $this->request->get('profile');
 
-        $profile = $user->profile()->updateOrCreate(['user_id' => $user->id], $profileData);
+        User::unguard(true);
+        $oldAvatar = $user->avatar;
+        $user->fill($userData)->save();
+
+        if (isset($userData['avatar']) && $oldAvatar !== $userData['avatar']) {
+            event(new UserAvatarChanged($user));
+        }
+
+        $profile = $user
+            ->profile()
+            ->updateOrCreate(['user_id' => $user->id], $profileData);
 
         $user->links()->delete();
         $links = $user->links()->createMany($this->request->get('links'));

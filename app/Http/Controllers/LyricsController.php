@@ -1,69 +1,48 @@
 <?php namespace App\Http\Controllers;
 
 use App\Lyric;
-use App\Services\Lyrics\AzLyricsProvider;
-use App\Services\Lyrics\LyricsWikiaProvider;
-use App\Services\Lyrics\OvhLyricsProvider;
-use App\Services\Lyrics\RapidApiLyricsProvider;
+use App\Services\Lyrics\ImportLyrics;
 use App\Track;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use Common\Settings\Settings;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
-class LyricsController extends BaseController {
-
-    /**
-     * @var Lyric
-     */
-    private $lyric;
-
-    /**
-     * @var Track
-     */
-    private $track;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(Lyric $lyric, Track $track, Request $request)
-    {
-        $this->lyric = $lyric;
-        $this->track = $track;
-        $this->request = $request;
+class LyricsController extends BaseController
+{
+    public function __construct(
+        protected Lyric $lyric,
+        protected Track $track,
+        protected Request $request,
+    ) {
     }
 
     public function index()
     {
         $this->authorize('index', Lyric::class);
 
-        $paginator = new Paginator($this->lyric, $this->request->all());
-        $paginator->searchCallback = function(Builder $query, $term) {
-            $query->whereHas('track', function(Builder $query) use($term) {
-                return $query->where('tracks.name', 'like', "$term%");
-            });
-        };
+        $paginator = new Datasource($this->lyric, $this->request->all());
         return $this->success(['pagination' => $paginator->paginate()]);
     }
 
-	public function show(int $trackId)
-	{
+    public function show(int $trackId)
+    {
         $this->authorize('show', Lyric::class);
 
-	    $lyric = $this->lyric->where('track_id', $trackId)->first();
+        $lyric = $this->lyric->where('track_id', $trackId)->first();
 
-        if ( ! $lyric) {
-            $lyric = $this->fetchLyrics($trackId);
+        if (!$lyric && app(Settings::class)->get('player.lyrics_automate')) {
+            $lyric = app(ImportLyrics::class)->execute($trackId);
+        }
+
+        if (!$lyric) {
+            return $this->error(__('Could not find lyrics'), [], 404);
         }
 
         return $this->success(['lyric' => $lyric]);
-	}
+    }
 
-	public function store()
+    public function store()
     {
         $this->authorize('store', Lyric::class);
 
@@ -74,7 +53,7 @@ class LyricsController extends BaseController {
 
         $lyric = $this->lyric->create([
             'track_id' => $this->request->get('track_id'),
-            'text'     => $this->request->get('text')
+            'text' => $this->request->get('text'),
         ]);
 
         return $this->success(['lyric' => $lyric]);
@@ -93,63 +72,19 @@ class LyricsController extends BaseController {
 
         $lyric->update([
             'track_id' => $this->request->get('track_id'),
-            'text'     => $this->request->get('text')
+            'text' => $this->request->get('text'),
         ]);
 
         return $this->success(['lyric' => $lyric]);
     }
 
-    public function destroy()
+    public function destroy(string $ids)
     {
-        $this->authorize('destroy', Lyric::class);
+        $lyricIds = explode(',', $ids);
+        $this->authorize('destroy', [Lyric::class, $lyricIds]);
 
-        $this->validate($this->request, [
-            'ids'   => 'required|array',
-            'ids.*' => 'required|integer'
-        ]);
-
-        $this->lyric->destroy($this->request->get('ids'));
+        $this->lyric->destroy($lyricIds);
 
         return $this->success();
-    }
-
-	public function fetchLyrics(int $trackId)
-    {
-        $track = $this->track->with('album.artists')->findOrFail($trackId);
-
-        $trackName  = $track->name;
-        $artistName = $track->artists->first()['name'];
-
-        // Peace Sells - 2011 Remastered => Peace Sells
-        $trackName = preg_replace('/ - [0-9]{4} Remastered/', '', $trackName);
-
-        // Zero - From the Original Motion Picture "Ralph Breaks The Internet" => Zero
-        $trackName = preg_replace('/- From the Original Motion Picture.*?$/', '', $trackName);
-
-        // South of the Border (feat. Camila Cabello & Cardi B) => South of the Border
-        $trackName = trim(explode('(feat.', $trackName)[0]);
-
-        switch (app(Settings::class)->get('providers.lyrics')) {
-            case 'ovh':
-                $text = app(OvhLyricsProvider::class)->getLyrics($artistName, $trackName);
-                break;
-            case 'lyricswikia':
-                $text = app(LyricsWikiaProvider::class)->getLyrics($artistName, $trackName);
-                break;
-            case 'azlyrics':
-                $text = app(AzLyricsProvider::class)->getLyrics($artistName, $trackName);
-                break;
-            default:
-                $text = null;
-        }
-
-        if ( ! $text) {
-            abort(404);
-        }
-
-        return $this->lyric->create([
-            'track_id' => $trackId,
-            'text'     => $text
-        ]);
     }
 }

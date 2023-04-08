@@ -2,7 +2,7 @@
 
 namespace Sentry\Laravel\Http;
 
-use Illuminate\Contracts\Container\Container;
+use Illuminate\Container\Container;
 use Psr\Http\Message\ServerRequestInterface;
 use Sentry\Integration\RequestFetcher;
 use Sentry\Integration\RequestFetcherInterface;
@@ -14,26 +14,19 @@ class LaravelRequestFetcher implements RequestFetcherInterface
      */
     public const CONTAINER_PSR7_INSTANCE_KEY = 'sentry-laravel.psr7.request';
 
-    /**
-     * The Laravel container.
-     *
-     * @var \Illuminate\Contracts\Container\Container
-     */
-    private $container;
-
-    public function __construct(Container $container)
-    {
-        $this->container = $container;
-    }
-
     public function fetchRequest(): ?ServerRequestInterface
     {
-        if (\PHP_SAPI === 'cli' || \PHP_SAPI === 'phpdbg' || !$this->container->bound('request')) {
+        $container = Container::getInstance();
+
+        // If there is no request bound to the container
+        // we are not dealing with a HTTP request and there
+        // is no request to fetch for us so we can exit early.
+        if (!$container->bound('request')) {
             return null;
         }
 
-        if ($this->container->bound(self::CONTAINER_PSR7_INSTANCE_KEY)) {
-            return $this->container->make(self::CONTAINER_PSR7_INSTANCE_KEY);
+        if ($container->bound(self::CONTAINER_PSR7_INSTANCE_KEY)) {
+            return $container->make(self::CONTAINER_PSR7_INSTANCE_KEY);
         }
 
         return (new RequestFetcher)->fetchRequest();

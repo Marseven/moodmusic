@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Refresh;
 
@@ -18,7 +18,8 @@ final class RefreshIndex
 
     /**
      * RefreshIndex constructor.
-     * @param Index $index
+     *
+     * @param  Index  $index
      */
     public function __construct(Index $index)
     {

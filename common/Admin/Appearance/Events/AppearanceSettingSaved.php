@@ -24,14 +24,12 @@ class AppearanceSettingSaved
      */
     public $previousValue;
 
-    /**
-     * @param string $type
-     * @param string $key
-     * @param string $value
-     * @param string $previousValue
-     */
-    public function __construct($type, $key, $value, $previousValue)
-    {
+    public function __construct(
+        string $type,
+        string $key,
+        string $value,
+        string $previousValue = null
+    ) {
         //
         $this->type = $type;
         $this->key = $key;

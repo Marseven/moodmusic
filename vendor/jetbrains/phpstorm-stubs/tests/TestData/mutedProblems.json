@@ -3,848 +3,1725 @@
     {
       "name": "DEBUG_BACKTRACE_PROVIDE_OBJECT",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "DEBUG_BACKTRACE_IGNORE_ARGS",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "TRUE",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "FALSE",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ZEND_THREAD_SAFE",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ZEND_DEBUG_BUILD",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "NULL",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_MAJOR_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_MINOR_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_RELEASE_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_EXTRA_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_VERSION_ID",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "DEFAULT_INCLUDE_PATH",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PEAR_INSTALL_DIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PEAR_EXTENSION_DIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_PREFIX",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_BINDIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_MANDIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_LIBDIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_DATADIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_SYSCONFDIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_LOCALSTATEDIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_EXTENSION_DIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_CONFIG_FILE_PATH",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_CONFIG_FILE_SCAN_DIR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_INT_MIN",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_BINARY",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_OUTPUT_HANDLER_CONT",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PHP_OUTPUT_HANDLER_END",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "STDIN",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "STDOUT",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "STDERR",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "LIBXML_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "LIBXML_DOTTED_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "LIBXML_LOADED_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "LIBXML_BIGLINES",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "OPENSSL_VERSION_TEXT",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "OPENSSL_VERSION_NUMBER",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "OPENSSL_DEFAULT_STREAM_CIPHERS",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "PCRE_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ZLIB_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ZLIB_VERNUM",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "FILEINFO_EXTENSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ICONV_VERSION",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "POSIX_RLIMIT_AS",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "POSIX_RLIMIT_MEMLOCK",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "POSIX_RLIMIT_NOFILE",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "POSIX_RLIMIT_NPROC",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "POSIX_RLIMIT_INFINITY",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "ZEND_ACC_PPP_MASK",
       "problems": [
-        "wrong value"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "pcov\\version",
       "problems": [
-        "wrong value"
-      ]
-    },
-    {
-      "name": "MONGODB_VERSION",
-      "problems": [
-        "missing constant"
-      ]
-    },
-    {
-      "name": "MONGODB_STABILITY",
-      "problems": [
-        "missing constant"
+        {
+          "description": "wrong value",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     }
   ],
   "functions": [
     {
-      "name": "mktime",
+      "name": "session_set_save_handler",
       "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "gmmktime",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_push",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_unshift",
-      "problems": [
-        "parameter mismatch"
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "array_map",
       "problems": [
-        "parameter mismatch"
+        {
+          "description": "absent in meta",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
-      "name": "array_intersect_uassoc",
+      "name": "stream_context_set_option",
       "problems": [
-        "parameter mismatch"
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
-      "name": "array_intersect",
+      "name": "setcookie",
       "problems": [
-        "parameter mismatch"
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
-      "name": "array_diff_ukey",
+      "name": "setrawcookie",
       "problems": [
-        "parameter mismatch"
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
-      "name": "array_diff_uassoc",
+      "name": "strtr",
       "problems": [
-        "parameter mismatch"
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "implode",
+      "problems": [
+        {
+          "description": "parameter mismatch",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "join",
+      "problems": [
+        {
+          "description": "parameter mismatch",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "array_multisort",
+      "parameters": [
+        {
+          "name": "rest",
+          "problems": [
+            {
+              "description": "parameter reference",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "array",
+          "problems": [
+            {
+              "description": "parameter reference",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "extract",
+      "parameters": [
+        {
+          "name": "array",
+          "problems": [
+            {
+              "description": "parameter reference",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "dba_fetch",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "cubrid_execute",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "crypt",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pg_lo_import",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "pg_lo_export",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "session_set_cookie_params",
+      "problems": [
+        {
+          "description": "parameter mismatch",
+          "versions": [
+            "ALL"
+          ]
+        },
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "parallel\\run",
+      "problems": [
+        {
+          "description": "has type mismatch in signature and phpdoc",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "timezone_transitions_get",
+      "parameters": [
+        {
+          "name": "timestampBegin",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "timestampEnd",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mb_encode_mimeheader",
+      "parameters": [
+        {
+          "name": "newline",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "trim",
+      "parameters": [
+        {
+          "name": "characters",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "rtrim",
+      "parameters": [
+        {
+          "name": "characters",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "chop",
+      "parameters": [
+        {
+          "name": "characters",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ltrim",
+      "parameters": [
+        {
+          "name": "characters",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "explode",
+      "parameters": [
+        {
+          "name": "limit",
+          "problems": [
+            {
+              "description": "wrong default value",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bcdiv",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "bcmod",
+      "problems": [
+        {
+          "description": "has duplicate in stubs",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sodium_crypto_secretstream_xchacha20poly1305_push",
+      "problems": [
+        {
+          "description": "missing function",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sodium_crypto_secretstream_xchacha20poly1305_pull",
+      "problems": [
+        {
+          "description": "missing function",
+          "versions": [
+            "ALL"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "hash_update_file",
+      "problems": [
+        {
+          "description": "parameter mismatch",
+          "versions": [
+            5.6,
+            7.0
+          ]
+        }
       ]
     },
     {
       "name": "var_dump",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "setlocale",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "sprintf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "printf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "min",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "max",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "compact",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_merge",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_key",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_key",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "xmlwriter_write_dtd_entity",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "register_tick_function",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "pack",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "fprintf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "forward_static_call",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "register_shutdown_function",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_ukey",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace_recursive",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_push",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_unshift",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_map",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_ukey",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "var_dump",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "setlocale",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "sprintf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "printf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "min",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "max",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "compact",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_merge",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_key",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_key",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_udiff_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "xmlwriter_write_dtd_entity",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "register_tick_function",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "pack",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "fprintf",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "forward_static_call",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "register_shutdown_function",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect_uassoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_diff",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_ukey",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_replace_recursive",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_intersect_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "array_uintersect_assoc",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"session_set_save_handler",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"stream_context_set_option",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"setcookie",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"setrawcookie",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"sodium_memzero",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"strtr",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "mysqli_stmt_bind_result",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name": "mysqli_stmt_bind_param",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"mysqli_escape_string",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"mysqli_set_opt",
-      "problems": [
-        "parameter mismatch"
-      ]
-    },
-    {
-      "name":"socket_cmsg_space",
-      "problems": [
-        "parameter mismatch"
+      "parameters": [
+        {
+          "name": "vars",
+          "problems": [
+            {
+              "description": "wrong optionallity",
+              "versions": [
+                5.6,
+                7.0,
+                7.1,
+                7.2,
+                7.3,
+                7.4
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "sodium_crypto_stream_xchacha20_xor_ic",
+      "problems": [
+        {
+          "description": "missing function",
+          "versions": [
+            8.2
+          ]
+        }
       ]
     }
   ],
   "classes": [
     {
-      "name" : "AMQPBasicProperties",
+      "name": "DOMException",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "mysqli_sql_exception",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            5.6
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Application",
+      "methods": [
+        {
+          "name": "execute",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                8.0,
+                8.1
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Dispatcher",
+      "methods": [
+        {
+          "name": "setErrorHandler",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "call == callable"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionFunction",
+      "methods": [
+        {
+          "name": "export",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionFunctionAbstract",
+      "methods": [
+        {
+          "name": "getReturnType",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionReference",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            8.0,
+            8.1,
+            8.2
+          ]
+        }
+      ],
+      "methods": [
+        {
+          "name": "fromArrayElement",
+          "parameters": [
+            {
+              "name": "key",
+              "problems": [
+                {
+                  "description": "parameter type mismatch",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionClassConstant",
+      "methods": [
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "class",
+              "problems": [
+                {
+                  "description": "parameter type mismatch",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ZMQSocket",
+      "methods": [
+        {
+          "name": "getSockOpt",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionExtension",
+      "methods": [
+        {
+          "name": "export",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Request_Http",
+      "methods": [
+        {
+          "name": "getQuery",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "getPost",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "getCookie",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Request_Abstract",
+      "methods": [
+        {
+          "name": "getParam",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$default is mixed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Registry",
+      "methods": [
+        {
+          "name": "set",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value is mixed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Request_Abstract",
+      "methods": [
+        {
+          "name": "getServer",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value is mixed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Session",
+      "methods": [
+        {
+          "name": "offsetGet",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$name is mixed in ArrayAccess"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Router",
+      "methods": [
+        {
+          "name": "addRoute",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "There is no Yaf_Route_Abstract class"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "NumberFormatter",
+      "methods": [
+        {
+          "name": "format",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value is number"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvCheck",
+      "methods": [
+        {
+          "name": "createStopped",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvPeriodic",
       "methods": [
         {
           "name": "__construct",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvPrepare",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvIdle",
+      "methods": [
+        {
+          "name": "createStopped",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvLoop",
+      "methods": [
+        {
+          "name": "child",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "embed",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            },
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "check",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            },
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "prepare",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "fork",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "EvPrepare",
+      "methods": {
+        "name": "__construct",
+        "problems": [
+          {
+            "description": "has type mismatch in signature and phpdoc",
+            "versions": [
+              "ALL"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "EvIdle",
+      "methods": {
+        "name": "__construct",
+        "problems": [
+          {
+            "description": "has type mismatch in signature and phpdoc",
+            "versions": [
+              "ALL"
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "EvFork",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "createStopped",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Route_Rewrite",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yar_Concurrent_Client",
+      "methods": [
+        {
+          "name": "call",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "parallel\\Sync",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value is scalar"
+          ]
+        },
+        {
+          "name": "set",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value is scalar"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Lua",
+      "methods": [
+        {
+          "name": "call",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$use_self appears to be bool"
+          ]
+        },
+        {
+          "name": "assign",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "$value appears to be mixed"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SoapFault",
+      "methods": [
+        {
+          "name": "SoapFault",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Yaf_Route_Map",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "XSLTProcessor",
+      "methods": [
+        {
+          "name": "transformToXml",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SolrQuery",
+      "methods": [
+        {
+          "name": "setFacetDateHardEnd",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Imagick",
+      "methods": [
+        {
+          "name": "getImageDistortion",
+          "problems": [
+            {
+              "description": "has type mismatch in signature and phpdoc",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ],
+          "comment": [
+            "magickwand is a type from c sources"
+          ]
+        }
+      ]
+    },
+    {
+      "name": "AMQPBasicProperties",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -855,7 +1732,12 @@
         {
           "name": "accept",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -864,9 +1746,30 @@
       "name": "Phar",
       "methods": [
         {
-          "name":"getPath",
+          "name": "getPath",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]
@@ -875,322 +1778,601 @@
       "name": "PharData",
       "methods": [
         {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
           "name": "__destruct",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "addEmptyDir",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"addFile",
+          "name": "addFile",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"addFromString",
+          "name": "addFromString",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"buildFromDirectory",
+          "name": "buildFromDirectory",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"buildFromIterator",
+          "name": "buildFromIterator",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"compressFiles",
+          "name": "compressFiles",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"decompressFiles",
+          "name": "decompressFiles",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"compress",
+          "name": "compress",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"decompress",
+          "name": "decompress",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"convertToExecutable",
+          "name": "convertToExecutable",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"convertToData",
+          "name": "convertToData",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"copy",
+          "name": "copy",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"count",
+          "name": "count",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"delete",
+          "name": "delete",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"delMetadata",
+          "name": "delMetadata",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"extractTo",
+          "name": "extractTo",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "getAlias",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getPath",
+          "name": "getPath",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getMetadata",
+          "name": "getMetadata",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getModified",
+          "name": "getModified",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getSignature",
+          "name": "getSignature",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getStub",
+          "name": "getStub",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getVersion",
+          "name": "getVersion",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"hasMetadata",
+          "name": "hasMetadata",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"isBuffering",
+          "name": "isBuffering",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"isCompressed",
+          "name": "isCompressed",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"isFileFormat",
+          "name": "isFileFormat",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"isWritable",
+          "name": "isWritable",
           "problems": [
-            "missing method"
-         ]
-        },
-        {
-          "name":"setAlias",
-          "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"setDefaultStub",
+          "name": "setAlias",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"setMetadata",
+          "name": "setDefaultStub",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"setSignatureAlgorithm",
+          "name": "setMetadata",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"setStub",
+          "name": "setSignatureAlgorithm",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"startBuffering",
+          "name": "setStub",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"stopBuffering",
+          "name": "startBuffering",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"apiVersion",
+          "name": "stopBuffering",
           "problems": [
-            "missing method"
-          ]
-        },
-
-        {
-          "name":"canCompress",
-          "problems": [
-            "missing method"
-          ]
-        },
-        {
-          "name":"canWrite",
-          "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"createDefaultStub",
+          "name": "apiVersion",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getSupportedCompression",
+          "name": "canCompress",
           "problems": [
-            "missing method"
-          ]
-        },{
-          "name":"getSupportedSignatures",
-          "problems": [
-            "missing method"
-          ]
-        },
-
-        {
-          "name":"interceptFileFunc",
-          "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"isValidPharFilename",
+          "name": "canWrite",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"loadPhar",
+          "name": "createDefaultStub",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"mapPhar",
+          "name": "getSupportedCompression",
           "problems": [
-            "missing method"
-          ]
-        },
-
-        {
-          "name":"running",
-          "problems": [
-            "missing method"
-          ]
-        },
-        {
-          "name":"mount",
-          "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"mungServer",
+          "name": "getSupportedSignatures",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"unlinkArchive",
+          "name": "interceptFileFunc",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"webPhar",
+          "name": "isValidPharFilename",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"interceptFileFuncs",
+          "name": "loadPhar",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "mapPhar",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "running",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "mount",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "mungServer",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "unlinkArchive",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "webPhar",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "interceptFileFuncs",
+          "problems": [
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ],
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
@@ -1199,31 +2381,56 @@
         {
           "name": "getFilename",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "getExtension",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "getBasename",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "__toString",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
-          "name":"getSignature",
+          "name": "getSignature",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1234,7 +2441,12 @@
         {
           "name": "getName",
           "problems": [
-            "missing method"
+            {
+              "description": "missing method",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1243,9 +2455,30 @@
       "name": "ReflectionProperty",
       "methods": [
         {
-          "name": "setValue",
+          "name": "getType",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionParameter",
+      "methods": [
+        {
+          "name": "getType",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1256,7 +2489,12 @@
         {
           "name": "newInstance",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1267,7 +2505,12 @@
         {
           "name": "__construct",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1278,7 +2521,12 @@
         {
           "name": "hasFeature",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1289,7 +2537,12 @@
         {
           "name": "__set_state",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1300,7 +2553,12 @@
         {
           "name": "__set_state",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1311,7 +2569,12 @@
         {
           "name": "registerPhpFunctions",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1322,7 +2585,12 @@
         {
           "name": "compare",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1333,7 +2601,12 @@
         {
           "name": "query",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1344,7 +2617,12 @@
         {
           "name": "writeDtdEntity",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1355,7 +2633,12 @@
         {
           "name": "invoke",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1366,7 +2649,123 @@
         {
           "name": "__set_state",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "getTransitions",
+          "parameters": [
+            {
+              "name": "timestampBegin",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "timestampEnd",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RecursiveCachingIterator",
+      "methods": [
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "RecursiveTreeIterator",
+      "methods": [
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "mode",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "FilesystemIterator",
+      "methods": [
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "MultipleIterator",
+      "methods": [
+        {
+          "name": "__construct",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "wrong default value",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
           ]
         }
       ]
@@ -1377,7 +2776,12 @@
         {
           "name": "__set_state",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1388,7 +2792,12 @@
         {
           "name": "setFetchMode",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1399,7 +2808,12 @@
         {
           "name": "setPostfix",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1410,25 +2824,45 @@
         {
           "name": "schemaValidate",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "saveHTML",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "save",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "schemaValidateSource",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1439,7 +2873,12 @@
         {
           "name": "__invoke",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1450,7 +2889,12 @@
         {
           "name": "__construct",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         }
       ]
@@ -1461,19 +2905,266 @@
         {
           "name": "__construct",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "bind_param",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
           ]
         },
         {
           "name": "bind_result",
           "problems": [
-            "parameter mismatch"
+            {
+              "description": "parameter mismatch",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SQLite3",
+      "methods": [
+        {
+          "name": "createFunction",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "has scalar typehint",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "openBlob",
+          "parameters": [
+            {
+              "name": "flags",
+              "problems": [
+                {
+                  "description": "has scalar typehint",
+                  "versions": [
+                    "ALL"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "IntlCalendar",
+      "methods": [
+        {
+          "name": "set",
+          "problems": [
+            {
+              "description": "has duplicate in stubs",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ParseError",
+      "problems": [
+        {
+          "description": "wrong parent",
+          "versions": [
+            7.0,
+            7.1,
+            7.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "SimpleXMLElement",
+      "methods": [
+        {
+          "name": "__construct",
+          "problems": [
+            {
+              "description": "has wrong final modifier",
+              "versions": [
+                5.6,
+                7.0,
+                7.1,
+                7.2,
+                7.3,
+                7.4
+              ]
+            }
+          ]
+        },
+        {
+          "name": "current",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "attributes",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "children",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        },
+        {
+          "name": "addChild",
+          "problems": [
+            {
+              "description": "wrong return typehint",
+              "versions": [
+                "ALL"
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "XMLReader",
+      "methods": [
+        {
+          "name": "open",
+          "problems": [
+            {
+              "description": "has wrong static modifier",
+              "versions": [
+                5.6,
+                7.0,
+                7.1,
+                7.2,
+                7.3,
+                7.4
+              ]
+            }
+          ]
+        },
+        {
+          "name": "XML",
+          "problems": [
+            {
+              "description": "has wrong static modifier",
+              "versions": [
+                5.6,
+                7.0,
+                7.1,
+                7.2,
+                7.3,
+                7.4
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "DOMNamedNodeMap",
+      "methods": [
+        {
+          "name": "item",
+          "parameters": [
+            {
+              "name": "index",
+              "problems": [
+                {
+                  "description": "wrong optionallity",
+                  "versions": [
+                    7.1,
+                    7.2,
+                    7.3,
+                    7.4
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionGenerator",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            8.0,
+            8.1,
+            8.2
+          ]
+        }
+      ]
+    },
+    {
+      "name": "ReflectionAttribute",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            7.1,
+            7.2,
+            7.3,
+            7.4
+          ]
+        }
+      ]
+    },
+    {
+      "name": "__PHP_Incomplete_Class",
+      "problems": [
+        {
+          "description": "has wrong final modifier",
+          "versions": [
+            8.0,
+            8.1,
+            8.2
           ]
         }
       ]
@@ -1483,37 +3174,67 @@
     {
       "name": "Traversable",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "IteratorAggregate",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "Iterator",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "RecursiveIterator",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "OuterIterator",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     },
     {
       "name": "SeekableIterator",
       "problems": [
-        "wrong parent"
+        {
+          "description": "wrong parent",
+          "versions": [
+            "ALL"
+          ]
+        }
       ]
     }
   ]

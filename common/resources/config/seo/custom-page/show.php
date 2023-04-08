@@ -3,7 +3,7 @@
 return [
     [
         'property' => 'og:url',
-        'content' =>  '{{url.page}}',
+        'content' =>  '{{url.customPage}}',
     ],
     [
         'property' => 'og:title',

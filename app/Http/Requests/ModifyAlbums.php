@@ -4,17 +4,14 @@ use Common\Core\BaseFormRequest;
 
 class ModifyAlbums extends BaseFormRequest
 {
-    /**
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         return [
             'name' => [
                 'required', 'string', 'min:1', 'max:255',
             ],
             'spotify_popularity' => 'integer|min:1|max:100|nullable',
-            'release_date'       => 'date_format:Y-m-d|nullable',
+            'release_date'       => 'date',
             'image'              => 'nullable',
             'tracks.*.name' => 'required|string|min:1|max:190',
             'artists'            => 'required|array|min:1',
@@ -22,7 +19,7 @@ class ModifyAlbums extends BaseFormRequest
         ];
     }
 
-    public function messages()
+    public function messages(): array
     {
         return [
             'name.unique' => __('Artist already has album with this name.'),

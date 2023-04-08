@@ -7,10 +7,11 @@ use App\Artist;
 use App\Services\Providers\Local\LocalSearch;
 use App\Services\Providers\Spotify\SpotifySearch;
 use App\Track;
+use Illuminate\Support\Collection;
 
 class LocalAndSpotifySearch extends SpotifySearch
 {
-    public function search(string $q, int $limit, $modelTypes): array
+    public function search(string $q, int $limit, $modelTypes): Collection
     {
         $spotifyResults = parent::search($q, $limit, $modelTypes);
 

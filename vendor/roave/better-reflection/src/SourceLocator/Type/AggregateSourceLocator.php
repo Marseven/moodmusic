@@ -8,28 +8,18 @@ use Roave\BetterReflection\Identifier\Identifier;
 use Roave\BetterReflection\Identifier\IdentifierType;
 use Roave\BetterReflection\Reflection\Reflection;
 use Roave\BetterReflection\Reflector\Reflector;
+
 use function array_map;
 use function array_merge;
 
 class AggregateSourceLocator implements SourceLocator
 {
-    /** @var SourceLocator[] */
-    private $sourceLocators;
-
-    /**
-     * @param SourceLocator[] $sourceLocators
-     */
-    public function __construct(array $sourceLocators = [])
+    /** @param list<SourceLocator> $sourceLocators */
+    public function __construct(private array $sourceLocators = [])
     {
-        // This slightly confusing code simply type-checks the $sourceLocators
-        // array by unpacking them and splatting them in the closure.
-        $validator            = static function (SourceLocator ...$sourceLocator) : array {
-            return $sourceLocator;
-        };
-        $this->sourceLocators = $validator(...$sourceLocators);
     }
 
-    public function locateIdentifier(Reflector $reflector, Identifier $identifier) : ?Reflection
+    public function locateIdentifier(Reflector $reflector, Identifier $identifier): Reflection|null
     {
         foreach ($this->sourceLocators as $sourceLocator) {
             $located = $sourceLocator->locateIdentifier($reflector, $identifier);
@@ -45,13 +35,11 @@ class AggregateSourceLocator implements SourceLocator
     /**
      * {@inheritDoc}
      */
-    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType) : array
+    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
     {
         return array_merge(
             [],
-            ...array_map(static function (SourceLocator $sourceLocator) use ($reflector, $identifierType) {
-                return $sourceLocator->locateIdentifiersByType($reflector, $identifierType);
-            }, $this->sourceLocators)
+            ...array_map(static fn (SourceLocator $sourceLocator): array => $sourceLocator->locateIdentifiersByType($reflector, $identifierType), $this->sourceLocators),
         );
     }
 }

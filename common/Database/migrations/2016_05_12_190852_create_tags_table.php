@@ -19,7 +19,8 @@ class CreateTagsTable extends Migration
             $table->string('name')->index()->unique();
             $table->string('display_name')->nullable();
             $table->string('type', 30)->index()->default('custom');
-            $table->timestamps();
+            $table->timestamp('created_at')->index()->nullable();
+            $table->timestamp('updated_at')->index()->nullable();
 
             $table->collation = config('database.connections.mysql.collation');
             $table->charset = config('database.connections.mysql.charset');

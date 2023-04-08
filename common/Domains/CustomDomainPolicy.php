@@ -7,14 +7,18 @@ use Common\Core\Policies\BasePolicy;
 
 class CustomDomainPolicy extends BasePolicy
 {
-    public function index(User $user, $userId = null)
+    public $permissionName = 'custom_domains';
+
+    public function index(User $user, int $userId = null)
     {
-        return $user->hasPermission('custom_domains.view') || $user->id === (int) $userId;
+        return $user->hasPermission("$this->permissionName.view") ||
+            $user->id === $userId;
     }
 
     public function show(User $user, CustomDomain $customDomain)
     {
-        return $user->hasPermission('custom_domains.view') || $customDomain->user_id === $user->id;
+        return $user->hasPermission("$this->permissionName.view") ||
+            $customDomain->user_id === $user->id;
     }
 
     public function store(User $user)
@@ -24,17 +28,12 @@ class CustomDomainPolicy extends BasePolicy
 
     public function update(User $user)
     {
-        return $user->hasPermission('custom_domains.update');
+        return $user->hasPermission("$this->permissionName.update");
     }
 
-    /**
-     * @param User $user
-     * @param array $domainIds
-     * @return bool
-     */
-    public function destroy(User $user, $domainIds)
+    public function destroy(User $user, array $domainIds)
     {
-        if ($user->hasPermission('custom_domains.delete')) {
+        if ($user->hasPermission("$this->permissionName.delete")) {
             return true;
         } else {
             $dbCount = app(CustomDomain::class)

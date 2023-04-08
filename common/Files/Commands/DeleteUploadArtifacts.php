@@ -86,6 +86,13 @@ class DeleteUploadArtifacts extends Command
             'type' => 'model',
             'table' => 'articles',
             'column' => 'body',
+        ],
+
+        // belink
+        'link_overlay_images' => [
+            'type' => 'model',
+            'table' => 'link_overlays',
+            'column' => 'colors',
         ]
     ];
 

@@ -7,36 +7,29 @@ use Common\Settings\Settings;
 
 class BuildManifestFile
 {
-    /**
-     * @var Settings
-     */
-    private $settings;
-
-    /**
-     * @param Settings $settings
-     */
-    public function __construct(Settings $settings)
+    public function __construct(protected Settings $settings)
     {
-        $this->settings = $settings;
     }
 
-    public function execute()
+    public function execute(): void
     {
+        $primaryColor = config('common.themes.light.--be-primary');
+        $bgColor = config('common.themes.light.--be-background');
         $replacements = [
             'DUMMY_NAME' => config('app.name'),
             'DUMMY_SHORT_NAME' => config('app.name'),
-            'DUMMY_THEME_COLOR' => config('common.themes.light.--be-accent-default'),
-            'DUMMY_BACKGROUND_COLOR' => config('common.themes.light.--be-background'),
+            'DUMMY_THEME_COLOR' => "rgb($primaryColor)",
+            'DUMMY_BACKGROUND_COLOR' => "rgb($bgColor)",
             'DUMMY_START_URL' => app(AppUrl::class)->htmlBaseUri,
         ];
 
         @file_put_contents(
-            public_path('client/manifest.json'),
+            public_path('manifest.json'),
             str_replace(
                 array_keys($replacements),
                 $replacements,
-                file_get_contents(__DIR__.'/manifest-example.json')
-            )
+                file_get_contents(__DIR__ . '/manifest-example.json'),
+            ),
         );
     }
 }

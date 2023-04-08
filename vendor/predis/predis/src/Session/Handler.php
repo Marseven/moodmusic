@@ -3,7 +3,8 @@
 /*
  * This file is part of the Predis package.
  *
- * (c) Daniele Alessandri <suppakilla@gmail.com>
+ * (c) 2009-2020 Daniele Alessandri
+ * (c) 2021-2023 Till Krüss
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -12,6 +13,8 @@
 namespace Predis\Session;
 
 use Predis\ClientInterface;
+use ReturnTypeWillChange;
+use SessionHandlerInterface;
 
 /**
  * Session handler class that relies on Predis\Client to store PHP's sessions
@@ -20,10 +23,8 @@ use Predis\ClientInterface;
  * This class is mostly intended for PHP 5.4 but it can be used under PHP 5.3
  * provided that a polyfill for `SessionHandlerInterface` is defined by either
  * you or an external package such as `symfony/http-foundation`.
- *
- * @author Daniele Alessandri <suppakilla@gmail.com>
  */
-class Handler implements \SessionHandlerInterface
+class Handler implements SessionHandlerInterface
 {
     protected $client;
     protected $ttl;
@@ -32,7 +33,7 @@ class Handler implements \SessionHandlerInterface
      * @param ClientInterface $client  Fully initialized client instance.
      * @param array           $options Session handler options.
      */
-    public function __construct(ClientInterface $client, array $options = array())
+    public function __construct(ClientInterface $client, array $options = [])
     {
         $this->client = $client;
 
@@ -48,23 +49,13 @@ class Handler implements \SessionHandlerInterface
      */
     public function register()
     {
-        if (PHP_VERSION_ID >= 50400) {
-            session_set_save_handler($this, true);
-        } else {
-            session_set_save_handler(
-                array($this, 'open'),
-                array($this, 'close'),
-                array($this, 'read'),
-                array($this, 'write'),
-                array($this, 'destroy'),
-                array($this, 'gc')
-            );
-        }
+        session_set_save_handler($this, true);
     }
 
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function open($save_path, $session_id)
     {
         // NOOP
@@ -74,6 +65,7 @@ class Handler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function close()
     {
         // NOOP
@@ -83,6 +75,7 @@ class Handler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function gc($maxlifetime)
     {
         // NOOP
@@ -92,6 +85,7 @@ class Handler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function read($session_id)
     {
         if ($data = $this->client->get($session_id)) {
@@ -100,9 +94,11 @@ class Handler implements \SessionHandlerInterface
 
         return '';
     }
+
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function write($session_id, $session_data)
     {
         $this->client->setex($session_id, $this->ttl, $session_data);
@@ -113,6 +109,7 @@ class Handler implements \SessionHandlerInterface
     /**
      * {@inheritdoc}
      */
+    #[ReturnTypeWillChange]
     public function destroy($session_id)
     {
         $this->client->del($session_id);

@@ -2,10 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Album;
 use App\Services\UrlGenerator;
 use App\Track;
-use App\User;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -15,68 +13,50 @@ class ArtistUploadedMedia extends Notification
 {
     use Queueable;
 
-    /**
-     * @var Album|Track
-     */
-    public  $media;
+    private UrlGenerator $urlGenerator;
 
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @param Album|Track $media
-     */
-    public function __construct($media)
+    public function __construct(public $media)
     {
-        $this->media = $media;
         $this->urlGenerator = app(UrlGenerator::class);
     }
-
-    /**
-     * @param  User  $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    
+    public function via(): array
     {
         return ['database', 'mail'];
     }
 
-    /**
-     * @param  User  $notifiable
-     * @return MailMessage
-     */
-    public function toMail($notifiable)
+    public function toMail($notifiable): MailMessage
     {
-        return (new MailMessage)
-            ->subject(__('New upload on :siteName', ['siteName' => config('app.name')]))
+        return (new MailMessage())
+            ->subject(
+                __('New upload on :siteName', [
+                    'siteName' => config('app.name'),
+                ]),
+            )
             ->line($this->getFirstLine())
             ->line($this->media['name'])
             ->action(__('View Now'), $this->getMainAction());
     }
 
-    /**
-     * @param User $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             'image' => $this->getImage(),
             'mainAction' => [
                 'action' => $this->getMainAction(),
-                'label' => is_a($this->media, Track::class) ? 'View Track' : 'View Album',
+                'label' => is_a($this->media, Track::class)
+                    ? 'View Track'
+                    : 'View Album',
             ],
             'lines' => [
                 [
                     'content' => $this->getFirstLine(),
-                    'type' => 'secondary'
+                    'type' => 'secondary',
                 ],
                 [
                     'content' => $this->media['name'],
                     'icon' => 'play-arrow',
-                    'type' => 'primary'
+                    'type' => 'primary',
                 ],
             ],
         ];
@@ -86,15 +66,18 @@ class ArtistUploadedMedia extends Notification
     {
         $artistName = $this->getArtist()['name'];
         $type = is_a($this->media, Track::class) ? 'track' : 'album';
-        return __(":artistName uploaded a new $type", ['artistName' => $artistName]);
+        return __(":artistName uploaded a new $type", [
+            'artistName' => $artistName,
+        ]);
     }
 
     public function getImage()
     {
         if (is_a($this->media, Track::class)) {
-            return $this->media['image'] ?: Arr::get($this->media, 'album.image') ?: 'audiotrack';
+            return $this->media['image'] ?:
+                Arr::get($this->media, 'album.image');
         } else {
-            return $this->media['image'] ?: 'album';
+            return $this->media['image'];
         }
     }
 

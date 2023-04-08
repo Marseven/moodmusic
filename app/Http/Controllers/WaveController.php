@@ -5,57 +5,57 @@ namespace App\Http\Controllers;
 use App\Track;
 use Common\Comments\Comment;
 use Common\Core\BaseController;
-use Illuminate\Http\Request;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Storage;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class WaveController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Track
-     */
-    private $track;
-
-    /**
-     * @param Request $request
-     * @param Track $track
-     */
-    public function __construct(Request $request, Track $track)
-    {
-        $this->request = $request;
-        $this->track = $track;
+    public function __construct(
+        protected Request $request,
+        protected Track $track,
+    ) {
     }
 
-    public function show($trackId)
+    public function show(Track $track)
     {
+        $this->authorize('show', $track);
+
         try {
-            $waveData = json_decode($this->track->getWaveStorageDisk()->get("waves/$trackId.json"), true);
+            $isDemoSite = config('common.site.demo');
+            if ($isDemoSite && Str::contains($track->url, 'storage/samples')) {
+                preg_match_all('!\d+!', $track->url, $matches);
+                $trackId = $matches[0][0];
+                $waveData = json_decode(
+                    Storage::disk('local')->get("waves/{$trackId}.json"),
+                    true,
+                );
+            } else {
+                $waveData = json_decode(
+                    $this->track
+                        ->getWaveStorageDisk()
+                        ->get("waves/$track->id.json"),
+                    true,
+                );
+            }
         } catch (FileNotFoundException $e) {
             $waveData = [];
         }
 
         $comments = app(Comment::class)
-            ->where('commentable_id', $trackId)
+            ->where('commentable_id', $track->id)
             ->where('commentable_type', Track::class)
             ->rootOnly()
             ->with('user')
-            ->limit(50)
+            ->limit(30)
             ->groupBy('position')
             ->orderBy('position', 'asc')
-            ->get()
-            ->map(function(Comment $comment) {
-                $comment->relative_created_at = $comment->created_at->diffForHumans();
-                return $comment;
-            });
+            ->get();
 
         return $this->success([
             'waveData' => $waveData,
-            'comments' => $comments
+            'comments' => $comments,
         ]);
     }
 }

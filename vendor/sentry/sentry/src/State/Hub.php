@@ -85,12 +85,12 @@ final class Hub implements HubInterface
     /**
      * {@inheritdoc}
      */
-    public function withScope(callable $callback): void
+    public function withScope(callable $callback)
     {
         $scope = $this->pushScope();
 
         try {
-            $callback($scope);
+            return $callback($scope);
         } finally {
             $this->popScope();
         }
@@ -121,7 +121,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureMessage($message, $level, $this->getScope(), $hint);
         }
 
@@ -136,7 +135,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureException($exception, $this->getScope(), $hint);
         }
 
@@ -165,7 +163,6 @@ final class Hub implements HubInterface
         $client = $this->getClient();
 
         if (null !== $client) {
-            /** @psalm-suppress TooManyArguments */
             return $this->lastEventId = $client->captureLastError($this->getScope(), $hint);
         }
 
@@ -237,9 +234,14 @@ final class Hub implements HubInterface
         $tracesSampler = $options->getTracesSampler();
 
         if (null === $transaction->getSampled()) {
-            $sampleRate = null !== $tracesSampler
-                ? $tracesSampler($samplingContext)
-                : $this->getSampleRate($samplingContext->getParentSampled(), $options->getTracesSampleRate());
+            if (null !== $tracesSampler) {
+                $sampleRate = $tracesSampler($samplingContext);
+            } else {
+                $sampleRate = $this->getSampleRate(
+                    $samplingContext->getParentSampled(),
+                    $options->getTracesSampleRate() ?? 0
+                );
+            }
 
             if (!$this->isValidSampleRate($sampleRate)) {
                 $transaction->setSampled(false);
@@ -247,13 +249,15 @@ final class Hub implements HubInterface
                 return $transaction;
             }
 
+            $transaction->getMetadata()->setSamplingRate($sampleRate);
+
             if (0.0 === $sampleRate) {
                 $transaction->setSampled(false);
 
                 return $transaction;
             }
 
-            $transaction->setSampled(mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax() < $sampleRate);
+            $transaction->setSampled($this->sample($sampleRate));
         }
 
         if (!$transaction->getSampled()) {
@@ -262,14 +266,20 @@ final class Hub implements HubInterface
 
         $transaction->initSpanRecorder();
 
+        $profilesSampleRate = $options->getProfilesSampleRate();
+        if ($this->sample($profilesSampleRate)) {
+            $transaction->initProfiler();
+            $profiler = $transaction->getProfiler();
+            if (null !== $profiler) {
+                $profiler->start();
+            }
+        }
+
         return $transaction;
     }
 
     /**
      * {@inheritdoc}
-     *
-     * @psalm-suppress MoreSpecificReturnType
-     * @psalm-suppress LessSpecificReturnStatement
      */
     public function getTransaction(): ?Transaction
     {
@@ -321,6 +331,22 @@ final class Hub implements HubInterface
         }
 
         return $fallbackSampleRate;
+    }
+
+    /**
+     * @param mixed $sampleRate
+     */
+    private function sample($sampleRate): bool
+    {
+        if (0.0 === $sampleRate) {
+            return false;
+        }
+
+        if (1.0 === $sampleRate) {
+            return true;
+        }
+
+        return mt_rand(0, mt_getrandmax() - 1) / mt_getrandmax() < $sampleRate;
     }
 
     /**

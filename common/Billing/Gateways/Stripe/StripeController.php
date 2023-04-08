@@ -1,124 +1,74 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
-use App\User;
-use Common\Billing\BillingPlan;
-use Common\Billing\GatewayException;
+use Auth;
+use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
+use Common\Core\BaseController;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Common\Core\BaseController;
-use Omnipay\Common\Exception\InvalidCreditCardException;
+use Illuminate\Http\Response;
 
 class StripeController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var BillingPlan
-     */
-    private $billingPlan;
-
-    /**
-     * @var Subscription
-     */
-    private $subscription;
-
-    /**
-     * @var StripeGateway
-     */
-    private $stripe;
-
-    /**
-     * @param Request $request
-     * @param BillingPlan $billingPlan
-     * @param Subscription $subscription
-     * @param StripeGateway $stripe
-     */
     public function __construct(
-        Request $request,
-        BillingPlan $billingPlan,
-        Subscription $subscription,
-        StripeGateway $stripe
-    )
-    {
-        $this->stripe = $stripe;
-        $this->request = $request;
-        $this->billingPlan = $billingPlan;
-        $this->subscription = $subscription;
-
+        protected Request $request,
+        protected Subscription $subscription,
+        protected Stripe $stripe
+    ) {
         $this->middleware('auth');
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function createSubscription()
+    public function createPartialSubscription(): Response|JsonResponse
     {
-        $this->validate($this->request, [
-            'plan_id' => 'required|integer|exists:billing_plans,id',
-            'start_date' => 'string'
+        $data = $this->validate($this->request, [
+            'product_id' => 'required|integer|exists:products,id',
+            'start_date' => 'string',
         ]);
 
-        /** @var User $user */
-        $user = $this->request->user();
-        $plan = $this->billingPlan->findOrFail($this->request->get('plan_id'));
+        $product = Product::findOrFail($data['product_id']);
+        $clientSecret = $this->stripe->subscriptions->createPartial(
+            $product,
+            Auth::user(),
+        );
 
-        $sub = $this->stripe->subscriptions()->create($plan, $user, $this->request->get('start_date'));
-
-        if ($sub['status'] === 'complete') {
-            $user->subscribe('stripe', $sub['reference'], $plan);
-        }
-
-        $sub['user'] = $user->loadPermissions(true)->load('subscriptions.plan');
-
-        return $this->success($sub);
+        return $this->success(['clientSecret' => $clientSecret]);
     }
 
-    /**
-     * Finalize 3d secure subscription on stripe.
-     */
-    public function finalizeSubscription()
+    public function createSetupIntent(): Response|JsonResponse
     {
-        $user = $this->request->user();
-
-        $subscriptionStub = new Subscription([
-            'gateway_id' => $this->request->get('reference'),
-        ]);
-        $subscriptionStub->setRelation('user', $user);
-        $stripeSubscription = $this->stripe->subscriptions()->find($subscriptionStub)['subscription'];
-
-        if ( ! $stripeSubscription || $stripeSubscription['status'] !== 'active') {
-            throw new GatewayException('Stripe subscription does not exist or is not active.');
-        }
-
-        $plan = $this->billingPlan->where('uuid', $stripeSubscription['plan']['id'])->first();
-        $user->subscribe('stripe', $stripeSubscription['id'], $plan);
-        $stripeSubscription['user'] = $user->loadPermissions(true)->load('subscriptions.plan');
-
-        return $this->success($stripeSubscription);
+        $clientSecret = $this->stripe->createSetupIntent(Auth::user());
+        return $this->success(['clientSecret' => $clientSecret]);
     }
 
-    /**
-     * Add a new bank card to user using stripe token.chan
-     *
-     * @return JsonResponse
-     * @throws GatewayException
-     */
-    public function addCard()
+    public function changeDefaultPaymentMethod(): Response|JsonResponse
     {
-        $this->validate($this->request, [
-            'token' => 'required|string',
+        $data = $this->validate($this->request, [
+            'payment_method_id' => 'required|string',
         ]);
 
-        try {
-            $user = $this->stripe->addCard($this->request->user(), $this->request->get('token'));
-        } catch (InvalidCreditCardException $e) {
-            return $this->error($e->getMessage());
-        }
+        $this->stripe->changeDefaultPaymentMethod(
+            $this->request->user(),
+            $data['payment_method_id'],
+        );
 
-        return $this->success(['user' => $user->loadPermissions(true)->load('subscriptions.plan')]);
+        return $this->success();
+    }
+
+    public function storeSubscriptionDetailsLocally(): Response|JsonResponse
+    {
+        $data = $this->validate($this->request, [
+            'payment_intent_id' => 'required|string',
+        ]);
+
+        $paymentIntent = $this->stripe->client->paymentIntents->retrieve(
+            $data['payment_intent_id'],
+            ['expand' => ['invoice']],
+        );
+
+        $this->stripe->storeSubscriptionDetailsLocally(
+            $paymentIntent->invoice->subscription,
+        );
+
+        return $this->success();
     }
 }

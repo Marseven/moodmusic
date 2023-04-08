@@ -1,10 +1,5 @@
 <?php
 
-//TODO: for json+ld
-//@foreach($data['tracks'] as $track)
-//        <meta property="music:song" content="{{ $utils->getTrackUrl($track) }}">
-//    @endforeach
-
 return [
     [
         'property' => 'og:url',
@@ -34,4 +29,30 @@ return [
         'property' => 'og:image:height',
         'content' => '300',
     ],
+    [
+        'nodeName' => 'script',
+        'type' => 'application/ld+json',
+        '_text' => [
+            '@context' => 'http://schema.org',
+            "@type" => "MusicPlaylist",
+            '@id' => '{{url.playlist}}',
+            'url' => '{{url.playlist}}',
+            'name' => '{{playlist.name}}',
+            "numTracks" => "{{playlist.tracks_count}}",
+            'image' => '{{playlist.image}}',
+            'description' => '{{playlist.description}}',
+            "track" => [
+                '_type' => 'loop',
+                'dataSelector' => 'tracks',
+                'limit' => 10,
+                'template' => [
+                    "@type" => "MusicRecording",
+                    "@id" => "{{url.track}}",
+                    "url" => "{{url.track}}",
+                    "name" => "{{track.name}}",
+                    "datePublished" => "{{track.album.release_date}}"
+                ]
+            ],
+        ]
+    ]
 ];

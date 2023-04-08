@@ -6,7 +6,9 @@ use Doctrine\DBAL\Driver\AbstractSQLServerDriver;
 use Doctrine\DBAL\Driver\AbstractSQLServerDriver\Exception\PortWithoutHost;
 use Doctrine\DBAL\Driver\Exception;
 use Doctrine\DBAL\Driver\PDO\Connection as PDOConnection;
+use Doctrine\DBAL\Driver\PDO\Exception as PDOException;
 use PDO;
+use SensitiveParameter;
 
 use function is_int;
 use function sprintf;
@@ -18,14 +20,16 @@ final class Driver extends AbstractSQLServerDriver
      *
      * @return Connection
      */
-    public function connect(array $params)
-    {
-        $pdoOptions = $dsnOptions = [];
+    public function connect(
+        #[SensitiveParameter]
+        array $params
+    ) {
+        $driverOptions = $dsnOptions = [];
 
         if (isset($params['driverOptions'])) {
             foreach ($params['driverOptions'] as $option => $value) {
                 if (is_int($option)) {
-                    $pdoOptions[$option] = $value;
+                    $driverOptions[$option] = $value;
                 } else {
                     $dsnOptions[$option] = $value;
                 }
@@ -33,17 +37,24 @@ final class Driver extends AbstractSQLServerDriver
         }
 
         if (! empty($params['persistent'])) {
-            $pdoOptions[PDO::ATTR_PERSISTENT] = true;
+            $driverOptions[PDO::ATTR_PERSISTENT] = true;
         }
 
-        return new Connection(
-            new PDOConnection(
-                $this->_constructPdoDsn($params, $dsnOptions),
+        $safeParams = $params;
+        unset($safeParams['password'], $safeParams['url']);
+
+        try {
+            $pdo = new PDO(
+                $this->constructDsn($safeParams, $dsnOptions),
                 $params['user'] ?? '',
                 $params['password'] ?? '',
-                $pdoOptions
-            )
-        );
+                $driverOptions,
+            );
+        } catch (\PDOException $exception) {
+            throw PDOException::new($exception);
+        }
+
+        return new Connection(new PDOConnection($pdo));
     }
 
     /**
@@ -52,11 +63,9 @@ final class Driver extends AbstractSQLServerDriver
      * @param mixed[]  $params
      * @param string[] $connectionOptions
      *
-     * @return string The DSN.
-     *
      * @throws Exception
      */
-    private function _constructPdoDsn(array $params, array $connectionOptions)
+    private function constructDsn(array $params, array $connectionOptions): string
     {
         $dsn = 'sqlsrv:server=';
 

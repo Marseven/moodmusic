@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 use Illuminate\Bus\Queueable;
 use Illuminate\Support\Collection;
 use Matchish\ScoutElasticSearch\ProgressReportable;
@@ -22,7 +22,7 @@ final class Import
     private $source;
 
     /**
-     * @param ImportSource $source
+     * @param  ImportSource  $source
      */
     public function __construct(ImportSource $source)
     {
@@ -30,7 +30,7 @@ final class Import
     }
 
     /**
-     * @param Client $elasticsearch
+     * @param  Client  $elasticsearch
      */
     public function handle(Client $elasticsearch): void
     {

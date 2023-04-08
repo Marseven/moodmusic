@@ -1,5 +1,7 @@
 <?php
 
+use Matchish\ScoutElasticSearch\ElasticSearchServiceProvider;
+
 return [
 
     /*
@@ -51,7 +53,6 @@ return [
     | your application so that it is used when running Artisan tasks.
     |
     */
-
     'url' => env('APP_URL', 'http://localhost'),
 
     'asset_url' => env('ASSET_URL', null),
@@ -167,7 +168,7 @@ return [
          */
         Common\CommonServiceProvider::class,
         App\Providers\SpotifyHttpClientServiceProvider::class,
-        \Matchish\ScoutElasticSearch\ElasticSearchServiceProvider::class,
+        ElasticSearchServiceProvider::class,
 
         /*
          * Application Service Providers...
@@ -178,6 +179,7 @@ return [
         App\Providers\EventServiceProvider::class,
         App\Providers\HorizonServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+        Common\Auth\Fortify\FortifyServiceProvider::class,
 
     ],
 

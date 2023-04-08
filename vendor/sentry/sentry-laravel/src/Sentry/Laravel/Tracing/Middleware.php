@@ -4,14 +4,13 @@ namespace Sentry\Laravel\Tracing;
 
 use Closure;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Routing\Route;
-use Sentry\Laravel\Integration;
 use Sentry\SentrySdk;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\TransactionContext;
+use Sentry\Tracing\TransactionSource;
+use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
 
 class Middleware
 {
@@ -44,7 +43,7 @@ class Middleware
      *
      * @return mixed
      */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if (app()->bound(HubInterface::class)) {
             $this->startTransaction($request, app(HubInterface::class));
@@ -56,32 +55,36 @@ class Middleware
     /**
      * Handle the application termination.
      *
-     * @param \Illuminate\Http\Request  $request
-     * @param \Illuminate\Http\Response $response
+     * @param \Illuminate\Http\Request $request
+     * @param mixed                    $response
      *
      * @return void
      */
-    public function terminate($request, $response): void
+    public function terminate(Request $request, $response): void
     {
-        if ($this->transaction !== null && app()->bound(HubInterface::class)) {
-            if ($this->appSpan !== null) {
-                $this->appSpan->finish();
-            }
-
-            // Make sure we set the transaction and not have a child span in the Sentry SDK
-            // If the transaction is not on the scope during finish, the trace.context is wrong
-            SentrySdk::getCurrentHub()->setSpan($this->transaction);
-
-            if ($request instanceof Request) {
-                $this->hydrateRequestData($request);
-            }
-
-            if ($response instanceof Response) {
-                $this->hydrateResponseData($response);
-            }
-
-            $this->transaction->finish();
+        // If there is no transaction or the HubInterface is not bound in the container there is nothing for us to do
+        if ($this->transaction === null || !app()->bound(HubInterface::class)) {
+            return;
         }
+
+        // We stop here if a route has not been matched unless we are configured to trace missing routes
+        if (config('sentry.tracing.missing_routes', false) === false && $request->route() === null) {
+            return;
+        }
+
+        if ($this->appSpan !== null) {
+            $this->appSpan->finish();
+        }
+
+        // Make sure we set the transaction and not have a child span in the Sentry SDK
+        // If the transaction is not on the scope during finish, the trace.context is wrong
+        SentrySdk::getCurrentHub()->setSpan($this->transaction);
+
+        if ($response instanceof SymfonyResponse) {
+            $this->hydrateResponseData($response);
+        }
+
+        $this->transaction->finish();
     }
 
     /**
@@ -90,9 +93,8 @@ class Middleware
      * @param float|null $timestamp The unix timestamp of the booted event, default to `microtime(true)` if not `null`.
      *
      * @return void
-     * @internal This method should only be invoked right after the application has finished "booting":
-     *           For Laravel this is from the application `booted` callback.
-     *           For Lumen this is right before returning from the `bootstrap/app.php` file.
+     *
+     * @internal This method should only be invoked right after the application has finished "booting".
      */
     public function setBootedTimestamp(?float $timestamp = null): void
     {
@@ -102,28 +104,40 @@ class Middleware
     private function startTransaction(Request $request, HubInterface $sentry): void
     {
         $requestStartTime = $request->server('REQUEST_TIME_FLOAT', microtime(true));
-        $sentryTraceHeader = $request->header('sentry-trace');
 
-        $context = $sentryTraceHeader
-            ? TransactionContext::fromSentryTrace($sentryTraceHeader)
-            : new TransactionContext;
+        $context = TransactionContext::fromHeaders(
+            $request->header('sentry-trace', ''),
+            $request->header('baggage', '')
+        );
+
+        $requestPath = '/' . ltrim($request->path(), '/');
 
         $context->setOp('http.server');
-        $context->setData([
-            'url' => '/' . ltrim($request->path(), '/'),
-            'method' => strtoupper($request->method()),
-        ]);
+        $context->setName($requestPath);
+        $context->setSource(TransactionSource::url());
         $context->setStartTimestamp($requestStartTime);
 
-        $this->transaction = $sentry->startTransaction($context);
+        $context->setData([
+            'url' => $requestPath,
+            'method' => strtoupper($request->method()),
+        ]);
+
+        $transaction = $sentry->startTransaction($context);
+
+        // If this transaction is not sampled, don't set it either and stop doing work from this point on
+        if (!$transaction->getSampled()) {
+            return;
+        }
+
+        $this->transaction = $transaction;
 
         // Setting the Transaction on the Hub
         SentrySdk::getCurrentHub()->setSpan($this->transaction);
 
         $bootstrapSpan = $this->addAppBootstrapSpan($request);
 
-        $appContextStart = new SpanContext();
-        $appContextStart->setOp('app.handle');
+        $appContextStart = new SpanContext;
+        $appContextStart->setOp('middleware.handle');
         $appContextStart->setStartTimestamp($bootstrapSpan ? $bootstrapSpan->getEndTimestamp() : microtime(true));
 
         $this->appSpan = $this->transaction->startChild($appContextStart);
@@ -143,7 +157,7 @@ class Middleware
             return null;
         }
 
-        $spanContextStart = new SpanContext();
+        $spanContextStart = new SpanContext;
         $spanContextStart->setOp('app.bootstrap');
         $spanContextStart->setStartTimestamp($laravelStartTime);
         $spanContextStart->setEndTimestamp($this->bootedTimestamp);
@@ -168,49 +182,15 @@ class Middleware
         }
 
         $autoload = new SpanContext();
-        $autoload->setOp('autoload');
+        $autoload->setOp('app.php.autoload');
         $autoload->setStartTimestamp($bootstrap->getStartTimestamp());
         $autoload->setEndTimestamp(SENTRY_AUTOLOAD);
 
         $bootstrap->startChild($autoload);
     }
 
-    private function hydrateRequestData(Request $request): void
+    private function hydrateResponseData(SymfonyResponse $response): void
     {
-        $route = $request->route();
-
-        if ($route instanceof Route) {
-            $this->updateTransactionNameIfDefault(Integration::extractNameForRoute($route));
-
-            $this->transaction->setData([
-                'name' => $route->getName(),
-                'action' => $route->getActionName(),
-                'method' => $request->getMethod(),
-            ]);
-        }
-
-        $this->updateTransactionNameIfDefault('/' . ltrim($request->path(), '/'));
-    }
-
-    private function hydrateResponseData(Response $response): void
-    {
-        $this->transaction->setHttpStatus($response->status());
-    }
-
-    private function updateTransactionNameIfDefault(?string $name): void
-    {
-        // Ignore empty names (and `null`) for caller convenience
-        if (empty($name)) {
-            return;
-        }
-
-        // If the transaction already has a name other than the default
-        // ignore the new name, this will most occur if the user has set a
-        // transaction name themself before the application reaches this point
-        if ($this->transaction->getName() !== TransactionContext::DEFAULT_NAME) {
-            return;
-        }
-
-        $this->transaction->setName($name);
+        $this->transaction->setHttpStatus($response->getStatusCode());
     }
 }

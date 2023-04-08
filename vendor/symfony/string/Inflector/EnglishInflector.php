@@ -55,11 +55,20 @@ final class EnglishInflector implements InflectorInterface
         // indices (index), appendices (appendix), prices (price)
         ['seci', 4, false, true, ['ex', 'ix', 'ice']],
 
+        // codes (code)
+        ['sedoc', 5, false, true, 'code'],
+
         // selfies (selfie)
         ['seifles', 7, true, true, 'selfie'],
 
+        // zombies (zombie)
+        ['seibmoz', 7, true, true, 'zombie'],
+
         // movies (movie)
         ['seivom', 6, true, true, 'movie'],
+
+        // names (name)
+        ['seman', 5, true, false, 'name'],
 
         // conspectuses (conspectus), prospectuses (prospectus)
         ['sesutcep', 8, true, true, 'pectus'],
@@ -347,9 +356,6 @@ final class EnglishInflector implements InflectorInterface
         'seiceps',
     ];
 
-    /**
-     * {@inheritdoc}
-     */
     public function singularize(string $plural): array
     {
         $pluralRev = strrev($plural);
@@ -381,7 +387,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $pluralLength) {
-                        $nextIsVocal = false !== strpos('aeiou', $lowerPluralRev[$j]);
+                        $nextIsVocal = str_contains('aeiou', $lowerPluralRev[$j]);
 
                         if (!$map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one
@@ -426,9 +432,6 @@ final class EnglishInflector implements InflectorInterface
         return [$plural];
     }
 
-    /**
-     * {@inheritdoc}
-     */
     public function pluralize(string $singular): array
     {
         $singularRev = strrev($singular);
@@ -461,7 +464,7 @@ final class EnglishInflector implements InflectorInterface
                 if ($j === $suffixLength) {
                     // Is there any character preceding the suffix in the plural string?
                     if ($j < $singularLength) {
-                        $nextIsVocal = false !== strpos('aeiou', $lowerSingularRev[$j]);
+                        $nextIsVocal = str_contains('aeiou', $lowerSingularRev[$j]);
 
                         if (!$map[2] && $nextIsVocal) {
                             // suffix may not succeed a vocal but next char is one

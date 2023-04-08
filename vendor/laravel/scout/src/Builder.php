@@ -6,6 +6,7 @@ use Illuminate\Container\Container;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Traits\Macroable;
+use Laravel\Scout\Contracts\PaginatesEloquentModels;
 
 class Builder
 {
@@ -54,6 +55,13 @@ class Builder
     public $wheres = [];
 
     /**
+     * The "where in" constraints added to the query.
+     *
+     * @var array
+     */
+    public $whereIns = [];
+
+    /**
      * The "limit" that should be applied to the search.
      *
      * @var int
@@ -66,6 +74,13 @@ class Builder
      * @var array
      */
     public $orders = [];
+
+    /**
+     * Extra options that should be applied to the search.
+     *
+     * @var int
+     */
+    public $options = [];
 
     /**
      * Create a new search builder instance.
@@ -110,6 +125,20 @@ class Builder
     public function where($field, $value)
     {
         $this->wheres[$field] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Add a "where in" constraint to the search query.
+     *
+     * @param  string  $field
+     * @param  array  $values
+     * @return $this
+     */
+    public function whereIn($field, array $values)
+    {
+        $this->whereIns[$field] = $values;
 
         return $this;
     }
@@ -164,6 +193,19 @@ class Builder
             'column' => $column,
             'direction' => strtolower($direction) == 'asc' ? 'asc' : 'desc',
         ];
+
+        return $this;
+    }
+
+    /**
+     * Set extra options for the search query.
+     *
+     * @param  array  $options
+     * @return $this
+     */
+    public function options(array $options)
+    {
+        $this->options = $options;
 
         return $this;
     }
@@ -252,6 +294,16 @@ class Builder
     }
 
     /**
+     * Get the results of the search as a "lazy collection" instance.
+     *
+     * @return \Illuminate\Support\LazyCollection
+     */
+    public function cursor()
+    {
+        return $this->engine()->cursor($this);
+    }
+
+    /**
      * Paginate the given query into a simple paginator.
      *
      * @param  int  $perPage
@@ -263,6 +315,10 @@ class Builder
     {
         $engine = $this->engine();
 
+        if ($engine instanceof PaginatesEloquentModels) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        }
+
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
@@ -270,10 +326,6 @@ class Builder
         $results = $this->model->newCollection($engine->map(
             $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
         )->all());
-
-        $total = $engine->getTotalCount($rawResults);
-
-        $hasMorePages = ($perPage * $page) < $engine->getTotalCount($rawResults);
 
         $paginator = Container::getInstance()->makeWith(Paginator::class, [
             'items' => $results,
@@ -283,7 +335,42 @@ class Builder
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ])->hasMorePagesWhen($hasMorePages);
+        ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($rawResults));
+
+        return $paginator->appends('query', $this->query);
+    }
+
+    /**
+     * Paginate the given query into a simple paginator with raw data.
+     *
+     * @param  int  $perPage
+     * @param  string  $pageName
+     * @param  int|null  $page
+     * @return \Illuminate\Contracts\Pagination\Paginator
+     */
+    public function simplePaginateRaw($perPage = null, $pageName = 'page', $page = null)
+    {
+        $engine = $this->engine();
+
+        if ($engine instanceof PaginatesEloquentModels) {
+            return $engine->simplePaginate($this, $perPage, $page)->appends('query', $this->query);
+        }
+
+        $page = $page ?: Paginator::resolveCurrentPage($pageName);
+
+        $perPage = $perPage ?: $this->model->getPerPage();
+
+        $results = $engine->paginate($this, $perPage, $page);
+
+        $paginator = Container::getInstance()->makeWith(Paginator::class, [
+            'items' => $results,
+            'perPage' => $perPage,
+            'currentPage' => $page,
+            'options' => [
+                'path' => Paginator::resolveCurrentPath(),
+                'pageName' => $pageName,
+            ],
+        ])->hasMorePagesWhen(($perPage * $page) < $engine->getTotalCount($results));
 
         return $paginator->appends('query', $this->query);
     }
@@ -300,6 +387,10 @@ class Builder
     {
         $engine = $this->engine();
 
+        if ($engine instanceof PaginatesEloquentModels) {
+            return $engine->paginate($this, $perPage, $page)->appends('query', $this->query);
+        }
+
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
@@ -308,22 +399,20 @@ class Builder
             $this, $rawResults = $engine->paginate($this, $perPage, $page), $this->model
         )->all());
 
-        $paginator = Container::getInstance()->makeWith(LengthAwarePaginator::class, [
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
             'items' => $results,
-            'total' => $engine->getTotalCount($rawResults),
+            'total' => $this->getTotalCount($rawResults),
             'perPage' => $perPage,
             'currentPage' => $page,
             'options' => [
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ]);
-
-        return $paginator->appends('query', $this->query);
+        ])->appends('query', $this->query);
     }
 
     /**
-     * Paginate the given query into a simple paginator with raw data.
+     * Paginate the given query into a paginator with raw data.
      *
      * @param  int  $perPage
      * @param  string  $pageName
@@ -334,24 +423,60 @@ class Builder
     {
         $engine = $this->engine();
 
+        if ($engine instanceof PaginatesEloquentModels) {
+            return $engine->paginate($this, $perPage, $page)->appends('query', $this->query);
+        }
+
         $page = $page ?: Paginator::resolveCurrentPage($pageName);
 
         $perPage = $perPage ?: $this->model->getPerPage();
 
         $results = $engine->paginate($this, $perPage, $page);
 
-        $paginator = Container::getInstance()->makeWith(LengthAwarePaginator::class, [
+        return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
             'items' => $results,
-            'total' => $engine->getTotalCount($results),
+            'total' => $this->getTotalCount($results),
             'perPage' => $perPage,
             'currentPage' => $page,
             'options' => [
                 'path' => Paginator::resolveCurrentPath(),
                 'pageName' => $pageName,
             ],
-        ]);
+        ])->appends('query', $this->query);
+    }
 
-        return $paginator->appends('query', $this->query);
+    /**
+     * Get the total number of results from the Scout engine, or fallback to query builder.
+     *
+     * @param  mixed  $results
+     * @return int
+     */
+    protected function getTotalCount($results)
+    {
+        $engine = $this->engine();
+
+        $totalCount = $engine->getTotalCount($results);
+
+        if (is_null($this->queryCallback)) {
+            return $totalCount;
+        }
+
+        $ids = $engine->mapIdsFrom(
+            $results,
+            $this->model->getUnqualifiedScoutKeyName()
+        )->all();
+
+        if (count($ids) < $totalCount) {
+            $ids = $engine->keys(tap(clone $this, function ($builder) use ($totalCount) {
+                $builder->take(
+                    is_null($this->limit) ? $totalCount : min($this->limit, $totalCount)
+                );
+            }))->all();
+        }
+
+        return $this->model->queryScoutModelsByIds(
+            $this, $ids
+        )->toBase()->getCountForPagination();
     }
 
     /**

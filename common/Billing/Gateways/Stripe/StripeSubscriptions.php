@@ -1,187 +1,151 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
 use App\User;
-use Carbon\Carbon;
-use Common\Billing\BillingPlan;
-use Common\Billing\GatewayException;
-use Common\Billing\Gateways\Contracts\GatewaySubscriptionsInterface;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
-use LogicException;
-use Omnipay\Stripe\Gateway;
+use Stripe\StripeClient;
 
-class StripeSubscriptions implements GatewaySubscriptionsInterface
+class StripeSubscriptions
 {
-    /**
-     * @var Gateway
-     */
-    private $gateway;
-
-    /**
-     * @param Gateway $gateway
-     */
-    public function __construct(Gateway $gateway)
+    public function __construct(public StripeClient $client)
     {
-        $this->gateway = $gateway;
     }
 
-    /**
-     * Fetch specified subscription's details from gateway.
-     *
-     * @param Subscription $subscription
-     * @return array
-     * @throws GatewayException
-     */
-    public function find(Subscription $subscription)
+    public function createPartial(Product $product, User $user): string
     {
-        $response = $this->gateway->fetchSubscription([
-            'subscriptionReference' => $subscription->gateway_id,
-            'customerReference' => $subscription->user->stripe_id,
-        ])->send();
+        $price = $product->prices->first();
 
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException("Could not find stripe subscription: {$response->getMessage()}");
-        }
+        $user = $this->syncStripeCustomer($user);
 
-        return [
-            'subscription' => $response->getData(),
-            'renews_at' => Carbon::createFromTimestamp($response->getData()['current_period_end']),
-        ];
-    }
+        // find incomplete subscriptions for this customer and price
+        $stripeSubscription = $this->client->subscriptions
+            ->all([
+                'customer' => $user->stripe_id,
+                'price' => $price->stripe_id,
+                'status' => 'incomplete',
+                'expand' => ['data.latest_invoice.payment_intent'],
+            ])
+            ->first();
 
-    /**
-     * Create a new subscription on stripe using specified plan.
-     *
-     * @param BillingPlan $plan
-     * @param User $user
-     * @param null $startDate
-     * @return array
-     * @throws GatewayException
-     */
-    public function create(BillingPlan $plan, User $user, $startDate = null)
-    {
-        if ($user->subscribedTo($plan, 'stripe')) {
-            throw new LogicException("User already subscribed to '{$plan->name}' plan.");
-        }
-
-        $request = $this->gateway->createSubscription([
-            'customerReference' => $user->stripe_id,
-            'plan' => $plan->uuid,
-        ]);
-        $response = $request->sendData(array_merge(
-            $request->getData(),
-            [
-                'trial_end' => $startDate ? Carbon::parse($startDate)->getTimestamp() : 'now',
+        // if matching subscription was not created yet, do it now
+        if (!$stripeSubscription) {
+            $stripeSubscription = $this->client->subscriptions->create([
+                'customer' => $user->stripe_id,
+                'items' => [
+                    [
+                        'price' => $price->stripe_id,
+                    ],
+                ],
+                'payment_behavior' => 'default_incomplete',
+                'payment_settings' => [
+                    'save_default_payment_method' => 'on_subscription',
+                ],
                 'expand' => ['latest_invoice.payment_intent'],
-            ]
-        ));
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException("Stripe subscription creation failed: {$response->getMessage()}");
+            ]);
         }
 
-        $data = $response->getData();
-
-        if ($data['latest_invoice']['payment_intent']['status'] === 'requires_action') {
-            $status = 'requires_action';
-        } else if ($data['status'] === 'active') {
-            $status = 'complete';
-        } else {
-            $status = 'incomplete';
-        }
-
-        return [
-            'status' => $status,
-            'payment_intent_secret' => $data['latest_invoice']['payment_intent']['client_secret'],
-            'reference' => $response->getSubscriptionReference(),
-            'end_date' => $data['current_period_end'],
-            'last_payment_error' => $data['latest_invoice']['payment_intent']['last_payment_error'] ?? null,
-        ];
+        // return client secret, needed in frontend to complete subscription
+        return $stripeSubscription
+            ->latest_invoice->payment_intent->client_secret;
     }
 
-    /**
-     * Cancel specified subscription on stripe.
-     *
-     * @param Subscription $subscription
-     * @param bool $atPeriodEnd
-     * @return bool
-     * @throws GatewayException
-     */
-    public function cancel(Subscription $subscription, $atPeriodEnd = true)
-    {
+    public function cancel(
+        Subscription $subscription,
+        bool $atPeriodEnd = true,
+    ): bool {
+        if (!$subscription->user->stripe_id) {
+            return true;
+        }
+
+        $stripeSubscription = $this->client->subscriptions->retrieve(
+            $subscription->gateway_id,
+        );
+
         // cancel subscription at current period end and don't delete
         if ($atPeriodEnd) {
-            $request = $this->gateway->updateSubscription([
-                'subscriptionReference' => $subscription->gateway_id,
-                'customerReference' => $subscription->user->stripe_id,
-                'plan' => $subscription->plan->uuid,
-            ]);
-            $response = $request->sendData(array_merge(
-                $request->getData(),
-                ['cancel_at_period_end' => 'true']
-            ));
-        // cancel and delete subscription instantly
+            $updatedSubscription = $this->client->subscriptions->update(
+                $stripeSubscription->id,
+                [
+                    'cancel_at_period_end' => true,
+                ],
+            );
+            return $updatedSubscription->cancel_at_period_end;
+            // cancel and delete subscription instantly
         } else {
-            $response = $this->gateway->cancelSubscription([
-                'subscriptionReference' => $subscription->gateway_id,
-                'customerReference' => $subscription->user->stripe_id,
-            ])->send();
+            $stripeSubscription = $this->client->subscriptions->cancel(
+                $stripeSubscription->id,
+            );
+            return $stripeSubscription->status === 'cancelled';
         }
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException("Stripe subscription cancel failed: {$response->getMessage()}");
-        }
-
-        return true;
     }
 
-    /**
-     * Resume specified subscription on stripe.
-     *
-     * @param Subscription $subscription
-     * @param array $params
-     * @return bool
-     * @throws GatewayException
-     */
-    public function resume(Subscription $subscription, $params)
+    public function resume(Subscription $subscription, array $params): bool
     {
-        $response = $this->gateway->updateSubscription(array_merge([
-            'plan' => $subscription->plan->uuid,
-            'customerReference' => $subscription->user->stripe_id,
-            'subscriptionReference' => $subscription->gateway_id,
-        ], $params))->send();
+        $stripeSubscription = $this->client->subscriptions->retrieve(
+            $subscription->gateway_id,
+        );
 
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException("Stripe subscription resume failed: {$response->getMessage()}");
-        }
+        $updatedSubscription = $this->client->subscriptions->update(
+            $stripeSubscription->id,
+            array_merge(
+                [
+                    'cancel_at_period_end' => false,
+                ],
+                $params,
+            ),
+        );
 
-        return true;
+        return $updatedSubscription->status === 'active';
     }
 
-    /**
-     * Change billing plan of specified subscription.
-     *
-     * @param Subscription $subscription
-     * @param BillingPlan $newPlan
-     * @return boolean
-     * @throws GatewayException
-     */
-    public function changePlan(Subscription $subscription, BillingPlan $newPlan)
+    public function changePlan(
+        Subscription $subscription,
+        Product $newProduct,
+        Price $newPrice,
+    ): bool {
+        $stripeSubscription = $this->client->subscriptions->retrieve(
+            $subscription->gateway_id,
+        );
+
+        $updatedSubscription = $this->client->subscriptions->update(
+            $stripeSubscription->id,
+            [
+                'proration_behavior' => 'always_invoice',
+                'items' => [
+                    [
+                        'id' => $stripeSubscription->items->data[0]->id,
+                        'price' => $newPrice->stripe_id,
+                    ],
+                ],
+            ],
+        );
+
+        return $updatedSubscription->status === 'active';
+    }
+
+    protected function syncStripeCustomer(User $user): User
     {
-        $request = $this->gateway->updateSubscription([
-            'plan' => $newPlan->uuid,
-            'customerReference' => $subscription->user->stripe_id,
-            'subscriptionReference' => $subscription->gateway_id,
-        ]);
-
-        $response = $request->sendData(array_merge(
-            $request->getData(),
-            ['proration_behavior' => 'always_invoice']
-        ));
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException("Stripe subscription plan change failed: {$response->getMessage()}");
+        // make sure user with stored stripe ID actually exists on stripe
+        if ($user->stripe_id) {
+            try {
+                $this->client->customers->retrieve($user->stripe_id);
+            } finally {
+                $user->stripe_id = null;
+            }
         }
 
-        return true;
+        // create customer object on stripe, if it does not exist already
+        if (!$user->stripe_id) {
+            $customer = $this->client->customers->create([
+                'email' => $user->email,
+                'metadata' => [
+                    'userId' => $user->id,
+                ],
+            ]);
+            $user->fill(['stripe_id' => $customer->id])->save();
+        }
+
+        return $user;
     }
 }

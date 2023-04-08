@@ -17,7 +17,7 @@ trait EncodesUrl
      */
     protected function createUrl($uri)
     {
-        return Psr7\uri_for($uri);
+        return Psr7\Utils::uriFor($uri);
     }
 
     /**

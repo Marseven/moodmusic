@@ -4,51 +4,42 @@ namespace Common\Settings\Validators;
 
 use Exception;
 use Illuminate\Support\Arr;
-use Common\Core\HttpClient;
+use Illuminate\Support\Facades\Http;
 
 class RecaptchaCredentialsValidator
 {
     const KEYS = ['recaptcha.site_key', 'recaptcha.secret_key'];
 
-    /**
-     * @var HttpClient
-     */
-    private $httpClient;
-
-    public function __construct()
-    {
-        $this->httpClient = new HttpClient([
-            'exceptions' => true
-        ]);
-    }
-
-    public function fails($settings)
+    public function fails($settings): array|false
     {
         try {
-            $response = $this->httpClient->post('https://www.google.com/recaptcha/api/siteverify', [
-                'form_params' => [
+            $response = Http::asForm()->post(
+                'https://www.google.com/recaptcha/api/siteverify',
+                [
                     'response' => 'foo-bar',
                     'secret' => Arr::get($settings, 'recaptcha.secret_key'),
-                ]
-            ]);
-            if ($response['success'] === false && Arr::get($response, 'error-codes.1') === 'invalid-input-secret') {
-                $errors = ['recaptcha.secret_key' => 'This recaptcha secret key is not valid.'];
-                if ( ! Arr::get($settings, 'recaptcha.site_key')) {
-                    $errors['recaptcha.site_key'] = 'Recaptcha site key is required';
-                }
-                return $errors;
+                ],
+            );
+
+            if (
+                $response['success'] === false &&
+                $response['error-codes'][0] !== 'invalid-input-response'
+            ) {
+                return [
+                    'recaptcha_group' =>
+                        Arr::get($response, 'error-codes')[0] ??
+                        __('These credentials are not valid'),
+                ];
             }
         } catch (Exception $e) {
             return $this->getErrorMessage($e);
         }
+
+        return false;
     }
 
-    /**
-     * @param Exception $e
-     * @return array
-     */
-    private function getErrorMessage($e)
+    private function getErrorMessage(Exception $e): array
     {
-        return ['recaptcha-group' => $e->getMessage()];
+        return ['recaptcha_group' => $e->getMessage()];
     }
 }

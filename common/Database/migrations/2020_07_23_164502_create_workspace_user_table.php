@@ -13,16 +13,18 @@ class CreateWorkspaceUserTable extends Migration
      */
     public function up()
     {
-        Schema::create('workspace_user', function (Blueprint $table) {
-            $table->id();
-            $table->integer('user_id')->unsigned()->index();
-            $table->integer('workspace_id')->unsigned()->index();
-            $table->integer('role_id')->unsigned()->index()->nullable();
-            $table->boolean('is_owner')->index()->default(false);
-            $table->timestamps();
+        if ( ! Schema::hasTable('workspace_user')) {
+            Schema::create('workspace_user', function (Blueprint $table) {
+                $table->id();
+                $table->integer('user_id')->unsigned()->index();
+                $table->integer('workspace_id')->unsigned()->index();
+                $table->integer('role_id')->unsigned()->index()->nullable();
+                $table->boolean('is_owner')->index()->default(false);
+                $table->timestamps();
 
-            $table->unique(['workspace_id', 'user_id']);
-        });
+                $table->unique(['workspace_id', 'user_id']);
+            });
+        }
     }
 
     /**

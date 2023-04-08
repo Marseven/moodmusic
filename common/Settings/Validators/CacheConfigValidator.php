@@ -2,12 +2,12 @@
 
 namespace Common\Settings\Validators;
 
-use Cache;
-use Carbon\Carbon;
 use Common\Settings\DotEnvEditor;
 use Exception;
-use Throwable;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Str;
+use Throwable;
 
 class CacheConfigValidator
 {
@@ -18,7 +18,11 @@ class CacheConfigValidator
         $this->setConfigDynamically($settings);
 
         try {
-            $driverName = Arr::get($settings, 'cache_driver', config('cache.default'));
+            $driverName = Arr::get(
+                $settings,
+                'cache_driver',
+                config('cache.default'),
+            );
             $driver = Cache::driver($driverName);
             $driver->put('foo', 'bar', 1);
             if ($driver->get('foo') !== 'bar') {
@@ -33,32 +37,27 @@ class CacheConfigValidator
 
     private function setConfigDynamically($settings)
     {
-        app(DotEnvEditor::class)->write(Arr::except($settings, ['cache_driver']));
+        app(DotEnvEditor::class)->write(
+            Arr::except($settings, ['cache_driver']),
+        );
     }
 
-    /**
-     * @param Exception|Throwable $e
-     * @return array
-     */
-    private function getErrorMessage($e)
+    private function getErrorMessage($e): array
     {
         $message = $e->getMessage();
 
-        if (\Str::contains($message, 'apc_fetch')) {
+        if (Str::contains($message, 'apc_fetch')) {
             return ['cache_group' => "Could not enable APC. $message"];
-        } else if (\Str::contains($message, 'Memcached')) {
+        } elseif (Str::contains($message, 'Memcached')) {
             return ['cache_group' => "Could not enable Memcached. $message"];
-        } else if (\Str::contains($message, 'Connection refused')) {
+        } elseif (Str::contains($message, 'Connection refused')) {
             return ['cache_group' => 'Could not connect to redis server.'];
         } else {
             return $this->getDefaultErrorMessage();
         }
     }
 
-    /**
-     * @return array
-     */
-    private function getDefaultErrorMessage()
+    private function getDefaultErrorMessage(): array
     {
         return ['cache_group' => 'Could not enable this cache method.'];
     }

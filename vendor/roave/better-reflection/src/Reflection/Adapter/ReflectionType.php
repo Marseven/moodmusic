@@ -5,45 +5,44 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\Adapter;
 
 use ReflectionType as CoreReflectionType;
-use Roave\BetterReflection\Reflection\ReflectionType as BetterReflectionType;
+use Roave\BetterReflection\Reflection\ReflectionIntersectionType as BetterReflectionIntersectionType;
+use Roave\BetterReflection\Reflection\ReflectionNamedType as BetterReflectionNamedType;
+use Roave\BetterReflection\Reflection\ReflectionUnionType as BetterReflectionUnionType;
 
-class ReflectionType extends CoreReflectionType
+use function array_filter;
+use function array_values;
+use function count;
+
+abstract class ReflectionType extends CoreReflectionType
 {
-    /** @var BetterReflectionType */
-    private $betterReflectionType;
-
-    public function __construct(BetterReflectionType $betterReflectionType)
-    {
-        $this->betterReflectionType = $betterReflectionType;
-    }
-
-    public static function fromReturnTypeOrNull(?BetterReflectionType $betterReflectionType) : ?self
+    public static function fromTypeOrNull(BetterReflectionNamedType|BetterReflectionUnionType|BetterReflectionIntersectionType|null $betterReflectionType): ReflectionUnionType|ReflectionNamedType|ReflectionIntersectionType|null
     {
         if ($betterReflectionType === null) {
             return null;
         }
 
-        return new self($betterReflectionType);
-    }
+        if ($betterReflectionType instanceof BetterReflectionUnionType) {
+            // php-src has this weird behavior where a union type composed of a single type `T`
+            // together with `null` means that a `ReflectionNamedType` for `?T` is produced,
+            // rather than `T|null`. This is done to keep BC compatibility with PHP 7.1 (which
+            // introduced nullable types), but at reflection level, this is mostly a nuisance.
+            // In order to keep parity with core, we stashed this weird behavior in here.
+            $nonNullTypes = array_values(array_filter(
+                $betterReflectionType->getTypes(),
+                static fn (BetterReflectionNamedType $type): bool => $type->getName() !== 'null',
+            ));
 
-    public function __toString() : string
-    {
-        return $this->betterReflectionType->__toString();
-    }
+            if ($betterReflectionType->allowsNull() && count($nonNullTypes) === 1) {
+                return new ReflectionNamedType($nonNullTypes[0], true);
+            }
 
-    public function allowsNull() : bool
-    {
-        return $this->betterReflectionType->allowsNull();
-    }
-
-    public function isBuiltin() : bool
-    {
-        $type = (string) $this->betterReflectionType;
-
-        if ($type === 'self' || $type === 'parent') {
-            return false;
+            return new ReflectionUnionType($betterReflectionType);
         }
 
-        return $this->betterReflectionType->isBuiltin();
+        if ($betterReflectionType instanceof BetterReflectionIntersectionType) {
+            return new ReflectionIntersectionType($betterReflectionType);
+        }
+
+        return new ReflectionNamedType($betterReflectionType, $betterReflectionType->allowsNull());
     }
 }

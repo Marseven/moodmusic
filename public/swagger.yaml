@@ -16,8 +16,6 @@ tags:
   - name: Users
   - name: Uploads
     description: Upload files to SITE_NAME
-  - name: Chunked Uploads
-    description: Upload files using chunked uploading
   - name: Auth
     description: Authenticate requests to the API
   - name: Files and Folders
@@ -326,7 +324,7 @@ Search results include hits from all the specified types.'
         '403':
           $ref: '#/components/schemas/403-Response'
   /playlists/{id}/tracks/add:
-    get:
+    post:
       tags:
         - Playlists
       summary: Add one or more tracks to a user's playlist
@@ -366,7 +364,7 @@ Search results include hits from all the specified types.'
         '403':
           $ref: '#/components/schemas/403-Response'
   /playlists/{id}/tracks/remove:
-    get:
+    post:
       tags:
         - Playlists
       summary: Remove one or more tracks from a user's playlist
@@ -891,9 +889,7 @@ Search results include hits from all the specified types.'
                   status:
                     type: string
                     example: success
-                  tag:
-                    $ref: '#/components/schemas/Tag'
-                  tracks:
+                  pagination:
                     allOf:
                       - $ref: '#/components/schemas/Pagination'
                       - type: object
@@ -942,9 +938,7 @@ Search results include hits from all the specified types.'
                   status:
                     type: string
                     example: success
-                  tag:
-                    $ref: '#/components/schemas/Tag'
-                  tracks:
+                  pagination:
                     allOf:
                       - $ref: '#/components/schemas/Pagination'
                       - type: object
@@ -1324,7 +1318,7 @@ Search results include hits from all the specified types.'
                 password:
                   type: string
                   example: 'password'
-                device_name:
+                token_name:
                   type: string
                   example: 'iphone 12'
   /auth/login:
@@ -1372,7 +1366,7 @@ Search results include hits from all the specified types.'
                 password:
                   type: string
                   example: 'password'
-                device_name:
+                token_name:
                   type: string
                   example: 'iphone 12'
 components:

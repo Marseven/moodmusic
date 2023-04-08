@@ -1,4 +1,4 @@
-<p align="center"><img src="https://laravel.com/assets/img/components/logo-scout.svg"></p>
+<p align="center"><img src="/art/logo.svg" alt="Logo Laravel Scout"></p>
 
 <p align="center">
 <a href="https://github.com/laravel/scout/actions"><img src="https://github.com/laravel/scout/workflows/tests/badge.svg" alt="Build Status"></a>
@@ -9,7 +9,10 @@
 
 ## Introduction
 
-Laravel Scout provides a simple, driver-based solution for adding full-text search to your Eloquent models. Once Scout is installed and configured, it will automatically sync your model changes to your search indexes. Currently, Scout supports [Algolia](https://www.algolia.com/), a blazing-fast and hosted search service.
+Laravel Scout provides a simple, driver-based solution for adding full-text search to your Eloquent models. Once Scout is installed and configured, it will automatically sync your model changes to your search indexes. Currently, Scout supports:
+
+- [Algolia](https://www.algolia.com/)
+- [MeiliSearch](https://github.com/meilisearch/meilisearch)
 
 ## Official Documentation
 

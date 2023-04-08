@@ -2,33 +2,48 @@
 
 namespace Database\Factories;
 
-use Agent;
 use App\TrackPlay;
-use Arr;
+use Carbon\CarbonPeriod;
 use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Arr;
 
 class TrackPlayFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = TrackPlay::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
+        $period = CarbonPeriod::create(now()->subMonths(3), now());
+
         return [
-            'created_at' => $this->faker->dateTimeBetween('-4 months', 'now'),
-            'platform' => Arr::random(array_keys(Agent::getPlatforms())),
+            'created_at' => Arr::random($period->toArray()),
+            'platform' => Arr::random([
+                'AndroidOS',
+                'iOS',
+                'Windows',
+                'OS X',
+                'Linux',
+            ]),
             'device' => Arr::random(['mobile', 'tablet', 'desktop']),
-            'browser' => Arr::random(array_keys(Agent::getBrowsers())),
-            'location' => $this->faker->countryCode,
+            'browser' => Arr::random([
+                'chrome',
+                'firefox',
+                'edge',
+                'internet explorer',
+                'safari',
+            ]),
+            'location' => Arr::random([
+                'US',
+                'DE',
+                'FR',
+                'GB',
+                'CA',
+                'AU',
+                'JP',
+                'CN',
+                'IN',
+                'RU',
+            ]),
         ];
     }
 }

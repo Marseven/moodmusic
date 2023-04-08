@@ -7,26 +7,14 @@ use Common\Workspaces\Workspace;
 
 class CrupdateWorkspace
 {
-    /**
-     * @var Workspace
-     */
-    private $workspace;
-
-    /**
-     * @param Workspace $workspace
-     */
-    public function __construct(Workspace $workspace)
+    public function __construct(protected Workspace $workspace)
     {
-        $this->workspace = $workspace;
     }
 
-    /**
-     * @param array $data
-     * @param Workspace $initialWorkspace
-     * @return Workspace
-     */
-    public function execute($data, $initialWorkspace = null)
-    {
+    public function execute(
+        array $data,
+        Workspace|null $initialWorkspace = null
+    ): Workspace {
         if ($initialWorkspace) {
             $workspace = $initialWorkspace;
         } else {
@@ -41,8 +29,10 @@ class CrupdateWorkspace
 
         $workspace->fill($attributes)->save();
 
-        if ( ! $initialWorkspace) {
-            $workspace->members()->create(['user_id' => Auth::id(), 'is_owner' => true]);
+        if (!$initialWorkspace) {
+            $workspace
+                ->members()
+                ->create(['user_id' => Auth::id(), 'is_owner' => true]);
         }
 
         return $workspace;

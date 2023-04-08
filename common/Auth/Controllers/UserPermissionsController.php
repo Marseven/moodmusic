@@ -1,9 +1,9 @@
 <?php namespace Common\Auth\Controllers;
 
-use Illuminate\Http\Request;
+use App\User;
 use Common\Auth\UserRepository;
 use Common\Core\BaseController;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class UserPermissionsController extends BaseController
 {
@@ -25,33 +25,39 @@ class UserPermissionsController extends BaseController
 
     public function add(int $userId)
     {
-        $user = $this->repository->findOrFail($userId);
+        $user = User::findOrFail($userId);
 
         $this->authorize('update', $user);
 
         $this->validate($this->request, [
-            'permissions'   => 'required|array|min:1',
-            'permissions.*' => 'required|string'
+            'permissions' => 'required|array|min:1',
+            'permissions.*' => 'required|string',
         ]);
 
         return $this->success([
-            'data' => $this->repository->addPermissions($user, $this->request->get('permissions'))
+            'data' => $this->repository->addPermissions(
+                $user,
+                $this->request->get('permissions'),
+            ),
         ]);
     }
 
     public function remove(int $userId)
     {
-        $user = $this->repository->findOrFail($userId);
+        $user = User::findOrFail($userId);
 
         $this->authorize('update', $user);
 
         $this->validate($this->request, [
-            'permissions'   => 'required|array|min:1',
-            'permissions.*' => 'required|string'
+            'permissions' => 'required|array|min:1',
+            'permissions.*' => 'required|string',
         ]);
 
         return $this->success([
-            'data' => $this->repository->removePermissions($user, $this->request->get('permissions'))
+            'data' => $this->repository->removePermissions(
+                $user,
+                $this->request->get('permissions'),
+            ),
         ]);
     }
 }

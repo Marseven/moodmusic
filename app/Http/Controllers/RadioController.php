@@ -12,19 +12,26 @@ use Common\Core\BaseController;
 
 class RadioController extends BaseController
 {
-    public function getRecommendations(string $type, int $seedId): array
+    public function getRecommendations(string $modelType, int $modelId): array
     {
-        $model = $this->findModel($type, $seedId);
+        $model = $this->findModel($modelType, $modelId);
 
         $this->authorize('show', $model);
 
-        $recommendations = Cache::remember("radio.$type.$model->id", Carbon::now()->addDays(2), function() use($model, $type) {
-            $recommendations = app(ProviderResolver::class)->get('radio')->getRecommendations($model, $type);
-            return empty($recommendations) ? null : $recommendations;
-        });
+        $recommendations = Cache::remember(
+            "radio.$modelType.$model->id",
+            Carbon::now()->addDays(2),
+            function () use ($model, $modelType) {
+                $recommendations = app(ProviderResolver::class)
+                    ->get('radio')
+                    ->getRecommendations($model, $modelType);
+
+                return empty($recommendations) ? null : $recommendations;
+            },
+        );
 
         return [
-            'type' => $type,
+            'type' => $modelType,
             'seed' => $model,
             'recommendations' => $recommendations ?: [],
         ];
@@ -34,9 +41,9 @@ class RadioController extends BaseController
     {
         if ($type === 'artist') {
             return Artist::findOrFail($modelId);
-        } else if ($type === 'genre') {
+        } elseif ($type === 'genre') {
             return Genre::findOrFail($modelId);
-        } else if ($type === 'track') {
+        } elseif ($type === 'track') {
             return Track::with('album.artists')->findOrFail($modelId);
         }
 

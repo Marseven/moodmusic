@@ -7,13 +7,15 @@ use Illuminate\Database\Eloquent\Builder;
 
 trait HandlesEntryPaths
 {
-    public function getPathAttribute($value)
+    public function getPathAttribute($value): string
     {
-        if ( ! $value) $value = '';
+        if (!$value) {
+            $value = '';
+        }
 
         $parts = explode('/', $value);
 
-        $parts = array_map(function($part) {
+        $parts = array_map(function ($part) {
             return $this->decodePathId($part);
         }, array_filter($parts));
 
@@ -22,17 +24,14 @@ trait HandlesEntryPaths
 
     public function setPathAttribute($value)
     {
-        if ( ! $value) $value = '';
+        if (!$value) {
+            $value = '';
+        }
 
         $this->attributes['path'] = $this->encodePath($value);
     }
 
-    /**
-     * @param string $oldPath
-     * @param string $newPath
-     * @param null $entryIds
-     */
-    public function updatePaths($oldPath, $newPath, $entryIds = null)
+    public function updatePaths(string $oldPath, string $newPath, $entryIds = null): void
     {
         $oldPath = $this->encodePath($oldPath);
         $newPath = $this->encodePath($newPath);
@@ -43,16 +42,17 @@ trait HandlesEntryPaths
             $query->whereIn('id', $entryIds);
         }
 
-        $query->where('path', 'LIKE', "$oldPath%")
-            ->update(['path' => DB::raw("REPLACE(path, '$oldPath', '$newPath')")]);
+        $query->where('path', 'LIKE', "$oldPath%")->update([
+            'path' => DB::raw("REPLACE(path, '$oldPath', '$newPath')"),
+        ]);
     }
 
     /**
-     * Loads current model as well as all children currently.
+     * Loads current model as well as all children.
      */
     public function scopeAllChildren(Builder $builder): Builder
     {
-        return $builder->where('path', 'like', $this->attributes['path'].'%');
+        return $builder->where('path', 'like', $this->attributes['path'] . '%');
     }
 
     public function scopeAllParents(Builder $builder): Builder
@@ -65,38 +65,41 @@ trait HandlesEntryPaths
     /**
      * Generate full path for current entry, based on its parent.
      */
-    public function generatePath()
+    public function generatePath(): void
     {
-        if ( ! $this->exists) return;
+        if (!$this->exists) {
+            return;
+        }
 
         $this->path = $this->id;
 
-        if ($this->parent_id) {
-            $parent = $this->find($this->parent_id);
+        if ($this->parent_id && ($parent = $this->find($this->parent_id))) {
             $this->path = "{$parent->path}/$this->path";
         }
 
         $this->save();
     }
 
-    private function encodePath($path)
+    private function encodePath($path): string
     {
         $parts = explode('/', (string) $path);
 
         $parts = array_filter($parts);
 
-        $parts = array_map(function($part) {
+        $parts = array_map(function ($part) {
             return $this->encodePathId($part);
         }, $parts);
 
         return implode('/', $parts);
     }
 
-    private function encodePathId($id) {
+    private function encodePathId($id): string
+    {
         return base_convert($id, 10, 36);
     }
 
-    private function decodePathId($id) {
+    private function decodePathId($id): string
+    {
         return base_convert($id, 36, 10);
     }
 }

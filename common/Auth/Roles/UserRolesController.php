@@ -1,8 +1,9 @@
 <?php namespace Common\Auth\Roles;
 
-use Illuminate\Http\Request;
-use Common\Core\BaseController;
+use App\User;
 use Common\Auth\UserRepository;
+use Common\Core\BaseController;
+use Illuminate\Http\Request;
 
 class UserRolesController extends BaseController
 {
@@ -40,11 +41,15 @@ class UserRolesController extends BaseController
      */
     public function attach($userId)
     {
-        $user = $this->repository->findOrFail($userId);
+        $user = User::findOrFail($userId);
 
         $this->authorize('update', $user);
 
-        return $this->repository->attachRoles($user, $this->request->get('roles'), 'attach');
+        return $this->repository->attachRoles(
+            $user,
+            $this->request->get('roles'),
+            'attach',
+        );
     }
 
     /**
@@ -55,10 +60,10 @@ class UserRolesController extends BaseController
      */
     public function detach($userId)
     {
-        $user = $this->repository->findOrFail($userId);
+        $user = User::findOrFail($userId);
 
         $this->authorize('update', $user);
 
-        return $this->repository->detachRoles($user, $this->request->get('roles'));
+        return $user->roles()->detach($this->request->get('roles'));
     }
 }

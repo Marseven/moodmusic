@@ -59,6 +59,16 @@ abstract class Engine
     abstract public function map(Builder $builder, $results, $model);
 
     /**
+     * Map the given results to instances of the given model via a lazy collection.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @param  mixed  $results
+     * @param  \Illuminate\Database\Eloquent\Model  $model
+     * @return \Illuminate\Support\LazyCollection
+     */
+    abstract public function lazyMap(Builder $builder, $results, $model);
+
+    /**
      * Get the total count from a raw result returned by the engine.
      *
      * @param  mixed  $results
@@ -73,6 +83,35 @@ abstract class Engine
      * @return void
      */
     abstract public function flush($model);
+
+    /**
+     * Create a search index.
+     *
+     * @param  string  $name
+     * @param  array  $options
+     * @return mixed
+     */
+    abstract public function createIndex($name, array $options = []);
+
+    /**
+     * Delete a search index.
+     *
+     * @param  string  $name
+     * @return mixed
+     */
+    abstract public function deleteIndex($name);
+
+    /**
+     * Pluck and return the primary keys of the given results using the given key name.
+     *
+     * @param  mixed  $results
+     * @param  string  $key
+     * @return \Illuminate\Support\Collection
+     */
+    public function mapIdsFrom($results, $key)
+    {
+        return $this->mapIds($results);
+    }
 
     /**
      * Get the results of the query as a Collection of primary keys.
@@ -94,6 +133,19 @@ abstract class Engine
     public function get(Builder $builder)
     {
         return $this->map(
+            $builder, $this->search($builder), $builder->model
+        );
+    }
+
+    /**
+     * Get a lazy collection for the given query mapped onto models.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function cursor(Builder $builder)
+    {
+        return $this->lazyMap(
             $builder, $this->search($builder), $builder->model
         );
     }

@@ -4,8 +4,6 @@ namespace App\Notifications;
 
 use App\Services\UrlGenerator;
 use App\Track;
-use App\User;
-use Common\Comments\Comment;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
 use Str;
@@ -14,30 +12,11 @@ class CommentReceivedReply extends Notification
 {
     use Queueable;
 
-    /**
-     * @var array
-     */
-    public $newComment;
+    public array $newComment;
+    private array $originalComment;
+    private array $track;
+    private UrlGenerator $urlGenerator;
 
-    /**
-     * @var array
-     */
-    private $originalComment;
-
-    /**
-     * @var array
-     */
-    private $track;
-
-    /**
-     * @var UrlGenerator
-     */
-    private $urlGenerator;
-
-    /**
-     * @param Comment $newComment
-     * @param array $originalComment
-     */
     public function __construct($newComment, $originalComment)
     {
         $this->newComment = $newComment;
@@ -49,20 +28,12 @@ class CommentReceivedReply extends Notification
         $this->urlGenerator = app(UrlGenerator::class);
     }
 
-    /**
-     * @param User $notifiable
-     * @return array
-     */
-    public function via($notifiable)
+    public function via(): array
     {
         return ['database'];
     }
 
-    /**
-     * @param User $notifiable
-     * @return array
-     */
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         $username = $this->newComment['user']['display_name'];
 
@@ -73,17 +44,27 @@ class CommentReceivedReply extends Notification
             ],
             'lines' => [
                 [
-                    'content' => __(':username replied to your comment:', ['username' => $username]),
-                    'action' => ['action' => $this->urlGenerator->user($this->newComment['user']), 'label' => __('View user')],
-                    'type' => 'secondary'
+                    'content' => __(':username replied to your comment:', [
+                        'username' => $username,
+                    ]),
+                    'action' => [
+                        'action' => $this->urlGenerator->user(
+                            $this->newComment['user'],
+                        ),
+                        'label' => __('View user'),
+                    ],
+                    'type' => 'secondary',
                 ],
                 [
-                    'content' => '"'.Str::limit($this->newComment['content'], 180).'"',
-                    'icon' => 'comment', 'type' => 'primary'
+                    'content' =>
+                        '"' .
+                        Str::limit($this->newComment['content'], 180) .
+                        '"',
+                    'type' => 'primary',
                 ],
                 [
                     'content' => __('on') . " {$this->track['name']}",
-                    'type' => 'secondary'
+                    'type' => 'secondary',
                 ],
             ],
         ];

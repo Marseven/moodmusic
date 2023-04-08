@@ -1,9 +1,11 @@
 <?php namespace Common\Billing;
 
 use Carbon\Carbon;
+use Common\Billing\Models\Price;
 use DB;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use LogicException;
 
 /**
  * Trait Billable
@@ -11,60 +13,51 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  */
 trait Billable
 {
-    public function subscribe($gateway, $gatewayId, BillingPlan $plan)
+    public function subscribe(string $gateway, string $gatewayId, Price $price): Subscription
     {
-        if ($plan->interval === 'year') {
-            $renewsAt = Carbon::now()->addYears($plan->interval_count);
-        } else if ($plan->interval === 'week') {
-            $renewsAt = Carbon::now()->addWeeks($plan->interval_count);
-        } else {
-            $renewsAt = Carbon::now()->addMonths($plan->interval_count);
+        if (Subscription::where('gateway_id', $gatewayId)->exists()) {
+            throw new LogicException(__('This subscription ID already exists'));
         }
 
-        $this->subscriptions()->create([
-            'plan_id' => $plan->id,
+        if ($price->interval === 'year') {
+            $renewsAt = Carbon::now()->addYears($price->interval_count);
+        } elseif ($price->interval === 'week') {
+            $renewsAt = Carbon::now()->addWeeks($price->interval_count);
+        } else {
+            $renewsAt = Carbon::now()->addMonths($price->interval_count);
+        }
+
+        $subscription = $this->subscriptions()->create([
+            'price_id' => $price->id,
+            'product_id' => $price->product_id,
             'ends_at' => null,
             'renews_at' => $renewsAt,
-            'gateway' => $gateway,
+            'gateway_name' => $gateway,
             'gateway_id' => $gatewayId,
         ]);
 
         $this->load('subscriptions');
+
+        return $subscription;
     }
 
-    /**
-     * Determine if user is subscribed.
-     *
-     * @return bool
-     */
-    public function subscribed()
+    public function subscribed(): bool
     {
-        $subscription = $this->subscriptions->first(function(Subscription $sub) {
+        $subscription = $this->subscriptions->first(function (
+            Subscription $sub
+        ) {
             return $sub->valid();
         });
 
-        return ! is_null($subscription);
+        return !is_null($subscription);
     }
 
-    /**
-     * Check if user is subscribed to specified plan and gateway.
-     *
-     * @param BillingPlan $plan
-     * @param string $gateway
-     * @return bool
-     */
-    public function subscribedTo(BillingPlan $plan, $gateway) {
-        return ! is_null($this->subscriptions->first(function(Subscription $sub) use($plan, $gateway) {
-            return $sub->valid && $sub->plan_id === $plan->id && $sub->gateway === $gateway;
-        }));
-    }
-
-    /**
-     * @return HasMany
-     */
-    public function subscriptions()
+    public function subscriptions(): HasMany
     {
         // always return subscriptions that are not attached to any gateway last
-        return $this->hasMany(Subscription::class, 'user_id')->orderBy(DB::raw('FIELD(gateway, "none")'), 'asc');
+        return $this->hasMany(Subscription::class, 'user_id')->orderBy(
+            DB::raw('FIELD(gateway_name, "none")'),
+            'asc',
+        );
     }
 }

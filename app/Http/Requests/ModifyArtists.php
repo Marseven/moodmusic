@@ -1,16 +1,11 @@
 <?php namespace App\Http\Requests;
 
-use Illuminate\Validation\Rule;
 use Common\Core\BaseFormRequest;
+use Illuminate\Validation\Rule;
 
 class ModifyArtists extends BaseFormRequest
 {
-    /**
-     * Get the validation rules that apply to the request.
-     *
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         $artist = $this->route('artist');
 

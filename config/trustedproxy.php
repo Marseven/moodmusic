@@ -1,3 +1,5 @@
 <?php
 
-return [];
+return [
+    'proxies' => env('TRUSTED_PROXIES', '*'),
+];

@@ -2,51 +2,41 @@
 
 namespace Common\Billing\Listeners;
 
-use Common\Billing\BillingPlan;
-use Common\Billing\Gateways\GatewayFactory;
+use Common\Billing\Gateways\Paypal\Paypal;
+use Common\Billing\Gateways\Stripe\Stripe;
+use Common\Billing\Models\Product;
 use Common\Settings\Events\SettingsSaved;
-use Illuminate\Support\Collection;
 
 class SyncPlansWhenBillingSettingsChange
 {
-    /**
-     * @var GatewayFactory
-     */
-    private $gatewayFactory;
-
-    /**
-     * @param GatewayFactory $gatewayFactory
-     */
-    public function __construct(GatewayFactory $gatewayFactory)
-    {
-        $this->gatewayFactory = $gatewayFactory;
+    public function __construct(
+        protected Stripe $stripe,
+        protected Paypal $paypal
+    ) {
     }
 
-    /**
-     * @param SettingsSaved $event
-     */
-    public function handle(SettingsSaved $event)
+    public function handle(SettingsSaved $event): void
     {
         $s = $event->envSettings;
         @ini_set('max_execution_time', 300);
-        $plans = BillingPlan::where('free', false)->orderBy('parent_id', 'asc')->get();
+        $products = Product::where('free', false)->get();
 
-        if (array_key_exists('stripe_key', $s) || array_key_exists('stripe_secret', $s)) {
-            $this->syncPlans('stripe', $plans);
+        if (
+            array_key_exists('stripe_key', $s) ||
+            array_key_exists('stripe_secret', $s)
+        ) {
+            $products->each(
+                fn(Product $product) => $this->stripe->syncPlan($product),
+            );
         }
 
-        if (array_key_exists('paypal_client_id', $s) || array_key_exists('paypal_secret', $s)) {
-            $this->syncPlans('paypal', $plans);
+        if (
+            array_key_exists('paypal_client_id', $s) ||
+            array_key_exists('paypal_secret', $s)
+        ) {
+            $products->each(
+                fn(Product $product) => $this->paypal->syncPlan($product),
+            );
         }
-    }
-
-    private function syncPlans($gatewayName, Collection $plans)
-    {
-        $gateway = $this->gatewayFactory->get($gatewayName);
-        $plans->each(function(BillingPlan $plan) use($gateway) {
-            if ( ! $gateway->plans()->find($plan)) {
-                $gateway->plans()->create($plan);
-            }
-        });
     }
 }

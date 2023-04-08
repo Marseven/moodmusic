@@ -13,9 +13,19 @@ class AddCollaborativeColumnToPlaylistsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasColumn('playlists', 'collaborative')) {
+            return;
+        }
         Schema::table('playlists', function (Blueprint $table) {
-            $table->boolean('collaborative')->default(0)->index();
-            $table->bigInteger('plays')->unsigned()->default(0)->index();
+            $table
+                ->boolean('collaborative')
+                ->default(0)
+                ->index();
+            $table
+                ->bigInteger('plays')
+                ->unsigned()
+                ->default(0)
+                ->index();
         });
     }
 

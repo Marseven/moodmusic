@@ -2,12 +2,10 @@
 
 namespace Common\Files\Providers;
 
-use Aws\S3\S3Client;
+use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\ServiceProvider;
 use League\Flysystem\AwsS3v3\AwsS3Adapter;
-use League\Flysystem\Filesystem;
 use Storage;
-use Arr;
 
 class BackblazeServiceProvider extends ServiceProvider
 {
@@ -18,27 +16,12 @@ class BackblazeServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        Storage::extend('backblaze', function ($app, $config) {
-            $region = $config['region'];
+        Storage::extend('backblaze_s3', function ($app, $config) {
+            $config[
+                'endpoint'
+            ] = "https://s3.{$config['region']}.backblazeb2.com";
 
-            $client = new S3Client([
-                'credentials' => [
-                    'key'    => $config['key_id'],
-                    'secret' => $config['application_key']
-                ],
-                'region' => $region,
-                'version' => 'latest',
-                'endpoint' => "https://s3.$region.backblazeb2.com",
-            ]);
-
-            $root = isset($config['root']) ? $config['root'] : null;
-
-            $options = isset($config['options']) ? $config['options'] : [];
-
-            $adapter = new AwsS3Adapter($client, $config['bucket'], $root, $options);
-
-            $flysystemConfig = Arr::only($config, ['visibility', 'disable_asserts', 'url']);
-            return new Filesystem($adapter, count($flysystemConfig) > 0 ? $flysystemConfig : null);
+            return app(FilesystemManager::class)->createS3Driver($config);
         });
     }
 

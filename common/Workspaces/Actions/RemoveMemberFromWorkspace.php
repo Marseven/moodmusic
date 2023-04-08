@@ -16,14 +16,17 @@ class RemoveMemberFromWorkspace
                 $baseName = class_basename($model);
                 $namespace = "App\Workspaces\Transfer{$baseName}";
                 if (class_exists($namespace)) {
-                    app($namespace)->execute($workspace->id, $workspace->owner_id, $userToBeRemoved);
+                    app($namespace)->execute(
+                        $workspace->id,
+                        $workspace->owner_id,
+                        $userToBeRemoved,
+                    );
                 } else {
                     app($model)
                         ->where('workspace_id', $workspace->id)
                         ->where('user_id', $userToBeRemoved)
                         ->update(['user_id' => $workspace->owner_id]);
                 }
-
             }
         }
 

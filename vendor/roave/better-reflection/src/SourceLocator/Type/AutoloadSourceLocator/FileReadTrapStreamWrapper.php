@@ -5,10 +5,13 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\SourceLocator\Type\AutoloadSourceLocator;
 
 use LogicException;
+
+use function sprintf;
 use function stat;
 use function stream_wrapper_register;
 use function stream_wrapper_restore;
 use function stream_wrapper_unregister;
+
 use const STREAM_URL_STAT_QUIET;
 
 /**
@@ -29,36 +32,35 @@ final class FileReadTrapStreamWrapper
         'phar',
     ];
 
-    /** @var string[]|null */
-    private static $registeredStreamWrapperProtocols;
+    /** @var list<string>|null */
+    private static array|null $registeredStreamWrapperProtocols = null;
 
     /**
      * Read this property to determine the last file on which reads were attempted
      *
-     * @var string|null
      * @psalm-readonly
      * @psalm-allow-private-mutation
      */
-    public static $autoloadLocatedFile;
+    public static string|null $autoloadLocatedFile = null;
 
     /**
      * @param callable() : ExecutedMethodReturnType $executeMeWithinStreamWrapperOverride
-     * @param string[]                              $streamWrapperProtocols
+     * @param list<string>                          $streamWrapperProtocols
      *
-     * @return mixed
+     * @psalm-return ExecutedMethodReturnType
      *
      * @psalm-template ExecutedMethodReturnType of mixed
-     * @psalm-return ExecutedMethodReturnType
      */
     public static function withStreamWrapperOverride(
         callable $executeMeWithinStreamWrapperOverride,
-        array $streamWrapperProtocols = self::DEFAULT_STREAM_WRAPPER_PROTOCOLS
-    ) {
+        array $streamWrapperProtocols = self::DEFAULT_STREAM_WRAPPER_PROTOCOLS,
+    ): mixed {
         self::$registeredStreamWrapperProtocols = $streamWrapperProtocols;
         self::$autoloadLocatedFile              = null;
 
         try {
             foreach ($streamWrapperProtocols as $protocol) {
+                /** @psalm-suppress UnusedFunctionCall */
                 stream_wrapper_unregister($protocol);
                 stream_wrapper_register($protocol, self::class);
             }
@@ -66,12 +68,13 @@ final class FileReadTrapStreamWrapper
             $result = $executeMeWithinStreamWrapperOverride();
         } finally {
             foreach ($streamWrapperProtocols as $protocol) {
+                /** @psalm-suppress UnusedFunctionCall */
                 stream_wrapper_restore($protocol);
             }
-        }
 
-        self::$registeredStreamWrapperProtocols = null;
-        self::$autoloadLocatedFile              = null;
+            self::$registeredStreamWrapperProtocols = null;
+            self::$autoloadLocatedFile              = null;
+        }
 
         return $result;
     }
@@ -91,7 +94,7 @@ final class FileReadTrapStreamWrapper
      * @param int    $options
      * @param string $opened_path
      */
-    public function stream_open($path, $mode, $options, &$opened_path) : bool
+    public function stream_open($path, $mode, $options, &$opened_path): bool
     {
         self::$autoloadLocatedFile = $path;
 
@@ -114,13 +117,14 @@ final class FileReadTrapStreamWrapper
      *
      * @return mixed[]|bool
      */
-    public function url_stat($path, $flags)
+    public function url_stat($path, $flags): array|bool
     {
         if (self::$registeredStreamWrapperProtocols === null) {
-            throw new LogicException(self::class . ' not registered: cannot operate. Do not call this method directly.');
+            throw new LogicException(sprintf('%s not registered: cannot operate. Do not call this method directly.', self::class));
         }
 
         foreach (self::$registeredStreamWrapperProtocols as $protocol) {
+            /** @psalm-suppress UnusedFunctionCall */
             stream_wrapper_restore($protocol);
         }
 
@@ -131,6 +135,7 @@ final class FileReadTrapStreamWrapper
         }
 
         foreach (self::$registeredStreamWrapperProtocols as $protocol) {
+            /** @psalm-suppress UnusedFunctionCall */
             stream_wrapper_unregister($protocol);
             stream_wrapper_register($protocol, self::class);
         }

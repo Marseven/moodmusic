@@ -3,84 +3,74 @@
 namespace Common\Workspaces;
 
 use App\User;
-use Arr;
 use Auth;
-use Str;
 
 class ActiveWorkspace
 {
+    protected Workspace|null $cachedWorkspace = null;
+    public array $memberCache = [];
+    public int $id = 0;
+
     /**
-     * @var Workspace|null;
+     * Whether selected workspace was explicitly specified via request query params or defaulted to personal.
      */
-    private $cachedWorkspace;
-    private $resourceCountCache = [];
-    private $memberCache = [];
-    public $id;
+    public bool $explicitlySelected = false;
 
     public function __construct()
     {
-        $this->id = (int) Arr::get($_COOKIE, $this->cookieName()) ?: null;
+        $this->explicitlySelected = request()->has('workspaceId');
+        $this->id = (int) request()->get('workspaceId', 0);
     }
 
     public function workspace(): ?Workspace
     {
-        if (is_null($this->cachedWorkspace)) {
-            $workspaceId = $this->id;
-            $this->cachedWorkspace = $this->personal() ? 0 : (Workspace::find($workspaceId) ?? 0);
-            if ( ! $this->cachedWorkspace) {
-                cookie()->queue($this->cookieName(), null, -2628000, null, null, null, false);
-            }
+        if (
+            is_null($this->cachedWorkspace) ||
+            $this->cachedWorkspace->id !== $this->id
+        ) {
+            $this->cachedWorkspace = $this->isPersonal()
+                ? null
+                : Workspace::find($this->id);
         }
 
-        return $this->cachedWorkspace ? $this->cachedWorkspace :  null;
+        return $this->cachedWorkspace ?: null;
     }
 
-    public function personal()
+    public function isPersonal(): bool
     {
         return !$this->id;
     }
 
     public function owner(): User
     {
-        return $this->workspace()->owner_id === Auth::id() ? Auth::user() : $this->workspace()->owner;
+        return $this->workspace()->owner_id === Auth::id()
+            ? Auth::user()
+            : $this->workspace()->owner;
     }
 
-    public function currentUserIsOwner(): bool {
-        return $this->personal() || $this->workspace()->owner_id === Auth::id();
+    public function currentUserIsOwner(): bool
+    {
+        if ($this->isPersonal()) {
+            return true;
+        }
+        return $this->workspace() &&
+            $this->workspace()->owner_id === Auth::id();
     }
 
     public function member(int $userId): ?WorkspaceMember
     {
-        if ( ! isset($this->memberCache[$userId])) {
-            $this->memberCache[$userId] = app(WorkspaceMember::class)->where([
-                'user_id' => $userId,
-                'workspace_id' => $this->workspace()->id,
-            ])->first();
+        if (!$this->workspace()) {
+            return null;
+        }
+
+        if (!isset($this->memberCache[$userId])) {
+            $this->memberCache[$userId] = app(WorkspaceMember::class)
+                ->where([
+                    'user_id' => $userId,
+                    'workspace_id' => $this->workspace()->id,
+                ])
+                ->first();
         }
         return $this->memberCache[$userId];
-    }
-
-    public function getRestrictionValue(string $permissionName, string $restriction): ?int
-    {
-        return $this->personal() ?
-            (Auth::check() ? Auth::user()->getRestrictionValue($permissionName, $restriction) : null) :
-            $this->owner()->getRestrictionValue($permissionName, $restriction);
-    }
-
-    public function getResourceCount(string $resource): ?int
-    {
-        $relationName = Str::camel(Str::plural(class_basename($resource)));
-        if ( ! isset($this->resourceCountCache[$relationName])) {
-            $this->resourceCountCache[$relationName] = $this->personal() ?
-                Auth::user()->$relationName()->count() :
-                $this->workspace()->$relationName()->count();
-        }
-        return $this->resourceCountCache[$relationName];
-    }
-
-    private function cookieName()
-    {
-        $userId = Auth::id();
-        return "{$userId}_activeWorkspace";
     }
 }

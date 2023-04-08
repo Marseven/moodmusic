@@ -1,6 +1,6 @@
 {
     "name": "meilisearch/meilisearch-php",
-    "description": "PHP wrapper for the MeiliSearch API",
+    "description": "PHP wrapper for the Meilisearch API",
     "keywords": ["meilisearch", "instant", "search", "api", "client", "php"],
     "type": "library",
     "license": "MIT",
@@ -12,7 +12,7 @@
     ],
     "minimum-stability": "stable",
     "require": {
-        "php": ">=7.2",
+        "php": "^7.4 || ^8.0",
         "ext-json": "*",
         "php-http/discovery": "^1.7",
         "php-http/httplug": "^2.1",
@@ -33,20 +33,33 @@
         "http-interop/http-factory-guzzle": "Factory for guzzlehttp/guzzle"
     },
     "require-dev": {
-        "phpunit/phpunit": "^8.5 || ^9.0",
-        "friendsofphp/php-cs-fixer": "^2.16",
+        "phpunit/phpunit": "^9.5",
+        "friendsofphp/php-cs-fixer": "^3.0",
         "guzzlehttp/guzzle": "^7.1",
-        "http-interop/http-factory-guzzle": "^1.0"
+        "http-interop/http-factory-guzzle": "^1.0",
+        "phpstan/phpstan": "^1.4",
+        "phpstan/extension-installer": "^1.1",
+        "phpstan/phpstan-strict-rules": "^1.1",
+        "phpstan/phpstan-phpunit": "^1.0",
+        "phpstan/phpstan-deprecation-rules": "^1.0"
     },
     "scripts": {
         "lint": [
-            "./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --config=./.php_cs.dist --diff --show-progress=estimating --dry-run --using-cache=yes --allow-risky=yes"
+            "./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --config=.php-cs-fixer.dist.php --using-cache=no --dry-run --diff"
         ],
         "lint:fix": [
-            "./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --config=./.php_cs.dist --diff --show-progress=estimating --using-cache=no --allow-risky=yes"
+            "./vendor/friendsofphp/php-cs-fixer/php-cs-fixer fix --verbose --config=.php-cs-fixer.dist.php --using-cache=no  --diff"
+        ],
+        "phpstan": [
+            "php ./vendor/bin/phpstan"
         ],
         "test": [
             "sh scripts/tests.sh"
         ]
+    },
+    "config": {
+        "allow-plugins": {
+            "phpstan/extension-installer": true
+        }
     }
 }

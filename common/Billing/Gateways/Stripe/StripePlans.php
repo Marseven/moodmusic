@@ -1,91 +1,85 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
-use Common\Billing\BillingPlan;
-use Omnipay\Stripe\Gateway;
-use Common\Billing\GatewayException;
-use Common\Billing\Gateways\Contracts\GatewayPlansInterface;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
+use Stripe\Exception\ApiErrorException;
+use Stripe\Exception\InvalidRequestException;
+use Stripe\Price as StripePrice;
+use Stripe\StripeClient;
 
-class StripePlans implements GatewayPlansInterface
+class StripePlans
 {
+    use FormatsMoney;
 
-    /**
-     * @var Gateway
-     */
-    private $gateway;
-
-    /**
-     * StripePlans constructor.
-     *
-     * @param Gateway $gateway
-     */
-    public function __construct(Gateway $gateway)
+    public function __construct(protected StripeClient $client)
     {
-        $this->gateway = $gateway;
     }
 
-    /**
-     * Find specified plan on stripe.
-     *
-     * @param BillingPlan $plan
-     * @return array|null
-     */
-    public function find(BillingPlan $plan)
+    public function sync(Product $product): bool
     {
-        $response = $this->gateway->fetchPlan(['id' => $plan->uuid])->send();
+        $product->load('prices');
 
-        if ( ! $response->isSuccessful()) return null;
-
-        return $response->getData();
-    }
-
-    /**
-     * Create a new plan on stripe gateway.
-     *
-     * @param BillingPlan $plan
-     * @return bool
-     * @throws GatewayException
-     */
-    public function create(BillingPlan $plan)
-    {
-        $params = [
-            'id' => $plan->uuid,
-            'amount' => $plan->amount,
-            'currency' => $plan->currency,
-            'interval' => $plan->interval,
-            'interval_count' => $plan->interval_count,
-            'nickname' => $plan->name,
-            'name' => $plan->name,
-        ];
-
-        if ($plan->parent) {
-            $params['product'] = $plan->parent->uuid;
-        } else {
-            $params['product'] = [
-                'id' => $plan->uuid,
-                'name' => $plan->name,
-            ];
+        // create product on stripe, if it does not exist already
+        try {
+            $stripeProduct = $this->client->products->retrieve($product->uuid);
+        } catch (ApiErrorException $err) {
+            $stripeProduct = null;
         }
 
-        //TODO: fix this when omnipay stripe package is updated
-        $r = new \ReflectionMethod(Gateway::class, 'createRequest');
-        $r->setAccessible(true);
-        $response = $r->invoke($this->gateway, StripeCreatePlanRequest::class, $params)->send();
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException($response->getMessage());
+        if (!$stripeProduct) {
+            $this->client->products->create([
+                'id' => $product->uuid,
+                'name' => $product->name,
+            ]);
         }
+
+        // create any local product prices on stripe, that don't exist there already
+        $product->prices->each(function (Price $price) use ($product) {
+            // todo: check if stripe actually exist on stripe (when switching from test to live will not work otherwise)
+            if (!$price->stripe_id) {
+                $this->createPrice($product, $price);
+            }
+        });
 
         return true;
     }
 
-    /**
-     * Delete specified billing plan from currently active gateway.
-     *
-     * @param BillingPlan $plan
-     * @return bool
-     */
-    public function delete(BillingPlan $plan)
+    public function createPrice(Product $product, Price $price): StripePrice
     {
-        return $this->gateway->deletePlan(['id' => $plan->uuid])->send()->isSuccessful();
+        $stripePrice = $this->client->prices->create([
+            'product' => $product->uuid,
+            'unit_amount' => $this->priceToCents($price),
+            'currency' => $price->currency,
+            'recurring' => [
+                'interval' => $price->interval,
+                'interval_count' => $price->interval_count,
+            ],
+        ]);
+
+        $price->fill(['stripe_id' => $stripePrice->id])->save();
+
+        return $stripePrice;
+    }
+
+    public function delete(Product $product): bool
+    {
+        // stripe does not allow deleting product if it has prices attached,
+        // and prices can't be deleted via API, we archive the product instead
+        try {
+            $this->client->products->update($product->uuid, [
+                'active' => false,
+            ]);
+        } catch (InvalidRequestException $e) {
+            // if this product is already deleted on stripe, ignore
+            if ($e->getStripeCode() !== 'resource_missing') {
+                throw $e;
+            }
+        }
+        return true;
+    }
+
+    public function getAll(): array
+    {
+        return $this->client->products->all()->toArray();
     }
 }

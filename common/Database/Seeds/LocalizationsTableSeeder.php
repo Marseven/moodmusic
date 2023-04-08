@@ -1,8 +1,9 @@
 <?php namespace Common\Database\Seeds;
 
-use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Collection;
+use Common\Localizations\Localization;
 use Common\Localizations\LocalizationsRepository;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Seeder;
 
 class LocalizationsTableSeeder extends Seeder
 {
@@ -24,12 +25,15 @@ class LocalizationsTableSeeder extends Seeder
      */
     public function run()
     {
-        $localizations = $this->repository->all();
+        $localizations = Localization::all();
 
         if ($localizations->isNotEmpty()) {
             $this->mergeExistingTranslationLines($localizations);
         } else {
-            $this->repository->create(['name' => 'english', 'language' => 'en']);
+            $this->repository->create([
+                'name' => 'English',
+                'language' => 'en',
+            ]);
         }
     }
 
@@ -42,12 +46,13 @@ class LocalizationsTableSeeder extends Seeder
     {
         $defaultLines = $this->repository->getDefaultTranslationLines();
 
-        $localizations->each(function ($localization) use($defaultLines) {
-            $model = $localization['model'];
-
+        $localizations->each(function ($localization) use ($defaultLines) {
             $this->repository->storeLocalizationLines(
-                $model,
-                array_merge($defaultLines, $this->repository->getLocalizationLines($model))
+                $localization,
+                array_merge(
+                    $defaultLines,
+                    $this->repository->getLocalizationLines($localization),
+                ),
             );
         });
     }

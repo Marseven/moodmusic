@@ -1,43 +1,33 @@
 <?php namespace App\Http\Controllers;
 
-use Auth;
 use App\User;
-use Illuminate\Http\Request;
+use Auth;
 use Common\Core\BaseController;
+use Illuminate\Http\Request;
 
 class UserFollowersController extends BaseController {
 
-    /**
-     * @var User
-     */
-    private $model;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @param User $user
-     * @param Request $request
-     */
-    public function __construct(User $user, Request $request)
+    public function __construct(protected User $user, protected Request $request)
     {
-        $this->model = $user;
-        $this->request = $request;
-
-        $this->middleware('auth');
     }
 
-    /**
-     * Follow user with given id.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function follow($id)
+    public function index(User $user)
     {
-        $user = $this->model->findOrFail($id);
+        $this->authorize('show', $user);
+
+        $pagination = $user
+            ->followers()
+            ->withCount(['followers'])
+            ->simplePaginate(request('perPage') ?? 20);
+
+        return $this->success(['pagination' => $pagination]);
+    }
+
+    public function follow(int $id)
+    {
+        $this->middleware('auth');
+
+        $user = $this->user->findOrFail($id);
 
         if ($user->id !== Auth::user()->id) {
             Auth::user()->followedUsers()->sync([$id], false);
@@ -46,15 +36,11 @@ class UserFollowersController extends BaseController {
         return $this->success();
     }
 
-    /**
-     * UnFollow user with given id.
-     *
-     * @param int $id
-     * @return \Illuminate\Http\JsonResponse
-     */
-    public function unfollow($id)
+    public function unfollow(int $id)
     {
-        $user = $this->model->findOrFail($id);
+        $this->middleware('auth');
+
+        $user = $this->user->findOrFail($id);
 
         if ($user->id != Auth::user()->id) {
             Auth::user()->followedUsers()->detach($id);

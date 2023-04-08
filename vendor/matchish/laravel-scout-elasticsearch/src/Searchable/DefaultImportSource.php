@@ -22,8 +22,9 @@ final class DefaultImportSource implements ImportSource
 
     /**
      * DefaultImportSource constructor.
-     * @param string $className
-     * @param array $scopes
+     *
+     * @param  string  $className
+     * @param  array  $scopes
      */
     public function __construct(string $className, array $scopes = [])
     {
@@ -80,7 +81,7 @@ final class DefaultImportSource implements ImportSource
             ->when($softDelete, function ($query) {
                 return $query->withTrashed();
             })
-            ->orderBy($this->model()->getKeyName());
+            ->orderBy($this->model()->getQualifiedKeyName());
         $scopes = $this->scopes;
 
         return collect($scopes)->reduce(function ($instance, $scope) {

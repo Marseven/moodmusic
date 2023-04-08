@@ -3,30 +3,17 @@
 namespace App\Http\Controllers\Artist;
 
 use App\Artist;
+use App\Services\Artists\PaginateArtistTracks;
 use Common\Core\BaseController;
-use Illuminate\Http\Request;
 
 class ArtistTracksController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
     public function index(Artist $artist)
     {
-        $userId = $this->request->get('userId');
+        $userId = request('userId');
         $this->authorize('index', [$artist, $userId]);
 
-        $pagination = $artist->tracks()
-            ->with('genres')
-            ->withCount('plays')
-            ->paginate($this->request->get('perPage') ?? 20);
+        $pagination = (new PaginateArtistTracks())->execute($artist);
 
         return $this->success(['pagination' => $pagination]);
     }

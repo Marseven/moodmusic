@@ -2,56 +2,49 @@
 
 namespace Common\Billing\Invoices;
 
-use Common\Billing\Gateways\Stripe\StripeGateway;
-use Common\Billing\Subscription;
 use Common\Core\AppUrl;
 use Common\Core\BaseController;
 use Common\Settings\Settings;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class InvoiceController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Invoice
-     */
-    private $invoice;
-
-    /**
-     * @param Request $request
-     * @param Invoice $invoice
-     */
-    public function __construct(Request $request, Invoice $invoice)
-    {
-        $this->request = $request;
-        $this->invoice = $invoice;
+    public function __construct(
+        protected Request $request,
+        protected Invoice $invoice
+    ) {
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function index()
+    public function index(): Response|JsonResponse
     {
-        $this->authorize('index', [Invoice::class, $this->request->get('userId')]);
+        $this->authorize('index', [
+            Invoice::class,
+            $this->request->get('userId'),
+        ]);
 
-        $invoices = $this->invoice->with('subscription.plan')
-            ->whereHas('subscription', function(Builder $builder) {
+        $invoices = $this->invoice
+            ->with('subscription.product', 'subscription.price')
+            ->whereHas('subscription', function (Builder $builder) {
                 $builder->where('user_id', $this->request->get('userId'));
-            })->get();
+            })
+            ->limit(50)
+            ->get();
 
         return $this->success(['invoices' => $invoices]);
     }
 
-    public function show($uuid)
+    public function show(string $uuid)
     {
-        $invoice = $this->invoice->where('uuid', $uuid)
-            ->with('subscription.plan', 'subscription.user')
+        $invoice = $this->invoice
+            ->where('uuid', $uuid)
+            ->with(
+                'subscription.product',
+                'subscription.user',
+                'subscription.price',
+            )
             ->firstOrFail();
 
         $this->authorize('show', $invoice);

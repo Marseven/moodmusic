@@ -8,58 +8,70 @@ use Arr;
 
 class CrupdateArtist
 {
-    /**
-     * @var Artist
-     */
-    private $artist;
-
-    /**
-     * @var Genre
-     */
-    private $genre;
-
-    public function __construct(Artist $artist, Genre $genre)
-    {
-        $this->artist = $artist;
-        $this->genre = $genre;
+    public function __construct(
+        protected Artist $artist,
+        protected Genre $genre,
+    ) {
     }
 
     public function execute($data, Artist $artist = null): Artist
     {
-        if ( ! $artist) {
+        if (!$artist) {
             $artist = $this->artist->newInstance();
         }
 
-        $artist->fill([
-            'name' => $data['name'],
-            'verified' => $data['verified'] ?? false,
-            'image_small' => $data['image_small'],
-            'auto_update' => $data['auto_update'] ?? false,
-        ])->save();
+        $artist
+            ->fill([
+                'name' => $data['name'],
+                'verified' => $data['verified'] ?? false,
+                'image_small' => Arr::get($data, 'image_small'),
+                'auto_update' => $data['auto_update'] ?? false,
+                'spotify_id' =>
+                    $data['spotify_id'] ?? Arr::get($artist, 'spotify_id'),
+            ])
+            ->save();
 
-        $genreIds = $this->genre->insertOrRetrieve(Arr::get($data, 'genres'))->pluck('id');
-        $artist->genres()->sync($genreIds);
+        if (Arr::get($data, 'genres')) {
+            $genreIds = $this->genre
+                ->insertOrRetrieve(Arr::get($data, 'genres'))
+                ->pluck('id');
+            $artist->genres()->sync($genreIds);
+        }
 
-        $artist->profile()->updateOrCreate(
-            ['artist_id' => $artist->id],
-            [
-                'description' => $data['description'] ?? null,
-                'country' => $data['country'] ?? null,
-                'city' => $data['city'] ?? null,
-            ]
-        );
+        if ($profile = Arr::get($data, 'profile')) {
+            $artist->profile()->updateOrCreate(
+                ['artist_id' => $artist->id],
+                [
+                    'description' => $profile['description'] ?? null,
+                    'country' => $profile['country'] ?? null,
+                    'city' => $profile['city'] ?? null,
+                ],
+            );
+        }
 
-        $artist->profileImages()->delete();
-        $profileImages = array_map(function($img) {
-            return is_string($img) ? ['url' => $img] : $img;
-        }, array_filter($data['profile_images']));
-        $artist->profileImages()->createMany($profileImages);
+        if (array_key_exists('profile_images', $data)) {
+            $artist->profileImages()->delete();
+            $profileImages = array_map(function ($img) {
+                return is_string($img) ? ['url' => $img] : $img;
+            }, array_filter($data['profile_images']));
+            $artist->profileImages()->createMany($profileImages);
+        }
 
-        if ($links = Arr::get($data, 'links')) {
+        if (array_key_exists('links', $data)) {
+            $links = array_filter(
+                $data['links'],
+                fn($link) => Arr::get($link, 'url') && Arr::get($link, 'title'),
+            );
             $artist->links()->delete();
             $artist->links()->createMany($links);
         }
 
-        return $artist->load('albums.tracks', 'genres', 'profile', 'profileImages', 'links');
+        return $artist->load(
+            'albums.tracks',
+            'genres',
+            'profile',
+            'profileImages',
+            'links',
+        );
     }
 }

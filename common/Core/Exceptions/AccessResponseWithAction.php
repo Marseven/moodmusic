@@ -6,5 +6,5 @@ use Illuminate\Auth\Access\Response as LaravelAccessResponse;
 
 class AccessResponseWithAction extends LaravelAccessResponse
 {
-    public $action;
+    public array|null $action;
 }

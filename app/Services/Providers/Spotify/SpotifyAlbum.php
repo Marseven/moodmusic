@@ -3,6 +3,7 @@
 use App;
 use App\Album;
 use App\Services\HttpClient;
+use Illuminate\Support\Arr;
 
 class SpotifyAlbum {
 
@@ -27,7 +28,7 @@ class SpotifyAlbum {
             $spotifyAlbum = $this->httpClient->get("albums/{$album->spotify_id}");
         }
 
-        if ( ! isset($spotifyAlbum) || ! $spotifyAlbum) {
+        if ( ! Arr::get($spotifyAlbum, 'id')) {
             return null;
         }
 

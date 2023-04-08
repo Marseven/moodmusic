@@ -1,6 +1,8 @@
 <?php
 
 // Start of dba v.
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 
 /**
  * Open database
@@ -105,7 +107,7 @@
  * <td>false</td>
  * </tr>
  * </table>
- * ok: the second call will be successfull.
+ * ok: the second call will be successful.
  * wait: the second call waits until <b>dba_close</b> is called for the first.
  * false: the second call returns false.
  * illegal: you must not mix "l" and "d" modifiers for <i>mode</i> parameter.
@@ -116,12 +118,14 @@
  * all optional parameters given to <b>dba_open</b> and
  * can act on behalf of them.
  * </p>
- * @param mixed $_ [optional]
- * @return resource a positive handle on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
+ * @param mixed ...$handler_params [optional]
+ * @return resource|false a positive handle on success or <b>FALSE</b> on failure.
  */
-function dba_open ($path, $mode, $handler = null, $_ = null) {}
+#[PhpStormStubsElementAvailable(from: '5.3', to: '8.1')]
+function dba_open($path, $mode, $handler, ...$handler_params) {}
+
+#[PhpStormStubsElementAvailable(from: '8.2')]
+function dba_open(string $path, string $mode, ?string $handler = null, int $permission = 0o644, int $map_size = 0) {}
 
 /**
  * Open database persistently
@@ -141,25 +145,25 @@ function dba_open ($path, $mode, $handler = null, $_ = null) {}
  * all optional parameters given to <b>dba_popen</b> and
  * can act on behalf of them.
  * </p>
- * @param mixed $_ [optional]
- * @return resource a positive handle on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
+ * @param mixed ...$handler_params [optional]
+ * @return resource|false a positive handle on success or <b>FALSE</b> on failure.
  */
-function dba_popen ($path, $mode, $handler = null, $_ = null) {}
+#[PhpStormStubsElementAvailable(from: '5.3', to: '8.1')]
+function dba_popen($path, $mode, $handler, ...$handler_params) {}
+
+#[PhpStormStubsElementAvailable(from: '8.2')]
+function dba_popen(string $path, string $mode, ?string $handler = null, int $permission = 0o644, int $map_size = 0) {}
 
 /**
  * Close a DBA database
  * @link https://php.net/manual/en/function.dba-close.php
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return void No value is returned.
- * @since 4.0
- * @since 5.0
  */
-function dba_close ($handle) {}
+function dba_close($dba): void {}
 
 /**
  * Delete DBA entry specified by key
@@ -167,15 +171,13 @@ function dba_close ($handle) {}
  * @param string $key <p>
  * The key of the entry which is deleted.
  * </p>
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function dba_delete ($key, $handle) {}
+function dba_delete(#[LanguageLevelTypeAware(['8.2' => 'array|string'], default: '')] $key, $dba): bool {}
 
 /**
  * Check whether key exists
@@ -183,15 +185,13 @@ function dba_delete ($key, $handle) {}
  * @param string $key <p>
  * The key the check is performed for.
  * </p>
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> if the key exists, <b>FALSE</b> otherwise.
- * @since 4.0
- * @since 5.0
  */
-function dba_exists ($key, $handle) {}
+function dba_exists(#[LanguageLevelTypeAware(['8.2' => 'array|string'], default: '')] $key, $dba): bool {}
 
 /**
  * Fetch data specified by key
@@ -210,10 +210,8 @@ function dba_exists ($key, $handle) {}
  * </p>
  * @return string|false the associated string if the key/data pair is found, <b>FALSE</b>
  * otherwise.
- * @since 4.0
- * @since 5.0
  */
-function dba_fetch ($key, $handle) {}
+function dba_fetch($key, $handle): string|false {}
 
 /**
  * Fetch data specified by key
@@ -227,16 +225,14 @@ function dba_fetch ($key, $handle) {}
  * <b>dba_key_split</b>.
  * </p>
  * @param int $skip The number of key-value pairs to ignore when using cdb databases. This value is ignored for all other databases which do not support multiple keys with the same name.
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return string|false the associated string if the key/data pair is found, <b>FALSE</b>
  * otherwise.
- * @since 4.0
- * @since 5.0
  */
-function dba_fetch ($key, $skip, $handle) {}
+function dba_fetch($key, $skip, $dba): string|false {}
 
 /**
  * Insert entry
@@ -249,15 +245,13 @@ function dba_fetch ($key, $skip, $handle) {}
  * @param string $value <p>
  * The value to be inserted.
  * </p>
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function dba_insert ($key, $value, $handle) {}
+function dba_insert(#[LanguageLevelTypeAware(['8.2' => 'array|string'], default: '')] $key, string $value, $dba): bool {}
 
 /**
  * Replace or insert entry
@@ -268,67 +262,57 @@ function dba_insert ($key, $value, $handle) {}
  * @param string $value <p>
  * The value to be replaced.
  * </p>
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function dba_replace ($key, $value, $handle) {}
+function dba_replace(#[LanguageLevelTypeAware(['8.2' => 'array|string'], default: '')] $key, string $value, $dba): bool {}
 
 /**
  * Fetch first key
  * @link https://php.net/manual/en/function.dba-firstkey.php
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
- * @return string the key on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
+ * @return string|false the key on success or <b>FALSE</b> on failure.
  */
-function dba_firstkey ($handle) {}
+function dba_firstkey($dba): string|false {}
 
 /**
  * Fetch next key
  * @link https://php.net/manual/en/function.dba-nextkey.php
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
- * @return string the key on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
+ * @return string|false the key on success or <b>FALSE</b> on failure.
  */
-function dba_nextkey ($handle) {}
+function dba_nextkey($dba): string|false {}
 
 /**
  * Optimize database
  * @link https://php.net/manual/en/function.dba-optimize.php
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function dba_optimize ($handle) {}
+function dba_optimize($dba): bool {}
 
 /**
  * Synchronize database
  * @link https://php.net/manual/en/function.dba-sync.php
- * @param resource $handle <p>
+ * @param resource $dba <p>
  * The database handler, returned by <b>dba_open</b> or
  * <b>dba_popen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function dba_sync ($handle) {}
+function dba_sync($dba): bool {}
 
 /**
  * List all the handlers available
@@ -344,31 +328,26 @@ function dba_sync ($handle) {}
  * <p>
  * When the internal cdb library is used you will see
  * cdb and cdb_make.
- * @since 4.3
- * @since 5.0
  */
-function dba_handlers ($full_info = false) {}
+function dba_handlers(bool $full_info = false): array {}
 
 /**
  * List all open database files
  * @link https://php.net/manual/en/function.dba-list.php
  * @return array An associative array, in the form resourceid =&gt; filename.
- * @since 4.3
- * @since 5.0
  */
-function dba_list () {}
+function dba_list(): array {}
 
 /**
  * Splits a key in string representation into array representation
  * @link https://php.net/manual/en/function.dba-key-split.php
- * @param mixed $key <p>
+ * @param string|false|null $key <p>
  * The key in string representation.
  * </p>
  * @return array|false an array of the form array(0 =&gt; group, 1 =&gt;
  * value_name). This function will return <b>FALSE</b> if
  * <i>key</i> is <b>NULL</b> or <b>FALSE</b>.
- * @since 5.0
  */
-function dba_key_split ($key) {}
+function dba_key_split(string|false|null $key): array|false {}
 
 // End of dba v.

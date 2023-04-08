@@ -52,22 +52,41 @@ class AppUrl
 
         $envParts = parse_url(config('app.url'));
 
-        $schemeIsDifferent = $request->getScheme() !== Arr::get($envParts, 'scheme');
-        $this->envAndCurrentHostsAreEqual = $this->getHostFrom($requestHost) === $this->getHostFrom(Arr::get($envParts, 'host'));
+        $requestScheme = in_array($request->header('x-forwarded-proto'), [
+            'https',
+            'on',
+            'ssl',
+            '1',
+        ])
+            ? 'https'
+            : $request->getScheme();
+
+        $schemeIsDifferent = $requestScheme !== Arr::get($envParts, 'scheme');
+        $this->envAndCurrentHostsAreEqual =
+            $this->getHostFrom($requestHost) ===
+            $this->getHostFrom(Arr::get($envParts, 'host'));
         $hostsWithWwwAreEqual = $requestHost === Arr::get($envParts, 'host');
         $customDomainsEnabled = config('common.site.enable_custom_domains');
         $endsWithSlash = Str::endsWith(Arr::get($envParts, 'path'), '/');
 
-        if ($this->envAndCurrentHostsAreEqual && ($schemeIsDifferent || $endsWithSlash || !$hostsWithWwwAreEqual)) {
-            $this->newAppUrl = $request->getSchemeAndHttpHost() . rtrim(Arr::get($envParts, 'path'), '/');
+        if (
+            $this->envAndCurrentHostsAreEqual &&
+            ($schemeIsDifferent || $endsWithSlash || !$hostsWithWwwAreEqual)
+        ) {
+            $this->newAppUrl =
+                $request->getSchemeAndHttpHost() .
+                rtrim(Arr::get($envParts, 'path'), '/');
             config(['app.url' => $this->newAppUrl]);
             // update social auth urls as well
             foreach (config('services') as $serviceName => $serviceConfig) {
                 if (isset($serviceConfig['redirect'])) {
-                    Config::set("services.$serviceName.redirect", "$this->newAppUrl/secure/auth/social/$serviceName/callback");
+                    Config::set(
+                        "services.$serviceName.redirect",
+                        "$this->newAppUrl/secure/auth/social/$serviceName/callback",
+                    );
                 }
             }
-        } else if ( ! $this->envAndCurrentHostsAreEqual && $customDomainsEnabled) {
+        } elseif (!$this->envAndCurrentHostsAreEqual && $customDomainsEnabled) {
             $this->matchedCustomDomain = DB::table('custom_domains')
                 ->where('host', $requestHost)
                 ->orWhere('host', $request->getSchemeAndHttpHost())
@@ -96,13 +115,19 @@ class AppUrl
     /**
      * @return string
      */
-    public function getRequestHost() {
+    public function getRequestHost()
+    {
         return $this->getHostFrom(app('request')->getHost());
     }
 
-    public function requestHostMatches($hostOrUrl)
-    {
-        return $this->getHostFrom($hostOrUrl) === $this->getRequestHost();
+    public function requestHostMatches(
+        $hostOrUrl,
+        $subdomainMatch = false,
+    ): bool {
+        $hostOrUrl = $this->getHostFrom($hostOrUrl);
+        $requestHost = $this->getRequestHost();
+        return $hostOrUrl === $requestHost ||
+            ($subdomainMatch && Str::endsWith($requestHost, $hostOrUrl));
     }
 
     /*
@@ -112,7 +137,7 @@ class AppUrl
     public function getHostFrom($hostOrUrl)
     {
         // if there's no scheme, add // so it's parsed properly
-        if ( ! preg_match('/^([a-z][a-z0-9\-\.\+]*:)|(\/)/', $hostOrUrl)) {
+        if (!preg_match('/^([a-z][a-z0-9\-\.\+]*:)|(\/)/', $hostOrUrl)) {
             $hostOrUrl = '//' . $hostOrUrl;
         }
 

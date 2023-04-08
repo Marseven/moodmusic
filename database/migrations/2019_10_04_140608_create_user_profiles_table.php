@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateUserProfilesTable extends Migration
 {
@@ -15,8 +15,6 @@ class CreateUserProfilesTable extends Migration
     {
         Schema::create('user_profiles', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('header_image')->nullable();
-            $table->string('header_colors', 50)->nullable();
             $table->string('description')->nullable();
             $table->string('city')->nullable();
             $table->string('country')->nullable();

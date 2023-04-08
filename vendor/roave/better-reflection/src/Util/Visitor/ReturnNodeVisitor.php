@@ -11,9 +11,9 @@ use PhpParser\NodeVisitorAbstract;
 class ReturnNodeVisitor extends NodeVisitorAbstract
 {
     /** @var Node\Stmt\Return_[] */
-    private $returnNodes = [];
+    private array $returnNodes = [];
 
-    public function enterNode(Node $node) : ?int
+    public function enterNode(Node $node): int|null
     {
         if ($this->isScopeChangingNode($node)) {
             return NodeTraverser::DONT_TRAVERSE_CHILDREN;
@@ -26,15 +26,13 @@ class ReturnNodeVisitor extends NodeVisitorAbstract
         return null;
     }
 
-    private function isScopeChangingNode(Node $node) : bool
+    private function isScopeChangingNode(Node $node): bool
     {
         return $node instanceof Node\FunctionLike || $node instanceof Node\Stmt\Class_;
     }
 
-    /**
-     * @return Node\Stmt\Return_[]
-     */
-    public function getReturnNodes() : array
+    /** @return Node\Stmt\Return_[] */
+    public function getReturnNodes(): array
     {
         return $this->returnNodes;
     }

@@ -5,49 +5,86 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\NodeCompiler;
 
 use Roave\BetterReflection\Reflection\ReflectionClass;
+use Roave\BetterReflection\Reflection\ReflectionClassConstant;
+use Roave\BetterReflection\Reflection\ReflectionConstant;
+use Roave\BetterReflection\Reflection\ReflectionEnumCase;
+use Roave\BetterReflection\Reflection\ReflectionFunction;
+use Roave\BetterReflection\Reflection\ReflectionMethod;
+use Roave\BetterReflection\Reflection\ReflectionParameter;
+use Roave\BetterReflection\Reflection\ReflectionProperty;
 use Roave\BetterReflection\Reflector\Reflector;
-use RuntimeException;
 
+/** @internal */
 class CompilerContext
 {
-    /** @var Reflector */
-    private $reflector;
-
-    /** @var ReflectionClass|null */
-    private $self;
-
-    public function __construct(Reflector $reflector, ?ReflectionClass $self)
-    {
-        $this->reflector = $reflector;
-        $this->self      = $self;
+    public function __construct(
+        private Reflector $reflector,
+        private ReflectionClass|ReflectionProperty|ReflectionClassConstant|ReflectionEnumCase|ReflectionMethod|ReflectionFunction|ReflectionParameter|ReflectionConstant $contextReflection,
+    ) {
     }
 
-    /**
-     * Does the current context have a "self" or "this"
-     *
-     * (e.g. if the context is a function, then no, there will be no self)
-     */
-    public function hasSelf() : bool
-    {
-        return $this->self !== null;
-    }
-
-    public function getSelf() : ReflectionClass
-    {
-        if (! $this->hasSelf()) {
-            throw new RuntimeException('The current context does not have a class for self');
-        }
-
-        return $this->self;
-    }
-
-    public function getReflector() : Reflector
+    public function getReflector(): Reflector
     {
         return $this->reflector;
     }
 
-    public function getFileName() : string
+    public function getFileName(): string|null
     {
-        return $this->getSelf()->getFileName();
+        if ($this->contextReflection instanceof ReflectionConstant) {
+            return $this->contextReflection->getFileName();
+        }
+
+        return $this->getClass()?->getFileName() ?? $this->getFunction()?->getFileName();
+    }
+
+    public function getNamespace(): string
+    {
+        if ($this->contextReflection instanceof ReflectionConstant) {
+            return $this->contextReflection->getNamespaceName();
+        }
+
+        return $this->getClass()?->getNamespaceName() ?? $this->getFunction()?->getNamespaceName() ?? '';
+    }
+
+    public function getClass(): ReflectionClass|null
+    {
+        if ($this->contextReflection instanceof ReflectionClass) {
+            return $this->contextReflection;
+        }
+
+        if ($this->contextReflection instanceof ReflectionFunction) {
+            return null;
+        }
+
+        if ($this->contextReflection instanceof ReflectionConstant) {
+            return null;
+        }
+
+        if ($this->contextReflection instanceof ReflectionClassConstant) {
+            return $this->contextReflection->getDeclaringClass();
+        }
+
+        if ($this->contextReflection instanceof ReflectionEnumCase) {
+            return $this->contextReflection->getDeclaringClass();
+        }
+
+        return $this->contextReflection->getImplementingClass();
+    }
+
+    public function getFunction(): ReflectionMethod|ReflectionFunction|null
+    {
+        if ($this->contextReflection instanceof ReflectionMethod) {
+            return $this->contextReflection;
+        }
+
+        if ($this->contextReflection instanceof ReflectionFunction) {
+            return $this->contextReflection;
+        }
+
+        if ($this->contextReflection instanceof ReflectionParameter) {
+            return $this->contextReflection->getDeclaringFunction();
+        }
+
+        return null;
     }
 }

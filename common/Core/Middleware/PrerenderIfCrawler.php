@@ -3,11 +3,11 @@
 use Closure;
 use Common\Core\Controllers\HomeController;
 use Illuminate\Http\Request;
-use Illuminate\View\View;
+use Illuminate\Support\Str;
 
 class PrerenderIfCrawler
 {
-    protected $crawlerUserAgents = [
+    protected array $crawlerUserAgents = [
         'Yahoo! Slurp',
         'bingbot',
         'yandex',
@@ -40,55 +40,52 @@ class PrerenderIfCrawler
         'developers.google.com/+/web/snippet',
     ];
 
-    /**
-     * Prerender request if it's requested by a crawler.
-     *
-     * @param Request $request
-     * @param Closure $next
-     * @param string $routeName
-     * @return Request|View
-     */
-    public function handle(Request $request, Closure $next, $routeName = null)
-    {
+    public function handle(
+        Request $request,
+        Closure $next,
+        string $routeName = null
+    ) {
         if ($this->shouldPrerender($request)) {
             define('SHOULD_PRERENDER', true);
 
-        // Always fallback to client routes if not prerendering
-        // otherwise prerender routes will override client side routing
-        } else if ($routeName !== 'homepage') {
+            // Always fallback to client routes if not prerendering
+            // otherwise prerender routes will override client side routing
+        } elseif ($routeName !== 'homepage') {
             return app(HomeController::class)->show();
         }
 
         return $next($request);
     }
 
-    /**
-     * Check if request should be prerendered.
-     *
-     * @param Request $request
-     * @return bool
-     */
-    protected function shouldPrerender(Request $request)
+    protected function shouldPrerender(Request $request): bool
     {
         $userAgent = strtolower($request->server->get('HTTP_USER_AGENT'));
         $bufferAgent = $request->server->get('X-BUFFERBOT');
 
         $shouldPrerender = false;
 
-        if ( ! $userAgent) return false;
-        if ( ! $request->isMethod('GET')) return false;
+        if (!$userAgent) {
+            return false;
+        }
+        if (!$request->isMethod('GET')) {
+            return false;
+        }
 
         // prerender if _escaped_fragment_ is in the query string
-        if ($request->query->has('_escaped_fragment_')) $shouldPrerender = true;
+        if ($request->query->has('_escaped_fragment_')) {
+            $shouldPrerender = true;
+        }
 
         // prerender if a crawler is detected
         foreach ($this->crawlerUserAgents as $crawlerUserAgent) {
-            if (\Str::contains($userAgent, strtolower($crawlerUserAgent))) {
+            if (Str::contains($userAgent, strtolower($crawlerUserAgent))) {
                 $shouldPrerender = true;
             }
         }
 
-        if ($bufferAgent) $shouldPrerender = true;
+        if ($bufferAgent) {
+            $shouldPrerender = true;
+        }
 
         return $shouldPrerender;
     }

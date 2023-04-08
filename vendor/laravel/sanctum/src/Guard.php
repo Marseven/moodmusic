@@ -5,6 +5,7 @@ namespace Laravel\Sanctum;
 use Illuminate\Contracts\Auth\Factory as AuthFactory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
+use Laravel\Sanctum\Events\TokenAuthenticated;
 
 class Guard
 {
@@ -60,18 +61,34 @@ class Guard
             }
         }
 
-        if ($token = $request->bearerToken()) {
+        if ($token = $this->getTokenFromRequest($request)) {
             $model = Sanctum::$personalAccessTokenModel;
 
             $accessToken = $model::findToken($token);
 
-            if (! $this->isValidAccessToken($accessToken)) {
+            if (! $this->isValidAccessToken($accessToken) ||
+                ! $this->supportsTokens($accessToken->tokenable)) {
                 return;
             }
 
-            return $this->supportsTokens($accessToken->tokenable) ? $accessToken->tokenable->withAccessToken(
-                tap($accessToken->forceFill(['last_used_at' => now()]))->save()
-            ) : null;
+            $tokenable = $accessToken->tokenable->withAccessToken(
+                $accessToken
+            );
+
+            event(new TokenAuthenticated($accessToken));
+
+            if (method_exists($accessToken->getConnection(), 'hasModifiedRecords') &&
+                method_exists($accessToken->getConnection(), 'setRecordModificationState')) {
+                tap($accessToken->getConnection()->hasModifiedRecords(), function ($hasModifiedRecords) use ($accessToken) {
+                    $accessToken->forceFill(['last_used_at' => now()])->save();
+
+                    $accessToken->getConnection()->setRecordModificationState($hasModifiedRecords);
+                });
+            } else {
+                $accessToken->forceFill(['last_used_at' => now()])->save();
+            }
+
+            return $tokenable;
         }
     }
 
@@ -89,6 +106,44 @@ class Guard
     }
 
     /**
+     * Get the token from the request.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return string|null
+     */
+    protected function getTokenFromRequest(Request $request)
+    {
+        if (is_callable(Sanctum::$accessTokenRetrievalCallback)) {
+            return (string) (Sanctum::$accessTokenRetrievalCallback)($request);
+        }
+
+        $token = $request->bearerToken();
+
+        return $this->isValidBearerToken($token) ? $token : null;
+    }
+
+    /**
+     * Determine if the bearer token is in the correct format.
+     *
+     * @param  string|null  $token
+     * @return bool
+     */
+    protected function isValidBearerToken(string $token = null)
+    {
+        if (! is_null($token) && str_contains($token, '|')) {
+            $model = new Sanctum::$personalAccessTokenModel;
+
+            if ($model->getKeyType() === 'int') {
+                [$id, $token] = explode('|', $token, 2);
+
+                return ctype_digit($id) && ! empty($token);
+            }
+        }
+
+        return ! empty($token);
+    }
+
+    /**
      * Determine if the provided access token is valid.
      *
      * @param  mixed  $accessToken
@@ -102,6 +157,7 @@ class Guard
 
         $isValid =
             (! $this->expiration || $accessToken->created_at->gt(now()->subMinutes($this->expiration)))
+            && (! $accessToken->expires_at || ! $accessToken->expires_at->isPast())
             && $this->hasValidProvider($accessToken->tokenable);
 
         if (is_callable(Sanctum::$accessTokenAuthenticationCallback)) {

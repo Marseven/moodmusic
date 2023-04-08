@@ -12,12 +12,11 @@ class SitemapController extends BaseController
         $this->middleware('isAdmin');
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function generate()
+    public function generate(): JsonResponse
     {
-        $sitemap = class_exists('App\Services\SitemapGenerator') ? app('App\Services\SitemapGenerator') : app(BaseSitemapGenerator::class);
+        $sitemap = class_exists('App\Services\SitemapGenerator')
+            ? app('App\Services\SitemapGenerator')
+            : app(BaseSitemapGenerator::class);
         app($sitemap->generate());
         return $this->success([]);
     }

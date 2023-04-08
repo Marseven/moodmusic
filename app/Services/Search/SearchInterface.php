@@ -3,7 +3,7 @@
 use Illuminate\Support\Collection;
 
 interface SearchInterface {
-    public function search(string $q, int $limit, array $modelTypes): array;
+    public function search(string $q, int $limit, array $modelTypes): Collection;
     public function artists(): Collection;
     public function albums(): Collection;
     public function tracks(): Collection;

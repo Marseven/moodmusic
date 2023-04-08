@@ -1,35 +1,25 @@
 <?php namespace App\Services\Playlists;
 
 use App\Services\Tracks\Queries\PlaylistTrackQuery;
-use App\Track;
-use Common\Database\Paginator;
-use Illuminate\Contracts\Pagination\LengthAwarePaginator;
-use Illuminate\Http\Request;
+use Common\Database\Datasource\Datasource;
+use Illuminate\Pagination\AbstractPaginator;
 
 class PlaylistTracksPaginator
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    public function __construct(Request $request)
+    public function paginate(int $playlistId): AbstractPaginator
     {
-        $this->request = $request;
-    }
-
-    public function paginate(int $playlistId): LengthAwarePaginator
-    {
-        $query = (new PlaylistTrackQuery([
-            'orderBy' => $this->request->get('orderBy'),
-            'orderDir' => $this->request->get('orderDir'),
+        $builder = (new PlaylistTrackQuery([
+            'orderBy' => request()->get('orderBy', 'position'),
+            'orderDir' => request()->get('orderDir', 'asc'),
         ]))->get($playlistId);
 
-        $paginator = (new Paginator($query, $this->request->all()));
-        $paginator->searchColumn = 'tracks.name';
-        $paginator->defaultPerPage = 30;
-        $paginator->dontSort = true;
+        $params = request()->all();
+        $params['perPage'] = request('perPage', 30);
+        $params['paginate'] = request('paginate', 'simple');
 
-        return $paginator->paginate();
+        $datasource = (new Datasource($builder, $params));
+        $datasource->order = false;
+
+        return $datasource->paginate();
     }
 }

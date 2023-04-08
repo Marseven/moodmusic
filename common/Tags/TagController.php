@@ -4,51 +4,40 @@ namespace Common\Tags;
 
 use App\Tag as AppTag;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use DB;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TagController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @param Request $request
-     */
-    public function __construct(Request $request)
+    public function __construct(protected Request $request)
     {
-        $this->request = $request;
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function index()
     {
         $this->authorize('index', Tag::class);
 
-        $paginator = (new Paginator($this->getModel(), $this->request->all()));
+        $builder = $this->getModel()->newQuery();
 
-        if ($type = $paginator->param('type')) {
-            $paginator->where('type', $type);
+        if ($type = $this->request->get('type')) {
+            $builder->where('type', $type);
         }
 
-        if ($notType = $paginator->param('notType')) {
-            $paginator->where('type', '!=', $notType);
+        if ($notType = $this->request->get('notType')) {
+            $builder->where('type', '!=', $notType);
         }
 
-        $pagination = $paginator->paginate();
+        // don't show "label" tags in bedrive
+        $builder->where('type', '!=', 'label');
+
+        $dataSource = new Datasource($builder, $this->request->all());
+
+        $pagination = $dataSource->paginate();
 
         return $this->success(['pagination' => $pagination]);
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function store()
     {
         $this->authorize('store', Tag::class);
@@ -68,11 +57,7 @@ class TagController extends BaseController
         return $this->success(['tag' => $tag]);
     }
 
-    /**
-     * @param int $tagId
-     * @return JsonResponse
-     */
-    public function update($tagId)
+    public function update(int $tagId)
     {
         $this->authorize('update', Tag::class);
 
@@ -89,26 +74,23 @@ class TagController extends BaseController
         return $this->success(['tag' => $tag]);
     }
 
-    /**
-     * @param string $ids
-     * @return JsonResponse
-     */
-    public function destroy($ids)
+    public function destroy(string $ids)
     {
         $tagIds = explode(',', $ids);
         $this->authorize('destroy', [Tag::class, $tagIds]);
 
-        $this->getModel()->whereIn('id', $tagIds)->delete();
-        DB::table('taggables')->whereIn('tag_id', $tagIds)->delete();
+        $this->getModel()
+            ->whereIn('id', $tagIds)
+            ->delete();
+        DB::table('taggables')
+            ->whereIn('tag_id', $tagIds)
+            ->delete();
 
         return $this->success();
     }
 
-    /**
-     * @return Tag
-     */
-    protected function getModel()
+    protected function getModel(): Tag
     {
-        return $tag = app(class_exists(AppTag::class) ? AppTag::class : Tag::class);
+        return app(class_exists(AppTag::class) ? AppTag::class : Tag::class);
     }
 }

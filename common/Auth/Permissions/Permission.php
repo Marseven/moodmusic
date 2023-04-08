@@ -3,22 +3,9 @@
 namespace Common\Auth\Permissions;
 
 use Arr;
-use Carbon\Carbon;
-use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Collection;
 
-/**
- * App\Permission
- *
- * @property int $id
- * @property string $name
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property Collection restrictions
- * @property string description
- * @mixin Eloquent
- */
 class Permission extends Model
 {
     protected $guarded = ['id'];
@@ -50,26 +37,19 @@ class Permission extends Model
         }
     }
 
-    /**
-     * @param string $name
-     * @return int|null
-     */
-    public function getRestrictionValue($name)
+    public function getRestrictionValue(string $name): int | bool | null
     {
         $restriction = $this->restrictions->first(function($restriction) use($name) {
             return $restriction['name'] === $name;
         });
 
-        return (int) Arr::get($restriction, 'value') ?: null;
+        return Arr::get($restriction, 'value') ?? null;
     }
 
     /**
      * Merge restrictions from specified permission into this permission.
-     *
-     * @param Permission $permission
-     * @return self
      */
-    public function mergeRestrictions(Permission $permission = null)
+    public function mergeRestrictions(Permission $permission = null): self
     {
         if ($permission) {
             $permission->restrictions->each(function($restriction) {

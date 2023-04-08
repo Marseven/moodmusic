@@ -1,6 +1,9 @@
 
 = Elasticsearch-PHP
 
+:doctype:           book
+
+include::{docs-root}/shared/versions/stack/{source_branch}.asciidoc[]
 include::{asciidoc-dir}/../../shared/attributes.asciidoc[]
 
 include::overview.asciidoc[]
@@ -9,22 +12,12 @@ include::installation.asciidoc[]
 
 include::connecting.asciidoc[]
 
+include::usage.asciidoc[]
+
 include::configuration.asciidoc[]
 
-include::php_json_objects.asciidoc[]
+include::operations.asciidoc[]
 
-include::index-operations.asciidoc[]
-
-include::crud.asciidoc[]
-
-include::search-operations.asciidoc[]
-
-include::breaking-changes.asciidoc[]
-
-include::community.asciidoc[]
-
-include::experimental-beta-apis.asciidoc[]
-
-include::build/classes.asciidoc[]
+include::release-notes.asciidoc[]
 
 include::redirects.asciidoc[]

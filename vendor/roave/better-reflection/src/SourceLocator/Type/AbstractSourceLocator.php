@@ -15,9 +15,6 @@ use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
 
 abstract class AbstractSourceLocator implements SourceLocator
 {
-    /** @var AstLocator */
-    private $astLocator;
-
     /**
      * Children should implement this method and return a LocatedSource object
      * which contains the source and the file from which it was located.
@@ -26,11 +23,10 @@ abstract class AbstractSourceLocator implements SourceLocator
      *   return new LocatedSource(['<?php class Foo {}', null]);
      *   return new LocatedSource([\file_get_contents('Foo.php'), 'Foo.php']);
      */
-    abstract protected function createLocatedSource(Identifier $identifier) : ?LocatedSource;
+    abstract protected function createLocatedSource(Identifier $identifier): LocatedSource|null;
 
-    public function __construct(AstLocator $astLocator)
+    public function __construct(private AstLocator $astLocator)
     {
-        $this->astLocator = $astLocator;
     }
 
     /**
@@ -38,7 +34,7 @@ abstract class AbstractSourceLocator implements SourceLocator
      *
      * @throws ParseToAstFailure
      */
-    public function locateIdentifier(Reflector $reflector, Identifier $identifier) : ?Reflection
+    public function locateIdentifier(Reflector $reflector, Identifier $identifier): Reflection|null
     {
         $locatedSource = $this->createLocatedSource($identifier);
 
@@ -48,7 +44,7 @@ abstract class AbstractSourceLocator implements SourceLocator
 
         try {
             return $this->astLocator->findReflection($reflector, $locatedSource, $identifier);
-        } catch (IdentifierNotFound $exception) {
+        } catch (IdentifierNotFound) {
             return null;
         }
     }
@@ -58,7 +54,7 @@ abstract class AbstractSourceLocator implements SourceLocator
      *
      * @throws ParseToAstFailure
      */
-    final public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType) : array
+    final public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
     {
         $locatedSource = $this->createLocatedSource(new Identifier(Identifier::WILDCARD, $identifierType));
 
@@ -69,7 +65,7 @@ abstract class AbstractSourceLocator implements SourceLocator
         return $this->astLocator->findReflectionsOfType(
             $reflector,
             $locatedSource,
-            $identifierType
+            $identifierType,
         );
     }
 }

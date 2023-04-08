@@ -9,6 +9,6 @@ class ReportPolicy
 
     public function index(User $user)
     {
-        return $user->hasPermission('reports.view');
+        return $user->hasPermission('admin.access');
     }
 }

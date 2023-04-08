@@ -27,8 +27,11 @@ class WorkspaceInvitation extends Notification implements ShouldQueue
      */
     private $joinCode;
 
-    public function __construct(Workspace $workspace, string $inviterName, string $joinCode)
-    {
+    public function __construct(
+        Workspace $workspace,
+        string $inviterName,
+        string $joinCode
+    ) {
         $this->workspace = $workspace;
         $this->inviterName = $inviterName;
         $this->joinCode = $joinCode;
@@ -56,15 +59,22 @@ class WorkspaceInvitation extends Notification implements ShouldQueue
         $data = [
             'inviter' => ucfirst($this->inviterName),
             'workspace' => ucfirst($this->workspace->name),
-            'siteName' => config('app.name')
+            'siteName' => config('app.name'),
         ];
 
-        return (new MailMessage)
+        return (new MailMessage())
             ->subject(__(':inviter invited you to :siteName :workspace', $data))
-            ->line(__("Join your :workspace teammates on :siteName", $data))
-            ->action(__('Join your team'), url("secure/workspace/join/{$this->joinCode}"))
+            ->line(__('Join your :workspace teammates on :siteName', $data))
+            ->action(
+                __('Join your team'),
+                url("workspace/join/{$this->joinCode}"),
+            )
             ->line(__('This invitation link will expire in 3 days.'))
-            ->line(__('If you do not wish to join this workspace, no further action is required.'));
+            ->line(
+                __(
+                    'If you do not wish to join this workspace, no further action is required.',
+                ),
+            );
     }
 
     /**
@@ -81,20 +91,28 @@ class WorkspaceInvitation extends Notification implements ShouldQueue
         ];
 
         return [
-            'image' => 'group-add',
             'inviteId' => $this->joinCode,
             'lines' => [
                 [
-                    'content' => __(':inviter invited you to join :workspace.', $translateData),
+                    'content' => __(
+                        ':inviter invited you to join `:workspace.`',
+                        $translateData,
+                    ),
                 ],
                 [
-                    'content' => __('Accepting the invitation will give you access to links, domains, overlays and other resources in this workspace.'),
+                    'content' => __(
+                        'Accepting the invitation will give you access to links, domains, overlays and other resources in this workspace.',
+                    ),
                 ],
             ],
             'buttonActions' => [
-                ['label' => 'Join', 'action' => 'join', 'color' => 'accent'],
-                ['label' => 'Decline', 'action' => 'decline', 'color' => 'warn'],
-            ]
+                ['label' => 'Join', 'action' => 'join', 'color' => 'primary'],
+                [
+                    'label' => 'Decline',
+                    'action' => 'decline',
+                    'color' => 'error',
+                ],
+            ],
         ];
     }
 }

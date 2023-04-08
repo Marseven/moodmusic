@@ -4,32 +4,32 @@ namespace App\Services\Artists;
 
 use App\Artist;
 use App\Genre;
-use Common\Database\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
-use Str;
+use Common\Database\Datasource\Datasource;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Str;
 
 class PaginateArtists
 {
-    public function execute(array $params, Genre $genre = null): LengthAwarePaginator
-    {
+    public function execute(
+        array $params,
+        Genre $genre = null
+    ): AbstractPaginator {
         if ($genre) {
-            $builder = $genre
-                ->artists()
-                ->whereNotNull('image_small')
-                ->groupBy('name');
+            $builder = $genre->artists()->whereNotNull("image_small");
         } else {
             $builder = Artist::query();
         }
 
-        $paginator = (new Paginator($builder, $params))
-            ->withCount('albums');
+        $builder->withCount(["albums"]);
 
-        $order = $paginator->getOrder();
-        if ($order['col'] === 'popularity') {
-            $paginator->dontSort = true;
-            $paginator->query()->orderByPopularity($order['dir']);
+        $datasource = new Datasource($builder, $params);
+        $order = $datasource->getOrder();
+
+        if (Str::endsWith($order['col'], 'popularity')) {
+            $datasource->order = false;
+            $builder->orderByPopularity($order["dir"]);
         }
 
-        return $paginator->paginate();
+        return $datasource->paginate();
     }
 }

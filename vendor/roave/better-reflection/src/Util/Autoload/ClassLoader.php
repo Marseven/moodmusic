@@ -9,23 +9,24 @@ use Roave\BetterReflection\Util\Autoload\ClassLoaderMethod\LoaderMethodInterface
 use Roave\BetterReflection\Util\Autoload\Exception\ClassAlreadyLoaded;
 use Roave\BetterReflection\Util\Autoload\Exception\ClassAlreadyRegistered;
 use Roave\BetterReflection\Util\Autoload\Exception\FailedToLoadClass;
-use function array_key_exists;
-use function class_exists;
-use function interface_exists;
-use function spl_autoload_register;
-use function trait_exists;
+use Roave\BetterReflection\Util\ClassExistenceChecker;
 
+use function array_key_exists;
+use function spl_autoload_register;
+
+/**
+ * @deprecated
+ *
+ * @psalm-suppress DeprecatedClass
+ */
 final class ClassLoader
 {
-    /** @var ReflectionClass[] */
-    private $reflections = [];
+    /** @var array<class-string, ReflectionClass> */
+    private array $reflections = [];
 
-    /** @var LoaderMethodInterface */
-    private $loaderMethod;
-
-    public function __construct(LoaderMethodInterface $loaderMethod)
+    public function __construct(private LoaderMethodInterface $loaderMethod)
     {
-        $this->loaderMethod = $loaderMethod;
+        /** @phpstan-ignore-next-line */
         spl_autoload_register($this, true, true);
     }
 
@@ -33,23 +34,21 @@ final class ClassLoader
      * @throws ClassAlreadyLoaded
      * @throws ClassAlreadyRegistered
      */
-    public function addClass(ReflectionClass $reflectionClass) : void
+    public function addClass(ReflectionClass $reflectionClass): void
     {
         if (array_key_exists($reflectionClass->getName(), $this->reflections)) {
             throw Exception\ClassAlreadyRegistered::fromReflectionClass($reflectionClass);
         }
 
-        if (class_exists($reflectionClass->getName(), false)) {
+        if (ClassExistenceChecker::exists($reflectionClass->getName())) {
             throw Exception\ClassAlreadyLoaded::fromReflectionClass($reflectionClass);
         }
 
         $this->reflections[$reflectionClass->getName()] = $reflectionClass;
     }
 
-    /**
-     * @throws FailedToLoadClass
-     */
-    public function __invoke(string $classToLoad) : bool
+    /** @throws FailedToLoadClass */
+    public function __invoke(string $classToLoad): bool
     {
         if (! array_key_exists($classToLoad, $this->reflections)) {
             return false;
@@ -57,9 +56,7 @@ final class ClassLoader
 
         $this->loaderMethod->__invoke($this->reflections[$classToLoad]);
 
-        if (! (class_exists($classToLoad, false)
-            || interface_exists($classToLoad, false)
-            || trait_exists($classToLoad, false))) {
+        if (! ClassExistenceChecker::exists($classToLoad)) {
             throw Exception\FailedToLoadClass::fromClassName($classToLoad);
         }
 

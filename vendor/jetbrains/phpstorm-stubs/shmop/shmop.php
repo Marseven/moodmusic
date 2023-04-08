@@ -1,6 +1,8 @@
 <?php
 
 // Start of shmop v.
+use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
 
 /**
  * Create or open shared memory block
@@ -9,12 +11,12 @@
  * System's id for the shared memory block.
  * Can be passed as a decimal or hex.
  * </p>
- * @param string $flags <p>
+ * @param string $mode <p>
  * The flags that you can use:
  * "a" for access (sets SHM_RDONLY for shmat)
  * use this flag when you need to open an existing shared memory
- * segment for read only
- * @param int $mode <p>
+ * segment for read only</p>
+ * @param int $permissions <p>
  * The permissions that you wish to assign to your memory segment, those
  * are the same as permission for a file. Permissions need to be passed
  * in octal form, like for example 0644
@@ -22,64 +24,59 @@
  * @param int $size <p>
  * The size of the shared memory block you wish to create in bytes
  * </p>
- * @return resource On success <b>shmop_open</b> will return an id that you can
+ * @return resource|false|Shmop On success <b>shmop_open</b> will return an id that you can
  * use to access the shared memory segment you've created. <b>FALSE</b> is
  * returned on failure.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_open ($key, $flags, $mode, $size) {}
+#[LanguageLevelTypeAware(["8.0" => "Shmop|false"], default: "resource|false")]
+function shmop_open(int $key, string $mode, int $permissions, int $size) {}
 
 /**
  * Read data from shared memory block
  * @link https://php.net/manual/en/function.shmop-read.php
- * @param resource $shmid <p>
+ * @param Shmop|resource $shmop <p>
  * The shared memory block identifier created by
  * <b>shmop_open</b>
  * </p>
- * @param int $start <p>
+ * @param int $offset <p>
  * Offset from which to start reading
  * </p>
- * @param int $count <p>
+ * @param int $size <p>
  * The number of bytes to read
  * </p>
  * @return string|false the data or <b>FALSE</b> on failure.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_read ($shmid, $start, $count) {}
+#[LanguageLevelTypeAware(["8.0" => "string"], default: "string|false")]
+function shmop_read(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, int $offset, int $size) {}
 
 /**
  * Close shared memory block
  * @link https://php.net/manual/en/function.shmop-close.php
- * @param resource $shmid <p>
+ * @param Shmop|resource $shmop <p>
  * The shared memory block identifier created by
  * <b>shmop_open</b>
  * </p>
  * @return void No value is returned.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_close ($shmid) {}
+#[Deprecated(since: '8.0')]
+function shmop_close(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): void {}
 
 /**
  * Get size of shared memory block
  * @link https://php.net/manual/en/function.shmop-size.php
- * @param resource $shmid <p>
+ * @param Shmop|resource $shmop <p>
  * The shared memory block identifier created by
  * <b>shmop_open</b>
  * </p>
  * @return int an int, which represents the number of bytes the shared memory
  * block occupies.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_size ($shmid) {}
+function shmop_size(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): int {}
 
 /**
  * Write data into shared memory block
  * @link https://php.net/manual/en/function.shmop-write.php
- * @param resource $shmid <p>
+ * @param Shmop|resource $shmop <p>
  * The shared memory block identifier created by
  * <b>shmop_open</b>
  * </p>
@@ -92,23 +89,24 @@ function shmop_size ($shmid) {}
  * </p>
  * @return int|false The size of the written <i>data</i>, or <b>FALSE</b> on
  * failure.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_write ($shmid, $data, $offset) {}
+#[LanguageLevelTypeAware(["8.0" => "int"], default: "int|false")]
+function shmop_write(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop, string $data, int $offset) {}
 
 /**
  * Delete shared memory block
  * @link https://php.net/manual/en/function.shmop-delete.php
- * @param resource $shmid <p>
+ * @param Shmop|resource $shmop <p>
  * The shared memory block identifier created by
  * <b>shmop_open</b>
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0.4
- * @since 5.0
  */
-function shmop_delete ($shmid) {}
+function shmop_delete(#[LanguageLevelTypeAware(["8.0" => "Shmop"], default: "resource")] $shmop): bool {}
+
+/**
+ * @since 8.0
+ */
+final class Shmop {}
 
 // End of shmop v.
-?>

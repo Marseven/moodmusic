@@ -13,6 +13,7 @@ class CreateBackStageRequestsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('backstage_requests')) return;
         Schema::create('backstage_requests', function (Blueprint $table) {
             $table->id();
             $table->string('type', 20)->index()->default('become-artist');
@@ -32,6 +33,6 @@ class CreateBackStageRequestsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('become_artist_requests');
+        Schema::dropIfExists('backstage_requests');
     }
 }

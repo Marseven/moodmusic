@@ -28,7 +28,7 @@ class Message
      * @var string
      */
     public $payload;
-    
+
     /**
      * @var int
      */
@@ -48,11 +48,10 @@ class Message
      * @var array
      */
     public $headers;
+    public $opaque;
 
     /**
      * @return string
      */
-    public function errstr()
-    {
-    }
+    public function errstr() {}
 }

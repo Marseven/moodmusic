@@ -1,42 +1,20 @@
 <?php namespace App\Http\Controllers\Search;
 
-use App;
 use App\Services\Providers\ProviderResolver;
 use App\Track;
 use Common\Core\BaseController;
 use Common\Settings\Settings;
-use Gate;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
-use Str;
+use Illuminate\Support\Facades\Gate;
 
 class SearchController extends BaseController
 {
-    /**
-     * @var ProviderResolver
-     */
-    private $provider;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var Settings
-     */
-    private $settings;
-
     public function __construct(
-        Request $request,
-        Settings $settings,
-        ProviderResolver $provider
-    )
-    {
-        $this->request = $request;
-        $this->settings = $settings;
-        $this->provider = $provider;
+        protected Request $request,
+        protected Settings $settings,
+        protected ProviderResolver $provider,
+    ) {
     }
 
     public function index()
@@ -45,7 +23,10 @@ class SearchController extends BaseController
 
         $limit = $this->request->get('limit', 3);
         $query = $this->request->get('query');
-        $contentProvider = $this->provider->get('search', request('localOnly') ? 'local' : null);
+        $contentProvider = $this->provider->get(
+            'search',
+            request('localOnly') ? 'local' : null,
+        );
 
         $response = [
             'query' => e($query),
@@ -53,13 +34,21 @@ class SearchController extends BaseController
         ];
 
         if ($query) {
-            $modelTypes = array_filter($modelTypes, function($modelType) {
-                // artist => App\Artist
-                $model = 'App\\' . ucfirst($modelType);
-                return Gate::inspect('index', $model)->allowed();
+            $modelTypes = array_filter($modelTypes, function ($modelType) {
+                return Gate::inspect(
+                    'index',
+                    modelTypeToNamespace($modelType),
+                )->allowed();
             });
 
             $results = $contentProvider->search($query, $limit, $modelTypes);
+
+            if ($this->request->get('normalize')) {
+                $results = $results->mapWithKeys(function($models, $modelName) {
+                    return [$modelName => $models->map(fn($model) => $model->toNormalizedArray())];
+                });
+            }
+
             $response['results'] = $results;
 
             if ($this->request->get('flatten')) {
@@ -70,28 +59,26 @@ class SearchController extends BaseController
         return $this->success($response);
     }
 
-    /**
-     * @param int $trackId
-     * @param string $artistName
-     * @param string $trackName
-     * @return array
-     */
-    public function searchAudio($trackId, $artistName, $trackName)
-    {
+    public function searchAudio(
+        int $trackId,
+        string $artistName,
+        string $trackName,
+    ) {
         $this->authorize('index', Track::class);
 
-        return $this->provider->get('audio_search')->search($trackId, $artistName, $trackName, 1);
+        $results = $this->provider
+            ->get('audio_search')
+            ->search($trackId, $artistName, $trackName, 1);
+
+        return $this->success(['results' => $results]);
     }
 
     /**
      * Remove artists that were blocked by admin from search results.
-     *
-     * @param array $results
-     * @return array
      */
-    private function filterOutBlockedArtists($results)
+    private function filterOutBlockedArtists(array $results): array
     {
-        if (($artists = $this->settings->get('artists.blocked'))) {
+        if ($artists = $this->settings->get('artists.blocked')) {
             $artists = json_decode($artists);
 
             if (isset($results['artists'])) {
@@ -105,22 +92,32 @@ class SearchController extends BaseController
             if (isset($results['albums'])) {
                 foreach ($results['albums'] as $k => $album) {
                     if (isset($album['artists'])) {
-                        if ($this->shouldBeBlocked($album['artists'][0]['name'], $artists)) {
+                        if (
+                            $this->shouldBeBlocked(
+                                $album['artists'][0]['name'],
+                                $artists,
+                            )
+                        ) {
                             unset($results['albums'][$k]);
                         }
                     }
                 }
             }
 
-           if (isset($results['tracks'])) {
-               foreach ($results['tracks'] as $k => $track) {
-                   if (isset($track['album']['artists'])) {
-                       if ($this->shouldBeBlocked($track['album']['artists'][0]['name'], $artists)) {
-                           unset($results['tracks'][$k]);
-                       }
-                   }
-               }
-           }
+            if (isset($results['tracks'])) {
+                foreach ($results['tracks'] as $k => $track) {
+                    if (isset($track['album']['artists'])) {
+                        if (
+                            $this->shouldBeBlocked(
+                                $track['album']['artists'][0]['name'],
+                                $artists,
+                            )
+                        ) {
+                            unset($results['tracks'][$k]);
+                        }
+                    }
+                }
+            }
         }
 
         return $results;
@@ -128,16 +125,15 @@ class SearchController extends BaseController
 
     /**
      * Check if given artist should be blocked.
-     *
-     * @param string $name
-     * @param array $toBlock
-     * @return boolean
      */
-    private function shouldBeBlocked($name, $toBlock)
+    private function shouldBeBlocked(string $name, array $toBlock): bool
     {
         foreach ($toBlock as $blockedName) {
-            $pattern = '/' . str_replace('*', '.*?', strtolower($blockedName)) . '/i';
-            if (preg_match($pattern, $name)) return true;
+            $pattern =
+                '/' . str_replace('*', '.*?', strtolower($blockedName)) . '/i';
+            if (preg_match($pattern, $name)) {
+                return true;
+            }
         }
     }
 }

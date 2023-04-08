@@ -2,25 +2,24 @@
 
 use App;
 use App\Artist;
-use App\Services\Artists\ArtistAlbumsPaginator;
+use App\Services\Artists\PaginateArtistAlbums;
 use Common\Core\BaseController;
 
-class ArtistAlbumsController extends BaseController {
-
-    /**
-     * @var ArtistAlbumsPaginator
-     */
-    private $paginator;
-
-	public function __construct(ArtistAlbumsPaginator $paginator)
-	{
-        $this->paginator = $paginator;
+class ArtistAlbumsController extends BaseController
+{
+    public function __construct(protected PaginateArtistAlbums $paginator)
+    {
     }
 
-	public function index(Artist $artist)
-	{
-		$this->authorize('show', $artist);
+    public function index(Artist $artist)
+    {
+        $this->authorize('show', $artist);
 
-	    return $this->success(['pagination' => $this->paginator->paginate($artist, request()->all())]);
-	}
+        return $this->success([
+            'pagination' => $this->paginator->execute(
+                $artist,
+                request()->all(),
+            ),
+        ]);
+    }
 }

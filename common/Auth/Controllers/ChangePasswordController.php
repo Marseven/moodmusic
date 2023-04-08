@@ -1,40 +1,21 @@
 <?php namespace Common\Auth\Controllers;
 
-use Hash;
 use App\User;
-use Illuminate\Http\Request;
+use Auth;
+use Common\Auth\Validators\HashIsValid;
 use Common\Core\BaseController;
+use Hash;
+use Illuminate\Http\Request;
+use Session;
 
 class ChangePasswordController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var User
-     */
-    private $user;
-
-    /**
-     * @param Request $request
-     * @param User $user
-     */
-    public function __construct(Request $request, User $user)
+    public function __construct(protected Request $request, User $user)
     {
-        $this->user = $user;
-        $this->request = $request;
     }
 
-    /**
-     * @param int $userId
-     * @return User
-     */
-    public function change($userId)
+    public function change(User $user)
     {
-        $user = $this->user->findOrFail($userId);
-
         $this->authorize('update', $user);
 
         $this->validate($this->request, $this->rules($user));
@@ -42,21 +23,26 @@ class ChangePasswordController extends BaseController
         $password = Hash::make($this->request->get('new_password'));
         $user->forceFill(['password' => $password])->save();
 
-        return $user;
+        // need to re-login after changing password
+        if (Auth::id() === $user->id) {
+            Session::forget('password_hash_web');
+            Auth::guard('web')->login($user);
+        }
+
+        return $this->success();
     }
 
-    /**
-     * @param User $user
-     * @return array
-     */
-    private function rules(User $user)
+    private function rules(User $user): array
     {
         $rules = [
-            'new_password' => 'required|confirmed'
+            'new_password' => 'required|confirmed',
         ];
 
         if ($user->hasPassword) {
-            $rules['current_password'] = "required|hash:{$user->password}";
+            $rules['current_password'] = [
+                'required',
+                new HashIsValid($user->password),
+            ];
             $rules['new_password'] .= '|different:current_password';
         }
 

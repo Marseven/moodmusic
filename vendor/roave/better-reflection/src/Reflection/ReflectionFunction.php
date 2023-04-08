@@ -6,63 +6,88 @@ namespace Roave\BetterReflection\Reflection;
 
 use Closure;
 use PhpParser\Node;
-use PhpParser\Node\FunctionLike as FunctionNode;
 use PhpParser\Node\Stmt\Namespace_ as NamespaceNode;
 use Roave\BetterReflection\BetterReflection;
 use Roave\BetterReflection\Reflection\Adapter\Exception\NotImplemented;
 use Roave\BetterReflection\Reflection\Exception\FunctionDoesNotExist;
 use Roave\BetterReflection\Reflection\StringCast\ReflectionFunctionStringCast;
+use Roave\BetterReflection\Reflector\DefaultReflector;
 use Roave\BetterReflection\Reflector\Exception\IdentifierNotFound;
-use Roave\BetterReflection\Reflector\FunctionReflector;
 use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
+use Roave\BetterReflection\SourceLocator\Type\AggregateSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\ClosureSourceLocator;
+
+use function assert;
 use function function_exists;
 
-class ReflectionFunction extends ReflectionFunctionAbstract implements Reflection
+class ReflectionFunction implements Reflection
 {
-    /**
-     * @throws IdentifierNotFound
-     */
-    public static function createFromName(string $functionName) : self
-    {
-        return (new BetterReflection())->functionReflector()->reflect($functionName);
+    use ReflectionFunctionAbstract;
+
+    public const CLOSURE_NAME = '{closure}';
+
+    private Node\Stmt\Function_|Node\Expr\Closure|Node\Expr\ArrowFunction $functionNode;
+
+    private function __construct(
+        private Reflector $reflector,
+        private Node\Stmt\ClassMethod|Node\Stmt\Function_|Node\Expr\Closure|Node\Expr\ArrowFunction $node,
+        private LocatedSource $locatedSource,
+        private NamespaceNode|null $declaringNamespace = null,
+    ) {
+        assert($node instanceof Node\Stmt\Function_ || $node instanceof Node\Expr\Closure || $node instanceof Node\Expr\ArrowFunction);
+
+        $this->functionNode = $node;
     }
 
-    /**
-     * @throws IdentifierNotFound
-     */
-    public static function createFromClosure(Closure $closure) : self
+    /** @throws IdentifierNotFound */
+    public static function createFromName(string $functionName): self
+    {
+        return (new BetterReflection())->reflector()->reflectFunction($functionName);
+    }
+
+    /** @throws IdentifierNotFound */
+    public static function createFromClosure(Closure $closure): self
     {
         $configuration = new BetterReflection();
 
-        return (new FunctionReflector(
+        return (new DefaultReflector(new AggregateSourceLocator([
+            $configuration->sourceLocator(),
             new ClosureSourceLocator($closure, $configuration->phpParser()),
-            $configuration->classReflector()
-        ))->reflect(self::CLOSURE_NAME);
+        ])))->reflectFunction(self::CLOSURE_NAME);
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return ReflectionFunctionStringCast::toString($this);
     }
 
-    /**
-     * @internal
-     *
-     * @param Node\Stmt\ClassMethod|Node\Stmt\Function_|Node\Expr\Closure $node Node has to be processed by the PhpParser\NodeVisitor\NameResolver
-     */
+    /** @internal */
     public static function createFromNode(
         Reflector $reflector,
-        FunctionNode $node,
+        Node\Stmt\Function_|Node\Expr\Closure|Node\Expr\ArrowFunction $node,
         LocatedSource $locatedSource,
-        ?NamespaceNode $namespaceNode = null
-    ) : self {
-        $function = new self();
+        NamespaceNode|null $namespaceNode = null,
+    ): self {
+        return new self($reflector, $node, $locatedSource, $namespaceNode);
+    }
 
-        $function->populateFunctionAbstract($reflector, $node, $locatedSource, $namespaceNode);
+    public function getAst(): Node\Stmt\Function_|Node\Expr\Closure|Node\Expr\ArrowFunction
+    {
+        return $this->functionNode;
+    }
 
-        return $function;
+    /**
+     * Get the "short" name of the function (e.g. for A\B\foo, this will return
+     * "foo").
+     */
+    public function getShortName(): string
+    {
+        if ($this->functionNode instanceof Node\Expr\Closure || $this->functionNode instanceof Node\Expr\ArrowFunction) {
+            return self::CLOSURE_NAME;
+        }
+
+        return $this->functionNode->name->name;
     }
 
     /**
@@ -77,16 +102,23 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
      *
      * @todo https://github.com/Roave/BetterReflection/issues/14
      */
-    public function isDisabled() : bool
+    public function isDisabled(): bool
     {
         return false;
+    }
+
+    public function isStatic(): bool
+    {
+        $node = $this->getAst();
+
+        return ($node instanceof Node\Expr\Closure || $node instanceof Node\Expr\ArrowFunction) && $node->static;
     }
 
     /**
      * @throws NotImplemented
      * @throws FunctionDoesNotExist
      */
-    public function getClosure() : Closure
+    public function getClosure(): Closure
     {
         $this->assertIsNoClosure();
 
@@ -94,33 +126,25 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
 
         $this->assertFunctionExist($functionName);
 
-        return static function (...$args) use ($functionName) {
-            return $functionName(...$args);
-        };
+        return static fn (mixed ...$args): mixed => $functionName(...$args);
     }
 
     /**
-     * @param mixed ...$args
-     *
-     * @return mixed
-     *
      * @throws NotImplemented
      * @throws FunctionDoesNotExist
      */
-    public function invoke(...$args)
+    public function invoke(mixed ...$args): mixed
     {
         return $this->invokeArgs($args);
     }
 
     /**
-     * @param mixed[] $args
-     *
-     * @return mixed
+     * @param array<mixed> $args
      *
      * @throws NotImplemented
      * @throws FunctionDoesNotExist
      */
-    public function invokeArgs(array $args = [])
+    public function invokeArgs(array $args = []): mixed
     {
         $this->assertIsNoClosure();
 
@@ -131,22 +155,16 @@ class ReflectionFunction extends ReflectionFunctionAbstract implements Reflectio
         return $functionName(...$args);
     }
 
-    /**
-     * @throws NotImplemented
-     */
-    private function assertIsNoClosure() : void
+    /** @throws NotImplemented */
+    private function assertIsNoClosure(): void
     {
         if ($this->isClosure()) {
             throw new NotImplemented('Not implemented for closures');
         }
     }
 
-    /**
-     * @throws FunctionDoesNotExist
-     *
-     * @psalm-assert callable-string $functionName
-     */
-    private function assertFunctionExist(string $functionName) : void
+    /** @throws FunctionDoesNotExist */
+    private function assertFunctionExist(string $functionName): void
     {
         if (! function_exists($functionName)) {
             throw FunctionDoesNotExist::fromName($functionName);

@@ -8,29 +8,26 @@ use Roave\BetterReflection\Identifier\Identifier;
 use Roave\BetterReflection\Identifier\IdentifierType;
 use Roave\BetterReflection\Reflection\Reflection;
 use Roave\BetterReflection\Reflector\Reflector;
+
 use function array_key_exists;
-use function get_class;
 use function spl_object_hash;
+use function sprintf;
 
 final class MemoizingSourceLocator implements SourceLocator
 {
-    /** @var SourceLocator */
-    private $wrappedSourceLocator;
+    /** @var array<string, Reflection|null> indexed by reflector key and identifier cache key */
+    private array $cacheByIdentifierKeyAndOid = [];
 
-    /** @var Reflection[]|null[] indexed by reflector key and identifier cache key */
-    private $cacheByIdentifierKeyAndOid = [];
+    /** @var array<string, list<Reflection>> indexed by reflector key and identifier type cache key */
+    private array $cacheByIdentifierTypeKeyAndOid = [];
 
-    /** @var Reflection[][] indexed by reflector key and identifier type cache key */
-    private $cacheByIdentifierTypeKeyAndOid = [];
-
-    public function __construct(SourceLocator $wrappedSourceLocator)
+    public function __construct(private SourceLocator $wrappedSourceLocator)
     {
-        $this->wrappedSourceLocator = $wrappedSourceLocator;
     }
 
-    public function locateIdentifier(Reflector $reflector, Identifier $identifier) : ?Reflection
+    public function locateIdentifier(Reflector $reflector, Identifier $identifier): Reflection|null
     {
-        $cacheKey = $this->reflectorCacheKey($reflector) . '_' . $this->identifierToCacheKey($identifier);
+        $cacheKey = sprintf('%s_%s', $this->reflectorCacheKey($reflector), $this->identifierToCacheKey($identifier));
 
         if (array_key_exists($cacheKey, $this->cacheByIdentifierKeyAndOid)) {
             return $this->cacheByIdentifierKeyAndOid[$cacheKey];
@@ -40,12 +37,10 @@ final class MemoizingSourceLocator implements SourceLocator
             = $this->wrappedSourceLocator->locateIdentifier($reflector, $identifier);
     }
 
-    /**
-     * @return Reflection[]
-     */
-    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType) : array
+    /** @return list<Reflection> */
+    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
     {
-        $cacheKey = $this->reflectorCacheKey($reflector) . '_' . $this->identifierTypeToCacheKey($identifierType);
+        $cacheKey = sprintf('%s_%s', $this->reflectorCacheKey($reflector), $this->identifierTypeToCacheKey($identifierType));
 
         if (array_key_exists($cacheKey, $this->cacheByIdentifierTypeKeyAndOid)) {
             return $this->cacheByIdentifierTypeKeyAndOid[$cacheKey];
@@ -55,20 +50,22 @@ final class MemoizingSourceLocator implements SourceLocator
             = $this->wrappedSourceLocator->locateIdentifiersByType($reflector, $identifierType);
     }
 
-    private function reflectorCacheKey(Reflector $reflector) : string
+    private function reflectorCacheKey(Reflector $reflector): string
     {
-        return 'type:' . get_class($reflector)
-            . '#oid:' . spl_object_hash($reflector);
+        return sprintf('type:%s#oid:%s', $reflector::class, spl_object_hash($reflector));
     }
 
-    private function identifierToCacheKey(Identifier $identifier) : string
+    private function identifierToCacheKey(Identifier $identifier): string
     {
-        return $this->identifierTypeToCacheKey($identifier->getType())
-            . '#name:' . $identifier->getName();
+        return sprintf(
+            '%s#name:%s',
+            $this->identifierTypeToCacheKey($identifier->getType()),
+            $identifier->getName(),
+        );
     }
 
-    private function identifierTypeToCacheKey(IdentifierType $identifierType) : string
+    private function identifierTypeToCacheKey(IdentifierType $identifierType): string
     {
-        return 'type:' . $identifierType->getName();
+        return sprintf('type:%s', $identifierType->getName());
     }
 }

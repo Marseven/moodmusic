@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\SourceLocator\SourceStubber;
 
 use LogicException;
-use PhpParser\Builder;
 use PhpParser\Builder\Class_;
-use PhpParser\Builder\Declaration;
+use PhpParser\Builder\ClassConst;
+use PhpParser\Builder\Enum_;
 use PhpParser\Builder\Function_;
 use PhpParser\Builder\FunctionLike;
 use PhpParser\Builder\Interface_;
@@ -16,38 +16,44 @@ use PhpParser\Builder\Param;
 use PhpParser\Builder\Property;
 use PhpParser\Builder\Trait_;
 use PhpParser\BuilderFactory;
-use PhpParser\BuilderHelpers;
 use PhpParser\Comment\Doc;
 use PhpParser\Node;
-use PhpParser\Node\Const_;
+use PhpParser\Node\IntersectionType;
 use PhpParser\Node\Name;
 use PhpParser\Node\Name\FullyQualified;
 use PhpParser\Node\NullableType;
-use PhpParser\Node\Stmt\Class_ as ClassNode;
-use PhpParser\Node\Stmt\ClassConst;
-use PhpParser\Node\Stmt\TraitUse;
-use PhpParser\Node\Stmt\TraitUseAdaptation;
-use PhpParser\NodeAbstract;
+use PhpParser\Node\UnionType;
 use PhpParser\PrettyPrinter\Standard;
 use ReflectionClass as CoreReflectionClass;
-use ReflectionClassConstant;
+use ReflectionClassConstant as CoreReflectionClassConstant;
+use ReflectionEnum as CoreReflectionEnum;
+use ReflectionEnumBackedCase as CoreReflectionEnumBackedCase;
+use ReflectionEnumUnitCase as CoreReflectionEnumUnitCase;
 use ReflectionFunction as CoreReflectionFunction;
 use ReflectionFunctionAbstract as CoreReflectionFunctionAbstract;
+use ReflectionIntersectionType as CoreReflectionIntersectionType;
 use ReflectionMethod as CoreReflectionMethod;
 use ReflectionNamedType as CoreReflectionNamedType;
 use ReflectionParameter;
 use ReflectionProperty as CoreReflectionProperty;
-use Reflector as CoreReflector;
+use ReflectionType as CoreReflectionType;
+use ReflectionUnionType as CoreReflectionUnionType;
+use Roave\BetterReflection\Reflection\Annotation\AnnotationHelper;
+use Roave\BetterReflection\Util\ClassExistenceChecker;
+
 use function array_diff;
 use function array_key_exists;
 use function assert;
-use function class_exists;
 use function explode;
 use function function_exists;
 use function get_defined_constants;
+use function implode;
 use function in_array;
-use function interface_exists;
-use function trait_exists;
+use function is_array;
+use function is_resource;
+use function method_exists;
+use function preg_replace;
+use function sprintf;
 
 /**
  * It generates a stub source from internal reflection for given class or function name.
@@ -58,11 +64,9 @@ final class ReflectionSourceStubber implements SourceStubber
 {
     private const BUILDER_OPTIONS = ['shortArraySyntax' => true];
 
-    /** @var BuilderFactory */
-    private $builderFactory;
+    private BuilderFactory $builderFactory;
 
-    /** @var Standard */
-    private $prettyPrinter;
+    private Standard $prettyPrinter;
 
     public function __construct()
     {
@@ -70,42 +74,57 @@ final class ReflectionSourceStubber implements SourceStubber
         $this->prettyPrinter  = new Standard(self::BUILDER_OPTIONS);
     }
 
-    public function generateClassStub(string $className) : ?StubData
+    /** @param class-string|trait-string $className */
+    public function generateClassStub(string $className): StubData|null
     {
-        if (! (class_exists($className, false) || interface_exists($className, false) || trait_exists($className, false))) {
+        if (! ClassExistenceChecker::exists($className)) {
             return null;
         }
 
-        $classReflection = new CoreReflectionClass($className);
+        /** phpcs:disable SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly.ReferenceViaFullyQualifiedName */
+        $isEnum = function_exists('enum_exists') && \enum_exists($className, false);
+        /** phpcs:enable */
+
+        $classReflection = $isEnum ? new CoreReflectionEnum($className) : new CoreReflectionClass($className);
         $classNode       = $this->createClass($classReflection);
 
         if ($classNode instanceof Class_) {
             $this->addClassModifiers($classNode, $classReflection);
         }
 
-        if ($classNode instanceof Class_ || $classNode instanceof Interface_) {
+        if ($classNode instanceof Class_ || $classNode instanceof Interface_ || $classNode instanceof Enum_) {
             $this->addExtendsAndImplements($classNode, $classReflection);
         }
 
         if ($classNode instanceof Class_ || $classNode instanceof Trait_) {
             $this->addProperties($classNode, $classReflection);
+        }
+
+        if ($classNode instanceof Class_ || $classNode instanceof Trait_ || $classNode instanceof Enum_) {
             $this->addTraitUse($classNode, $classReflection);
         }
 
         $this->addDocComment($classNode, $classReflection);
-        $this->addConstants($classNode, $classReflection);
+
+        if ($classNode instanceof Enum_ && $classReflection instanceof CoreReflectionEnum) {
+            $this->addEnumBackingType($classNode, $classReflection);
+            $this->addEnumCases($classNode, $classReflection);
+        }
+
+        $this->addClassConstants($classNode, $classReflection);
         $this->addMethods($classNode, $classReflection);
+
+        $node = $classNode->getNode();
+        $stub = $classReflection->inNamespace()
+            ? $this->generateStubInNamespace($node, $classReflection->getNamespaceName())
+            : $this->generateStub($node);
 
         $extensionName = $classReflection->getExtensionName() ?: null;
 
-        if (! $classReflection->inNamespace()) {
-            return $this->createStubData($this->generateStub($classNode->getNode()), $extensionName);
-        }
-
-        return $this->createStubData($this->generateStubInNamespace($classNode->getNode(), $classReflection->getNamespaceName()), $extensionName);
+        return $this->createStubData($stub, $extensionName);
     }
 
-    public function generateFunctionStub(string $functionName) : ?StubData
+    public function generateFunctionStub(string $functionName): StubData|null
     {
         if (! function_exists($functionName)) {
             return null;
@@ -117,6 +136,17 @@ final class ReflectionSourceStubber implements SourceStubber
         $this->addDocComment($functionNode, $functionReflection);
         $this->addParameters($functionNode, $functionReflection);
 
+        $returnType = $functionReflection->getReturnType();
+        if ($returnType === null && method_exists($functionReflection, 'getTentativeReturnType')) {
+            /** @psalm-var CoreReflectionType|null $returnType */
+            $returnType = $functionReflection->getTentativeReturnType();
+        }
+
+        if ($returnType !== null) {
+            assert($returnType instanceof CoreReflectionNamedType || $returnType instanceof CoreReflectionUnionType || $returnType instanceof CoreReflectionIntersectionType);
+            $functionNode->setReturnType($this->formatType($returnType));
+        }
+
         $extensionName = $functionReflection->getExtensionName() ?: null;
 
         if (! $functionReflection->inNamespace()) {
@@ -126,13 +156,8 @@ final class ReflectionSourceStubber implements SourceStubber
         return $this->createStubData($this->generateStubInNamespace($functionNode->getNode(), $functionReflection->getNamespaceName()), $extensionName);
     }
 
-    public function generateConstantStub(string $constantName) : ?StubData
+    public function generateConstantStub(string $constantName): StubData|null
     {
-        // Not supported because of resource as value
-        if (in_array($constantName, ['STDIN', 'STDOUT', 'STDERR'], true)) {
-            return null;
-        }
-
         $constantData = $this->findConstantData($constantName);
 
         if ($constantData === null) {
@@ -141,17 +166,19 @@ final class ReflectionSourceStubber implements SourceStubber
 
         [$constantValue, $extensionName] = $constantData;
 
+        if (is_resource($constantValue)) {
+            $constantValue = $this->builderFactory->funcCall('constant', [$constantName]);
+        }
+
         $constantNode = $this->builderFactory->funcCall('define', [$constantName, $constantValue]);
 
         return $this->createStubData($this->generateStub($constantNode), $extensionName);
     }
 
-    /**
-     * @return array{0: scalar|scalar[]|null, 1: string}|null
-     */
-    private function findConstantData(string $constantName) : ?array
+    /** @return array{0: scalar|list<scalar>|resource|null, 1: string|null}|null */
+    private function findConstantData(string $constantName): array|null
     {
-        /** @var array<string, array<string, int|string|float|bool|array|resource|null>> $constants */
+        /** @var array<string, array<string, scalar|list<scalar>|resource|null>> $constants */
         $constants = get_defined_constants(true);
 
         foreach ($constants as $constantExtensionName => $extensionConstants) {
@@ -166,11 +193,12 @@ final class ReflectionSourceStubber implements SourceStubber
         return null;
     }
 
-    /**
-     * @return Class_|Interface_|Trait_
-     */
-    private function createClass(CoreReflectionClass $classReflection) : Declaration
+    private function createClass(CoreReflectionClass $classReflection): Class_|Interface_|Trait_|Enum_
     {
+        if ($classReflection instanceof CoreReflectionEnum) {
+            return $this->builderFactory->enum($classReflection->getShortName());
+        }
+
         if ($classReflection->isTrait()) {
             return $this->builderFactory->trait($classReflection->getShortName());
         }
@@ -182,20 +210,52 @@ final class ReflectionSourceStubber implements SourceStubber
         return $this->builderFactory->class($classReflection->getShortName());
     }
 
-    /**
-     * @param Class_|Interface_|Trait_|Method|Property|Function_                                     $node
-     * @param CoreReflectionClass|CoreReflectionMethod|CoreReflectionProperty|CoreReflectionFunction $reflection
-     */
-    private function addDocComment(Builder $node, CoreReflector $reflection) : void
-    {
-        if ($reflection->getDocComment() === false) {
+    private function addDocComment(
+        Class_|Interface_|Trait_|Enum_|Method|Property|Function_ $node,
+        CoreReflectionClass|CoreReflectionMethod|CoreReflectionProperty|CoreReflectionFunction $reflection,
+    ): void {
+        $docComment  = $reflection->getDocComment() ?: '';
+        $annotations = [];
+
+        if (
+            ($reflection instanceof CoreReflectionMethod || $reflection instanceof CoreReflectionFunction)
+            && $reflection->isInternal()
+        ) {
+            if ($reflection->isDeprecated()) {
+                $annotations[] = '@deprecated';
+            }
+
+            if (method_exists($reflection, 'hasTentativeReturnType') && $reflection->hasTentativeReturnType()) {
+                $annotations[] = sprintf('@%s', AnnotationHelper::TENTATIVE_RETURN_TYPE_ANNOTATION);
+            }
+        }
+
+        if ($docComment === '' && $annotations === []) {
             return;
         }
 
-        $node->setDocComment(new Doc($reflection->getDocComment()));
+        if ($docComment === '') {
+            $docComment = sprintf("/**\n* %s\n*/", implode("\n *", $annotations));
+        } elseif ($annotations !== []) {
+            $docComment = preg_replace('~\s+\*/$~', sprintf("\n* %s\n*/", implode("\n *", $annotations)), $docComment);
+        }
+
+        $node->setDocComment(new Doc($docComment));
     }
 
-    private function addClassModifiers(Class_ $classNode, CoreReflectionClass $classReflection) : void
+    private function addEnumBackingType(Enum_ $enumNode, CoreReflectionEnum $enumReflection): void
+    {
+        if (! $enumReflection->isBacked()) {
+            return;
+        }
+
+        $backingType = $enumReflection->getBackingType();
+        assert($backingType instanceof CoreReflectionNamedType);
+
+        $enumNode->setScalarType($backingType->getName());
+    }
+
+    private function addClassModifiers(Class_ $classNode, CoreReflectionClass $classReflection): void
     {
         if (! $classReflection->isInterface() && $classReflection->isAbstract()) {
             // Interface \Iterator is interface and abstract
@@ -209,17 +269,17 @@ final class ReflectionSourceStubber implements SourceStubber
         $classNode->makeFinal();
     }
 
-    /**
-     * @param Class_|Interface_ $classNode
-     */
-    private function addExtendsAndImplements(Declaration $classNode, CoreReflectionClass $classReflection) : void
+    private function addExtendsAndImplements(Class_|Interface_|Enum_ $classNode, CoreReflectionClass $classReflection): void
     {
-        $parentClass = $classReflection->getParentClass();
-        $interfaces  = $classReflection->getInterfaceNames();
+        $interfaces = $classReflection->getInterfaceNames();
 
-        if ($parentClass) {
-            $classNode->extend(new FullyQualified($parentClass->getName()));
-            $interfaces = array_diff($interfaces, $parentClass->getInterfaceNames());
+        if ($classNode instanceof Class_ || $classNode instanceof Interface_) {
+            $parentClass = $classReflection->getParentClass();
+
+            if ($parentClass !== false) {
+                $classNode->extend(new FullyQualified($parentClass->getName()));
+                $interfaces = array_diff($interfaces, $parentClass->getInterfaceNames());
+            }
         }
 
         foreach ($classReflection->getInterfaces() as $interface) {
@@ -227,39 +287,45 @@ final class ReflectionSourceStubber implements SourceStubber
         }
 
         foreach ($interfaces as $interfaceName) {
+            $interfaceNode = new FullyQualified($interfaceName);
+
             if ($classNode instanceof Interface_) {
-                $classNode->extend(new FullyQualified($interfaceName));
+                $classNode->extend($interfaceNode);
             } else {
-                $classNode->implement(new FullyQualified($interfaceName));
+                $classNode->implement($interfaceNode);
             }
         }
     }
 
-    private function addTraitUse(Declaration $classNode, CoreReflectionClass $classReflection) : void
+    private function addTraitUse(Class_|Trait_|Enum_ $classNode, CoreReflectionClass $classReflection): void
     {
-        $alreadyUsedTraitNames = [];
+        $traitAliases = $classReflection->getTraitAliases();
+        assert(is_array($traitAliases));
 
-        foreach ($classReflection->getTraitAliases() as $methodNameAlias => $methodInfo) {
+        $traitUseAdaptations = [];
+
+        foreach ($traitAliases as $methodNameAlias => $methodInfo) {
             [$traitName, $methodName] = explode('::', $methodInfo);
-            $traitUseNode             = new TraitUse(
-                [new FullyQualified($traitName)],
-                [new TraitUseAdaptation\Alias(new FullyQualified($traitName), $methodName, null, $methodNameAlias)]
-            );
 
-            $classNode->addStmt($traitUseNode);
+            $traitUseAdaptation = $this->builderFactory->traitUseAdaptation(new FullyQualified($traitName), $methodName);
+            $traitUseAdaptation->as($methodNameAlias);
 
-            $alreadyUsedTraitNames[] = $traitName;
+            $traitUseAdaptations[$traitName] = $traitUseAdaptation;
         }
 
-        foreach (array_diff($classReflection->getTraitNames(), $alreadyUsedTraitNames) as $traitName) {
-            $classNode->addStmt(new TraitUse([new FullyQualified($traitName)]));
+        foreach ($classReflection->getTraitNames() as $traitName) {
+            $traitUse = $this->builderFactory->useTrait(new FullyQualified($traitName));
+
+            if (array_key_exists($traitName, $traitUseAdaptations)) {
+                $traitUse->with($traitUseAdaptations[$traitName]);
+            }
+
+            $classNode->addStmt($traitUse);
         }
     }
 
-    private function addProperties(Declaration $classNode, CoreReflectionClass $classReflection) : void
+    private function addProperties(Class_|Trait_ $classNode, CoreReflectionClass $classReflection): void
     {
-        $defaultProperties = $classReflection->getDefaultProperties();
-
         foreach ($classReflection->getProperties() as $propertyReflection) {
             if (! $this->isPropertyDeclaredInClass($propertyReflection, $classReflection)) {
                 continue;
@@ -270,19 +336,26 @@ final class ReflectionSourceStubber implements SourceStubber
             $this->addPropertyModifiers($propertyNode, $propertyReflection);
             $this->addDocComment($propertyNode, $propertyReflection);
 
-            if (array_key_exists($propertyReflection->getName(), $defaultProperties)) {
+            if ($propertyReflection->hasDefaultValue()) {
                 try {
-                    $propertyNode->setDefault($defaultProperties[$propertyReflection->getName()]);
-                } catch (LogicException $e) {
-                    // Unsupported value
+                    $propertyNode->setDefault($propertyReflection->getDefaultValue());
+                } catch (LogicException) {
+                    // Nothing
                 }
+            }
+
+            $propertyType = $propertyReflection->getType();
+
+            if ($propertyType !== null) {
+                assert($propertyType instanceof CoreReflectionNamedType || $propertyType instanceof CoreReflectionUnionType || $propertyType instanceof CoreReflectionIntersectionType);
+                $propertyNode->setType($this->formatType($propertyType));
             }
 
             $classNode->addStmt($propertyNode);
         }
     }
 
-    private function isPropertyDeclaredInClass(CoreReflectionProperty $propertyReflection, CoreReflectionClass $classReflection) : bool
+    private function isPropertyDeclaredInClass(CoreReflectionProperty $propertyReflection, CoreReflectionClass $classReflection): bool
     {
         if ($propertyReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
             return false;
@@ -297,61 +370,78 @@ final class ReflectionSourceStubber implements SourceStubber
         return true;
     }
 
-    private function addPropertyModifiers(Property $propertyNode, CoreReflectionProperty $propertyReflection) : void
+    private function addPropertyModifiers(Property $propertyNode, CoreReflectionProperty $propertyReflection): void
     {
+        if (method_exists($propertyReflection, 'isReadOnly') && $propertyReflection->isReadOnly()) {
+            $propertyNode->makeReadonly();
+        }
+
         if ($propertyReflection->isStatic()) {
             $propertyNode->makeStatic();
         }
 
         if ($propertyReflection->isPublic()) {
             $propertyNode->makePublic();
-        }
-
-        if ($propertyReflection->isProtected()) {
+        } elseif ($propertyReflection->isProtected()) {
             $propertyNode->makeProtected();
+        } else {
+            $propertyNode->makePrivate();
         }
-
-        if (! $propertyReflection->isPrivate()) {
-            return;
-        }
-
-        $propertyNode->makePrivate();
     }
 
-    private function addConstants(Declaration $classNode, CoreReflectionClass $classReflection) : void
+    private function addEnumCases(Enum_ $enumNode, CoreReflectionEnum $enumReflection): void
+    {
+        foreach ($enumReflection->getCases() as $enumCaseReflection) {
+            assert($enumCaseReflection instanceof CoreReflectionEnumUnitCase);
+            $enumCaseNode = $this->builderFactory->enumCase($enumCaseReflection->getName());
+
+            if ($enumCaseReflection instanceof CoreReflectionEnumBackedCase) {
+                $enumCaseNode->setValue($enumCaseReflection->getBackingValue());
+            }
+
+            $enumNode->addStmt($enumCaseNode);
+        }
+    }
+
+    private function addClassConstants(Class_|Interface_|Trait_|Enum_ $classNode, CoreReflectionClass $classReflection): void
     {
         foreach ($classReflection->getReflectionConstants() as $constantReflection) {
+            if (method_exists($constantReflection, 'isEnumCase') && $constantReflection->isEnumCase()) {
+                continue;
+            }
+
             if ($constantReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
                 continue;
             }
 
-            $classConstantNode = new ClassConst(
-                [new Const_($constantReflection->getName(), BuilderHelpers::normalizeValue($constantReflection->getValue()))],
-                $this->constantVisibilityFlags($constantReflection)
-            );
+            $classConstantNode = $this->builderFactory->classConst($constantReflection->getName(), $constantReflection->getValue());
 
             if ($constantReflection->getDocComment() !== false) {
                 $classConstantNode->setDocComment(new Doc($constantReflection->getDocComment()));
             }
 
+            $this->addClassConstantModifiers($classConstantNode, $constantReflection);
+
             $classNode->addStmt($classConstantNode);
         }
     }
 
-    private function constantVisibilityFlags(ReflectionClassConstant $constant) : int
+    private function addClassConstantModifiers(ClassConst $classConstantNode, CoreReflectionClassConstant $classConstantReflection): void
     {
-        if ($constant->isPrivate()) {
-            return ClassNode::MODIFIER_PRIVATE;
+        if (method_exists($classConstantReflection, 'isFinal') && $classConstantReflection->isFinal()) {
+            $classConstantNode->makeFinal();
         }
 
-        if ($constant->isProtected()) {
-            return ClassNode::MODIFIER_PROTECTED;
+        if ($classConstantReflection->isPrivate()) {
+            $classConstantNode->makePrivate();
+        } elseif ($classConstantReflection->isProtected()) {
+            $classConstantNode->makeProtected();
+        } else {
+            $classConstantNode->makePublic();
         }
-
-        return ClassNode::MODIFIER_PUBLIC;
     }
 
-    private function addMethods(Declaration $classNode, CoreReflectionClass $classReflection) : void
+    private function addMethods(Class_|Interface_|Trait_|Enum_ $classNode, CoreReflectionClass $classReflection): void
     {
         foreach ($classReflection->getMethods() as $methodReflection) {
             if (! $this->isMethodDeclaredInClass($methodReflection, $classReflection)) {
@@ -365,9 +455,13 @@ final class ReflectionSourceStubber implements SourceStubber
             $this->addParameters($methodNode, $methodReflection);
 
             $returnType = $methodReflection->getReturnType();
-            assert($returnType instanceof CoreReflectionNamedType || $returnType === null);
+            if ($returnType === null && method_exists($methodReflection, 'getTentativeReturnType')) {
+                /** @psalm-var CoreReflectionType|null $returnType */
+                $returnType = $methodReflection->getTentativeReturnType();
+            }
 
-            if ($methodReflection->getReturnType() !== null) {
+            if ($returnType !== null) {
+                assert($returnType instanceof CoreReflectionNamedType || $returnType instanceof CoreReflectionUnionType || $returnType instanceof CoreReflectionIntersectionType);
                 $methodNode->setReturnType($this->formatType($returnType));
             }
 
@@ -375,13 +469,16 @@ final class ReflectionSourceStubber implements SourceStubber
         }
     }
 
-    private function isMethodDeclaredInClass(CoreReflectionMethod $methodReflection, CoreReflectionClass $classReflection) : bool
+    private function isMethodDeclaredInClass(CoreReflectionMethod $methodReflection, CoreReflectionClass $classReflection): bool
     {
         if ($methodReflection->getDeclaringClass()->getName() !== $classReflection->getName()) {
             return false;
         }
 
-        if (array_key_exists($methodReflection->getName(), $classReflection->getTraitAliases())) {
+        /** @var array<string, string> $traitAliases */
+        $traitAliases = $classReflection->getTraitAliases();
+
+        if (array_key_exists($methodReflection->getName(), $traitAliases)) {
             return false;
         }
 
@@ -394,13 +491,13 @@ final class ReflectionSourceStubber implements SourceStubber
         return true;
     }
 
-    private function addMethodFlags(Method $methodNode, CoreReflectionMethod $methodReflection) : void
+    private function addMethodFlags(Method $methodNode, CoreReflectionMethod $methodReflection): void
     {
         if ($methodReflection->isFinal()) {
             $methodNode->makeFinal();
         }
 
-        if ($methodReflection->isAbstract()) {
+        if ($methodReflection->isAbstract() && ! $methodReflection->getDeclaringClass()->isInterface()) {
             $methodNode->makeAbstract();
         }
 
@@ -427,22 +524,19 @@ final class ReflectionSourceStubber implements SourceStubber
         $methodNode->makeReturnByRef();
     }
 
-    private function addParameters(FunctionLike $functionNode, CoreReflectionFunctionAbstract $functionReflectionAbstract) : void
+    private function addParameters(FunctionLike $functionNode, CoreReflectionFunctionAbstract $functionReflectionAbstract): void
     {
         foreach ($functionReflectionAbstract->getParameters() as $parameterReflection) {
             $parameterNode = $this->builderFactory->param($parameterReflection->getName());
 
             $this->addParameterModifiers($parameterReflection, $parameterNode);
+            $this->setParameterDefaultValue($parameterReflection, $parameterNode);
 
-            if ($parameterReflection->isOptional() && ! $parameterReflection->isVariadic()) {
-                $parameterNode->setDefault($this->parameterDefaultValue($parameterReflection, $functionReflectionAbstract));
-            }
-
-            $functionNode->addParam($this->addParameterModifiers($parameterReflection, $parameterNode));
+            $functionNode->addParam($parameterNode);
         }
     }
 
-    private function addParameterModifiers(ReflectionParameter $parameterReflection, Param $parameterNode) : Param
+    private function addParameterModifiers(ReflectionParameter $parameterReflection, Param $parameterNode): void
     {
         if ($parameterReflection->isVariadic()) {
             $parameterNode->makeVariadic();
@@ -453,41 +547,73 @@ final class ReflectionSourceStubber implements SourceStubber
         }
 
         $parameterType = $parameterReflection->getType();
-        assert($parameterType instanceof CoreReflectionNamedType || $parameterType === null);
 
-        if ($parameterReflection->getType() !== null) {
-            $parameterNode->setType($this->formatType($parameterType));
+        if ($parameterType === null) {
+            return;
         }
 
-        return $parameterNode;
+        assert($parameterType instanceof CoreReflectionNamedType || $parameterType instanceof CoreReflectionUnionType || $parameterType instanceof CoreReflectionIntersectionType);
+        $parameterNode->setType($this->formatType($parameterType));
     }
 
-    /**
-     * @return mixed
-     */
-    private function parameterDefaultValue(
-        ReflectionParameter $parameterReflection,
-        CoreReflectionFunctionAbstract $functionReflectionAbstract
-    ) {
-        if ($functionReflectionAbstract->isInternal()) {
-            return null;
-        }
-
-        return $parameterReflection->getDefaultValue();
-    }
-
-    /**
-     * @return Name|FullyQualified|NullableType
-     */
-    private function formatType(CoreReflectionNamedType $type) : NodeAbstract
+    private function setParameterDefaultValue(ReflectionParameter $parameterReflection, Param $parameterNode): void
     {
-        $name     = $type->getName();
-        $nameNode = $type->isBuiltin() || in_array($name, ['self', 'parent'], true) ? new Name($name) : new FullyQualified($name);
+        if (! $parameterReflection->isOptional()) {
+            return;
+        }
 
-        return $type->allowsNull() ? new NullableType($nameNode) : $nameNode;
+        if ($parameterReflection->isVariadic()) {
+            return;
+        }
+
+        if (! $parameterReflection->isDefaultValueAvailable()) {
+            return;
+        }
+
+        $parameterNode->setDefault($parameterReflection->getDefaultValue());
     }
 
-    private function generateStubInNamespace(Node $node, string $namespaceName) : string
+    private function formatType(CoreReflectionNamedType|CoreReflectionUnionType|CoreReflectionIntersectionType $type): Name|FullyQualified|Node\NullableType|Node\UnionType|Node\IntersectionType
+    {
+        if ($type instanceof CoreReflectionIntersectionType) {
+            $types = [];
+
+            foreach ($type->getTypes() as $innerType) {
+                assert($innerType instanceof CoreReflectionNamedType);
+                $types[] = $this->formatNamedType($innerType);
+            }
+
+            return new IntersectionType($types);
+        }
+
+        if ($type instanceof CoreReflectionUnionType) {
+            $types = [];
+
+            foreach ($type->getTypes() as $innerType) {
+                $types[] = $this->formatNamedType($innerType);
+            }
+
+            return new UnionType($types);
+        }
+
+        $name     = $type->getName();
+        $nameNode = $this->formatNamedType($type);
+
+        if (! $type->allowsNull() || $name === 'mixed' || $name === 'null') {
+            return $nameNode;
+        }
+
+        return new NullableType($nameNode);
+    }
+
+    private function formatNamedType(CoreReflectionNamedType $type): Name|FullyQualified
+    {
+        $name = $type->getName();
+
+        return $type->isBuiltin() || in_array($name, ['self', 'parent', 'static'], true) ? new Name($name) : new FullyQualified($name);
+    }
+
+    private function generateStubInNamespace(Node $node, string $namespaceName): string
     {
         $namespaceBuilder = $this->builderFactory->namespace($namespaceName);
         $namespaceBuilder->addStmt($node);
@@ -495,12 +621,16 @@ final class ReflectionSourceStubber implements SourceStubber
         return $this->generateStub($namespaceBuilder->getNode());
     }
 
-    private function generateStub(Node $node) : string
+    private function generateStub(Node $node): string
     {
-        return "<?php\n\n" . $this->prettyPrinter->prettyPrint([$node]) . ($node instanceof Node\Expr\FuncCall ? ';' : '') . "\n";
+        return sprintf(
+            "<?php\n\n%s%s\n",
+            $this->prettyPrinter->prettyPrint([$node]),
+            ($node instanceof Node\Expr\FuncCall ? ';' : ''),
+        );
     }
 
-    private function createStubData(string $stub, ?string $extensionName) : StubData
+    private function createStubData(string $stub, string|null $extensionName): StubData
     {
         return new StubData($stub, $extensionName);
     }

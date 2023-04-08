@@ -2,3 +2,4 @@
 !public/
 !chunks/
 !.gitignore
+!geoip.mmdb

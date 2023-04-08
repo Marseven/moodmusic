@@ -3,33 +3,32 @@
 namespace Common\Core\Policies;
 
 use App\User;
-use Common\Auth\BaseUser;
-use Illuminate\Auth\Access\HandlesAuthorization;
+use Illuminate\Auth\Access\Response;
 
 class TagPolicy extends BasePolicy
 {
-    public function index(?User $user)
+    public function index(?User $user): Response
     {
-        return $this->userOrGuestHasPermission($user, 'tags.view');
+        return $this->hasPermission($user, 'tags.view');
     }
 
-    public function show(?User $user)
+    public function show(?User $user): Response
     {
-        return $this->userOrGuestHasPermission($user, 'tags.view');
+        return $this->hasPermission($user, 'tags.view');
     }
 
-    public function store(BaseUser $user)
+    public function store(User $user): Response
     {
-        return $user->hasPermission('tags.create');
+        return $this->hasPermission($user, 'tags.create');
     }
 
-    public function update(BaseUser $user)
+    public function update(User $user): Response
     {
-        return $user->hasPermission('tags.update');
+        return $this->hasPermission($user, 'tags.update');
     }
 
-    public function destroy(User $user)
+    public function destroy(User $user): Response
     {
-        return $user->hasPermission('tags.delete');
+        return $this->hasPermission($user, 'tags.delete');
     }
 }

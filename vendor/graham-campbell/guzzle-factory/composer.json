@@ -6,16 +6,18 @@
     "authors": [
         {
             "name": "Graham Campbell",
-            "email": "graham@alt-three.com"
+            "email": "hello@gjcampbell.co.uk",
+            "homepage": "https://github.com/GrahamCampbell"
         }
     ],
     "require": {
-        "php": "^7.2.5 || ^8.0",
-        "guzzlehttp/guzzle": "^7.2"
+        "php": "^7.4.15 || ^8.0.2",
+        "guzzlehttp/guzzle": "^7.5.0",
+        "guzzlehttp/psr7": "^2.4.3"
     },
     "require-dev": {
-        "graham-campbell/analyzer": "^3.0.4",
-        "phpunit/phpunit": "^8.5.8 || ^9.3.7"
+        "graham-campbell/analyzer": "^4.0",
+        "phpunit/phpunit": "^9.6.3 || ^10.0.12"
     },
     "autoload": {
         "psr-4": {

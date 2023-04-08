@@ -2,38 +2,26 @@
 
 namespace App\Actions\Backstage;
 
-use Auth;
 use App\BackstageRequest;
+use Illuminate\Support\Facades\Auth;
 
 class CrupdateBackstageRequest
 {
-    /**
-     * @var BackstageRequest
-     */
-    private $backstageRequest;
-
-    /**
-     * @param BackstageRequest $backstageRequest
-     */
-    public function __construct(BackstageRequest $backstageRequest)
+    public function __construct(protected BackstageRequest $backstageRequest)
     {
-        $this->backstageRequest = $backstageRequest;
     }
 
-    /**
-     * @param array $data
-     * @param BackstageRequest $backstageRequest
-     * @return BackstageRequest
-     */
-    public function execute($data, $backstageRequest = null)
-    {
-        if ( ! $backstageRequest) {
+    public function execute(
+        array $data,
+        BackstageRequest $backstageRequest = null,
+    ): ?BackstageRequest {
+        if (!$backstageRequest) {
             $backstageRequest = $this->backstageRequest->newInstance([
                 'user_id' => Auth::id(),
             ]);
         }
 
-        if ( ! isset($data['artist_id'])) {
+        if (!isset($data['artist_id'])) {
             $artist = Auth::user()->primaryArtist();
             $data['artist_id'] = $artist->id ?? null;
         }

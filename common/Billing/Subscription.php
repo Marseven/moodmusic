@@ -1,30 +1,23 @@
 <?php namespace Common\Billing;
 
-use App;
 use App\User;
-use Common\Billing\Gateways\Contracts\GatewayInterface;
-use Common\Billing\Gateways\GatewayFactory;
 use Carbon\Carbon;
-use Common\Billing\Invoices\Invoice;
-use Exception;
+use Common\Billing\Gateways\Contracts\CommonSubscriptionGatewayActions;
+use Common\Billing\Gateways\Paypal\Paypal;
+use Common\Billing\Gateways\Stripe\Stripe;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
+use Common\Billing\Subscriptions\SubscriptionFactory;
+use Common\Search\Searchable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LogicException;
 
-/**
- * Class Subscription
- *
- * @property Carbon|null $trial_ends_at
- * @property Carbon|null $ends_at
- * @property Carbon|null $renews_at
- * @property-read User $user
- * @property-read BillingPlan $plan
- * @property-read Invoice $latest_invoice
- * @property string $gateway
- * @property string $gateway_id
- * @property integer $user_id
- */
 class Subscription extends Model
 {
+    use HasFactory, Searchable;
+
     protected $guarded = ['id'];
 
     protected $appends = [
@@ -32,79 +25,66 @@ class Subscription extends Model
         'on_trial',
         'valid',
         'active',
-        'cancelled'
+        'cancelled',
     ];
 
     protected $casts = [
         'id' => 'integer',
-        'plan_id' => 'integer',
-        'quantity' => 'integer'
+        'price_id' => 'integer',
+        'product_id' => 'integer',
+        'quantity' => 'integer',
     ];
 
-    public function getOnGracePeriodAttribute() {
+    public function getOnGracePeriodAttribute(): bool
+    {
         return $this->onGracePeriod();
     }
 
-    public function getOnTrialAttribute() {
+    public function getOnTrialAttribute(): bool
+    {
         return $this->onTrial();
     }
 
-    public function getValidAttribute() {
+    public function getValidAttribute(): bool
+    {
         return $this->valid();
     }
 
-    public function getActiveAttribute() {
+    public function getActiveAttribute(): bool
+    {
         return $this->active();
     }
 
-    public function getCancelledAttribute() {
+    public function getCancelledAttribute(): bool
+    {
         return $this->cancelled();
     }
-
-    /**
-     * The attributes that should be mutated to dates.
-     *
-     * @var array
-     */
     protected $dates = [
-        'trial_ends_at', 'ends_at', 'renews_at',
-        'created_at', 'updated_at',
+        'trial_ends_at',
+        'ends_at',
+        'renews_at',
+        'created_at',
+        'updated_at',
     ];
 
-    public function user()
+    public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
     }
 
-    public function plan()
+    public function price(): BelongsTo
     {
-        return $this->belongsTo(BillingPlan::class);
+        return $this->belongsTo(Price::class);
     }
 
-    public function latest_invoice()
+    public function product(): BelongsTo
     {
-        return $this->hasOne(Invoice::class)
-            ->orderBy('created_at', 'desc');
+        return $this->belongsTo(Product::class);
     }
 
-    /**
-     * Get plan or its parent (if has parent).
-     *
-     * @return BillingPlan
-     */
-    public function mainPlan()
+    public function onTrial(): bool
     {
-        return $this->plan->parent ?? $this->plan;
-    }
-
-    /**
-     * Determine if the subscription is within its trial period.
-     *
-     * @return bool
-     */
-    public function onTrial()
-    {
-        if (! is_null($this->trial_ends_at)) {
+        if (!is_null($this->trial_ends_at)) {
             return Carbon::now()->lt($this->trial_ends_at);
         } else {
             return false;
@@ -113,58 +93,60 @@ class Subscription extends Model
 
     /**
      * Determine if the subscription is active, on trial, or within its grace period.
-     *
-     * @return bool
      */
-    public function valid()
+    public function valid(): bool
     {
         return $this->active() || $this->onTrial() || $this->onGracePeriod();
     }
 
-    /**
-     * Determine if the subscription is active.
-     *
-     * @return bool
-     */
-    public function active()
+    public function active(): bool
     {
         return is_null($this->ends_at) || $this->onGracePeriod();
     }
 
     /**
      * Determine if the subscription is no longer active.
-     *
-     * @return bool
      */
-    public function cancelled()
+    public function cancelled(): bool
     {
-        return ! is_null($this->ends_at);
+        return !is_null($this->ends_at);
     }
 
     /**
      * Determine if the subscription is within its grace period after cancellation.
-     *
-     * @return bool
      */
-    public function onGracePeriod()
+    public function onGracePeriod(): bool
     {
-        if ( ! is_null($endsAt = $this->ends_at)) {
+        if (!is_null($endsAt = $this->ends_at)) {
             return Carbon::now()->lt(Carbon::instance($endsAt));
         } else {
             return false;
         }
     }
 
-    /**
-     * Cancel the subscription at the end of the billing period.
-     *
-     * @param bool $atPeriodEnd
-     * @return $this
-     */
-    public function cancel($atPeriodEnd = true)
+    public function changePlan(Product $newProduct, Price $newPrice): self
     {
-        if ($this->gateway !== 'none') {
-            $this->gateway()->subscriptions()->cancel($this, $atPeriodEnd);
+        $isSuccess = $this->gateway()->changePlan(
+            $this,
+            $newProduct,
+            $newPrice,
+        );
+
+        if ($isSuccess) {
+            $this->fill([
+                'product_id' => $newProduct->id,
+                'price_id' => $newPrice->id,
+                'ends_at' => null,
+            ])->save();
+        }
+
+        return $this;
+    }
+
+    public function cancel(bool $atPeriodEnd = true): self
+    {
+        if ($this->gateway_name !== 'none') {
+            $this->gateway()->cancelSubscription($this, $atPeriodEnd);
         }
 
         // If the user was on trial, we will set the grace period to end when the trial
@@ -185,37 +167,38 @@ class Subscription extends Model
     /**
      * Mark subscription as cancelled on local database
      * only, without interacting with payment gateway.
-     *
-     * @return void
      */
-    public function markAsCancelled()
+    public function markAsCancelled(): void
     {
-        $this->fill(['ends_at' => $this->renews_at, 'renews_at' => null])->save();
+        $this->fill([
+            'ends_at' => $this->renews_at,
+            'renews_at' => null,
+        ])->save();
     }
 
     /**
      * Cancel the subscription immediately and delete it from database.
-     *
-     * @return $this
-     * @throws Exception
      */
-    public function cancelAndDelete()
+    public function cancelAndDelete(): self
     {
         $this->cancel(false);
         $this->delete();
 
+        $this->user->update([
+            'card_last_four' => null,
+            'card_brand' => null,
+            'card_expires' => null,
+        ]);
+
         return $this;
     }
 
-    /**
-     * Resume the cancelled subscription.
-     *
-     * @return $this
-     */
-    public function resume()
+    public function resume(): self
     {
-        if ( ! $this->onGracePeriod()) {
-            throw new LogicException('Unable to resume subscription that is not within grace period.');
+        if (!$this->onGracePeriod()) {
+            throw new LogicException(
+                'Unable to resume subscription that is not within grace period.',
+            );
         }
 
         if ($this->onTrial()) {
@@ -227,10 +210,11 @@ class Subscription extends Model
         // To resume the subscription we need to set the plan parameter on the Stripe
         // subscription object. This will force Stripe to resume this subscription
         // where we left off. Then, we'll set the proper trial ending timestamp.
-        if ($this->gateway !== 'none') {
-            $this->gateway()->subscriptions()->resume($this, ['trial_end' => $trialEnd]);
+        if ($this->gateway_name !== 'none') {
+            $this->gateway()->resumeSubscription($this, [
+                'trial_end' => $trialEnd,
+            ]);
         }
-
 
         // Finally, we will remove the ending timestamp from the user's record in the
         // local database to indicate that the subscription is active again and is
@@ -243,27 +227,54 @@ class Subscription extends Model
     }
 
     /**
-     * Swap the subscription to a new billing plan.
-     *
-     * @param BillingPlan $plan
-     * @return $this
+     * Get gateway this subscription was created with.
      */
-    public function changePlan(BillingPlan $plan)
+    public function gateway(): ?CommonSubscriptionGatewayActions
     {
-        $this->gateway()->subscriptions()->changePlan($this, $plan);
+        if ($this->gateway_name === 'stripe') {
+            return app(Stripe::class);
+        } elseif ($this->gateway_name === 'paypal') {
+            return app(Paypal::class);
+        }
 
-        $this->fill(['plan_id' => $plan->id, 'ends_at' => null])->save();
-
-        return $this;
+        return null;
     }
 
-    /**
-     * Get gateway this subscriptions was created with.
-     * @return GatewayInterface
-     *
-     */
-    public function gateway()
+    public function toSearchableArray(): array
     {
-        return App::make(GatewayFactory::class)->get($this->gateway);
+        return [
+            'id' => $this->id,
+            'product_id' => $this->product_id,
+            'price_id' => $this->price_id,
+            'gateway_name' => $this->gateway_name,
+            'user' => $this->user ? $this->user->getSearchableValues() : null,
+            'description' => $this->description,
+            'ends_at' => $this->ends_at,
+            'created_at' => $this->created_at->timestamp ?? '_null',
+            'updated_at' => $this->updated_at->timestamp ?? '_null',
+        ];
+    }
+
+    protected function makeAllSearchableUsing($query)
+    {
+        return $query->with(['user']);
+    }
+
+    public static function filterableFields(): array
+    {
+        return [
+            'id',
+            'product_id',
+            'price_id',
+            'gateway_name',
+            'ends_at',
+            'created_at',
+            'updated_at',
+        ];
+    }
+
+    protected static function newFactory()
+    {
+        return SubscriptionFactory::new();
     }
 }

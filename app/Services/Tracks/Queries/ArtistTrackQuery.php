@@ -4,12 +4,13 @@ namespace App\Services\Tracks\Queries;
 
 use App\Artist;
 use App\Services\Artists\LoadArtist;
+use Illuminate\Database\Eloquent\Builder;
 
 class ArtistTrackQuery extends BaseTrackQuery
 {
     const ORDER_COL = 'spotify_popularity';
 
-    public function get($artistId)
+    public function get(int $artistId): Builder
     {
         $artist = app(Artist::class)->find($artistId);
 

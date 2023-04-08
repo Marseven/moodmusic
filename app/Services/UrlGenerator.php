@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Album;
 use Common\Core\Prerender\BaseUrlGenerator;
 
 class UrlGenerator extends BaseUrlGenerator
@@ -12,7 +13,7 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function channel($channel)
     {
-        return url($channel['slug']);
+        return url($channel["slug"]);
     }
 
     /**
@@ -21,19 +22,23 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function artist($artist)
     {
-        return url("artist/{$artist['id']}/".slugify($artist['name'], self::SEPARATOR));
+        return url(
+            "artist/{$artist["id"]}/" .
+                slugify($artist["name"], self::SEPARATOR),
+        );
     }
 
     /**
-     * @param array $album
-     * @return string
+     * @param array|Album $album
      */
-    public function album($album)
+    public function album($album): string
     {
-        $albumName = slugify($album['name']);
-        $uri = "album/{$album['id']}/";
-        $uri .= $album['artist'] ? slugify($album['artist']['name'], self::SEPARATOR).'/'.$albumName : $albumName;
-        return url($uri);
+        $albumName = slugify($album["name"]);
+        $artistName = slugify(
+            $album["artists"][0]["name"] ?? "unknown",
+            self::SEPARATOR,
+        );
+        return url("album/{$album["id"]}/$artistName/$albumName");
     }
 
     /**
@@ -42,7 +47,9 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function track($track)
     {
-        return url("track/{$track['id']}/".slugify($track['name'], self::SEPARATOR));
+        return url(
+            "track/{$track["id"]}/" . slugify($track["name"], self::SEPARATOR),
+        );
     }
 
     /**
@@ -51,7 +58,7 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function genre($genre)
     {
-        $name = slugify($genre['name'], self::SEPARATOR);
+        $name = slugify($genre["name"], self::SEPARATOR);
         return url("genre/$name");
     }
 
@@ -61,8 +68,8 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function playlist($playlist)
     {
-        $name = slugify($playlist['name'], self::SEPARATOR);
-        return url("playlists/{$playlist['id']}/$name");
+        $name = slugify($playlist["name"], self::SEPARATOR);
+        return url("playlist/{$playlist["id"]}/$name");
     }
 
     /**
@@ -71,8 +78,8 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function user($user)
     {
-        $name = slugify($user['display_name'], self::SEPARATOR);
-        return url("user/{$user['id']}/$name");
+        $name = slugify($user["display_name"], self::SEPARATOR);
+        return url("user/{$user["id"]}/$name");
     }
 
     /**
@@ -81,7 +88,7 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function search($data)
     {
-        $name = slugify($data['query'], self::SEPARATOR);
+        $name = slugify($data["query"], self::SEPARATOR);
         return url("search/$name");
     }
 
@@ -90,6 +97,6 @@ class UrlGenerator extends BaseUrlGenerator
      */
     public function top50()
     {
-        return url('top-50');
+        return url("top-50");
     }
 }

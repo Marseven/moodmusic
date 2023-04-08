@@ -5,6 +5,7 @@ namespace Illuminate\Foundation\Testing\Concerns;
 use Illuminate\Support\Facades\View as ViewFacade;
 use Illuminate\Support\MessageBag;
 use Illuminate\Support\ViewErrorBag;
+use Illuminate\Testing\TestComponent;
 use Illuminate\Testing\TestView;
 use Illuminate\View\View;
 
@@ -17,7 +18,7 @@ trait InteractsWithViews
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
-    protected function view(string $view, array $data = [])
+    protected function view(string $view, $data = [])
     {
         return new TestView(view($view, $data));
     }
@@ -29,7 +30,7 @@ trait InteractsWithViews
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
      * @return \Illuminate\Testing\TestView
      */
-    protected function blade(string $template, array $data = [])
+    protected function blade(string $template, $data = [])
     {
         $tempDirectory = sys_get_temp_dir();
 
@@ -51,17 +52,19 @@ trait InteractsWithViews
      *
      * @param  string  $componentClass
      * @param  \Illuminate\Contracts\Support\Arrayable|array  $data
-     * @return \Illuminate\Testing\TestView
+     * @return \Illuminate\Testing\TestComponent
      */
-    protected function component(string $componentClass, array $data = [])
+    protected function component(string $componentClass, $data = [])
     {
         $component = $this->app->make($componentClass, $data);
 
         $view = value($component->resolveView(), $data);
 
-        return $view instanceof View
-                ? new TestView($view->with($component->data()))
-                : new TestView(view($view, $component->data()));
+        $view = $view instanceof View
+            ? $view->with($component->data())
+            : view($view, $component->data());
+
+        return new TestComponent($component, $view);
     }
 
     /**

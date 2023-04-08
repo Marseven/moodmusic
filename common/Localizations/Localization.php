@@ -1,36 +1,57 @@
 <?php namespace Common\Localizations;
 
-use Carbon\Carbon;
-use Eloquent;
+use Common\Search\Searchable;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * Common\Localizations\Localization
- *
- * @property int $id
- * @property string $name
- * @property string $language
- * @property string $lines
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @mixin Eloquent
- */
 class Localization extends Model
 {
+    use Searchable;
+
+    const MODEL_TYPE = 'localization';
+
     protected $guarded = ['id'];
 
-    /**
-     * @param string $text
-     * @return array
-     */
-    public function getLinesAttribute($text) {
-        if ( ! $text) return [];
+    public function loadLines()
+    {
+        if (!$this->exists) {
+            return;
+        }
 
-        return json_decode($text, true);
+        $path = resource_path("lang/$this->language.json");
+
+        if (file_exists($path)) {
+            $this->lines = json_decode(file_get_contents($path), true);
+        }
     }
 
-    public function setNameAttribute($name)
+    public function toSearchableArray(): array
     {
-        $this->attributes['name'] = slugify($name);
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'language' => $this->language,
+            'created_at' => $this->created_at->timestamp ?? '_null',
+            'updated_at' => $this->updated_at->timestamp ?? '_null',
+        ];
+    }
+
+    public static function filterableFields(): array
+    {
+        return ['id', 'created_at', 'updated_at'];
+    }
+
+    public function toNormalizedArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->language,
+            'model_type' => self::MODEL_TYPE,
+        ];
+    }
+
+    public static function getModelTypeAttribute(): string
+    {
+        return self::MODEL_TYPE;
     }
 }

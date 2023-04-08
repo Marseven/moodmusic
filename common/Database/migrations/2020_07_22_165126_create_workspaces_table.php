@@ -13,12 +13,15 @@ class CreateWorkspacesTable extends Migration
      */
     public function up()
     {
-        Schema::create('workspaces', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->integer('owner_id')->unsigned()->index();
-            $table->timestamps();
-        });
+        if ( ! Schema::hasTable('workspaces')) {
+            Schema::create('workspaces', function (Blueprint $table) {
+                $table->id();
+                $table->string('name');
+                $table->integer('owner_id')->unsigned()->index();
+                $table->timestamp('created_at')->index()->nullable();
+                $table->timestamp('updated_at')->index()->nullable();
+            });
+        }
     }
 
     /**

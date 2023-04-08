@@ -10,24 +10,11 @@ use Illuminate\Validation\Rule;
 
 class GenreController extends BaseController
 {
-    /**
-     * @var Genre
-     */
-    private $genre;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
     public function __construct(
-        Genre $genre,
-        Request $request
+        protected Genre $genre,
+        protected Request $request
     )
-    {
-        $this->genre = $genre;
-        $this->request = $request;
-    }
+    {}
 
     public function index()
     {
@@ -97,15 +84,12 @@ class GenreController extends BaseController
         return $this->success(['genre' => $genre]);
     }
 
-    public function destroy()
+    public function destroy(string $ids)
     {
-        $this->authorize('destroy', Genre::class);
+        $genreIds = explode(',', $ids);
+        $this->authorize('destroy', [Genre::class, $genreIds]);
 
-        $this->validate($this->request, [
-            'ids' => 'required|array|exists:genres,id'
-        ]);
-
-        $count = $this->genre->destroy($this->request->get('ids'));
+        $count = $this->genre->destroy($genreIds);
 
         return $this->success(['count' => $count]);
     }

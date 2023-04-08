@@ -75,10 +75,7 @@ class Paginator
         $this->query = $model->newQuery();
     }
 
-    /**
-     * @return LengthAwarePaginator
-     */
-    public function paginate()
+    public function paginate(): LengthAwarePaginator
     {
         $with = array_filter(explode(',', $this->param('with', '')));
         $withCount = array_filter(explode(',', $this->param('withCount', '')));
@@ -88,22 +85,34 @@ class Paginator
         $page = (int) $this->param('page', 1);
 
         // load specified relations and counts
-        if ( ! empty($with)) $this->query->with($with);
-        if ( ! empty($withCount)) $this->query->withCount($withCount);
+        if (!empty($with)) {
+            $this->query->with($with);
+        }
+        if (!empty($withCount)) {
+            $this->query->withCount($withCount);
+        }
 
         // search
         if ($searchTerm) {
             if ($this->searchCallback) {
-                call_user_func($this->searchCallback, $this->query, $searchTerm);
+                call_user_func(
+                    $this->searchCallback,
+                    $this->query,
+                    $searchTerm,
+                );
             } else {
-                $this->query->where($this->searchColumn, 'like', "$searchTerm%");
+                $this->query->where(
+                    $this->searchColumn,
+                    'like',
+                    "$searchTerm%",
+                );
             }
         }
 
         $this->applyFilters();
 
         // order
-        if ( ! $this->dontSort) {
+        if (!$this->dontSort) {
             if ($this->isRawOrder($order['col'])) {
                 $this->query->orderByRaw($order['col']);
             } else {
@@ -111,21 +120,34 @@ class Paginator
             }
 
             if ($this->secondaryOrderCallback) {
-                call_user_func($this->secondaryOrderCallback, $this->query, $order['col'], $order['dir']);
+                call_user_func(
+                    $this->secondaryOrderCallback,
+                    $this->query,
+                    $order['col'],
+                    $order['dir'],
+                );
             }
         }
 
-        $countCacheKeyQuery = $this->query->toBase()->cloneWithout(['columns', 'orders', 'limit', 'offset']);
-        $countCacheKye = base64_encode(Str::replaceArray('?', $countCacheKeyQuery->getBindings(), $countCacheKeyQuery->toSql()));
+        $countCacheKeyQuery = $this->query
+            ->toBase()
+            ->cloneWithout(['columns', 'orders', 'limit', 'offset']);
+        $countCacheKye = base64_encode(
+            Str::replaceArray(
+                '?',
+                $countCacheKeyQuery->getBindings(),
+                $countCacheKeyQuery->toSql(),
+            ),
+        );
         $total = null;
         if ($countCacheKye) {
             $total = Cache::get($countCacheKye);
         }
         if (is_null($total)) {
-             $total = $this->query->toBase()->getCountForPagination();
-             if ($total > 500000) {
+            $total = $this->query->toBase()->getCountForPagination();
+            if ($total > 500000) {
                 Cache::put($countCacheKye, $total, Carbon::now()->addDay());
-             }
+            }
         }
 
         $items = $total
@@ -133,7 +155,10 @@ class Paginator
             : new Collection();
 
         return Container::getInstance()->makeWith(LengthAwarePaginator::class, [
-            'items' => $items, 'total' => $total, 'perPage' => $perPage, 'page' => $page,
+            'items' => $items,
+            'total' => $total,
+            'perPage' => $perPage,
+            'page' => $page,
         ]);
     }
 
@@ -151,7 +176,8 @@ class Paginator
     /**
      * @return Builder
      */
-    public function query() {
+    public function query()
+    {
         return $this->query;
     }
 
@@ -186,8 +212,12 @@ class Paginator
      * @param string $boolean
      * @return $this
      */
-    public function where($column, $operator = null, $value = null, $boolean = 'and')
-    {
+    public function where(
+        $column,
+        $operator = null,
+        $value = null,
+        $boolean = 'and'
+    ) {
         $this->query->where($column, $operator, $value, $boolean);
         return $this;
     }
@@ -202,10 +232,11 @@ class Paginator
     /**
      * @return array
      */
-    public function getOrder() {
+    public function getOrder()
+    {
         // order provided as single string: "column|direction"
         if ($specifiedOrder = $this->param('order')) {
-            $parts = preg_split("(\||:)", $specifiedOrder);
+            $parts = preg_split('(\||:)', $specifiedOrder);
             $orderCol = Arr::get($parts, 0, $this->defaultOrderColumn);
             $orderDir = Arr::get($parts, 1, $this->defaultOrderDirection);
         } else {
@@ -215,15 +246,19 @@ class Paginator
 
         return [
             'dir' => Str::snake($orderDir),
-            'col' => !$this->isRawOrder($orderCol) ? Str::snake($orderCol) : $orderCol,
+            'col' => !$this->isRawOrder($orderCol)
+                ? Str::snake($orderCol)
+                : $orderCol,
         ];
     }
 
     private function toCamelCase($params)
     {
-        return collect($params)->keyBy(function($value, $key) {
-            return Str::camel($key);
-        })->toArray();
+        return collect($params)
+            ->keyBy(function ($value, $key) {
+                return Str::camel($key);
+            })
+            ->toArray();
     }
 
     private function applyFilters()
@@ -239,15 +274,18 @@ class Paginator
                 if (is_callable($callback)) {
                     $callback($this->query, $value);
 
-                // boolean filter
-                } else if ($value === 'false' || $value === 'true') {
+                    // boolean filter
+                } elseif ($value === 'false' || $value === 'true') {
                     $this->applyBooleanFilter($column, $value);
 
-                // filter by between date
-                } else if (\Str::contains($column, '_at') && \Str::contains($value, ':')) {
+                    // filter by between date
+                } elseif (
+                    \Str::contains($column, '_at') &&
+                    \Str::contains($value, ':')
+                ) {
                     $this->query()->whereBetween($column, explode(':', $value));
 
-                // filter by specified column value
+                    // filter by specified column value
                 } else {
                     $this->query()->where($column, $value);
                 }

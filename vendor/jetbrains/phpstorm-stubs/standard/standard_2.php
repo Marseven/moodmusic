@@ -1,5 +1,11 @@
 <?php
 
+use JetBrains\PhpStorm\ArrayShape;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
+use JetBrains\PhpStorm\Internal\ReturnTypeContract as TypeContract;
+use JetBrains\PhpStorm\Pure;
+
 /**
  * Query language and locale information
  * @link https://php.net/manual/en/function.nl-langinfo.php
@@ -8,15 +14,15 @@
  * constant name of the element. The following is a list of constant names
  * for item that may be used and their description.
  * Some of these constants may not be defined or hold no value for certain
- * locales.
- * <table>
+ * locales.</p>
  * nl_langinfo Constants
+ * <table>
  * <tr valign="top">
  * <td>Constant</td>
  * <td>Description</td>
  * </tr>
- * <tr valign="top">
- * LC_TIME Category Constants</td>
+ * <tr colspan="2" valign="top" bgcolor="silver">
+ * <td >LC_TIME Category Constants</td>
  * </tr>
  * <tr valign="top">
  * <td>ABDAY_(1-7)</td>
@@ -78,8 +84,8 @@
  * <td>ERA_T_FMT</td>
  * <td>Time in alternate era format (string can be used in strftime).</td>
  * </tr>
- * <tr valign="top">
- * LC_MONETARY Category Constants</td>
+ * <tr colspan="2" valign="top" bgcolor="silver">
+ * <td>LC_MONETARY Category Constants</td>
  * </tr>
  * <tr valign="top">
  * <td>INT_CURR_SYMBOL</td>
@@ -139,25 +145,25 @@
  * </tr>
  * <tr valign="top">
  * <td>P_SIGN_POSN</td>
- * Returns 0 if parentheses surround the quantity and CURRENCY_SYMBOL.
+ * <td>Returns 0 if parentheses surround the quantity and CURRENCY_SYMBOL.</td>
+ * </tr>
+ * </table>
  * @return string|false the element as a string, or false if item
  * is not valid.
- * @since 4.1
- * @since 5.0
  */
-function nl_langinfo ($item) {}
+#[Pure(true)]
+function nl_langinfo(int $item): string|false {}
 
 /**
  * Calculate the soundex key of a string
  * @link https://php.net/manual/en/function.soundex.php
- * @param string $str <p>
+ * @param string $string <p>
  * The input string.
  * </p>
  * @return string the soundex key as a string.
- * @since 4.0
- * @since 5.0
  */
-function soundex ($str) {}
+#[Pure]
+function soundex(string $string): string {}
 
 /**
  * Calculate Levenshtein distance between two strings
@@ -168,98 +174,96 @@ function soundex ($str) {}
  * Note: A second variant will take three additional parameters that define
  * the cost of insert, replace and delete operations. This is more general
  * and adaptive than variant one, but not as efficient.
- * @param string $str1 <p>
+ * @param string $string1 <p>
  * One of the strings being evaluated for Levenshtein distance.
  * </p>
- * @param string $str2 <p>
+ * @param string $string2 <p>
  * One of the strings being evaluated for Levenshtein distance.
  * </p>
- * @param int $cost_ins [optional] <p>
+ * @param int $insertion_cost [optional] <p>
  * Defines the cost of insertion.
  * </p>
- * @param int $cost_rep [optional] <p>
+ * @param int $replacement_cost [optional] <p>
  * Defines the cost of replacement.
  * </p>
- * @param int $cost_del [optional] <p>
+ * @param int $deletion_cost [optional] <p>
  * Defines the cost of deletion.
  * </p>
  * @return int This function returns the Levenshtein-Distance between the
  * two argument strings or -1, if one of the argument strings
  * is longer than the limit of 255 characters.
- * @since 4.0.1
- * @since 5.0
  */
-function levenshtein ($str1, $str2, $cost_ins = null, $cost_rep = null, $cost_del = null) {}
+function levenshtein(string $string1, string $string2, int $insertion_cost = 1, int $replacement_cost = 1, int $deletion_cost = 1): int {}
 
 /**
- * Return a specific character
+ * Generate a single-byte string from a number
  * @link https://php.net/manual/en/function.chr.php
- * @param int $ascii <p>
+ * @param int $codepoint <p>
  * The ascii code.
  * </p>
  * @return string the specified character.
- * @since 4.0
- * @since 5.0
  */
-function chr ($ascii) {}
+#[Pure]
+function chr(int $codepoint): string {}
 
 /**
- * Return ASCII value of character
+ * Convert the first byte of a string to a value between 0 and 255
  * @link https://php.net/manual/en/function.ord.php
- * @param string $string <p>
+ * @param string $character <p>
  * A character.
  * </p>
  * @return int the ASCII value as an integer.
- * @since 4.0
- * @since 5.0
  */
-function ord ($string) {}
+#[Pure]
+function ord(string $character): int {}
 
 /**
  * Parses the string into variables
  * @link https://php.net/manual/en/function.parse-str.php
- * @param string $str <p>
+ * @param string $string <p>
  * The input string.
  * </p>
- * @param array $result [optional] <p>
+ * @param array &$result <p>
  * If the second parameter arr is present,
  * variables are stored in this variable as array elements instead.<br/>
  * Since 7.2.0 this parameter is not optional.
  * </p>
- * @return void 
- * @since 4.0
- * @since 5.0
+ * @return void
  */
-function parse_str ($str, array &$result = null) {}
+function parse_str(
+    string $string,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.4')] &$result = [],
+    #[PhpStormStubsElementAvailable(from: '8.0')] &$result
+): void {}
 
 /**
  * Parse a CSV string into an array
  * @link https://php.net/manual/en/function.str-getcsv.php
- * @param string $input <p>
+ * @param string $string <p>
  * The string to parse.
  * </p>
- * @param string $delimiter [optional] <p>
+ * @param string $separator [optional] <p>
  * Set the field delimiter (one character only).
  * </p>
  * @param string $enclosure [optional] <p>
  * Set the field enclosure character (one character only).
  * </p>
  * @param string $escape [optional] <p>
- * Set the escape character (one character only). 
+ * Set the escape character (one character only).
  * Defaults as a backslash (\)
  * </p>
  * @return array an indexed array containing the fields read.
- * @since 5.3
  */
-function str_getcsv ($input, $delimiter = ",", $enclosure = '"', $escape = "\\") {}
+#[Pure]
+function str_getcsv(string $string, string $separator = ",", string $enclosure = '"', string $escape = "\\"): array {}
 
 /**
  * Pad a string to a certain length with another string
  * @link https://php.net/manual/en/function.str-pad.php
- * @param string $input <p>
+ * @param string $string <p>
  * The input string.
  * </p>
- * @param int $pad_length <p>
+ * @param int $length <p>
  * If the value of pad_length is negative,
  * less than, or equal to the length of the input string, no padding
  * takes place.
@@ -277,38 +281,37 @@ function str_getcsv ($input, $delimiter = ",", $enclosure = '"', $escape = "\\")
  * STR_PAD_RIGHT.
  * </p>
  * @return string the padded string.
- * @since 4.0.1
- * @since 5.0
  */
-function str_pad ($input, $pad_length, $pad_string = " ", $pad_type = STR_PAD_RIGHT) {}
+#[Pure]
+function str_pad(string $string, int $length, string $pad_string = " ", int $pad_type = STR_PAD_RIGHT): string {}
 
 /**
- * &Alias; <function>rtrim</function>
- * @see rtrim()
- * @link https://php.net/manual/en/function.chop.php
- * @param string $str The input string.
- * @param string $character_mask [optional]
+ * Alias:
+ * {@see rtrim}
+ * @param string $string The input string.
+ * @param string $characters [optional]
  * @return string the modified string.
- * @since 4.0
- * @since 5.0
+ * @link https://php.net/manual/en/function.chop.php
+ * @see rtrim()
  */
-function chop ($str, $character_mask = null) {}
+#[Pure]
+function chop(string $string, string $characters): string {}
 
 /**
- * &Alias; <function>strstr</function>
+ * Alias:
+ * {@see strstr}
  * @link https://php.net/manual/en/function.strchr.php
  * Note: This function is case-sensitive. For case-insensitive searches, use stristr().
  * Note: If you only want to determine if a particular needle occurs within haystack,
  * use the faster and less memory intensive function strpos() instead.
- * @since 4.0
- * @since 5.0
  *
  * @param string $haystack The input string.
- * @param mixed $needle If needle is not a string, it is converted to an integer and applied as the ordinal value of a character.
- * @param bool $part [optional] If TRUE, strstr() returns the part of the haystack before the first occurrence of the needle (excluding the needle).
+ * @param string $needle If needle is not a string, it is converted to an integer and applied as the ordinal value of a character.
+ * @param bool $before_needle [optional] If TRUE, strstr() returns the part of the haystack before the first occurrence of the needle (excluding the needle).
  * @return string|false Returns the portion of string, or FALSE if needle is not found.
  */
-function strchr ($haystack, $needle, $part = false) {}
+#[Pure]
+function strchr(string $haystack, string $needle, bool $before_needle = false): string|false {}
 
 /**
  * Return a formatted string
@@ -328,16 +331,18 @@ function strchr ($haystack, $needle, $part = false) {}
  * An optional sign specifier that forces a sign
  * (- or +) to be used on a number. By default, only the - sign is used
  * on a number if it's negative. This specifier forces positive numbers
- * to have the + sign attached as well, and was added in PHP 4.3.0.
- * @param mixed $args [optional] <p>
+ * to have the + sign attached as well, and was added in PHP 4.3.0.</p>
+ * @param string|int|float ...$values <p>
  * </p>
- * @param mixed $_ [optional] 
  * @return string a string produced according to the formatting string
  * format.
- * @since 4.0
- * @since 5.0
  */
-function sprintf ($format, $args = null, $_ = null) {}
+#[Pure]
+function sprintf(
+    string $format,
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '5.6')] $values,
+    mixed ...$values
+): string {}
 
 /**
  * Output a formatted string
@@ -346,14 +351,11 @@ function sprintf ($format, $args = null, $_ = null) {}
  * See sprintf for a description of
  * format.
  * </p>
- * @param mixed $args [optional] <p>
+ * @param string|int|float ...$values [optional] <p>
  * </p>
- * @param mixed $_ [optional] 
  * @return int the length of the outputted string.
- * @since 4.0
- * @since 5.0
  */
-function printf ($format, $args = null, $_ = null) {}
+function printf(string $format, mixed ...$values): int {}
 
 /**
  * Output a formatted string
@@ -362,13 +364,11 @@ function printf ($format, $args = null, $_ = null) {}
  * See sprintf for a description of
  * format.
  * </p>
- * @param array $args <p>
+ * @param array $values <p>
  * </p>
  * @return int the length of the outputted string.
- * @since 4.1
- * @since 5.0
  */
-function vprintf ($format, array $args) {}
+function vprintf(string $format, array $values): int {}
 
 /**
  * Return a formatted string
@@ -377,52 +377,48 @@ function vprintf ($format, array $args) {}
  * See sprintf for a description of
  * format.
  * </p>
- * @param array $args <p>
+ * @param array $values <p>
  * </p>
  * @return string Return array values as a formatted string according to
  * format (which is described in the documentation
  * for sprintf).
- * @since 4.1
- * @since 5.0
  */
-function vsprintf ($format, array $args) {}
+#[Pure]
+function vsprintf(string $format, array $values): string {}
 
 /**
  * Write a formatted string to a stream
  * @link https://php.net/manual/en/function.fprintf.php
- * @param resource $handle &fs.file.pointer;
+ * @param resource $stream &fs.file.pointer;
  * @param string $format <p>
- * See sprintf for a description of 
+ * See sprintf for a description of
  * format.
  * </p>
- * @param mixed $args [optional] <p>
+ * @param mixed ...$values [optional] <p>
  * </p>
- * @param mixed $_ [optional] 
  * @return int the length of the string written.
- * @since 5.0
  */
-function fprintf ($handle, $format, $args = null, $_ = null) {}
+function fprintf($stream, string $format, mixed ...$values): int {}
 
 /**
  * Write a formatted string to a stream
  * @link https://php.net/manual/en/function.vfprintf.php
- * @param resource $handle <p>
+ * @param resource $stream <p>
  * </p>
  * @param string $format <p>
  * See sprintf for a description of
  * format.
  * </p>
- * @param array $args <p>
+ * @param array $values <p>
  * </p>
  * @return int the length of the outputted string.
- * @since 5.0
  */
-function vfprintf ($handle, $format, array $args) {}
+function vfprintf($stream, string $format, array $values): int {}
 
 /**
  * Parses input from a string according to a format
  * @link https://php.net/manual/en/function.sscanf.php
- * @param string $str <p>
+ * @param string $string <p>
  * The input string being parsed.
  * </p>
  * @param string $format <p>
@@ -436,34 +432,30 @@ function vfprintf ($handle, $format, array $args) {}
  * i stands for integer with base detection.
  * n stands for number of characters processed so far.
  * </p>
- * @param mixed ...$_
- * @return array|int If only
+ * @param mixed &...$vars [optional]
+ * @return array|int|null If only
  * two parameters were passed to this function, the values parsed
  * will be returned as an array. Otherwise, if optional parameters are passed,
  * the function will return the number of assigned values. The optional
  * parameters must be passed by reference.
- * @since 4.0.1
- * @since 5.0
  */
-function sscanf ($str, $format, &...$_) {}
+function sscanf(string $string, string $format, #[TypeContract(exists: "int|null", notExists: "array|null")] mixed &...$vars): array|int|null {}
 
 /**
  * Parses input from a file according to a format
  * @link https://php.net/manual/en/function.fscanf.php
- * @param resource $handle &fs.file.pointer;
+ * @param resource $stream &fs.file.pointer;
  * @param string $format <p>
- * The specified format as described in the 
+ * The specified format as described in the
  * sprintf documentation.
  * </p>
- * @param mixed $_ [optional] 
- * @return array|int If only two parameters were passed to this function, the values parsed will be
+ * @param mixed &...$vars [optional]
+ * @return array|int|false|null If only two parameters were passed to this function, the values parsed will be
  * returned as an array. Otherwise, if optional parameters are passed, the
  * function will return the number of assigned values. The optional
  * parameters must be passed by reference.
- * @since 4.0.1
- * @since 5.0
  */
-function fscanf ($handle, $format, &$_ = null) {}
+function fscanf($stream, string $format, #[TypeContract(exists: "int|false|null", notExists: "array|false|null")] mixed &...$vars): array|int|false|null {}
 
 /**
  * Parse a URL and return its components
@@ -484,7 +476,7 @@ function fscanf ($handle, $format, &$_ = null) {}
  * If the component parameter is omitted, an associative array is returned.
  * At least one element will be present within the array. Potential keys within this array are:
  * scheme - e.g. http
- * host 
+ * host
  * port
  * user
  * pass
@@ -495,15 +487,15 @@ function fscanf ($handle, $format, &$_ = null) {}
  * <p>
  * If the component parameter is specified a
  * string is returned instead of an array.
- * @since 4.0
- * @since 5.0
  */
-function parse_url ($url, $component = -1) {}
+#[ArrayShape(["scheme" => "string", "host" => "string", "port" => "int", "user" => "string", "pass" => "string", "query" => "string", "path" => "string", "fragment" => "string"])]
+#[Pure]
+function parse_url(string $url, int $component = -1): array|string|int|false|null {}
 
 /**
  * URL-encodes string
  * @link https://php.net/manual/en/function.urlencode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The string to be encoded.
  * </p>
  * @return string a string in which all non-alphanumeric characters except
@@ -512,30 +504,28 @@ function parse_url ($url, $component = -1) {}
  * as plus (+) signs. It is encoded the same way that the
  * posted data from a WWW form is encoded, that is the same way as in
  * application/x-www-form-urlencoded media type. This
- * differs from the RFC 1738 encoding (see
+ * differs from the RFC 3986 encoding (see
  * rawurlencode) in that for historical reasons, spaces
  * are encoded as plus (+) signs.
- * @since 4.0
- * @since 5.0
  */
-function urlencode ($str) {}
+#[Pure]
+function urlencode(string $string): string {}
 
 /**
  * Decodes URL-encoded string
  * @link https://php.net/manual/en/function.urldecode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The string to be decoded.
  * </p>
  * @return string the decoded string.
- * @since 4.0
- * @since 5.0
  */
-function urldecode ($str) {}
+#[Pure]
+function urldecode(string $string): string {}
 
 /**
- * URL-encode according to RFC 1738
+ * URL-encode according to RFC 3986
  * @link https://php.net/manual/en/function.rawurlencode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The URL to be encoded.
  * </p>
  * @return string a string in which all non-alphanumeric characters except
@@ -545,27 +535,25 @@ function urldecode ($str) {}
  * protecting literal characters from being interpreted as special URL
  * delimiters, and for protecting URLs from being mangled by transmission
  * media with character conversions (like some email systems).
- * @since 4.0
- * @since 5.0
  */
-function rawurlencode ($str) {}
+#[Pure]
+function rawurlencode(string $string): string {}
 
 /**
  * Decode URL-encoded strings
  * @link https://php.net/manual/en/function.rawurldecode.php
- * @param string $str <p>
+ * @param string $string <p>
  * The URL to be decoded.
  * </p>
  * @return string the decoded URL, as a string.
- * @since 4.0
- * @since 5.0
  */
-function rawurldecode ($str) {}
+#[Pure]
+function rawurldecode(string $string): string {}
 
 /**
  * Generate URL-encoded query string
  * @link https://php.net/manual/en/function.http-build-query.php
- * @param mixed $query_data <p>
+ * @param object|array $data <p>
  * May be an array or object containing properties.
  * </p>
  * <p>
@@ -584,19 +572,19 @@ function rawurldecode ($str) {}
  * This is meant to allow for legal variable names when the data is
  * decoded by PHP or another CGI application later on.
  * </p>
- * @param string $arg_separator [optional] <p>
+ * @param string|null $arg_separator <p>
  * arg_separator.output
  * is used to separate arguments, unless this parameter is specified,
  * and is then used.
  * </p>
- * @param int $enc_type By default, PHP_QUERY_RFC1738.
+ * @param int $encoding_type By default, PHP_QUERY_RFC1738.
  *  <p>If enc_type is PHP_QUERY_RFC1738, then encoding is performed per » RFC 1738 and the application/x-www-form-urlencoded media type,
  *  which implies that spaces are encoded as plus (+) signs.
  *  <p>If enc_type is PHP_QUERY_RFC3986, then encoding is performed according to » RFC 3986, and spaces will be percent encoded (%20).
  * @return string a URL-encoded string.
- * @since 5.0
  */
-function http_build_query ($query_data, $numeric_prefix = null, $arg_separator = null, $enc_type = PHP_QUERY_RFC1738){}
+#[Pure]
+function http_build_query(object|array $data, string $numeric_prefix = "", ?string $arg_separator = null, int $encoding_type = PHP_QUERY_RFC1738): string {}
 
 /**
  * Returns the target of a symbolic link
@@ -605,10 +593,9 @@ function http_build_query ($query_data, $numeric_prefix = null, $arg_separator =
  * The symbolic link path.
  * </p>
  * @return string|false the contents of the symbolic link path or false on error.
- * @since 4.0
- * @since 5.0
  */
-function readlink ($path) {}
+#[Pure(true)]
+function readlink(string $path): string|false {}
 
 /**
  * Gets information about a link
@@ -616,13 +603,12 @@ function readlink ($path) {}
  * @param string $path <p>
  * Path to the link.
  * </p>
- * @return int linkinfo returns the st_dev field
+ * @return int|false linkinfo returns the st_dev field
  * of the Unix C stat structure returned by the lstat
  * system call. Returns 0 or false in case of error.
- * @since 4.0
- * @since 5.0
  */
-function linkinfo ($path) {}
+#[Pure(true)]
+function linkinfo(string $path): int|false {}
 
 /**
  * Creates a symbolic link
@@ -634,10 +620,8 @@ function linkinfo ($path) {}
  * The link name.
  * </p>
  * @return bool true on success or false on failure.
- * @since 4.0
- * @since 5.0
  */
-function symlink ($target, $link) {}
+function symlink(string $target, string $link): bool {}
 
 /**
  * Create a hard link
@@ -645,10 +629,8 @@ function symlink ($target, $link) {}
  * @param string $target Target of the link.
  * @param string $link The link name.
  * @return bool true on success or false on failure.
- * @since 4.0
- * @since 5.0
  */
-function link (string $target , string $link):bool {}
+function link(string $target, string $link): bool {}
 
 /**
  * Deletes a file
@@ -656,12 +638,10 @@ function link (string $target , string $link):bool {}
  * @param string $filename <p>
  * Path to the file.
  * </p>
- * @param resource $context [optional] &note.context-support;
+ * @param resource $context [optional]
  * @return bool true on success or false on failure.
- * @since 4.0
- * @since 5.0
  */
-function unlink ($filename, $context = null):bool {}
+function unlink(string $filename, $context): bool {}
 
 /**
  * Execute an external program
@@ -669,7 +649,7 @@ function unlink ($filename, $context = null):bool {}
  * @param string $command <p>
  * The command that will be executed.
  * </p>
- * @param array $output [optional] <p>
+ * @param array &$output [optional] <p>
  * If the output argument is present, then the
  * specified array will be filled with every line of output from the
  * command. Trailing whitespace, such as \n, is not
@@ -679,23 +659,21 @@ function unlink ($filename, $context = null):bool {}
  * unset on the array before passing it to
  * exec.
  * </p>
- * @param int $return_var [optional] <p>
+ * @param int &$result_code [optional] <p>
  * If the return_var argument is present
  * along with the output argument, then the
  * return status of the executed command will be written to this
  * variable.
  * </p>
- * @return string The last line from the result of the command. If you need to execute a 
- * command and have all the data from the command passed directly back without 
+ * @return string|false The last line from the result of the command. If you need to execute a
+ * command and have all the data from the command passed directly back without
  * any interference, use the passthru function.
  * </p>
  * <p>
  * To get the output of the executed command, be sure to set and use the
  * output parameter.
- * @since 4.0
- * @since 5.0
  */
-function exec ($command, array &$output = null, &$return_var = null) {}
+function exec(string $command, &$output, &$result_code): string|false {}
 
 /**
  * Execute an external program and display the output
@@ -703,17 +681,15 @@ function exec ($command, array &$output = null, &$return_var = null) {}
  * @param string $command <p>
  * The command that will be executed.
  * </p>
- * @param int $return_var [optional] <p>
+ * @param int &$result_code [optional] <p>
  * If the return_var argument is present, then the
  * return status of the executed command will be written to this
  * variable.
  * </p>
  * @return string|false the last line of the command output on success, and false
  * on failure.
- * @since 4.0
- * @since 5.0
  */
-function system ($command, &$return_var = null) {}
+function system(string $command, &$result_code): string|false {}
 
 /**
  * Escape shell metacharacters
@@ -722,10 +698,9 @@ function system ($command, &$return_var = null) {}
  * The command that will be escaped.
  * </p>
  * @return string The escaped string.
- * @since 4.0
- * @since 5.0
  */
-function escapeshellcmd ($command) {}
+#[Pure]
+function escapeshellcmd(string $command): string {}
 
 /**
  * Escape a string to be used as a shell argument
@@ -734,10 +709,9 @@ function escapeshellcmd ($command) {}
  * The argument that will be escaped.
  * </p>
  * @return string The escaped string.
- * @since 4.0.3
- * @since 5.0
  */
-function escapeshellarg ($arg) {}
+#[Pure]
+function escapeshellarg(string $arg): string {}
 
 /**
  * Execute an external program and display raw output
@@ -745,35 +719,38 @@ function escapeshellarg ($arg) {}
  * @param string $command <p>
  * The command that will be executed.
  * </p>
- * @param int $return_var [optional] <p>
- * If the return_var argument is present, the 
+ * @param int &$result_code [optional] <p>
+ * If the return_var argument is present, the
  * return status of the Unix command will be placed here.
  * </p>
- * @return void 
- * @since 4.0
- * @since 5.0
+ * @return bool|null null on success or false on failure.
  */
-function passthru ($command, &$return_var = null) {}
+#[LanguageLevelTypeAware(['8.2' => 'null|false'], default: 'null|bool')]
+function passthru(string $command, &$result_code): ?bool {}
 
 /**
  * Execute command via shell and return the complete output as a string
  * @link https://php.net/manual/en/function.shell-exec.php
- * @param string $cmd <p>
+ * @param string $command <p>
  * The command that will be executed.
  * </p>
- * @return string|null The output from the executed command or NULL if an error occurred or the command produces no output.
- * @since 4.0
- * @since 5.0
+ * @return string|false|null The output from the executed command or NULL if an error occurred or the command produces no output.
  */
-function shell_exec ($cmd) {}
+function shell_exec(string $command): string|false|null {}
 
 /**
  * Execute a command and open file pointers for input/output
  * @link https://php.net/manual/en/function.proc-open.php
- * @param string $cmd <p>
- * The command to execute
+ * @param array|string $command <p>
+ * Execute a command and open file pointers for input/output
  * </p>
- * @param array $descriptorspec <p>
+ * <p>
+ * As of PHP 7.4.0, cmd may be passed as array of command parameters.
+ * In this case the process will be opened directly
+ * (without going through a shell) and PHP will take care of any
+ * necessary argument escaping.
+ * </p>
+ * @param array $descriptor_spec <p>
  * An indexed array where the key represents the descriptor number and the
  * value represents how PHP will pass that descriptor to the child
  * process. 0 is stdin, 1 is stdout, while 2 is stderr.
@@ -798,52 +775,51 @@ function shell_exec ($cmd) {}
  * secure manner. It is also useful for reading status information
  * provided by those programs on auxiliary file descriptors.
  * </p>
- * @param array $pipes <p>
+ * @param array &$pipes <p>
  * Will be set to an indexed array of file pointers that correspond to
  * PHP's end of any pipes that are created.
  * </p>
- * @param string $cwd [optional] <p>
+ * @param string|null $cwd [optional] <p>
  * The initial working dir for the command. This must be an
- * absolute directory path, or &null;
+ * absolute directory path, or null
  * if you want to use the default value (the working dir of the current
  * PHP process)
  * </p>
- * @param array $env [optional] <p>
+ * @param array|null $env_vars [optional] <p>
  * An array with the environment variables for the command that will be
- * run, or &null; to use the same environment as the current PHP process
+ * run, or null to use the same environment as the current PHP process
  * </p>
- * @param array $other_options [optional] <p>
+ * @param array|null $options [optional] <p>
  * Allows you to specify additional options. Currently supported options
  * include:
- * suppress_errors (windows only): suppresses errors
+ * suppress_errors (windows only): suppresses errors generated by this
+ * function when it's set to TRUE
  * generated by this function when it's set to true
- * bypass_shell (windows only): bypass
- * cmd.exe shell when set to true
+ * bypass_shell (windows only): bypass cmd.exe shell when set to TRUE
  * context: stream context used when opening files
  * (created with stream_context_create)
- * binary_pipes: open pipes in binary mode, instead
- * of using the usual stream_encoding
+ * blocking_pipes: (windows only): force blocking pipes when set to TRUE
+ * create_process_group (windows only): allow the child process to handle
+ * CTRL events when set to TRUE
+ * create_new_console (windows only): the new process has a new console,
+ * instead of inheriting its parent's console
  * </p>
  * @return resource|false a resource representing the process, which should be freed using
  * proc_close when you are finished with it. On failure
  * returns false.
- * @since 4.3
- * @since 5.0
  */
-function proc_open ($cmd, array $descriptorspec, array &$pipes, $cwd = null, array $env = null, array $other_options = null) {}
+function proc_open(array|string $command, array $descriptor_spec, &$pipes, ?string $cwd, ?array $env_vars, ?array $options) {}
 
 /**
- * Close a process opened by <function>proc_open</function> and return the exit code of that process
+ * Close a process opened by {@see proc_open} and return the exit code of that process
  * @link https://php.net/manual/en/function.proc-close.php
  * @param resource $process <p>
  * The proc_open resource that will
  * be closed.
  * </p>
  * @return int the termination status of the process that was run.
- * @since 4.3
- * @since 5.0
  */
-function proc_close ($process) {}
+function proc_close($process): int {}
 
 /**
  * Kills a process opened by proc_open
@@ -859,12 +835,11 @@ function proc_close ($process) {}
  * SIGTERM.
  * </p>
  * @return bool the termination status of the process that was run.
- * @since 5.0
  */
-function proc_terminate ($process, $signal = 15) {}
+function proc_terminate($process, int $signal = 15): bool {}
 
 /**
- * Get information about a process opened by <function>proc_open</function>
+ * Get information about a process opened by {@see proc_open}
  * @link https://php.net/manual/en/function.proc-get-status.php
  * @param resource $process <p>
  * The proc_open resource that will
@@ -937,35 +912,33 @@ function proc_terminate ($process, $signal = 15) {}
  * execution (only meaningful if stopped is true).
  * </td>
  * </tr>
- * @since 5.0
  */
-function proc_get_status ($process) {}
+#[ArrayShape(["command" => "string", "pid" => "int", "running" => "bool", "signaled" => "bool", "stopped" => "bool", "exitcode" => "int", "termsig" => "int", "stopsig" => "int"])]
+#[LanguageLevelTypeAware(["8.0" => "array"], default: "array|false")]
+function proc_get_status($process) {}
 
 /**
  * Change the priority of the current process. <br/>
  * Since 7.2.0 supported on Windows platforms.
  * @link https://php.net/manual/en/function.proc-nice.php
- * @param int $increment <p>
+ * @param int $priority <p>
  * The increment value of the priority change.
  * </p>
  * @return bool true on success or false on failure.
- * If an error occurs, like the user lacks permission to change the priority, 
+ * If an error occurs, like the user lacks permission to change the priority,
  * an error of level E_WARNING is also generated.
- * @since 5.0
  */
-function proc_nice ($increment) {}
+function proc_nice(int $priority): bool {}
 
 /**
  * Generate a random integer
  * @link https://php.net/manual/en/function.rand.php
- * @param int $min [optional]
+ * @param int $min
  * @param int $max [optional]
  * @return int A pseudo random value between min
  * (or 0) and max (or getrandmax, inclusive).
- * @since 4.0
- * @since 5.0
  */
-function rand ($min = 0, $max = null) {}
+function rand(int $min = null, int $max): int {}
 
 /**
  * Seed the random number generator
@@ -973,31 +946,31 @@ function rand ($min = 0, $max = null) {}
  * an alias of {@see mt_srand()}.
  * </p>
  * @link https://php.net/manual/en/function.srand.php
- * @param int $seed [optional] <p>
+ * @param int $seed <p>
  * Optional seed value
  * </p>
  * @param int $mode [optional] <p>
  * Use one of the following constants to specify the implementation of the algorithm to use.
  * </p>
- * @return void 
- * @since 4.0
- * @since 5.0
+ * @return void
  */
-function srand ($seed = null, $mode = MT_RAND_MT19937) {}
+function srand(
+    int $seed = 0,
+    #[PhpStormStubsElementAvailable(from: '7.1')] int $mode = MT_RAND_MT19937
+): void {}
 
 /**
  * Show largest possible random value
  * @link https://php.net/manual/en/function.getrandmax.php
  * @return int The largest possible random value returned by rand
- * @since 4.0
- * @since 5.0
  */
-function getrandmax () {}
+#[Pure]
+function getrandmax(): int {}
 
 /**
  * Generate a random value via the Mersenne Twister Random Number Generator
  * @link https://php.net/manual/en/function.mt-rand.php
- * @param int $min [optional] <p>
+ * @param int $min <p>
  * Optional lowest value to be returned (default: 0)
  * </p>
  * @param int $max [optional] <p>
@@ -1005,34 +978,32 @@ function getrandmax () {}
  * </p>
  * @return int A random integer value between min (or 0)
  * and max (or mt_getrandmax, inclusive)
- * @since 4.0
- * @since 5.0
  */
-function mt_rand ($min = 0, $max = null) {}
+function mt_rand(int $min = null, int $max): int {}
 
 /**
- * Seed the better random number generator
+ * Seeds the Mersenne Twister Random Number Generator
  * @link https://php.net/manual/en/function.mt-srand.php
- * @param int $seed [optional] <p>
+ * @param int $seed <p>
  * An optional seed value
  * </p>
  * @param int $mode [optional] <p>
  * Use one of the following constants to specify the implementation of the algorithm to use.
  * </p>
- * @return void 
- * @since 4.0
- * @since 5.0
+ * @return void
  */
-function mt_srand ($seed = null, $mode = MT_RAND_MT19937) {}
+function mt_srand(
+    int $seed = 0,
+    #[PhpStormStubsElementAvailable(from: '7.1')] int $mode = MT_RAND_MT19937
+): void {}
 
 /**
  * Show largest possible random value
  * @link https://php.net/manual/en/function.mt-getrandmax.php
  * @return int the maximum random value returned by mt_rand
- * @since 4.0
- * @since 5.0
  */
-function mt_getrandmax () {}
+#[Pure]
+function mt_getrandmax(): int {}
 
 /**
  * Get port number associated with an Internet service and protocol
@@ -1044,12 +1015,11 @@ function mt_getrandmax () {}
  * protocol is either "tcp"
  * or "udp" (in lowercase).
  * </p>
- * @return int the port number, or false if service or
+ * @return int|false the port number, or false if service or
  * protocol is not found.
- * @since 4.0
- * @since 5.0
  */
-function getservbyname ($service, $protocol) {}
+#[Pure]
+function getservbyname(string $service, string $protocol): int|false {}
 
 /**
  * Get Internet service which corresponds to port and protocol
@@ -1061,68 +1031,61 @@ function getservbyname ($service, $protocol) {}
  * protocol is either "tcp"
  * or "udp" (in lowercase).
  * </p>
- * @return string the Internet service name as a string.
- * @since 4.0
- * @since 5.0
+ * @return string|false the Internet service name as a string.
  */
-function getservbyport ($port, $protocol) {}
+#[Pure]
+function getservbyport(int $port, string $protocol): string|false {}
 
 /**
  * Get protocol number associated with protocol name
  * @link https://php.net/manual/en/function.getprotobyname.php
- * @param string $name <p>
+ * @param string $protocol <p>
  * The protocol name.
  * </p>
- * @return int the protocol number or -1 if the protocol is not found.
- * @since 4.0
- * @since 5.0
+ * @return int|false the protocol number or -1 if the protocol is not found.
  */
-function getprotobyname ($name) {}
+#[Pure]
+function getprotobyname(string $protocol): int|false {}
 
 /**
  * Get protocol name associated with protocol number
  * @link https://php.net/manual/en/function.getprotobynumber.php
- * @param int $number <p>
+ * @param int $protocol <p>
  * The protocol number.
  * </p>
- * @return string the protocol name as a string.
- * @since 4.0
- * @since 5.0
+ * @return string|false the protocol name as a string.
  */
-function getprotobynumber ($number) {}
+#[Pure]
+function getprotobynumber(int $protocol): string|false {}
 
 /**
  * Gets PHP script owner's UID
  * @link https://php.net/manual/en/function.getmyuid.php
- * @return int the user ID of the current script, or false on error.
- * @since 4.0
- * @since 5.0
+ * @return int|false the user ID of the current script, or false on error.
  */
-function getmyuid () {}
+#[Pure]
+function getmyuid(): int|false {}
 
 /**
  * Get PHP script owner's GID
  * @link https://php.net/manual/en/function.getmygid.php
- * @return int the group ID of the current script, or false on error.
- * @since 4.1
- * @since 5.0
+ * @return int|false the group ID of the current script, or false on error.
  */
-function getmygid () {}
+#[Pure]
+function getmygid(): int|false {}
 
 /**
  * Gets PHP's process ID
  * @link https://php.net/manual/en/function.getmypid.php
- * @return int the current PHP process ID, or false on error.
- * @since 4.0
- * @since 5.0
+ * @return int|false the current PHP process ID, or false on error.
  */
-function getmypid () {}
+#[Pure]
+function getmypid(): int|false {}
 
 /**
  * Gets the inode of the current script
  * @link https://php.net/manual/en/function.getmyinode.php
- * @return int the current script's inode as an integer, or false on error.
- * @since 4.0
- * @since 5.0
+ * @return int|false the current script's inode as an integer, or false on error.
  */
-function getmyinode () {}
+#[Pure]
+function getmyinode(): int|false {}

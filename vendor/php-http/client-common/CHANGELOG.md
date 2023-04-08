@@ -1,5 +1,36 @@
 # Change Log
 
+## 2.6.0 - 2022-09-29
+
+- [RedirectPlugin] Redirection of non GET/HEAD requests with a body now removes the body on follow-up requests, if the
+  HTTP method changes. To do this, the plugin needs to find a PSR-7 stream implementation. If none is found, you can
+  explicitly pass a PSR-17 StreamFactoryInterface in the `stream_factory` option.
+  To keep sending the body in all cases, set the `stream_factory` option to null explicitly.
+
+## 2.5.1 - 2022-09-29
+
+### Fixed
+
+- [RedirectPlugin] Fixed handling of redirection to different domain with default port
+- [RedirectPlugin] Fixed false positive circular detection in RedirectPlugin in cases when target location does not contain path
+
+## 2.5.0 - 2021-11-26
+
+### Added
+
+- Support for Symfony 6
+- Support for PHP 8.1
+
+### Changed
+
+- Dropped support for Symfony 2 and 3 - please keep using version 2.4.0 of this library if you can't update Symfony.
+
+## 2.4.0 - 2021-07-05
+
+### Added
+
+- `strict` option to `RedirectPlugin` to allow preserving the request method on redirections with status 300, 301 and 302.
+
 ## 2.3.0 - 2020-07-21
 
 ### Fixed
@@ -63,6 +94,18 @@
 - Deprecated option `debug_plugins` has been removed from `PluginClient`
 - Deprecated options `decider` and `delay` have been removed from `RetryPlugin`, use `exception_decider` and `exception_delay` instead.
 
+## 1.11.0 - 2021-07-11
+
+### Changed
+
+- Backported from version 2: AddPathPlugin: Do not add the prefix if the URL already has the same prefix.
+
+## 1.10.0 - 2019-11-18
+
+### Added
+
+- Support for Symfony 5
+
 ## 1.9.1 - 2019-02-02
 
 ### Added
@@ -112,7 +155,7 @@
 
 ## 1.7.0 - 2017-11-30
 
-### Added 
+### Added
 
 - Symfony 4 support
 
@@ -132,12 +175,12 @@
 
 ### Changed
 
-- The `RetryPlugin` does now wait between retries. To disable/change this feature you must write something like: 
- 
+- The `RetryPlugin` does now wait between retries. To disable/change this feature you must write something like:
+
 ```php
-$plugin = new RetryPlugin(['delay' => function(RequestInterface $request, Exception $e, $retries) { 
-  return 0; 
-}); 
+$plugin = new RetryPlugin(['delay' => function(RequestInterface $request, Exception $e, $retries) {
+  return 0;
+});
 ```
 
 ### Deprecated

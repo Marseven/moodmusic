@@ -1,6 +1,254 @@
 # Changelog
 
-## Unreleased
+## 3.3.2
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.3.2.
+
+### Bug Fixes
+
+- Fix "Object of class Closure could not be converted to string" error when tracing `redis_commands` [(#668)](https://github.com/getsentry/sentry-laravel/pull/668)
+
+## 3.3.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.3.1.
+
+### Bug Fixes
+
+-  Fix scheduled commands running in the background not reporting success/failure [(#664)](https://github.com/getsentry/sentry-laravel/pull/664)
+
+## 3.3.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.3.0.
+This release adds initial support for [Cron Monitoring](https://docs.sentry.io/product/crons/) as well as new performance spans and breadcrumbs.
+
+> **Warning**
+> Cron Monitoring is currently in beta. Beta features are still in-progress and may have bugs. We recognize the irony.
+> If you have any questions or feedback, please email us at crons-feedback@sentry.io, reach out via Discord (#cronjobs), or open an issue.
+
+### Features
+
+- Add inital support for Cron Monitoring [(#659)](https://github.com/getsentry/sentry-laravel/pull/659)
+
+  After creating your Cron Monitor on https://sentry.io, you can add the `sentryMonitor()` macro to your scheduled tasks defined in your `app/Console/Kernel.php` file.
+  This will let Sentry know if your scheduled task started, whether the task was successful or failed, and its duration.
+
+  ```php
+  protected function schedule(Schedule $schedule)
+  {
+      $schedule->command('emails:send')
+          ->everyHour()
+          ->sentryMonitor('<your-monitor-slug>'); // add this line
+  }
+  ```
+
+- Add Livewire tracing integration [(#657)](https://github.com/getsentry/sentry-laravel/pull/657)
+
+  You can enable this feature by adding new config options to your `config/sentry.php` file.
+
+  ```php
+  'breadcrumbs' => [
+      // Capture Livewire components in breadcrumbs
+      'livewire' => true,
+  ],
+  'tracing' => [
+      // Capture Livewire components as spans
+      'livewire' => true,
+  ],
+  ```
+
+- Add Redis operation spans & cache event breadcrumbs [(#656)](https://github.com/getsentry/sentry-laravel/pull/656)
+
+  You can enable this feature by adding new config options to your `config/sentry.php` file.
+
+  ```php
+  'breadcrumbs' => [
+      // Capture Laravel cache events in breadcrumbs
+      'cache' => true,
+  ],
+  'tracing' => [
+      // Capture Redis operations as spans (this enables Redis events in Laravel)
+      'redis_commands' => env('SENTRY_TRACE_REDIS_COMMANDS', false),
+
+      // Try to find out where the Redis command originated from and add it to the command spans
+      'redis_origin' => true,
+  ],
+
+- Add HTTP client request breadcrumbs [(#640)](https://github.com/getsentry/sentry-laravel/pull/640)
+
+  You can enable this feature by adding a new config option to your `config/sentry.php` file.
+
+  ```php
+  'breadcrumbs' => [
+      // Capture HTTP client requests information in breadcrumbs
+      'http_client_requests' => true,
+  ],
+
+- Offer the installation of a JavaScript SDK when running `sentry:publish` [(#647)](https://github.com/getsentry/sentry-laravel/pull/647)
+
+### Bug Fixes
+
+- Fix a log channel context crash when unexpected values are passed [(#651)](https://github.com/getsentry/sentry-laravel/pull/651)
+
+### Misc
+
+- The SDK is now licensed under MIT [(#654)](https://github.com/getsentry/sentry-php/pull/654)
+  - Read more about Sentry's licensing [here](https://open.sentry.io/licensing/).
+
+## 3.2.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.2.0.
+This release adds support for Laravel 10.
+
+### Features
+
+- Add support for Laravel 10 [(#630)](https://github.com/getsentry/sentry-laravel/pull/630)
+    - Thanks to [@jnoordsij](https://github.com/jnoordsij) for their contribution.
+- Add `tracing.http_client_requests` option [(#641)](https://github.com/getsentry/sentry-laravel/pull/641)
+    - You can now disable HTTP client tracing in your `config/sentry.php` file
+
+      ```php
+      'tracing' => [
+          'http_client_requests' => true|false, // This feature is enabled by default
+      ],
+      ```
+
+## 3.1.3
+
+- Increase debug trace limit count to 20 in `Integration::makeAnEducatedGuessIfTheExceptionMaybeWasHandled()` (#622)
+    - Look futher into the backtrace to check if `report()` was called.
+- Run the testsuite against PHP 8.2 (#624)
+
+## 3.1.2
+
+- Set `traces_sample_rate` to `null` by default (#616)
+    - Make sure to update your `config/sentry.php`.
+
+      Replace
+      ```
+      'traces_sample_rate' => (float)(env('SENTRY_TRACES_SAMPLE_RATE', 0.0)),
+      ```
+      with
+      ```
+      'traces_sample_rate' => env('SENTRY_TRACES_SAMPLE_RATE') === null ? null : (float)env('SENTRY_TRACES_SAMPLE_RATE'),
+      ```
+- Fix exceptions sent via the `report()` helper being marked as unhandled (#617)
+
+## 3.1.1
+
+- Fix missing scope information on unhandled exceptions (#611)
+
+## 3.1.0
+
+- Unhandled exceptions are now correctly marked as `handled: false` and displayed as such on the issues list and detail page (#608)
+   - Make sure to update your `App/Exceptions/Handler.php` file to enable this new behaviour. See https://docs.sentry.io/platforms/php/guides/laravel/
+
+## 3.0.1
+
+- Remove incorrect checks if performance tracing should be enabled and rely on the transaction sampling decision instead (#600)
+- Fix `SENTRY_RELEASE` .env variable not working when using config caching (#603)
+
+## 3.0.0
+
+**New features**
+
+- We are now creating more spans to give you better insights into the performance of your application
+    - Add a `http.client` span. This span indicates the time that is spent when using the Laravel HTTP client (#585)
+    - Add a `http.route` span. This span indicates the time that is spent inside a controller method or route closure (#593)
+    - Add a `db.transaction` span. This span indicates the time that is spent inside a database transaction (#594)
+- Add support for [Dynamic Sampling](https://docs.sentry.io/product/data-management-settings/dynamic-sampling/), allowing developers to set a server-side sampling rate without the need to re-deploy their applications
+    - Add support for Dynamic Sampling (#572)
+
+**Breaking changes**
+
+- Laravel Lumen is no longer supported
+    - Drop support for Laravel Lumen (#579)
+- Laravel versions 5.0 - 5.8 are no longer supported
+    - Drop support for Laravel 5.x (#581)
+- Remove `Sentry\Integration::extractNameForRoute()`, it's alternative `Sentry\Integration::extractNameAndSourceForRoute()` is marked as `@internal` (#580)
+- Remove internal `Sentry\Integration::currentTracingSpan()`, use `SentrySdk::getCurrentHub()->getSpan()` if you were using this internal method (#592)
+
+**Other changes**
+
+- Set the tracing transaction name on the `Illuminate\Routing\Events\RouteMatched` instead of at the end of the request (#580)
+- Remove extracting route name or controller for transaction names (#583). This unifies the transaction names to a more concise format.
+- Simplify Sentry meta tag retrieval, by adding `Sentry\Laravel\Integration::sentryMeta()` (#586)
+- Fix tracing with nested queue jobs (mostly when running jobs in the `sync` driver) (#592)
+
+## 2.14.2
+
+- Fix extracting command input resulting in errors when calling Artisan commands programatically with `null` as an argument value (#589)
+
+## 2.14.1
+
+- Fix not setting the correct SDK ID and version when running the `sentry:test` command (#582)
+- Transaction names now only show the parameterized URL (`/some/{route}`) instead of the route name or controller class (#583)
+
+## 2.14.0
+
+- Fix not listening to queue events because `QueueManager` is registered as `queue` in the container and not by it's class name (#568)
+- Fix status code not populated on transaction if response did not inherit from `Illuminate\Http\Response` like `Illuminate\Http\JsonResponse` (#573)
+- Align Span Operations with new spec (#574)
+- Fix broken `SetRequestMiddleware` on Laravel < 6.0 (#575)
+- Also extract the authenticated user `email` and `username` attributes if available (#577)
+
+## 2.13.0
+
+- Only catch `BindingResolutionException` when trying to get the PSR-7 request object from the container
+
+## 2.12.1
+
+- Fix incorrect `release` and `environment` values when using the `sentry:test` command
+
+## 2.12.0
+
+- Add support for normalized route names when using [Laravel Lumen](https://lumen.laravel.com/docs/9.x) (#449)
+- Add support for adding the user ID to the user scope when using [Laravel Sanctum](https://laravel.com/docs/9.x/sanctum) (#542)
+- Allow configuration of the [`send_default_pii`](https://docs.sentry.io/platforms/php/configuration/options/#send-default-pii) SDK option with the `SENTRY_SEND_DEFAULT_PII` env variable
+
+## 2.11.1
+
+- Fix deprecation notice in route name extraction (#543)
+
+## 2.11.0
+
+- Add support for Laravel 9 (#534)
+- Fix double wrapping the log channel in a `FingersCrossedHandler` on Laravel `v8.97` and newer when `action_level` option is set on the Log channel config (#534)
+- Update span operation names to match what Sentry server is expecting (#533)
+
+## 2.10.2
+
+- Fix `sentry:test` command not having correct exit code on success
+
+## 2.10.1
+
+- Fix compatibility with Laravel <= 6 of the `sentry:test` and `sentry:publish` commands
+
+## 2.10.0
+
+- Improve output and DX for `sentry:test` and `sentry:publish` commands (#522)
+
+## 2.9.0
+
+- Add support for Laravel Octane (#495)
+- Fix bug in Sentry log channel handler checking an undefined variable resulting in an error (#515)
+- Add `action_level` configuration option for Sentry log channel which configures a Monolog `FingersCrossedHandler` (#516)
+
+## 2.8.0
+
+- Update phpdoc on facade for better IDE autocompletion (#504)
+- Exceptions captured using log channels (Monolog) will now have the correct severity set (#505)
+- Tags passed through log channels (Monolog) context are cast as string to prevent type errors (#507)
+- Add options to the `artisan sentry:publish` command to better support `--no-interaction` mode (#509) 
+
+## 2.7.0
+
+- Replace type hint of concrete type (`Sentry\State\Hub`) with interface (`Sentry\State\HubInterface`) in `SentryHandler` constructor (#496)
+- Use latest version of the Sentry PHP SDK (#499)
+
+## 2.6.0
+
+- Add all log context as `log_context` to events when using the log channel (#489)
+- Add integration to improve performance tracing for [Laravel Lighthouse](https://github.com/nuwave/lighthouse) (#490)
 
 ## 2.5.3
 

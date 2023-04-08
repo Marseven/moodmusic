@@ -3,27 +3,44 @@
 namespace Common\Core\Bootstrap;
 
 use App\User;
-use Common\Localizations\LocalizationsRepository;
+use Common\Localizations\Localization;
+use Illuminate\Support\Str;
 use Spatie\Color\Hex;
 use Spatie\Color\Rgb;
-use Spatie\Color\Rgba;
-use Str;
 
 class MobileBootstrapData extends BaseBootstrapData
 {
-    public function init()
+    public function init(): self
     {
-        $themes = $this->getThemes();
-        $themes['light']['colors'] = $this->mapColorsToRgba($themes['light']['colors']);
-        $themes['dark']['colors'] = $this->mapColorsToRgba($themes['dark']['colors']);
+        $cssThemes = $this->getThemes()['all'];
+        $themes = [
+            'light' => $cssThemes
+                ->where('default_light', true)
+                ->first()
+                ->toArray(),
+            'dark' => $cssThemes
+                ->where('default_dark', true)
+                ->first()
+                ->toArray(),
+        ];
+
+        $themes['light']['colors'] = $this->mapColorsToRgba(
+            $themes['light']['colors'],
+        );
+        $themes['dark']['colors'] = $this->mapColorsToRgba(
+            $themes['dark']['colors'],
+        );
 
         $this->data = [
             'themes' => $themes,
             'user' => $this->getCurrentUser(),
             'menus' => $this->getMobileMenus(),
-            'locales' => app(LocalizationsRepository::class)->all()->map(function($value) {
-                return $value['model'];
-            }),
+            'settings' => [
+                'social.google.enable' => (bool) $this->settings->get(
+                    'social.google.enable',
+                ),
+            ],
+            'locales' => Localization::get(),
         ];
         return $this;
     }
@@ -34,7 +51,7 @@ class MobileBootstrapData extends BaseBootstrapData
         $user = $this->data['user'];
         if ($user) {
             $user['access_token'] = $user->refreshApiToken($deviceName);
-            $user->loadFcmToken();
+            $this->loadFcmToken($user);
         }
         return $this;
     }
@@ -43,36 +60,45 @@ class MobileBootstrapData extends BaseBootstrapData
     {
         /* @var User $user */
         if ($user = $this->request->user()) {
-            $user->loadFcmToken();
-            return $user;
+            return $this->loadFcmToken($user);
         }
         return null;
     }
 
     private function getMobileMenus(): array
     {
-        return array_values(array_filter($this->settings->getJson('menus'), function($menu) {
-            return Str::startsWith($menu['position'], 'mobile-app');
-        }));
+        return array_values(
+            array_filter(
+                $this->settings->getJson('menus'),
+                fn($menu) => collect($menu['positions'])->some(
+                    fn($position) => Str::startsWith($position, 'mobile-app'),
+                ),
+            ),
+        );
     }
 
     private function mapColorsToRgba(array $colors): array
     {
-        return array_map(function($color) {
-            if (Str::startsWith($color, '#')) {
-                $fullHex = str_pad($color, 7, substr($color, -1));
-                $hex = Hex::fromString($fullHex)->toRgba();
-                return [$hex->red(), $hex->green(), $hex->blue(), 1.0];
-            } else if (Str::startsWith($color, 'rgba')) {
-                $rgba = Rgba::fromString($color);
-                return [$rgba->red(), $rgba->green(), $rgba->blue(), $rgba->alpha()];
-            } else if ($color === 'black') {
-                return [0, 0, 0, 1.0];
+        if (!class_exists(Hex::class)) {
+            return $colors;
+        }
+
+        return array_map(function ($color) {
+            if (str_ends_with($color, '%')) {
+                return (int) str_replace('%', '', $color);
             } else {
-                $rgb = Rgb::fromString($color);
+                $color = str_replace(' ', ',', $color);
+                $rgb = Rgb::fromString("rgb($color)");
                 return [$rgb->red(), $rgb->green(), $rgb->blue(), 1.0];
             }
         }, $colors);
     }
 
+    private function loadFcmToken(User $user): User
+    {
+        if (method_exists($user, 'loadFcmToken')) {
+            $user->loadFcmToken();
+        }
+        return $user;
+    }
 }

@@ -19,7 +19,8 @@ class CreateCustomDomainsTable extends Migration
             $table->increments('id');
             $table->string('host', 100)->index()->unique();
             $table->integer('user_id')->index();
-            $table->timestamps();
+            $table->timestamp('created_at')->index()->nullable();
+            $table->timestamp('updated_at')->index()->nullable();
         });
     }
 

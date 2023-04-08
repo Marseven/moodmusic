@@ -2,12 +2,12 @@
 
 namespace Common\Settings\Validators;
 
-use Config;
-use Socialite;
 use Common\Auth\Oauth;
-use Illuminate\Support\Arr;
 use Common\Core\HttpClient;
+use Config;
 use GuzzleHttp\Exception\ClientException;
+use Illuminate\Support\Arr;
+use Socialite;
 
 class GoogleLoginValidator implements SettingsValidator
 {
@@ -59,16 +59,27 @@ class GoogleLoginValidator implements SettingsValidator
      */
     private function getErrorMessage(ClientException $e)
     {
-        $errResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+        $errResponse = json_decode(
+            $e
+                ->getResponse()
+                ->getBody()
+                ->getContents(),
+            true,
+        );
 
         // there were no credentials related errors, we can assume validation was successful
-        if (Arr::get($errResponse, 'error_description') === 'Malformed auth code.') {
+        if (
+            Arr::get($errResponse, 'error_description') ===
+            'Malformed auth code.'
+        ) {
             return null;
         }
 
         $msg1 = Arr::get($errResponse, 'error.errors.0.message', '');
         $msg2 = Arr::get($errResponse, 'error_description', '');
         $message = strtolower($msg1 ?: $msg2);
-        return ['google_group' => "Could not validate these credentials: $message"];
+        return [
+            'google_group' => "Could not validate these credentials: $message",
+        ];
     }
 }

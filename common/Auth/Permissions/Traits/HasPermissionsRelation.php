@@ -15,29 +15,17 @@ trait HasPermissionsRelation
             ->select('name', 'permissions.id', 'permissions.restrictions');
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function hasPermission($name)
+    public function hasPermission(string $name): bool
     {
         return !is_null($this->getPermission($name)) || !is_null($this->getPermission('admin'));
     }
 
-    /**
-     * @param string $name
-     * @return bool
-     */
-    public function hasExactPermission($name)
+    public function hasExactPermission(string $name): bool
     {
         return !is_null($this->getPermission($name));
     }
 
-    /**
-     * @param string $name
-     * @return Permission
-     */
-    public function getPermission($name)
+    public function getPermission(string $name): Permission | null
     {
         if (method_exists($this, 'loadPermissions')) {
             $this->loadPermissions();
@@ -48,5 +36,7 @@ trait HasPermissionsRelation
                 return $permission;
             }
         }
+
+        return null;
     }
 }

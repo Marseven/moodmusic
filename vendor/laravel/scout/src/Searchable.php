@@ -2,9 +2,10 @@
 
 namespace Laravel\Scout;
 
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Support\Collection as BaseCollection;
-use Laravel\Scout\Jobs\MakeSearchable;
+use Illuminate\Support\Str;
 
 trait Searchable
 {
@@ -63,7 +64,7 @@ trait Searchable
             return $models->first()->searchableUsing()->update($models);
         }
 
-        dispatch((new MakeSearchable($models))
+        dispatch((new Scout::$makeSearchableJob($models))
                 ->onQueue($models->first()->syncWithSearchUsingQueue())
                 ->onConnection($models->first()->syncWithSearchUsing()));
     }
@@ -80,7 +81,13 @@ trait Searchable
             return;
         }
 
-        return $models->first()->searchableUsing()->delete($models);
+        if (! config('scout.queue')) {
+            return $models->first()->searchableUsing()->delete($models);
+        }
+
+        dispatch(new Scout::$removeFromSearchJob($models))
+            ->onQueue($models->first()->syncWithSearchUsingQueue())
+            ->onConnection($models->first()->syncWithSearchUsing());
     }
 
     /**
@@ -89,6 +96,16 @@ trait Searchable
      * @return bool
      */
     public function shouldBeSearchable()
+    {
+        return true;
+    }
+
+    /**
+     * When updating a model, this method determines if we should update the search index.
+     *
+     * @return bool
+     */
+    public function searchIndexShouldBeUpdated()
     {
         return true;
     }
@@ -139,7 +156,7 @@ trait Searchable
      * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function makeAllSearchableUsing($query)
+    protected function makeAllSearchableUsing(EloquentBuilder $query)
     {
         return $query;
     }
@@ -177,6 +194,26 @@ trait Searchable
     }
 
     /**
+     * Determine if the model existed in the search index prior to an update.
+     *
+     * @return bool
+     */
+    public function wasSearchableBeforeUpdate()
+    {
+        return true;
+    }
+
+    /**
+     * Determine if the model existed in the search index prior to deletion.
+     *
+     * @return bool
+     */
+    public function wasSearchableBeforeDelete()
+    {
+        return true;
+    }
+
+    /**
      * Get the requested models from an array of object IDs.
      *
      * @param  \Laravel\Scout\Builder  $builder
@@ -185,6 +222,18 @@ trait Searchable
      */
     public function getScoutModelsByIds(Builder $builder, array $ids)
     {
+        return $this->queryScoutModelsByIds($builder, $ids)->get();
+    }
+
+    /**
+     * Get a query builder for retrieving the requested models from an array of object IDs.
+     *
+     * @param  \Laravel\Scout\Builder  $builder
+     * @param  array  $ids
+     * @return mixed
+     */
+    public function queryScoutModelsByIds(Builder $builder, array $ids)
+    {
         $query = static::usesSoftDelete()
             ? $this->withTrashed() : $this->newQuery();
 
@@ -192,9 +241,13 @@ trait Searchable
             call_user_func($builder->queryCallback, $query);
         }
 
-        return $query->whereIn(
+        $whereIn = in_array($this->getKeyType(), ['int', 'integer']) ?
+            'whereIntegerInRaw' :
+            'whereIn';
+
+        return $query->{$whereIn}(
             $this->getScoutKeyName(), $ids
-        )->get();
+        );
     }
 
     /**
@@ -336,6 +389,16 @@ trait Searchable
     public function getScoutKeyName()
     {
         return $this->getQualifiedKeyName();
+    }
+
+    /**
+     * Get the unqualified Scout key name.
+     *
+     * @return string
+     */
+    public function getUnqualifiedScoutKeyName()
+    {
+        return Str::afterLast($this->getScoutKeyName(), '.');
     }
 
     /**

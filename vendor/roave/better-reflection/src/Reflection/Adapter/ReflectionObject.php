@@ -4,197 +4,131 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
+use OutOfBoundsException;
+use ReflectionClass as CoreReflectionClass;
 use ReflectionException as CoreReflectionException;
+use ReflectionExtension as CoreReflectionExtension;
 use ReflectionObject as CoreReflectionObject;
-use Roave\BetterReflection\Reflection\Exception\NotAnObject;
+use Roave\BetterReflection\Reflection\ReflectionAttribute as BetterReflectionAttribute;
 use Roave\BetterReflection\Reflection\ReflectionClass as BetterReflectionClass;
+use Roave\BetterReflection\Reflection\ReflectionClassConstant as BetterReflectionClassConstant;
 use Roave\BetterReflection\Reflection\ReflectionMethod as BetterReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionObject as BetterReflectionObject;
 use Roave\BetterReflection\Reflection\ReflectionProperty as BetterReflectionProperty;
 use Roave\BetterReflection\Util\FileHelper;
+use ValueError;
+
 use function array_combine;
+use function array_filter;
 use function array_map;
 use function array_values;
-use function assert;
 use function func_num_args;
-use function is_array;
 use function sprintf;
 use function strtolower;
 
-class ReflectionObject extends CoreReflectionObject
+/** @psalm-suppress PropertyNotSetInConstructor */
+final class ReflectionObject extends CoreReflectionObject
 {
-    /** @var BetterReflectionObject */
-    private $betterReflectionObject;
-
-    public function __construct(BetterReflectionObject $betterReflectionObject)
+    public function __construct(private BetterReflectionObject $betterReflectionObject)
     {
-        $this->betterReflectionObject = $betterReflectionObject;
+        unset($this->name);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws CoreReflectionException
-     */
-    public static function export($argument, $return = null)
-    {
-        $output = BetterReflectionObject::createFromInstance($argument)->__toString();
-
-        if ($return) {
-            return $output;
-        }
-
-        echo $output;
-
-        return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->betterReflectionObject->__toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->betterReflectionObject->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isInternal()
+    public function isInternal(): bool
     {
         return $this->betterReflectionObject->isInternal();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isUserDefined()
+    public function isUserDefined(): bool
     {
         return $this->betterReflectionObject->isUserDefined();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isInstantiable()
+    public function isInstantiable(): bool
     {
         return $this->betterReflectionObject->isInstantiable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isCloneable()
+    public function isCloneable(): bool
     {
         return $this->betterReflectionObject->isCloneable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getFileName()
+    public function getFileName(): string|false
     {
         $fileName = $this->betterReflectionObject->getFileName();
 
         return $fileName !== null ? FileHelper::normalizeSystemPath($fileName) : false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getStartLine()
+    public function getStartLine(): int|false
     {
         return $this->betterReflectionObject->getStartLine();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getEndLine()
+    public function getEndLine(): int|false
     {
         return $this->betterReflectionObject->getEndLine();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDocComment()
+    public function getDocComment(): string|false
     {
         return $this->betterReflectionObject->getDocComment() ?: false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getConstructor()
+    public function getConstructor(): ReflectionMethod
     {
         return new ReflectionMethod($this->betterReflectionObject->getConstructor());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasMethod($name)
+    public function hasMethod(string $name): bool
     {
         return $this->betterReflectionObject->hasMethod($this->getMethodRealName($name));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getMethod($name)
+    public function getMethod(string $name): ReflectionMethod
     {
         return new ReflectionMethod($this->betterReflectionObject->getMethod($this->getMethodRealName($name)));
     }
 
-    private function getMethodRealName(string $name) : string
+    private function getMethodRealName(string $name): string
     {
-        $realMethodNames = array_map(static function (BetterReflectionMethod $method) : string {
-            return $method->getName();
-        }, $this->betterReflectionObject->getMethods());
+        $realMethodNames = array_map(static fn (BetterReflectionMethod $method): string => $method->getName(), $this->betterReflectionObject->getMethods());
 
-        $methodNames = array_combine(array_map(static function (string $methodName) : string {
-            return strtolower($methodName);
-        }, $realMethodNames), $realMethodNames);
+        $methodNames = array_combine(array_map(static fn (string $methodName): string => strtolower($methodName), $realMethodNames), $realMethodNames);
 
         return $methodNames[strtolower($name)] ?? $name;
     }
 
     /**
-     * {@inheritDoc}
+     * @return list<ReflectionMethod>
+     *
+     * @psalm-suppress MethodSignatureMismatch
      */
-    public function getMethods($filter = null)
+    public function getMethods(int|null $filter = null): array
     {
-        $methods = $this->betterReflectionObject->getMethods();
-
-        $wrappedMethods = [];
-        foreach ($methods as $key => $method) {
-            $wrappedMethods[$key] = new ReflectionMethod($method);
-        }
-
-        return $wrappedMethods;
+        return array_map(
+            static fn (BetterReflectionMethod $method): ReflectionMethod => new ReflectionMethod($method),
+            $this->betterReflectionObject->getMethods($filter),
+        );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasProperty($name)
+    public function hasProperty(string $name): bool
     {
         return $this->betterReflectionObject->hasProperty($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getProperty($name)
+    public function getProperty(string $name): ReflectionProperty
     {
         $property = $this->betterReflectionObject->getProperty($name);
 
@@ -206,188 +140,155 @@ class ReflectionObject extends CoreReflectionObject
     }
 
     /**
-     * {@inheritDoc}
+     * @return list<ReflectionProperty>
+     *
+     * @psalm-suppress MethodSignatureMismatch
      */
-    public function getProperties($filter = null)
+    public function getProperties(int|null $filter = null): array
     {
-        return array_values(array_map(static function (BetterReflectionProperty $property) : ReflectionProperty {
-            return new ReflectionProperty($property);
-        }, $this->betterReflectionObject->getProperties()));
+        return array_values(array_map(static fn (BetterReflectionProperty $property): ReflectionProperty => new ReflectionProperty($property), $this->betterReflectionObject->getProperties()));
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasConstant($name)
+    public function hasConstant(string $name): bool
     {
         return $this->betterReflectionObject->hasConstant($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getConstants()
+    /** @return array<string, mixed> */
+    public function getConstants(int|null $filter = null): array
     {
-        return $this->betterReflectionObject->getConstants();
+        $reflectionConstants = $this->betterReflectionObject->getReflectionConstants();
+
+        if ($filter !== null) {
+            $reflectionConstants = array_filter(
+                $reflectionConstants,
+                static fn (BetterReflectionClassConstant $betterConstant): bool => (bool) ($betterConstant->getModifiers() & $filter),
+            );
+        }
+
+        return array_map(
+            static fn (BetterReflectionClassConstant $betterConstant): mixed => $betterConstant->getValue(),
+            $reflectionConstants,
+        );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getConstant($name)
+    public function getConstant(string $name): mixed
     {
         return $this->betterReflectionObject->getConstant($name);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInterfaces()
+    public function getReflectionConstant(string $name): ReflectionClassConstant|false
     {
-        $interfaces = $this->betterReflectionObject->getInterfaces();
+        $betterReflectionConstant = $this->betterReflectionObject->getReflectionConstant($name);
 
-        $wrappedInterfaces = [];
-        foreach ($interfaces as $key => $interface) {
-            $wrappedInterfaces[$key] = new ReflectionClass($interface);
+        if ($betterReflectionConstant === null) {
+            return false;
         }
 
-        return $wrappedInterfaces;
+        return new ReflectionClassConstant($betterReflectionConstant);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getInterfaceNames()
+    /** @return list<ReflectionClassConstant> */
+    public function getReflectionConstants(int|null $filter = null): array
+    {
+        return array_values(array_map(
+            static fn (BetterReflectionClassConstant $betterConstant): ReflectionClassConstant => new ReflectionClassConstant($betterConstant),
+            $this->betterReflectionObject->getReflectionConstants(),
+        ));
+    }
+
+    /** @return array<class-string, CoreReflectionClass> */
+    public function getInterfaces(): array
+    {
+        return array_map(
+            static fn (BetterReflectionClass $interface): ReflectionClass => new ReflectionClass($interface),
+            $this->betterReflectionObject->getInterfaces(),
+        );
+    }
+
+    /** @return list<class-string> */
+    public function getInterfaceNames(): array
     {
         return $this->betterReflectionObject->getInterfaceNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isInterface()
+    public function isInterface(): bool
     {
         return $this->betterReflectionObject->isInterface();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTraits()
+    /** @return array<trait-string, ReflectionClass> */
+    public function getTraits(): array
     {
         $traits = $this->betterReflectionObject->getTraits();
 
-        /** @var array<trait-string> $traitNames */
-        $traitNames = array_map(static function (BetterReflectionClass $trait) : string {
-            return $trait->getName();
-        }, $traits);
+        /** @var list<trait-string> $traitNames */
+        $traitNames = array_map(static fn (BetterReflectionClass $trait): string => $trait->getName(), $traits);
 
-        $traitsByName = array_combine(
+        return array_combine(
             $traitNames,
-            array_map(static function (BetterReflectionClass $trait) : ReflectionClass {
-                return new ReflectionClass($trait);
-            }, $traits)
+            array_map(static fn (BetterReflectionClass $trait): ReflectionClass => new ReflectionClass($trait), $traits),
         );
-
-        assert(
-            is_array($traitsByName),
-            sprintf(
-                'Could not create an array<trait-string, ReflectionClass> for class "%s"',
-                $this->betterReflectionObject->getName()
-            )
-        );
-
-        return $traitsByName;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTraitNames()
+    /** @return list<trait-string> */
+    public function getTraitNames(): array
     {
         return $this->betterReflectionObject->getTraitNames();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getTraitAliases()
+    /** @return array<string, string> */
+    public function getTraitAliases(): array
     {
         return $this->betterReflectionObject->getTraitAliases();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isTrait()
+    public function isTrait(): bool
     {
         return $this->betterReflectionObject->isTrait();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isAbstract()
+    public function isAbstract(): bool
     {
         return $this->betterReflectionObject->isAbstract();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isFinal()
+    public function isFinal(): bool
     {
         return $this->betterReflectionObject->isFinal();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getModifiers()
+    public function isReadOnly(): bool
+    {
+        return $this->betterReflectionObject->isReadOnly();
+    }
+
+    public function getModifiers(): int
     {
         return $this->betterReflectionObject->getModifiers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isInstance($object)
+    public function isInstance(object $object): bool
     {
-        try {
-            return $this->betterReflectionObject->isInstance($object);
-        } catch (NotAnObject $e) {
-            return null;
-        }
+        return $this->betterReflectionObject->isInstance($object);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function newInstance($arg = null, ...$args)
+    public function newInstance(mixed ...$args): ReflectionObject
     {
         throw new Exception\NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function newInstanceWithoutConstructor()
+    public function newInstanceWithoutConstructor(): ReflectionObject
     {
         throw new Exception\NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function newInstanceArgs(?array $args = null)
+    public function newInstanceArgs(array|null $args = null): ReflectionObject
     {
         throw new Exception\NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getParentClass()
+    public function getParentClass(): ReflectionClass|false
     {
         $parentClass = $this->betterReflectionObject->getParentClass();
 
@@ -398,34 +299,32 @@ class ReflectionObject extends CoreReflectionObject
         return new ReflectionClass($parentClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isSubclassOf($class)
+    /** @psalm-suppress MethodSignatureMismatch */
+    public function isSubclassOf(CoreReflectionClass|string $class): bool
     {
         $realParentClassNames = $this->betterReflectionObject->getParentClassNames();
 
-        $parentClassNames = array_combine(array_map(static function (string $parentClassName) : string {
-            return strtolower($parentClassName);
-        }, $realParentClassNames), $realParentClassNames);
+        $parentClassNames = array_combine(array_map(static fn (string $parentClassName): string => strtolower($parentClassName), $realParentClassNames), $realParentClassNames);
 
-        $realParentClassName = $parentClassNames[strtolower($class)] ?? $class;
+        $className           = $class instanceof CoreReflectionClass ? $class->getName() : $class;
+        $lowercasedClassName = strtolower($className);
+
+        $realParentClassName = $parentClassNames[$lowercasedClassName] ?? $className;
 
         return $this->betterReflectionObject->isSubclassOf($realParentClassName);
     }
 
     /**
-     * {@inheritDoc}
+     * @return array<string, mixed>
+     *
+     * @psalm-suppress LessSpecificImplementedReturnType
      */
-    public function getStaticProperties()
+    public function getStaticProperties(): array
     {
         return $this->betterReflectionObject->getStaticProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getStaticPropertyValue($name, $default = null)
+    public function getStaticPropertyValue(string $name, mixed $default = null): mixed
     {
         $betterReflectionProperty = $this->betterReflectionObject->getProperty($name);
 
@@ -439,10 +338,6 @@ class ReflectionObject extends CoreReflectionObject
 
         $property = new ReflectionProperty($betterReflectionProperty);
 
-        if (! $property->isAccessible()) {
-            throw new CoreReflectionException(sprintf('Property "%s" is not accessible', $name));
-        }
-
         if (! $property->isStatic()) {
             throw new CoreReflectionException(sprintf('Property "%s" is not static', $name));
         }
@@ -450,10 +345,7 @@ class ReflectionObject extends CoreReflectionObject
         return $property->getValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setStaticPropertyValue($name, $value)
+    public function setStaticPropertyValue(string $name, mixed $value): void
     {
         $betterReflectionProperty = $this->betterReflectionObject->getProperty($name);
 
@@ -463,10 +355,6 @@ class ReflectionObject extends CoreReflectionObject
 
         $property = new ReflectionProperty($betterReflectionProperty);
 
-        if (! $property->isAccessible()) {
-            throw new CoreReflectionException(sprintf('Property "%s" is not accessible', $name));
-        }
-
         if (! $property->isStatic()) {
             throw new CoreReflectionException(sprintf('Property "%s" is not static', $name));
         }
@@ -474,75 +362,100 @@ class ReflectionObject extends CoreReflectionObject
         $property->setValue($value);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultProperties()
+    /** @return array<string, scalar|array<scalar>|null> */
+    public function getDefaultProperties(): array
     {
         return $this->betterReflectionObject->getDefaultProperties();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isIterateable()
+    public function isIterateable(): bool
     {
         return $this->betterReflectionObject->isIterateable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function implementsInterface($interface)
+    public function isIterable(): bool
+    {
+        return $this->isIterateable();
+    }
+
+    /** @psalm-suppress MethodSignatureMismatch */
+    public function implementsInterface(CoreReflectionClass|string $interface): bool
     {
         $realInterfaceNames = $this->betterReflectionObject->getInterfaceNames();
 
-        $interfaceNames = array_combine(array_map(static function (string $interfaceName) : string {
-            return strtolower($interfaceName);
-        }, $realInterfaceNames), $realInterfaceNames);
+        $interfaceNames = array_combine(array_map(static fn (string $interfaceName): string => strtolower($interfaceName), $realInterfaceNames), $realInterfaceNames);
 
-        $realInterfaceName = $interfaceNames[strtolower($interface)] ?? $interface;
+        $interfaceName          = $interface instanceof CoreReflectionClass ? $interface->getName() : $interface;
+        $lowercasedIntefaceName = strtolower($interfaceName);
+
+        $realInterfaceName = $interfaceNames[$lowercasedIntefaceName] ?? $interfaceName;
 
         return $this->betterReflectionObject->implementsInterface($realInterfaceName);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtension()
+    public function getExtension(): CoreReflectionExtension|null
     {
         throw new Exception\NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtensionName()
+    public function getExtensionName(): string|false
     {
         return $this->betterReflectionObject->getExtensionName() ?? false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function inNamespace()
+    public function inNamespace(): bool
     {
         return $this->betterReflectionObject->inNamespace();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getNamespaceName()
+    public function getNamespaceName(): string
     {
         return $this->betterReflectionObject->getNamespaceName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getShortName()
+    public function getShortName(): string
     {
         return $this->betterReflectionObject->getShortName();
+    }
+
+    public function isAnonymous(): bool
+    {
+        return $this->betterReflectionObject->isAnonymous();
+    }
+
+    /**
+     * @param class-string|null $name
+     *
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(string|null $name = null, int $flags = 0): array
+    {
+        if ($flags !== 0 && $flags !== ReflectionAttribute::IS_INSTANCEOF) {
+            throw new ValueError('Argument #2 ($flags) must be a valid attribute filter flag');
+        }
+
+        if ($name !== null && $flags & ReflectionAttribute::IS_INSTANCEOF) {
+            $attributes = $this->betterReflectionObject->getAttributesByInstance($name);
+        } elseif ($name !== null) {
+            $attributes = $this->betterReflectionObject->getAttributesByName($name);
+        } else {
+            $attributes = $this->betterReflectionObject->getAttributes();
+        }
+
+        return array_map(static fn (BetterReflectionAttribute $betterReflectionAttribute): ReflectionAttribute => new ReflectionAttribute($betterReflectionAttribute), $attributes);
+    }
+
+    public function isEnum(): bool
+    {
+        return $this->betterReflectionObject->isEnum();
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ($name === 'name') {
+            return $this->betterReflectionObject->getName();
+        }
+
+        throw new OutOfBoundsException(sprintf('Property %s::$%s does not exist.', self::class, $name));
     }
 }

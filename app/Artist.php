@@ -2,46 +2,20 @@
 
 use App\Traits\OrdersByPopularity;
 use Carbon\Carbon;
+use Common\Search\Searchable;
 use Common\Settings\Settings;
-use Eloquent;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
-use Laravel\Scout\Searchable;
 
-/**
- * App\Artist
- *
- * @property int $id
- * @property string $name
- * @property string $spotify_id
- * @property int|null $spotify_followers
- * @property int $spotify_popularity
- * @property string $image_small
- * @property string|null $image_large
- * @property int $fully_scraped
- * @property Carbon|null $updated_at
- * @property boolean $auto_update
- * @property-read Collection|Album[] $albums
- * @property-read Collection|Genre[] $genres
- * @property-read string $image_big
- * @property-read Collection|Artist[] $similar
- * @method Artist orderByPopularity(string $direction)
- * @mixin Eloquent
- */
 class Artist extends Model {
     use OrdersByPopularity, Searchable, HasFactory;
 
     const MODEL_TYPE = 'artist';
 
-    /**
-     * @var array
-     */
     protected $casts = [
         'id' => 'integer',
         'spotify_popularity' => 'integer',
@@ -126,16 +100,23 @@ class Artist extends Model {
             ->withTimestamps();
     }
 
-    public function getImageSmallAttribute(?string $value): string
+    public function likes(): BelongsToMany
     {
-        if ($value) return $value;
-        return asset('client/assets/images/default/artist_small.jpg');
+        return $this->morphToMany(
+            User::class,
+            'likeable',
+            'likes',
+        )->withTimestamps();
     }
 
-    public function getImageLargeAttribute(?string $value): string
+    public function toNormalizedArray(): array
     {
-        if ($value) return $value;
-        return asset('client/assets/images/default/artist-big.jpg');
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'image' => $this->image_small,
+            'model_type' => self::MODEL_TYPE,
+        ];
     }
 
     public function toSearchableArray(): array
@@ -147,9 +128,12 @@ class Artist extends Model {
         ];
     }
 
-    public function basicSearch(string $query): Builder
+    public static function filterableFields(): array
     {
-        return $this->where('name' ,'like', $query.'%');
+        return [
+            'id',
+            'spotify_id',
+        ];
     }
 
     public function needsUpdating(): bool

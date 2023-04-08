@@ -1,42 +1,26 @@
 <?php namespace Common\Auth\Roles;
 
 use App\User;
-use Carbon\Carbon;
-use Common\Auth\Permissions\Permission;
 use Common\Auth\Permissions\Traits\HasPermissionsRelation;
-use Eloquent;
-use Illuminate\Database\Eloquent\Collection;
+use Common\Search\Searchable;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property integer $id
- * @property string $name
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property boolean $default
- * @property-read Collection|User[] $users
- * @property-read Collection|Permission[] $permissions
- * @mixin Eloquent
- * @property int $guests
- */
 class Role extends Model
 {
-    use HasPermissionsRelation;
+    use HasPermissionsRelation, Searchable;
 
-    /**
-     * @var array
-     */
+    const MODEL_TYPE = 'role';
+
     protected $guarded = ['id'];
 
-    /**
-     * @var array
-     */
     protected $hidden = ['pivot', 'legacy_permissions'];
 
-    /**
-     * @var array
-     */
-    protected $casts = ['id' => 'integer', 'default' => 'boolean', 'guests' => 'boolean'];
+    protected $casts = [
+        'id' => 'integer',
+        'default' => 'boolean',
+        'guests' => 'boolean',
+        'internal' => 'boolean',
+    ];
 
     /**
      * Get default role for assigning to new users.
@@ -50,7 +34,30 @@ class Role extends Model
 
     public function users()
     {
-        return $this->belongsToMany(User::class, 'user_role')
-            ->withPivot('created_at');
+        return $this->belongsToMany(User::class, 'user_role')->withPivot(
+            'created_at',
+        );
+    }
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->description,
+            'type' => $this->type,
+            'created_at' => $this->created_at->timestamp ?? '_null',
+            'updated_at' => $this->updated_at->timestamp ?? '_null',
+        ];
+    }
+
+    public static function filterableFields(): array
+    {
+        return ['id', 'type', 'created_at', 'updated_at'];
+    }
+
+    public static function getModelTypeAttribute(): string
+    {
+        return Role::MODEL_TYPE;
     }
 }

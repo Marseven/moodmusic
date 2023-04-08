@@ -8,19 +8,10 @@ use Str;
 
 class SeedCommand extends Command
 {
-    /**
-     * @var string
-     */
     protected $signature = 'common:seed';
 
-    /**
-     * @var string
-     */
     protected $description = 'Execute all common package seeders.';
 
-    /**
-     * @return void
-     */
     public function handle()
     {
         $paths = collect(File::files(__DIR__ . '/../../Database/Seeds'));
@@ -36,14 +27,8 @@ class SeedCommand extends Command
 
         $this->info('Seeded database successfully.');
     }
-
-    /**
-     * Get a seeder instance from the container.
-     *
-     * @param string $namespace
-     * @return Seeder
-     */
-    protected function getSeeder($namespace)
+    
+    protected function getSeeder(string $namespace): Seeder
     {
         $class = $this->laravel->make($namespace);
 

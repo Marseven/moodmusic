@@ -1,58 +1,28 @@
 <?php namespace Common\Core\Bootstrap;
 
 use App\User;
-use Arr;
 use Common\Admin\Appearance\Themes\CssTheme;
 use Common\Auth\Roles\Role;
-use Common\Localizations\Localization;
+use Common\Billing\Gateways\Stripe\FormatsMoney;
+use Common\Core\AppUrl;
+use Common\Core\Prerender\MetaTags;
 use Common\Localizations\LocalizationsRepository;
 use Common\Settings\Settings;
 use Illuminate\Http\Request;
+use Illuminate\Support\Arr;
 
 class BaseBootstrapData implements BootstrapData
 {
-    /**
-     * @var Settings
-     */
-    protected $settings;
+    use FormatsMoney;
 
-    /**
-     * @var Request
-     */
-    protected $request;
+    protected array $data = [];
 
-    /**
-     * @var Localization
-     */
-    protected $localizationRepository;
-
-    /**
-     * @var Role
-     */
-    protected $role;
-
-    /**
-     * @var array
-     */
-    protected $data = [];
-
-    /**
-     * @param Settings $settings
-     * @param Request $request
-     * @param Role $role
-     * @param LocalizationsRepository $localizationsRepository
-     */
     public function __construct(
-        Settings $settings,
-        Request $request,
-        Role $role,
-        LocalizationsRepository $localizationsRepository
-    )
-    {
-        $this->role = $role;
-        $this->request = $request;
-        $this->settings = $settings;
-        $this->localizationRepository = $localizationsRepository;
+        protected Settings $settings,
+        protected Request $request,
+        protected Role $role,
+        protected LocalizationsRepository $localizationsRepository,
+    ) {
     }
 
     public function getEncoded(): string
@@ -71,27 +41,57 @@ class BaseBootstrapData implements BootstrapData
 
     public function getSelectedTheme($key = null)
     {
-        $selected = $this->get('themes.selected') ?: 'light';
-        $value = Arr::get($this->data['themes'][$selected], $key);
+        $themeId = $this->get('themes.selectedThemeId');
+        $theme = Arr::first(
+            $this->data['themes']['all'],
+            fn($theme) => $theme['id'] === (int) $themeId,
+        );
+        if (!$theme) {
+            $theme = $this->data['themes']['all'][0];
+        }
+
+        $value = $key ? Arr::get($theme, $key) : $theme;
         return $key === 'name' ? strtolower($value) : $value;
     }
 
-    public function init()
+    public function init(): self
     {
-        $this->data['settings'] = $this->settings->all();
+        $this->data['settings'] = $this->settings->getUnflattened();
         $this->data['csrf_token'] = csrf_token();
         $this->data['settings']['base_url'] = config('app.url');
+        $this->data['settings']['html_base_uri'] = app(
+            AppUrl::class,
+        )->htmlBaseUri;
         $this->data['settings']['version'] = config('common.site.version');
+        $this->data['default_meta_tags'] = $this->getDefaultMetaTags();
         $this->data['user'] = $this->getCurrentUser();
-        $this->data['guests_role'] = $this->role->where('guests', 1)->with('permissions')->first();
-        $this->data['i18n'] = $this->getLocalizationsData() ?: null;
+        $this->data['guest_role'] = $this->role
+            ->where('guests', true)
+            ->with('permissions')
+            ->first();
+        $this->data['i18n'] =
+            $this->localizationsRepository->getByNameOrCode(
+                app()->getLocale(),
+                $this->settings->get('i18n.enable', true),
+            ) ?:
+            null;
         $this->data['themes'] = $this->getThemes();
-        $this->data['language'] = $this->data['i18n'] ? $this->data['i18n']['model']['language'] : 'en';
+        $this->data['language'] = $this->data['i18n']
+            ? $this->data['i18n']['language']
+            : 'en';
 
-        if (config('common.site.notifications_integrated') && $this->data['user']) {
-            $this->data['user']->unread_notifications_count = $this->data['user']
-                ->unreadNotifications()->count();
+        if (
+            config('common.site.notifications_integrated') &&
+            $this->data['user']
+        ) {
+            $this->data['user']->loadCount('unreadNotifications');
         }
+
+        $alreadyAccepted =
+            !$this->settings->get('cookie_notice.enable') ||
+            (bool) Arr::get($_COOKIE, 'cookie_notice', false);
+        $this->data['show_cookie_notice'] =
+            !$alreadyAccepted && $this->isCookieLawCountry();
 
         return $this;
     }
@@ -103,26 +103,26 @@ class BaseBootstrapData implements BootstrapData
             ->orWhere('default_light', true)
             ->get();
 
-        $defaultDark = new CssTheme(['name' => 'dark', 'is_dark' => true, 'colors' => config('common.themes.dark')]);
-        $defaultLight = new CssTheme(['name' => 'light', 'is_light' => true, 'colors' => config('common.themes.light')]);
-
-        $cookieName = slugify(config('app.name')).'_theme';
-        $defaultMode = $this->settings->get('themes.default_mode', 'light');
-
+        $selectedTheme = null;
         if ($this->settings->get('themes.user_change')) {
-            if ($themeFromUrl = $this->request->get('be-mode')) {
-                $selectedTheme = $themeFromUrl === 'light' ? 'light' : 'dark';
+            if ($themeFromUrl = $this->request->get('beThemeId')) {
+                $selectedTheme = $themes->find($themeFromUrl);
             } else {
-                $selectedTheme = Arr::get($_COOKIE, $cookieName);
+                $selectedTheme = $themes->find(
+                    Arr::get($_COOKIE, 'be-active-theme'),
+                );
             }
-        } else {
-            $selectedTheme = $defaultMode;
+        } elseif ($defaultId = $this->settings->get('themes.default_id')) {
+            $selectedTheme = $themes->find($defaultId);
+        }
+
+        if (!$selectedTheme) {
+            $selectedTheme = $themes->where('default_light', true)->first();
         }
 
         return [
-            'dark' => $themes->where('default_dark', true)->first() ?: $defaultDark,
-            'light' => $themes->where('default_light', true)->first() ?: $defaultLight,
-            'selected' => $selectedTheme ?: $defaultMode,
+            'all' => $themes,
+            'selectedThemeId' => $selectedTheme?->id,
         ];
     }
 
@@ -134,16 +134,19 @@ class BaseBootstrapData implements BootstrapData
         $user = $this->request->user();
         if ($user) {
             // load user subscriptions, if billing is enabled
-            if (app(Settings::class)->get('billing.enable') && ! $user->relationLoaded('subscriptions')) {
-                $user->load('subscriptions.plan');
+            if (
+                app(Settings::class)->get('billing.enable') &&
+                !$user->relationLoaded('subscriptions')
+            ) {
+                $user->load('subscriptions.price');
             }
 
             // load user roles, if not already loaded
-            if ( ! $user->relationLoaded('roles')) {
+            if (!$user->relationLoaded('roles')) {
                 $user->load('roles');
             }
 
-            if ( ! $user->relationLoaded('permissions')) {
+            if (!$user->relationLoaded('permissions')) {
                 $user->loadPermissions();
             }
         }
@@ -151,24 +154,18 @@ class BaseBootstrapData implements BootstrapData
         return $user;
     }
 
-    /**
-     * Get currently selected i18n language.
-     *
-     * @return Localization
-     */
-    protected function getLocalizationsData()
+    protected function getDefaultMetaTags(): array
     {
-        if ( ! $this->settings->get('i18n.enable')) return null;
+        $namespace = 'home.show';
+        $meta = new MetaTags(config("seo.$namespace"), [], $namespace);
+        return $meta->toArray();
+    }
 
-        //get user selected or default language
-        $userLang = $this->request->user() ? $this->request->user()->language : null;
-
-        if ( ! $userLang) {
-            $userLang = config('app.locale');
-        }
-
-        if ($userLang) {
-            return $this->localizationRepository->getByNameOrCode($userLang);
-        }
+    protected function isCookieLawCountry(): bool
+    {
+        $isoCode = geoip(getIp())['iso_code'];
+        // prettier-ignore
+        return in_array($isoCode, ['AT', 'BE', 'BG', 'BR', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'FI', 'FR', 'GB', 'HR', 'HU', 'IE', 'IT','LT', 'LU', 'LV', 'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK',
+        ]);
     }
 }

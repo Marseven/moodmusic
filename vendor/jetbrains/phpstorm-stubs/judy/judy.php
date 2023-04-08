@@ -6,33 +6,38 @@
  * Class Judy.
  * @link https://php.net/manual/en/class.judy.php
  */
-class Judy implements ArrayAccess {
+class Judy implements ArrayAccess
+{
     /**
      * Define the Judy Array as a Bitset with keys as Integer and Values as a Boolean.
      * @link https://php.net/manual/en/class.judy.php#judy.constants.bitset
      */
-    const BITSET = 1;
+    public const BITSET = 1;
+
     /**
      * Define the Judy Array with key/values as Integer, and Integer only.
      * @link https://php.net/manual/en/class.judy.php#judy.constants.int-to-int
      */
-    const INT_TO_INT = 2;
+    public const INT_TO_INT = 2;
+
     /**
      * Define the Judy Array with keys as Integer and Values of any type.
      * @link https://php.net/manual/en/class.judy.php#judy.constants.int-to-mixed
      */
-    const INT_TO_MIXED = 3;
+    public const INT_TO_MIXED = 3;
+
     /**
      * Define the Judy Array with keys as a String and Values as Integer, and Integer only.
      * @link https://php.net/manual/en/class.judy.php#judy.constants.string-to-int
      */
-    const STRING_TO_INT = 4;
+    public const STRING_TO_INT = 4;
+
     /**
      * Define the Judy Array with keys as a String and Values of any type.
      * @link https://php.net/manual/en/class.judy.php#judy.constants.string-to-mixed
      */
-    const STRING_TO_MIXED = 5;
-    
+    public const STRING_TO_MIXED = 5;
+
     /**
      * (PECL judy &gt;= 0.1.1)<br/>
      * Construct a new Judy object. A Judy object can be accessed like a PHP Array.
@@ -104,7 +109,7 @@ class Judy implements ArrayAccess {
      * (PECL judy &gt;= 0.1.1)<br/>
      * Search (inclusive) for the last index present that is equal to or less than the passed Index.
      * @link https://php.net/manual/en/judy.last.php
-     * @param mixed $index [optional] <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
+     * @param int|string $index [optional] <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
      * @return mixed <p>Return the corresponding index in the array.</p>
      */
     public function last($index = -1) {}
@@ -113,7 +118,7 @@ class Judy implements ArrayAccess {
      * (PECL judy &gt;= 0.1.1)<br/>
      * Search (inclusive) for the last absent index that is equal to or less than the passed Index.
      * @link https://php.net/manual/en/judy.lastempty.php
-     * @param mixed $index [optional] <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
+     * @param int|string $index [optional] <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
      * @return mixed <p>Return the corresponding index in the array.</p>
      */
     public function lastEmpty($index = -1) {}
@@ -139,7 +144,7 @@ class Judy implements ArrayAccess {
      * (PECL judy &gt;= 0.1.1)<br/>
      * Search (exclusive) for the next absent index that is greater than the passed Index.
      * @link https://php.net/manual/en/judy.nextempty.php
-     * @param mixed $index <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
+     * @param int|string $index <p>The index can be an integer or a string corresponding to the index where to start the search.</p>
      * @return mixed <p>Return the corresponding index in the array.</p>
      */
     public function nextEmpty($index) {}
@@ -210,5 +215,3 @@ class Judy implements ArrayAccess {
 }
 
 // End of judy.
-
-?>

@@ -1,74 +1,75 @@
 <?php namespace Common\Admin\Analytics;
 
-use Cache;
-use Carbon\Carbon;
-use Common\Core\BaseController;
-use Common\Admin\Analytics\Actions\GetAnalyticsData;
+use Carbon\CarbonImmutable;
+use Common\Admin\Analytics\Actions\BuildAnalyticsReport;
+use Common\Admin\Analytics\Actions\BuildNullAnalyticsReport;
 use Common\Admin\Analytics\Actions\GetAnalyticsHeaderDataAction;
+use Common\Core\BaseController;
+use Common\Database\Metrics\MetricDateRange;
 use Exception;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class AnalyticsController extends BaseController
 {
-    /**
-     * @var GetAnalyticsData
-     */
-    private $getDataAction;
-
-    /**
-     * @var GetAnalyticsHeaderDataAction
-     */
-    private $getHeaderDataAction;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    const DEFAULT_CHANNEL = 'default';
-
-    /**
-     * @param GetAnalyticsData $getDataAction
-     * @param GetAnalyticsHeaderDataAction $getHeaderDataAction
-     * @param Request $request
-     */
     public function __construct(
-        Request $request,
-        GetAnalyticsData $getDataAction,
-        GetAnalyticsHeaderDataAction $getHeaderDataAction
-    )
-    {
-        $this->getDataAction = $getDataAction;
-        $this->getHeaderDataAction = $getHeaderDataAction;
-        $this->request = $request;
+        protected Request $request,
+        protected BuildAnalyticsReport $getDataAction,
+        protected GetAnalyticsHeaderDataAction $getHeaderDataAction,
+    ) {
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function stats()
+    public function report()
     {
         $this->authorize('index', 'ReportPolicy');
 
-        $channel = $this->request->get('channel') ?: self::DEFAULT_CHANNEL;
+        $types = explode(',', $this->request->get('types', 'visitors,header'));
+        $dateRange = $this->getDateRange();
+        $cacheKey = sprintf(
+            '%s-%s',
+            $dateRange->getCacheKey(),
+            implode(',', $types),
+        );
 
-        if ($channel === 'clicks') {
-            // TODO: temp override of BeLink, refactor get data action and move caching into there so each app can control caching
-            $mainData = $this->getDataAction->execute($channel);
-        } else {
-            $mainData = $data = Cache::remember("analytics.data.main.$channel", Carbon::now()->addDay(), function() use($channel) {
-                return $this->getDataAction->execute($channel);
-            }) ?: [];
+        $response = [];
+        $reportParams = ['dateRange' => $dateRange];
+        if (in_array('visitors', $types)) {
+            try {
+                $report = $this->getDataAction->execute($reportParams);
+                if ($report) {
+                    Cache::put(
+                        "adminReport.main.$cacheKey",
+                        $report,
+                        CarbonImmutable::now()->addDay(),
+                    );
+                }
+            } catch (Exception $e) {
+                $response['visitorsReport'] = app(
+                    BuildNullAnalyticsReport::class,
+                )->execute($reportParams);
+            }
+        }
+        if (in_array('header', $types)) {
+            $response['headerReport'] = Cache::remember(
+                "adminReport.header.$cacheKey",
+                CarbonImmutable::now()->addDay(),
+                fn() => $this->getHeaderDataAction->execute($reportParams),
+            );
         }
 
-        $headerData = $data = Cache::remember("analytics.data.header.$channel", Carbon::now()->addDay(), function() use($channel) {
-            return $this->getHeaderDataAction->execute($channel);
-        });
+        return $this->success($response);
+    }
 
-        return $this->success([
-            'mainData' => $mainData,
-            'headerData' => $headerData,
-        ]);
+    protected function getDateRange(): MetricDateRange
+    {
+        $startDate = $this->request->get('startDate');
+        $endDate = $this->request->get('endDate');
+        $timezone = $this->request->get('timezone', config('app.timezone'));
+
+        return new MetricDateRange(
+            start: $startDate,
+            end: $endDate,
+            timezone: $timezone,
+        );
     }
 }

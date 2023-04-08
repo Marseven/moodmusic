@@ -2,8 +2,10 @@
 
 return [
     // dates
-    ['name' => 'dates.format', 'value' => 'yyyy-MM-dd'],
+    ['name' => 'dates.format', 'value' => 'short'],
     ['name' => 'dates.locale', 'value' => 'en_US'],
+    ['name' => 'dates.default_timezone', 'value' => 'auto'],
+    ['name' => 'locale.default', 'value' => 'auto'],
 
     // social login
     ['name' => 'social.google.enable', 'value' => true],
@@ -19,12 +21,15 @@ return [
     // cache
     ['name' => 'cache.report_minutes', 'value' => 60],
 
-    // branding
-    ['name' => 'branding.favicon', 'value' => 'client/favicon/icon-144x144.png'],
-
     // logos
-    ['name' => 'branding.logo_dark', 'value' => 'client/assets/images/logo-dark.png'],
-    ['name' => 'branding.logo_light', 'value' => 'client/assets/images/logo-light.png'],
+    [
+        'name' => 'branding.logo_dark',
+        'value' => 'images/logo-dark.png',
+    ],
+    [
+        'name' => 'branding.logo_light',
+        'value' => 'images/logo-light.png',
+    ],
 
     // translations
     ['name' => 'i18n.default_localization', 'value' => 'en'],
@@ -43,8 +48,8 @@ return [
     ['name' => 'homepage.type', 'value' => 'default'],
 
     // themes
-    ['name' => 'themes.default_mode', 'value' => 'light'],
     ['name' => 'themes.user_change', 'value' => true],
+    ['name' => 'themes.default_id', 'value' => 0],
 
     // billing
     ['name' => 'billing.enable', 'value' => false],
@@ -52,14 +57,22 @@ return [
     ['name' => 'billing.stripe_test_mode', 'value' => true],
     ['name' => 'billing.stripe.enable', 'value' => false],
     ['name' => 'billing.paypal.enable', 'value' => false],
-    ['name' => 'billing.accepted_cards', 'value' => json_encode(['visa', 'mastercard', 'american-express', 'discover'])],
+    [
+        'name' => 'billing.accepted_cards',
+        'value' => json_encode([
+            'visa',
+            'mastercard',
+            'american-express',
+            'discover',
+        ]),
+    ],
 
     // custom domains
-    ['name' => 'custom_domains.default_host', 'value' => null],
+    ['name' => 'custom_domains.default_host', 'value' => config('app.url')],
 
     // uploading
     ['name' => 'uploads.chunk', 'value' => true],
-    ['name' => 'uploads.chunk_size', 'value' => 5242880],
+    ['name' => 'uploads.chunk_size', 'value' => 5242880], // 5MB
 
     // GDPR
     ['name' => 'cookie_notice.enable', 'value' => true],

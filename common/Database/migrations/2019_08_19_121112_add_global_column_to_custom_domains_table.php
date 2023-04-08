@@ -13,6 +13,7 @@ class AddGlobalColumnToCustomDomainsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasColumn('custom_domains', 'global')) return;
         Schema::table('custom_domains', function (Blueprint $table) {
             $table->boolean('global')->index()->default(0);
         });

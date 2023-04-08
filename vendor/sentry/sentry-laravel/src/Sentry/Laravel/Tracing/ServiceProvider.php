@@ -2,38 +2,53 @@
 
 namespace Sentry\Laravel\Tracing;
 
+use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Contracts\View\Engine;
 use Illuminate\Contracts\View\View;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
-use Illuminate\Queue\QueueManager;
+use Illuminate\Routing\Contracts\CallableDispatcher;
+use Illuminate\Routing\Contracts\ControllerDispatcher;
 use Illuminate\View\Engines\EngineResolver;
 use Illuminate\View\Factory as ViewFactory;
 use InvalidArgumentException;
-use Laravel\Lumen\Application as Lumen;
 use Sentry\Laravel\BaseServiceProvider;
+use Sentry\Laravel\Tracing\Routing\TracingCallableDispatcherTracing;
+use Sentry\Laravel\Tracing\Routing\TracingControllerDispatcherTracing;
 use Sentry\Serializer\RepresentationSerializer;
 
 class ServiceProvider extends BaseServiceProvider
 {
+    public const DEFAULT_INTEGRATIONS = [
+        Integrations\LighthouseIntegration::class,
+    ];
+
     public function boot(): void
     {
-        if ($this->hasDsnSet()) {
-            $tracingConfig = $this->getUserConfig()['tracing'] ?? [];
+        // If there is no DSN set we register nothing since it's impossible for us to send traces without a DSN set
+        if (!$this->hasDsnSet()) {
+            return;
+        }
 
-            $this->bindEvents($tracingConfig);
+        $this->app->booted(function () {
+            $this->app->make(Middleware::class)->setBootedTimestamp();
+        });
 
-            $this->bindViewEngine($tracingConfig);
+        $tracingConfig = $this->getUserConfig()['tracing'] ?? [];
 
-            if ($this->app instanceof Lumen) {
-                $this->app->middleware(Middleware::class);
-            } elseif ($this->app->bound(HttpKernelInterface::class)) {
-                /** @var \Illuminate\Foundation\Http\Kernel $httpKernel */
-                $httpKernel = $this->app->make(HttpKernelInterface::class);
+        $this->bindEvents($tracingConfig);
 
-                if ($httpKernel instanceof HttpKernel) {
-                    $httpKernel->prependMiddleware(Middleware::class);
-                }
+        $this->bindViewEngine($tracingConfig);
+
+        $this->decorateRoutingDispatchers();
+
+        if ($this->app->bound(HttpKernelInterface::class)) {
+            /** @var \Illuminate\Foundation\Http\Kernel $httpKernel */
+            $httpKernel = $this->app->make(HttpKernelInterface::class);
+
+            if ($httpKernel instanceof HttpKernel) {
+                $httpKernel->prependMiddleware(Middleware::class);
             }
         }
     }
@@ -50,28 +65,26 @@ class ServiceProvider extends BaseServiceProvider
 
             return new BacktraceHelper($options, new RepresentationSerializer($options));
         });
-
-        if (!$this->app instanceof Lumen) {
-            $this->app->booted(function () {
-                $this->app->make(Middleware::class)->setBootedTimestamp();
-            });
-        }
     }
 
     private function bindEvents(array $tracingConfig): void
     {
         $handler = new EventHandler(
-            $this->app,
-            $this->app->make(BacktraceHelper::class),
-            $tracingConfig
+            $tracingConfig,
+            $this->app->make(BacktraceHelper::class)
         );
 
-        $handler->subscribe();
+        try {
+            /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
+            $dispatcher = $this->app->make(Dispatcher::class);
 
-        if ($this->app->bound(QueueManager::class)) {
-            $handler->subscribeQueueEvents(
-                $this->app->make(QueueManager::class)
-            );
+            $handler->subscribe($dispatcher);
+
+            if ($this->app->bound('queue')) {
+                $handler->subscribeQueueEvents($dispatcher, $this->app->make('queue'));
+            }
+        } catch (BindingResolutionException $e) {
+            // If we cannot resolve the event dispatcher we also cannot listen to events
         }
     }
 
@@ -114,5 +127,16 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         return new ViewEngineDecorator($realEngine, $viewFactory);
+    }
+
+    private function decorateRoutingDispatchers(): void
+    {
+        $this->app->extend(CallableDispatcher::class, static function (CallableDispatcher $dispatcher) {
+            return new TracingCallableDispatcherTracing($dispatcher);
+        });
+
+        $this->app->extend(ControllerDispatcher::class, static function (ControllerDispatcher $dispatcher) {
+            return new TracingControllerDispatcherTracing($dispatcher);
+        });
     }
 }

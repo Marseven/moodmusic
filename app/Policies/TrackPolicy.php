@@ -2,7 +2,6 @@
 
 namespace App\Policies;
 
-use App\Album;
 use App\Track;
 use App\User;
 use Common\Core\Policies\BasePolicy;
@@ -11,18 +10,22 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TrackPolicy extends BasePolicy
 {
-    public function index(?User $user)
+    public function index(User $user)
     {
-        return $this->userOrGuestHasPermission($user, 'tracks.view') || $this->userOrGuestHasPermission($user, 'music.view');
+        return $this->hasPermission($user, 'tracks.view') ||
+            $this->hasPermission($user, 'music.view');
     }
 
-    public function show(?User $user, Track $track)
+    public function show(User $user, Track $track)
     {
         if ($track->owner_id === $user->id) {
             return true;
-        } else if ($this->userOrGuestHasPermission($user, 'tracks.view') || $this->userOrGuestHasPermission($user, 'music.view')) {
+        } elseif (
+            $this->hasPermission($user, 'tracks.view') ||
+            $this->hasPermission($user, 'music.view')
+        ) {
             return true;
-        } else if ($user) {
+        } elseif ($user) {
             $managedArtists = $user->artists()->pluck('artists.id');
             $trackArtists = $track->artists->pluck('pivot.artist_id');
             return $trackArtists->intersect($managedArtists)->isNotEmpty();
@@ -33,17 +36,20 @@ class TrackPolicy extends BasePolicy
     public function store(User $user)
     {
         // user can't create tracks at all
-        if (!$user->hasPermission('tracks.create') && !$user->hasPermission('music.create')) {
+        if (
+            !$this->hasPermission($user, 'tracks.create') &&
+            !$this->hasPermission($user, 'music.create')
+        ) {
             return false;
         }
 
         // user is admin, can ignore count restriction
-        if ($user->hasPermission('admin')) {
+        if ($this->hasPermission($user, 'admin')) {
             return true;
         }
 
         // user does not have any restriction on track minutes
-        $maxMinutes = $user->getRestrictionValue('tracks.create', 'minutes');
+        $maxMinutes = $user->getRestrictionValue('music.create', 'minutes');
         if (is_null($maxMinutes)) {
             return true;
         }
@@ -53,7 +59,9 @@ class TrackPolicy extends BasePolicy
 
         // check if user did not go over their max quota
         if ($usedMinutes >= $maxMinutes) {
-            $this->deny(__('policies.minutes_exceeded'), ['showUpgradeButton' => true]);
+            $this->deny(__('policies.minutes_exceeded'), [
+                'showUpgradeButton' => true,
+            ]);
         }
 
         return true;
@@ -63,9 +71,12 @@ class TrackPolicy extends BasePolicy
     {
         if ($track->owner_id === $user->id) {
             return true;
-        } else if ($this->userOrGuestHasPermission($user, 'tracks.update') || $this->userOrGuestHasPermission($user, 'music.update')) {
+        } elseif (
+            $this->hasPermission($user, 'tracks.update') ||
+            $this->hasPermission($user, 'music.update')
+        ) {
             return true;
-        } else if ($user) {
+        } elseif ($user) {
             $managedArtists = $user->artists()->pluck('artists.id');
             $trackArtists = $track->artists->pluck('pivot.artist_id');
             return $trackArtists->intersect($managedArtists)->isNotEmpty();
@@ -75,16 +86,27 @@ class TrackPolicy extends BasePolicy
 
     public function destroy(User $user, $trackIds)
     {
-        if ($user->hasPermission('tracks.delete') || $user->hasPermission('music.delete')) {
+        if (
+            $this->hasPermission($user, 'tracks.delete') ||
+            $this->hasPermission($user, 'music.delete')
+        ) {
             return true;
         } else {
             $managedArtists = $user->artists()->pluck('artists.id');
             $dbCount = Track::whereIn('tracks.id', $trackIds)
-                ->where(function(Builder $builder) use($user, $managedArtists, $trackIds) {
-                    $builder->where('owner_id', $user->id)
-                        ->orWhereHas('artists', function(Builder $builder) use($managedArtists) {
+                ->where(function (Builder $builder) use (
+                    $user,
+                    $managedArtists,
+                    $trackIds,
+                ) {
+                    $builder->where('owner_id', $user->id)->orWhereHas(
+                        'artists',
+                        function (Builder $builder) use ($managedArtists) {
                             $builder->whereIn('artists.id', $managedArtists);
-                        }, '=', count($trackIds));
+                        },
+                        '=',
+                        count($trackIds),
+                    );
                 })
                 ->count();
             return $dbCount === count($trackIds);
@@ -93,6 +115,7 @@ class TrackPolicy extends BasePolicy
 
     public function download(User $user, Track $track)
     {
-        return app(Settings::class)->get('player.enable_download') && $user->hasPermission('music.download');
+        return app(Settings::class)->get('player.enable_download') &&
+            $this->hasPermission($user, 'music.download');
     }
 }

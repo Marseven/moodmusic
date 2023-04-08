@@ -27,9 +27,11 @@ class SpotifyPlaylist
         @ini_set('max_execution_time', 0);
     }
 
-    public function getContent(string $playlistId): array
+    public function getContent(string $playlistId): ?array
     {
         $response = $this->httpClient->get("playlists/$playlistId");
+        if ( ! isset($response['tracks']['items'])) return null;
+
         $tracks = array_map(function($track) {
             return $track['track'];
         }, $response['tracks']['items']);

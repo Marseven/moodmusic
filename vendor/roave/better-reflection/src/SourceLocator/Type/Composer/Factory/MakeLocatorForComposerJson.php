@@ -15,19 +15,30 @@ use Roave\BetterReflection\SourceLocator\Type\Composer\PsrAutoloaderLocator;
 use Roave\BetterReflection\SourceLocator\Type\DirectoriesSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\SingleFileSourceLocator;
 use Roave\BetterReflection\SourceLocator\Type\SourceLocator;
+
 use function array_filter;
 use function array_map;
 use function array_merge;
-use function file_exists;
+use function array_values;
 use function file_get_contents;
 use function is_array;
 use function is_dir;
+use function is_file;
 use function json_decode;
 use function realpath;
 
+/**
+ * @psalm-type ComposerAutoload array{
+ *  psr-0?: array<string, string|list<string>>,
+ *  psr-4?: array<string, string|list<string>>,
+ *  classmap?: list<string>,
+ *  files?: list<string>,
+ *  exclude-from-classmap?: list<string>
+ * }
+ */
 final class MakeLocatorForComposerJson
 {
-    public function __invoke(string $installationPath, Locator $astLocator) : SourceLocator
+    public function __invoke(string $installationPath, Locator $astLocator): SourceLocator
     {
         $realInstallationPath = (string) realpath($installationPath);
 
@@ -37,11 +48,11 @@ final class MakeLocatorForComposerJson
 
         $composerJsonPath = $realInstallationPath . '/composer.json';
 
-        if (! file_exists($composerJsonPath)) {
+        if (! is_file($composerJsonPath)) {
             throw MissingComposerJson::inProjectPath($installationPath);
         }
 
-        /** @var array{autoload: array{classmap: array<int, string>, files: array<int, string>, psr-4: array<string, array<int, string>>, psr-0: array<string, array<int, string>>}}|null $composer */
+        /** @psalm-var array{autoload: ComposerAutoload}|null $composer */
         $composer = json_decode((string) file_get_contents($composerJsonPath), true);
 
         if (! is_array($composer)) {
@@ -51,96 +62,86 @@ final class MakeLocatorForComposerJson
         $pathPrefix          = $realInstallationPath . '/';
         $classMapPaths       = $this->prefixPaths($this->packageToClassMapPaths($composer), $pathPrefix);
         $classMapFiles       = array_filter($classMapPaths, 'is_file');
-        $classMapDirectories = array_filter($classMapPaths, 'is_dir');
+        $classMapDirectories = array_values(array_filter($classMapPaths, 'is_dir'));
         $filePaths           = $this->prefixPaths($this->packageToFilePaths($composer), $pathPrefix);
 
         return new AggregateSourceLocator(array_merge(
             [
                 new PsrAutoloaderLocator(
                     Psr4Mapping::fromArrayMappings(
-                        $this->prefixWithInstallationPath($this->packageToPsr4AutoloadNamespaces($composer), $pathPrefix)
+                        $this->prefixWithInstallationPath($this->packageToPsr4AutoloadNamespaces($composer), $pathPrefix),
                     ),
-                    $astLocator
+                    $astLocator,
                 ),
                 new PsrAutoloaderLocator(
                     Psr0Mapping::fromArrayMappings(
-                        $this->prefixWithInstallationPath($this->packageToPsr0AutoloadNamespaces($composer), $pathPrefix)
+                        $this->prefixWithInstallationPath($this->packageToPsr0AutoloadNamespaces($composer), $pathPrefix),
                     ),
-                    $astLocator
+                    $astLocator,
                 ),
                 new DirectoriesSourceLocator($classMapDirectories, $astLocator),
             ],
-            ...array_map(static function (string $file) use ($astLocator) : array {
-                return [new SingleFileSourceLocator($file, $astLocator)];
-            }, array_merge($classMapFiles, $filePaths))
+            ...array_map(static fn (string $file): array => [new SingleFileSourceLocator($file, $astLocator)], array_merge($classMapFiles, $filePaths)),
         ));
     }
 
     /**
-     * @param array{autoload: array{classmap: array<int, string>, files: array<int, string>, psr-4: array<string, array<int, string>>, psr-0: array<string, array<int, string>>}} $package
+     * @param array{autoload: ComposerAutoload} $package
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, list<string>>
      */
-    private function packageToPsr4AutoloadNamespaces(array $package) : array
+    private function packageToPsr4AutoloadNamespaces(array $package): array
     {
-        return array_map(static function ($namespacePaths) : array {
-            return (array) $namespacePaths;
-        }, $package['autoload']['psr-4'] ?? []);
+        return array_map(static fn (string|array $namespacePaths): array => (array) $namespacePaths, $package['autoload']['psr-4'] ?? []);
     }
 
     /**
-     * @param array{autoload: array{classmap: array<int, string>, files: array<int, string>, psr-4: array<string, array<int, string>>, psr-0: array<string, array<int, string>>}} $package
+     * @param array{autoload: ComposerAutoload} $package
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, list<string>>
      */
-    private function packageToPsr0AutoloadNamespaces(array $package) : array
+    private function packageToPsr0AutoloadNamespaces(array $package): array
     {
-        return array_map(static function ($namespacePaths) : array {
-            return (array) $namespacePaths;
-        }, $package['autoload']['psr-0'] ?? []);
+        return array_map(static fn (string|array $namespacePaths): array => (array) $namespacePaths, $package['autoload']['psr-0'] ?? []);
     }
 
     /**
-     * @param array{autoload: array{classmap: array<int, string>, files: array<int, string>, psr-4: array<string, array<int, string>>, psr-0: array<string, array<int, string>>}} $package
+     * @param array{autoload: ComposerAutoload} $package
      *
-     * @return array<int, string>
+     * @return list<string>
      */
-    private function packageToClassMapPaths(array $package) : array
+    private function packageToClassMapPaths(array $package): array
     {
         return $package['autoload']['classmap'] ?? [];
     }
 
     /**
-     * @param array{autoload: array{classmap: array<int, string>, files: array<int, string>, psr-4: array<string, array<int, string>>, psr-0: array<string, array<int, string>>}} $package
+     * @param array{autoload: ComposerAutoload} $package
      *
-     * @return array<int, string>
+     * @return list<string>
      */
-    private function packageToFilePaths(array $package) : array
+    private function packageToFilePaths(array $package): array
     {
         return $package['autoload']['files'] ?? [];
     }
 
     /**
-     * @param array<string, array<int, string>> $paths
+     * @param array<string, list<string>> $paths
      *
-     * @return array<string, array<int, string>>
+     * @return array<string, list<string>>
      */
-    private function prefixWithInstallationPath(array $paths, string $trimmedInstallationPath) : array
+    private function prefixWithInstallationPath(array $paths, string $trimmedInstallationPath): array
     {
-        return array_map(function (array $paths) use ($trimmedInstallationPath) : array {
-            return $this->prefixPaths($paths, $trimmedInstallationPath);
-        }, $paths);
+        return array_map(fn (array $paths): array => $this->prefixPaths($paths, $trimmedInstallationPath), $paths);
     }
 
     /**
-     * @param array<int, string> $paths
+     * @param list<string> $paths
      *
-     * @return array<int, string>
+     * @return list<string>
      */
-    private function prefixPaths(array $paths, string $prefix) : array
+    private function prefixPaths(array $paths, string $prefix): array
     {
-        return array_map(static function (string $path) use ($prefix) {
-            return $prefix . $path;
-        }, $paths);
+        return array_map(static fn (string $path): string => $prefix . $path, $paths);
     }
 }

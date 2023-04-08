@@ -99,8 +99,12 @@ abstract class AbstractSerializer
                 return $this->serializeValue($value);
             }
 
-            if (\is_callable($value)) {
-                return $this->serializeCallable($value);
+            try {
+                if (@\is_callable($value)) {
+                    return $this->serializeCallable($value);
+                }
+            } catch (\Throwable $exception) {
+                // Do nothing on purpose
             }
 
             if (\is_array($value)) {
@@ -237,15 +241,32 @@ abstract class AbstractSerializer
         }
 
         if (\is_object($value)) {
-            return 'Object ' . \get_class($value);
+            $reflection = new \ReflectionObject($value);
+
+            $objectId = null;
+            if ($reflection->hasProperty('id') && ($idProperty = $reflection->getProperty('id'))->isPublic()) {
+                $objectId = $idProperty->getValue($value);
+            } elseif ($reflection->hasMethod('getId') && ($getIdMethod = $reflection->getMethod('getId'))->isPublic()) {
+                try {
+                    $objectId = $getIdMethod->invoke($value);
+                } catch (\Throwable $e) {
+                    // Do nothing on purpose
+                }
+            }
+
+            return 'Object ' . $reflection->getName() . (is_scalar($objectId) ? '(#' . $objectId . ')' : '');
         }
 
         if (\is_resource($value)) {
             return 'Resource ' . get_resource_type($value);
         }
 
-        if (\is_callable($value)) {
-            return $this->serializeCallable($value);
+        try {
+            if (\is_callable($value)) {
+                return $this->serializeCallable($value);
+            }
+        } catch (\Throwable $exception) {
+            // Do nothing on purpose
         }
 
         if (\is_array($value)) {

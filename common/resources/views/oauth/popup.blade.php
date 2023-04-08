@@ -1,8 +1,8 @@
 <h1 style="text-align: center">Logging in</h1>
 
 <script>
-    var status = "{!! $status !!}";
-    var data   = null;
+    let status = "{!! $status !!}";
+    let data   = null;
 
     @if(isset($data) && $data)
         @if(json_decode($data))

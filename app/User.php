@@ -2,7 +2,6 @@
 
 use Common\Auth\BaseUser;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -10,18 +9,10 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
-use Laravel\Scout\Searchable;
 
-/**
- * App\User
- *
- * @property-read Collection|Playlist[] $playlists
- * @property-read Collection|Track[] $uploadedTracks
- * @property-read UserProfile $profile
- */
 class User extends BaseUser
 {
-    use Notifiable, Searchable, HasApiTokens, HasFactory;
+    use Notifiable, HasApiTokens, HasFactory;
 
     const MODEL_TYPE = 'user';
 
@@ -128,10 +119,7 @@ class User extends BaseUser
         return $this->belongsToMany(Playlist::class);
     }
 
-    /**
-     * @return HasMany
-     */
-    public function reposts()
+    public function reposts(): HasMany
     {
         return $this->hasMany(Repost::class);
     }
@@ -141,23 +129,9 @@ class User extends BaseUser
         return $this->morphMany(ProfileLink::class, 'linkeable');
     }
 
-    public function toSearchableArray(): array
+    public function scopeOrderByPopularity(Builder $query, $direction = 'desc')
     {
-        return [
-            'id' => $this->id,
-            'username' => $this->username,
-            'first_name' => $this->first_name,
-            'last_name' => $this->last_name,
-            'display_name' => $this->display_name,
-            'email' => $this->email,
-        ];
-    }
-
-    public function basicSearch(string $query): Builder
-    {
-        return $this->where('email', 'like', $query.'%')
-            ->orWhere('username', 'like', $query.'%')
-            ->select(['email', 'username', 'first_name', 'last_name', 'id', 'avatar']);
+        return $query->orderBy('email', $direction);
     }
 
     public static function getModelTypeAttribute(): string

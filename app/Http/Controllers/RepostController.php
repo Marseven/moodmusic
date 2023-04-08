@@ -2,51 +2,51 @@
 
 namespace App\Http\Controllers;
 
-use Auth;
 use App\Album;
 use App\Repost;
+use App\User;
+use Auth;
 use Common\Core\BaseController;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class RepostController extends BaseController
 {
-    /**
-     * @var Repost
-     */
-    private $repost;
-
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @param Repost $repost
-     * @param Request $request
-     */
-    public function __construct(Repost $repost, Request $request)
+    public function __construct(protected Repost $repost, protected Request $request)
     {
-        $this->middleware('auth');
-
-        $this->repost = $repost;
-        $this->request = $request;
     }
 
-    public function index()
+    public function index(User $user)
     {
-        $pagination = Auth::user()->reposts()->with('repostable.artists')->paginate(20);
+        $this->authorize('show', $user);
+
+        $pagination = $user
+            ->reposts()
+            ->with('repostable.artists')
+            ->simplePaginate(20);
+
+        [$albums, $tracks] = $pagination
+            ->filter(function (Repost $repost) {
+                return !is_null($repost->repostable);
+            })
+            ->partition(function (Repost $repost) {
+                return $repost->repostable->model_type === Album::MODEL_TYPE;
+            });
+
+        $albums->load('repostable.tracks');
+
+        $pagination->setCollection($tracks->concat($albums)->values());
 
         return $this->success(['pagination' => $pagination]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function repost()
+    public function toggle()
     {
+        $this->middleware('auth');
+
         $userId = Auth::id();
-        $repostableType = $this->request->get('repostable_type');
+        $repostableType = modelTypeToNamespace(
+            $this->request->get('repostable_type'),
+        );
 
         $table = $repostableType === Album::class ? 'albums' : 'tracks';
         $this->validate($this->request, [
@@ -69,7 +69,10 @@ class RepostController extends BaseController
                 'repostable_id' => $this->request->get('repostable_id'),
                 'repostable_type' => $repostableType,
             ]);
-            return $this->success(['action' => 'added', 'repost' => $newRepost]);
+            return $this->success([
+                'action' => 'added',
+                'repost' => $newRepost,
+            ]);
         }
     }
 }

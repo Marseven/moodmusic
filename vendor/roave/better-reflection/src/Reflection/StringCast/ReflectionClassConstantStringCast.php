@@ -5,29 +5,30 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\StringCast;
 
 use Roave\BetterReflection\Reflection\ReflectionClassConstant;
+
 use function gettype;
 use function is_array;
 use function sprintf;
 
-/**
- * @internal
- */
+/** @internal */
 final class ReflectionClassConstantStringCast
 {
-    public static function toString(ReflectionClassConstant $constantReflection) : string
+    public static function toString(ReflectionClassConstant $constantReflection): string
     {
+        /** @psalm-var scalar|array<scalar> $value */
         $value = $constantReflection->getValue();
 
         return sprintf(
-            "Constant [ %s %s %s ] { %s }\n",
+            "Constant [ %s%s %s %s ] { %s }\n",
+            $constantReflection->isFinal() ? 'final ' : '',
             self::visibilityToString($constantReflection),
             gettype($value),
             $constantReflection->getName(),
-            is_array($value) ? 'Array' : (string) $value
+            is_array($value) ? 'Array' : (string) $value,
         );
     }
 
-    private static function visibilityToString(ReflectionClassConstant $constantReflection) : string
+    private static function visibilityToString(ReflectionClassConstant $constantReflection): string
     {
         if ($constantReflection->isProtected()) {
             return 'protected';

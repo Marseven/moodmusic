@@ -40,7 +40,7 @@ class RedisMetricsRepository implements MetricsRepository
 
         return collect($classes)->map(function ($class) {
             return preg_match('/job:(.*)$/', $class, $matches) ? $matches[1] : $class;
-        })->all();
+        })->sort()->values()->all();
     }
 
     /**
@@ -54,7 +54,7 @@ class RedisMetricsRepository implements MetricsRepository
 
         return collect($queues)->map(function ($class) {
             return preg_match('/queue:(.*)$/', $class, $matches) ? $matches[1] : $class;
-        })->all();
+        })->sort()->values()->all();
     }
 
     /**
@@ -331,8 +331,8 @@ class RedisMetricsRepository implements MetricsRepository
      */
     protected function minutesSinceLastSnapshot()
     {
-        $lastSnapshotAt = $this->connection()->get('last_snapshot_at')
-                    ?: $this->storeSnapshotTimestamp();
+        $lastSnapshotAt = (int) ($this->connection()->get('last_snapshot_at')
+                                    ?: $this->storeSnapshotTimestamp());
 
         return max(
             (CarbonImmutable::now()->getTimestamp() - $lastSnapshotAt) / 60, 1

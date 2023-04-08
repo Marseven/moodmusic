@@ -1,48 +1,28 @@
 <?php namespace Common\Files\Controllers;
 
-use App;
 use Auth;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
+use Common\Files\Actions\CreateFileEntry;
 use Common\Files\Actions\Deletion\DeleteEntries;
-use Common\Files\Actions\UploadFile;
+use Common\Files\Actions\StoreFile;
+use Common\Files\Actions\ValidateFileUpload;
+use Common\Files\Events\FileUploaded;
 use Common\Files\FileEntry;
-use Common\Files\Requests\UploadFileRequest;
+use Common\Files\FileEntryPayload;
 use Common\Files\Response\FileResponseFactory;
-use Common\Files\Traits\TransformsFileEntryResponse;
 use Illuminate\Contracts\Filesystem\FileNotFoundException;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Arr;
+use Illuminate\Http\UploadedFile;
 
-class FileEntriesController extends BaseController {
-
-    use TransformsFileEntryResponse;
-
-    /**
-     * @var Request
-     */
-    protected $request;
-
-    /**
-     * @var FileEntry
-     */
-    protected $entry;
-
-    /**
-     * @param Request $request
-     * @param FileEntry $entry
-     */
-    public function __construct(Request $request, FileEntry $entry)
-    {
-        $this->request = $request;
-        $this->entry = $entry;
+class FileEntriesController extends BaseController
+{
+    public function __construct(
+        protected Request $request,
+        protected FileEntry $entry,
+    ) {
     }
 
-    /**
-     * @return JsonResponse
-     */
     public function index()
     {
         $params = $this->request->all();
@@ -50,63 +30,62 @@ class FileEntriesController extends BaseController {
 
         $this->authorize('index', FileEntry::class);
 
-        $paginator = (new Paginator($this->entry, $params));
+        $dataSource = new Datasource($this->entry->with(['users']), $params);
 
-        $paginator->filterColumns = ['type', 'public', 'password', 'created_at', 'owner' => function(Builder $builder, $userId) {
-            if ($userId) {
-                $builder->whereOwner($userId);
-            }
-        }];
-
-        $pagination = $paginator->with('users')->paginate();
+        $pagination = $dataSource->paginate();
 
         return $this->success(['pagination' => $pagination]);
     }
 
-    public function show($id, FileResponseFactory $response)
+    public function show(FileEntry $fileEntry, FileResponseFactory $response)
     {
-        // ID might be with extension: "4546.mp4" or as hash: "ja4d5ad4" or int: 4546
-        $intId = (int) $id;
-        if ($intId === 0) {
-            $intId = $this->entry->decodeHash($id);
-        }
-
-        $entry = $this->entry->withTrashed()->findOrFail($intId);
-
-        $this->authorize('show', $entry);
+        $this->authorize('show', $fileEntry);
 
         try {
-            return $response->create($entry);
+            return $response->create($fileEntry);
         } catch (FileNotFoundException $e) {
             abort(404);
         }
     }
 
-    /**
-     * @param UploadFileRequest $request
-     * @return JsonResponse
-     */
-    public function store(UploadFileRequest $request)
+    public function store()
     {
-        $parentId = $request->get('parentId');
-        $uploadedFile = $this->request->file('file');
+        $parentId = (int) request('parentId') ?: null;
+        request()->merge(['parentId' => $parentId]);
 
-        $this->authorize('store', [FileEntry::class, $parentId]);
+        $this->authorize('store', [FileEntry::class, request('parentId')]);
 
-        $params = $this->request->except('file');
-        $fileEntry = app(UploadFile::class)
-            ->execute(Arr::get($params, 'disk', 'private'), $uploadedFile, $params);
+        $this->validate($this->request, [
+            'file' => [
+                'required',
+                'file',
+                function ($attribute, UploadedFile $value, $fail) {
+                    $errors = app(ValidateFileUpload::class)->execute([
+                        'extension' => $value->guessExtension(),
+                        'size' => $value->getSize(),
+                    ]);
+                    if ($errors) {
+                        $fail($errors->first());
+                    }
+                },
+            ],
+            'parentId' => 'nullable|exists:file_entries,id',
+            'relativePath' => 'nullable|string',
+        ]);
 
-        return $this->success(
-            $this->transformFileEntryResponse(['fileEntry' => $fileEntry->load('users')], $params), 201
-        );
+        $file = $this->request->file('file');
+        $payload = new FileEntryPayload($this->request->all());
+
+        app(StoreFile::class)->execute($payload, ['file' => $file]);
+
+        $fileEntry = app(CreateFileEntry::class)->execute($payload);
+
+        event(new FileUploaded($fileEntry));
+
+        return $this->success(['fileEntry' => $fileEntry->load('users')], 201);
     }
 
-    /**
-     * @param int $entryId
-     * @return JsonResponse
-     */
-    public function update($entryId)
+    public function update(int $entryId)
     {
         $this->authorize('update', [FileEntry::class, [$entryId]]);
 
@@ -120,28 +99,30 @@ class FileEntriesController extends BaseController {
 
         $entry->fill($params)->update();
 
-        return $this->success($this->transformFileEntryResponse(['fileEntry' => $entry->load('users')], $params));
+        return $this->success(['fileEntry' => $entry->load('users')]);
     }
 
-    /**
-     * @return JsonResponse
-     */
-    public function destroy()
+    public function destroy(string $entryIds = null)
     {
-        $entryIds = $this->request->get('entryIds');
-        $userId = Auth::user()->id;
+        if ($entryIds) {
+            $entryIds = explode(',', $entryIds);
+        } else {
+            $entryIds = $this->request->get('entryIds');
+        }
+
+        $userId = Auth::id();
 
         $this->validate($this->request, [
-            'entryIds' => 'requiredWithoutAll:emptyTrash,paths|array|exists:file_entries,id',
-            'paths' => 'requiredWithoutAll:emptyTrash,entryIds|array',
+            'entryIds' => 'array|exists:file_entries,id',
+            'paths' => 'array',
             'deleteForever' => 'boolean',
-            'emptyTrash' => 'boolean'
+            'emptyTrash' => 'boolean',
         ]);
 
         // get all soft deleted entries for user, if we are emptying trash
         if ($this->request->get('emptyTrash')) {
             $entryIds = $this->entry
-                ->whereOwner($userId)
+                ->where('owner_id', $userId)
                 ->onlyTrashed()
                 ->pluck('id')
                 ->toArray();
@@ -150,7 +131,9 @@ class FileEntriesController extends BaseController {
         app(DeleteEntries::class)->execute([
             'paths' => $this->request->get('paths'),
             'entryIds' => $entryIds,
-            'soft' => !$this->request->get('deleteForever') && !$this->request->get('emptyTrash'),
+            'soft' =>
+                !$this->request->get('deleteForever', true) &&
+                !$this->request->get('emptyTrash'),
         ]);
 
         return $this->success();

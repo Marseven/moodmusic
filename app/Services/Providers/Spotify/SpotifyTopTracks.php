@@ -23,9 +23,6 @@ class SpotifyTopTracks implements ContentProvider {
      */
     private $normalizer;
 
-    /**
-     * @param SpotifyNormalizer $normalizer
-     */
     public function __construct(SpotifyNormalizer $normalizer)
     {
         $this->httpClient = App::make(SpotifyHttpClient::class);
@@ -61,7 +58,6 @@ class SpotifyTopTracks implements ContentProvider {
 
         $savedArtists = $this->saveArtists($normalizedTracks->merge($normalizedAlbums));
         $savedAlbums = $this->saveAlbums($normalizedAlbums, $savedArtists);
-
         return $this->saveTracks($normalizedTracks, $savedAlbums, $savedArtists)->values();
     }
 

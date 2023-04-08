@@ -16,21 +16,30 @@ class StreamedFileResponse implements FileResponse
     public function make(FileEntry $entry, $options)
     {
         $path = $entry->getStoragePath($options['useThumbnail']);
-        $response = new StreamedResponse;
+        $response = new StreamedResponse();
         $disposition = $response->headers->makeDisposition(
-            $options['disposition'], $entry->getNameWithExtension(), str_replace('%', '', Str::ascii($entry->getNameWithExtension()))
+            $options['disposition'],
+            $entry->getNameWithExtension(),
+            str_replace('%', '', Str::ascii($entry->getNameWithExtension())),
         );
 
-        $fileSize = $options['useThumbnail'] ? $entry->getDisk()->size($path) : $entry->file_size;
+        $fileSize = $options['useThumbnail']
+            ? $entry->getDisk()->size($path)
+            : $entry->file_size;
 
         $response->headers->replace([
             'Content-Type' => $entry->mime,
             'Content-Length' => $fileSize,
             'Content-Disposition' => $disposition,
+            'Cache-Control' => 'private, max-age=31536000, no-transform',
         ]);
         $response->setCallback(function () use ($entry, $path) {
             $stream = $entry->getDisk()->readStream($path);
-            while ( ! feof($stream)) {
+            if (!$stream) {
+                abort(404);
+            }
+
+            while (!feof($stream)) {
                 echo fread($stream, 2048);
             }
             fclose($stream);

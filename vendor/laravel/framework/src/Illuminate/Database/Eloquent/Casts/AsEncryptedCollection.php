@@ -13,7 +13,7 @@ class AsEncryptedCollection implements Castable
      * Get the caster class to use when casting from / to this cast target.
      *
      * @param  array  $arguments
-     * @return object|string
+     * @return CastsAttributes<\Illuminate\Support\Collection<array-key, mixed>, iterable>
      */
     public static function castUsing(array $arguments)
     {
@@ -21,12 +21,20 @@ class AsEncryptedCollection implements Castable
         {
             public function get($model, $key, $value, $attributes)
             {
-                return new Collection(json_decode(Crypt::decryptString($attributes[$key]), true));
+                if (isset($attributes[$key])) {
+                    return new Collection(json_decode(Crypt::decryptString($attributes[$key]), true));
+                }
+
+                return null;
             }
 
             public function set($model, $key, $value, $attributes)
             {
-                return [$key => Crypt::encryptString(json_encode($value))];
+                if (! is_null($value)) {
+                    return [$key => Crypt::encryptString(json_encode($value))];
+                }
+
+                return null;
             }
         };
     }

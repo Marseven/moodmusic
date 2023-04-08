@@ -13,8 +13,16 @@ class AddPlaysColumnToAlbumsTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasColumn('albums', 'plays')) {
+            return;
+        }
+
         Schema::table('albums', function (Blueprint $table) {
-            $table->bigInteger('plays')->unsigned()->default(0)->index();
+            $table
+                ->bigInteger('plays')
+                ->unsigned()
+                ->default(0)
+                ->index();
         });
     }
 

@@ -6,9 +6,6 @@ interface GetAnalyticsHeaderDataAction
 {
     /**
      * Get analytics header data.
-     *
-     * @param string $channel
-     * @return array
      */
-    public function execute($channel);
+    public function execute(array $params): array;
 }

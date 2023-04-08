@@ -1,13 +1,10 @@
 <?php
-declare(strict_types=1);
 
 namespace StubTests\Model;
 
+use Exception;
 use PhpParser\Node\Stmt\Interface_;
 use ReflectionClass;
-use ReflectionClassConstant;
-use ReflectionException;
-use ReflectionMethod;
 use stdClass;
 
 class PHPInterface extends BasePHPClass
@@ -15,68 +12,66 @@ class PHPInterface extends BasePHPClass
     public $parentInterfaces = [];
 
     /**
-     * @param ReflectionClass $interface
-     * @return $this
+     * @param ReflectionClass $reflectionObject
+     * @return static
      */
-    public function readObjectFromReflection($interface): self
+    public function readObjectFromReflection($reflectionObject)
     {
-        try {
-            $reflectionInterface = new ReflectionClass($interface);
-            $this->name = $reflectionInterface->getName();
-            /**@var ReflectionMethod $method */
-            foreach ($reflectionInterface->getMethods() as $method) {
-                if ($method->getDeclaringClass()->getName() !== $this->name) {
-                    continue;
-                }
-                $this->methods[$method->name] = (new PHPMethod())->readObjectFromReflection($method);
+        $this->name = $reflectionObject->getName();
+        foreach ($reflectionObject->getMethods() as $method) {
+            if ($method->getDeclaringClass()->getName() !== $this->name) {
+                continue;
             }
-            $this->parentInterfaces = $reflectionInterface->getInterfaceNames();
-            /**@var ReflectionClassConstant $constant */
-            foreach ($reflectionInterface->getReflectionConstants() as $constant) {
+            $this->methods[$method->name] = (new PHPMethod())->readObjectFromReflection($method);
+        }
+        $this->parentInterfaces = $reflectionObject->getInterfaceNames();
+        if (method_exists($reflectionObject, 'getReflectionConstants')) {
+            foreach ($reflectionObject->getReflectionConstants() as $constant) {
                 if ($constant->getDeclaringClass()->getName() !== $this->name) {
                     continue;
                 }
                 $this->constants[$constant->name] = (new PHPConst())->readObjectFromReflection($constant);
             }
-        } catch (ReflectionException $ex) {
-            $this->parseError = $ex;
         }
         return $this;
     }
 
     /**
      * @param Interface_ $node
-     * @return $this
+     * @return static
      */
-    public function readObjectFromStubNode($node): self
+    public function readObjectFromStubNode($node)
     {
-        $this->name = $this->getFQN($node);
-        $this->collectLinks($node);
-        $this->collectSinceDeprecatedVersions($node);
+        $this->name = self::getFQN($node);
+        $this->collectTags($node);
+        $this->availableVersionsRangeFromAttribute = self::findAvailableVersionsRangeFromAttribute($node->attrGroups);
         if (!empty($node->extends)) {
-            $this->parentInterfaces[] = implode('\\', $node->extends[0]->parts);
+            foreach ($node->extends as $extend) {
+                $this->parentInterfaces[] = implode('\\', $extend->parts);
+            }
         }
         return $this;
     }
 
-    public function readMutedProblems($jsonData): void
+    /**
+     * @param stdClass|array $jsonData
+     * @throws Exception
+     */
+    public function readMutedProblems($jsonData)
     {
-        /**@var stdClass $interface */
         foreach ($jsonData as $interface) {
             if ($interface->name === $this->name) {
                 if (!empty($interface->problems)) {
-                    /**@var stdClass $problem */
                     foreach ($interface->problems as $problem) {
-                        switch ($problem) {
+                        switch ($problem->description) {
                             case 'wrong parent':
-                                $this->mutedProblems[] = StubProblemType::WRONG_PARENT;
+                                $this->mutedProblems[StubProblemType::WRONG_PARENT] = $problem->versions;
                                 break;
                             case 'missing interface':
-                                $this->mutedProblems[] = StubProblemType::STUB_IS_MISSED;
+                                $this->mutedProblems[StubProblemType::STUB_IS_MISSED] = $problem->versions;
                                 break;
                             default:
-                                $this->mutedProblems[] = -1;
-                                break;
+                                throw new Exception("Unexpected value $problem->description");
                         }
                     }
                 }
@@ -90,7 +85,6 @@ class PHPInterface extends BasePHPClass
                         $constant->readMutedProblems($interface->constants);
                     }
                 }
-                return;
             }
         }
     }

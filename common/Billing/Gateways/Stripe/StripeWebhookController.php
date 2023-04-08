@@ -1,93 +1,98 @@
 <?php namespace Common\Billing\Gateways\Stripe;
 
-use Common\Billing\Gateways\GatewayFactory;
-use Common\Billing\Invoices\CrupdateInvoice;
+use App\User;
+use Carbon\Carbon;
+use Common\Billing\Invoices\CreateInvoice;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
+use Common\Billing\Notifications\PaymentFailed;
 use Common\Billing\Subscription;
+use Exception;
+use Illuminate\Contracts\Foundation\Application;
+use Illuminate\Contracts\Routing\ResponseFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Routing\Controller;
-use Symfony\Component\HttpFoundation\Response;
+use Stripe\Webhook;
 
 class StripeWebhookController extends Controller
 {
-    /**
-     * @var StripeGateway
-     */
-    private $gateway;
-
-    /**
-     * @var Subscription
-     */
-    private $subscription;
-
-    /**
-     * @param GatewayFactory $gatewayFactory
-     * @param Subscription $subscription
-     */
-    public function __construct(GatewayFactory $gatewayFactory, Subscription $subscription)
-    {
-        $this->gateway = $gatewayFactory->get('stripe');
-        $this->subscription = $subscription;
+    public function __construct(
+        protected Stripe $stripe,
+        protected Subscription $subscription
+    ) {
     }
 
-    /**
-     * @param Request $request
-     * @return Response
-     */
-    public function handleWebhook(Request $request)
+    public function handleWebhook(Request $request): Response|JsonResponse
     {
-        $payload = $request->all();
+        $webhookSecret = config('services.stripe.webhook_secret');
+        if ($webhookSecret) {
+            try {
+                $event = Webhook::constructEvent(
+                    $request->getContent(),
+                    $request->header('stripe-signature'),
+                    $webhookSecret,
+                )->toArray();
+            } catch (Exception $e) {
+                return response()->json(['message' => $e->getMessage()], 403);
+            }
+        } else {
+            $event = $request->all();
+        }
 
-        if ( ! $this->gateway->webhookIsValid($request)) {
-            return response('Webhook validation failed', 422);
-        };
-
-        switch ($payload['type']) {
+        switch ($event['type']) {
+            case 'invoice.paid':
+                return $this->handleInvoicePaid($event);
+            // sync user payment methods with local database
+            case 'customer.updated':
+                return $this->handleCustomerUpdated($event);
+            // user subscription ended and can't be resumed
             case 'customer.subscription.deleted':
-                return $this->handleSubscriptionDeleted($payload);
-            case 'invoice.payment_succeeded':
-                return $this->handleSubscriptionRenewed($payload);
+                $id = $event['data']['object']['id'];
+                return $this->deleteSubscription($id);
+            // user subscribed
+            case 'customer.subscription.created':
+                return $this->handleSubscriptionCreated($event);
+            // automatic subscription renewal failed on stripe
             case 'invoice.payment_failed':
-                return $this->handleSubscriptionFailed($payload);
+                return $this->handleInvoicePaymentFailed($event);
+            case 'customer.subscription.updated':
+                return $this->handleSubscriptionUpdated($event);
             default:
                 return response('Webhook handled', 200);
         }
     }
 
-    /**
-     * Handle a cancelled customer from a Stripe subscription.
-     *
-     * @param  array  $payload
-     * @return Response
-     */
-    protected function handleSubscriptionDeleted($payload)
+    protected function handleInvoicePaymentFailed(array $payload): Response
     {
-        $gatewayId = $payload['data']['object']['id'];
-
-        $subscription = $this->subscription->where('gateway_id', $gatewayId)->first();
-
-        if ($subscription && ! $subscription->cancelled()) {
-            $subscription->markAsCancelled();
+        $stripeUserId = $payload['data']['object']['customer'];
+        $user = User::where('stripe_id', $stripeUserId)->first();
+        if ($user) {
+            $stripeSubscription = $user
+                ->subscriptions()
+                ->where('gateway_name', 'stripe')
+                ->first();
+            if ($stripeSubscription) {
+                $user->notify(new PaymentFailed($stripeSubscription));
+            }
         }
-
-        return response('Webhook Handled', 200);
+        return response('Webhook handled', 200);
     }
 
-    /**
-     * Handle a renewed stripe subscription.
-     *
-     * @param  array  $payload
-     * @return Response
-     */
-    protected function handleSubscriptionRenewed($payload)
-    {
-        $gatewayId = $payload['data']['object']['subscription'];
+    protected function handleInvoicePaid(
+        array $payload
+    ): Response|Application|ResponseFactory {
+        $stripeInvoice = $payload['data']['object'];
+        $stripeSubscriptionId = $stripeInvoice['subscription'];
 
-        $subscription = $this->subscription->where('gateway_id', $gatewayId)->first();
+        $subscription = Subscription::where(
+            'gateway_id',
+            $stripeSubscriptionId,
+        )->first();
 
         if ($subscription) {
-            $stripeSubscription = $this->gateway->subscriptions()->find($subscription);
-            $subscription->fill(['renews_at' => $stripeSubscription['renews_at']])->save();
-            app(CrupdateInvoice::class)->execute([
+            app(CreateInvoice::class)->execute([
                 'subscription_id' => $subscription->id,
                 'paid' => true,
             ]);
@@ -96,15 +101,105 @@ class StripeWebhookController extends Controller
         return response('Webhook Handled', 200);
     }
 
-    protected function handleSubscriptionFailed($payload)
-    {
-        $gatewayId = $payload['data']['object']['subscription'];
+    protected function handleCustomerUpdated(
+        array $payload
+    ): Response|Application|ResponseFactory {
+        $stripeCustomer = $payload['data']['object'];
+        $user = User::where('stripe_id', $stripeCustomer['id'])->firstOrFail();
 
-        $subscription = $this->subscription->where('gateway_id', $gatewayId)->first();
+        $stripePaymentMethods = $this->stripe->client->customers
+            ->allPaymentMethods($stripeCustomer['id'], ['type' => 'card'])
+            ->toArray()['data'];
 
-        if ($subscription && ! $subscription->cancelled()) {
+        if (!empty($stripePaymentMethods)) {
+            $card = $stripePaymentMethods[0]['card'];
+            $this->stripe->storeCardDetailsLocally($user, $card);
+        }
+
+        return response('Webhook Handled', 200);
+    }
+
+    protected function handleSubscriptionUpdated(
+        array $payload
+    ): Response|Application|ResponseFactory {
+        $stripeSubscription = $payload['data']['object'];
+        $newStripePrice = $stripeSubscription['items']['data'][0]['price'];
+
+        // find product, price and subscription by stripe ID
+        $newPrice = Price::where(
+            'stripe_id',
+            $newStripePrice['id'],
+        )->firstOrFail();
+        $newProduct = Product::where(
+            'uuid',
+            $newStripePrice['product'],
+        )->firstOrFail();
+        $subscription = Subscription::where(
+            'gateway_id',
+            $stripeSubscription['id'],
+        )->first();
+
+        if ($subscription) {
+            // sync local subscription details with stripe
+            $subscription
+                ->fill([
+                    'renews_at' => Carbon::createFromTimestamp(
+                        $stripeSubscription['current_period_end'],
+                    ),
+                    'product_id' => $newProduct->id,
+                    'price_id' => $newPrice->id,
+                ])
+                ->save();
+
+            // mark local subscription as cancelled if renew failed on stripe
+            if (
+                $stripeSubscription['status'] === 'cancelled' ||
+                $stripeSubscription['status'] === 'unpaid' ||
+                $stripeSubscription['cancel_at_period_end']
+            ) {
+                $subscription->markAsCancelled();
+            }
+        }
+
+        return response('Webhook Handled', 200);
+    }
+
+    protected function handleSubscriptionCreated(
+        array $payload
+    ): Response|Application|ResponseFactory {
+        $stripeSubscription = $payload['data']['object'];
+
+        $this->stripe->storeSubscriptionDetailsLocally(
+            $stripeSubscription['id'],
+        );
+
+        return response('Webhook Handled', 200);
+    }
+
+    protected function markSubscriptionAsCancelled(
+        string $stripeSubscriptionId
+    ): Response|Application|ResponseFactory {
+        $subscription = Subscription::where(
+            'gateway_id',
+            $stripeSubscriptionId,
+        )->first();
+
+        if ($subscription && !$subscription->cancelled()) {
             $subscription->markAsCancelled();
         }
+
+        return response('Webhook handled', 200);
+    }
+
+    protected function deleteSubscription(
+        string $stripeSubscriptionId
+    ): Response|Application|ResponseFactory {
+        $subscription = Subscription::where(
+            'gateway_id',
+            $stripeSubscriptionId,
+        )->first();
+
+        $subscription?->cancelAndDelete();
 
         return response('Webhook handled', 200);
     }

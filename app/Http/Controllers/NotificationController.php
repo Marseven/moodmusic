@@ -39,11 +39,6 @@ class NotificationController extends BaseController
     {
         $pagination = Auth::user()->notifications()->paginate(5);
 
-        $pagination->transform(function($notification) {
-            $notification->relative_created_at = $notification->created_at->diffForHumans();
-            return $notification;
-        });
-
         return $this->success(['pagination' => $pagination]);
     }
 

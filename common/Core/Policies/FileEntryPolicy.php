@@ -6,20 +6,17 @@ use App\User;
 use Arr;
 use Common\Files\FileEntry;
 use Common\Files\FileEntryUser;
-use Illuminate\Auth\Access\HandlesAuthorization;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Collection;
 use Laravel\Sanctum\PersonalAccessToken;
-use Laravel\Sanctum\Sanctum;
-use Request;
 
-class FileEntryPolicy
+class FileEntryPolicy extends BasePolicy
 {
-    use HandlesAuthorization;
-
-    public function index(User $user, array $entryIds = null, int $userId = null): bool
-    {
+    public function index(
+        User $user,
+        array $entryIds = null,
+        int $userId = null
+    ): bool {
         if ($entryIds) {
             return $this->userCan($user, 'files.view', $entryIds);
         } else {
@@ -34,7 +31,11 @@ class FileEntryPolicy
         if ($token) {
             if ($entry->preview_token === $token) {
                 return true;
-            } else if ($accessToken = app(PersonalAccessToken::class)->findToken($token)) {
+            } elseif (
+                $accessToken = app(PersonalAccessToken::class)->findToken(
+                    $token,
+                )
+            ) {
                 $user = $accessToken->tokenable;
             }
         }
@@ -46,12 +47,18 @@ class FileEntryPolicy
     {
         $token = $this->getAccessTokenFromRequest();
         if ($token) {
-            $previewTokenMatches = collect($entries)->every(function($entry) use($token) {
+            $previewTokenMatches = collect($entries)->every(function (
+                $entry
+            ) use ($token) {
                 return $entry['preview_token'] === $token;
             });
             if ($previewTokenMatches) {
                 return true;
-            } else if ($accessToken = app(PersonalAccessToken::class)->findToken($token)) {
+            } elseif (
+                $accessToken = app(PersonalAccessToken::class)->findToken(
+                    $token,
+                )
+            ) {
                 $user = $accessToken->tokenable;
             }
         }
@@ -61,7 +68,6 @@ class FileEntryPolicy
 
     public function store(User $user, int $parentId = null): bool
     {
-
         //check if user can modify parent entry (if specified)
         if ($parentId) {
             return $this->userCan($user, 'files.update', [$parentId]);
@@ -70,12 +76,7 @@ class FileEntryPolicy
         return $user->hasPermission('files.create');
     }
 
-    /**
-     * @param User $user
-     * @param Collection|array|FileEntry $entries
-     * @return bool
-     */
-    public function update(User $user, $entries)
+    public function update(User $user, Collection|array|FileEntry $entries)
     {
         return $this->userCan($user, 'files.update', $entries);
     }
@@ -105,15 +106,23 @@ class FileEntryPolicy
         $entries = $this->findEntries($entries);
 
         // extending class might use "findEntries" method so we load users here
-        if ( ! $entries->every->relationLoaded('users')) {
-            $entries->load(['users' => function (MorphToMany $builder) use($currentUser) {
-                $builder->where('users.id', $currentUser->id);
-            }]);
+        if (!$entries->every->relationLoaded('users')) {
+            $entries->load([
+                'users' => function (MorphToMany $builder) use ($currentUser) {
+                    $builder->where('users.id', $currentUser->id);
+                },
+            ]);
         }
 
-        return $entries->every(function(FileEntry $entry) use($permission, $currentUser) {
+        return $entries->every(function (FileEntry $entry) use (
+            $permission,
+            $currentUser
+        ) {
             $user = $entry->users->find($currentUser->id);
-            return $this->userOwnsEntryOrWasGrantedPermission($user, $permission);
+            return $this->userOwnsEntryOrWasGrantedPermission(
+                $user,
+                $permission,
+            );
         });
     }
 
@@ -122,20 +131,24 @@ class FileEntryPolicy
      * @param string $permission
      * @return bool
      */
-    public function userOwnsEntryOrWasGrantedPermission($user, string $permission)
-    {
-        return $user && ($user['owns_entry'] || Arr::get($user['entry_permissions'], $this->sharedFilePermission($permission)));
+    public function userOwnsEntryOrWasGrantedPermission(
+        $user,
+        string $permission
+    ) {
+        return $user &&
+            ($user['owns_entry'] ||
+                Arr::get(
+                    $user['entry_permissions'],
+                    $this->sharedFilePermission($permission),
+                ));
     }
 
-    /**
-     * @param FileEntry|array|Collection $entries
-     * @return Collection
-     */
-    protected function findEntries($entries)
-    {
+    protected function findEntries(
+        FileEntry|array|Collection $entries
+    ): Collection {
         if ($entries instanceof FileEntry) {
             return $entries->newCollection([$entries]);
-        } else if (is_array($entries)) {
+        } elseif (isset($entries[0]) && is_numeric($entries[0])) {
             return app(FileEntry::class)
                 ->whereIn('id', $entries)
                 ->get();
@@ -151,19 +164,20 @@ class FileEntryPolicy
                 return 'view';
             case 'files.update':
                 return 'edit';
-            case 'files.delete';
+            case 'files.delete':
                 return 'delete';
-            case 'files.download';
+            case 'files.download':
                 return 'download';
         }
     }
 
-    protected function getAccessTokenFromRequest(): ?string {
+    protected function getAccessTokenFromRequest(): ?string
+    {
         if ($token = request()->bearerToken()) {
             return $token;
-        } else if ($token = request()->get('preview_token')) {
+        } elseif ($token = request()->get('preview_token')) {
             return $token;
-        } else if ($token = request()->get('accessToken')) {
+        } elseif ($token = request()->get('accessToken')) {
             return $token;
         } else {
             return null;

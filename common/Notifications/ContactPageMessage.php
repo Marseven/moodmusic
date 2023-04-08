@@ -4,19 +4,15 @@ namespace Common\Notifications;
 
 use Common\Settings\Settings;
 use Illuminate\Bus\Queueable;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 
 class ContactPageMessage extends Notification
 {
     use Queueable;
 
-    private $message;
-
-    public function __construct($message)
+    public function __construct(public $message)
     {
-        $this->message = $message;
     }
 
     /**
@@ -41,9 +37,18 @@ class ContactPageMessage extends Notification
         $siteName = app(Settings::class)->get('branding.site_name');
         $userEmail = $this->message['email'];
 
-        return (new MailMessage)
-            ->subject(__("New message via :siteName contact page.", ['siteName' => $siteName]))
-            ->greeting(__("New message via :siteName contact page from ':userEmail'", ['siteName' => $siteName, 'userEmail' => $userEmail]))
+        return (new MailMessage())
+            ->subject(
+                __('New message via :siteName contact page.', [
+                    'siteName' => $siteName,
+                ]),
+            )
+            ->greeting(
+                __("New message via :siteName contact page from ':userEmail'", [
+                    'siteName' => $siteName,
+                    'userEmail' => $userEmail,
+                ]),
+            )
             ->salutation(' ')
             ->from(config('mail.from.address'), config('mail.from.name'))
             ->replyTo($userEmail, $this->message['name'])
@@ -59,7 +64,7 @@ class ContactPageMessage extends Notification
     public function toArray($notifiable)
     {
         return [
-            //
-        ];
+                //
+            ];
     }
 }

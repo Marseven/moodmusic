@@ -8,7 +8,11 @@ use Algolia\AlgoliaSearch\Support\UserAgent;
 use Exception;
 use Illuminate\Support\Manager;
 use Laravel\Scout\Engines\AlgoliaEngine;
+use Laravel\Scout\Engines\CollectionEngine;
+use Laravel\Scout\Engines\DatabaseEngine;
+use Laravel\Scout\Engines\MeiliSearchEngine;
 use Laravel\Scout\Engines\NullEngine;
+use MeiliSearch\Client as MeiliSearch;
 
 class EngineManager extends Manager
 {
@@ -16,7 +20,7 @@ class EngineManager extends Manager
      * Get a driver instance.
      *
      * @param  string|null  $name
-     * @return mixed
+     * @return \Laravel\Scout\Engines\Engine
      */
     public function engine($name = null)
     {
@@ -32,7 +36,7 @@ class EngineManager extends Manager
     {
         $this->ensureAlgoliaClientIsInstalled();
 
-        UserAgent::addCustomUserAgent('Laravel Scout', '8.6.1');
+        UserAgent::addCustomUserAgent('Laravel Scout', Scout::VERSION);
 
         $config = SearchConfig::create(
             config('scout.algolia.id'),
@@ -40,6 +44,18 @@ class EngineManager extends Manager
         )->setDefaultHeaders(
             $this->defaultAlgoliaHeaders()
         );
+
+        if (is_int($connectTimeout = config('scout.algolia.connect_timeout'))) {
+            $config->setConnectTimeout($connectTimeout);
+        }
+
+        if (is_int($readTimeout = config('scout.algolia.read_timeout'))) {
+            $config->setReadTimeout($readTimeout);
+        }
+
+        if (is_int($writeTimeout = config('scout.algolia.write_timeout'))) {
+            $config->setWriteTimeout($writeTimeout);
+        }
 
         return new AlgoliaEngine(Algolia::createWithConfig($config), config('scout.soft_delete'));
     }
@@ -91,7 +107,62 @@ class EngineManager extends Manager
     }
 
     /**
-     * Create a Null engine instance.
+     * Create an MeiliSearch engine instance.
+     *
+     * @return \Laravel\Scout\Engines\MeiliSearchEngine
+     */
+    public function createMeilisearchDriver()
+    {
+        $this->ensureMeiliSearchClientIsInstalled();
+
+        return new MeiliSearchEngine(
+            $this->container->make(
+                class_exists(MeiliSearch::class)
+                    ? MeiliSearch::class
+                    : \Meilisearch\Client::class
+            ),
+            config('scout.soft_delete', false)
+        );
+    }
+
+    /**
+     * Ensure the MeiliSearch client is installed.
+     *
+     * @return void
+     *
+     * @throws \Exception
+     */
+    protected function ensureMeiliSearchClientIsInstalled()
+    {
+        if (class_exists(MeiliSearch::class) || class_exists(\Meilisearch\Client::class)) {
+            return;
+        }
+
+        throw new Exception('Please install the MeiliSearch client: meilisearch/meilisearch-php.');
+    }
+
+    /**
+     * Create a database engine instance.
+     *
+     * @return \Laravel\Scout\Engines\DatabaseEngine
+     */
+    public function createDatabaseDriver()
+    {
+        return new DatabaseEngine;
+    }
+
+    /**
+     * Create a collection engine instance.
+     *
+     * @return \Laravel\Scout\Engines\CollectionEngine
+     */
+    public function createCollectionDriver()
+    {
+        return new CollectionEngine;
+    }
+
+    /**
+     * Create a null engine instance.
      *
      * @return \Laravel\Scout\Engines\NullEngine
      */

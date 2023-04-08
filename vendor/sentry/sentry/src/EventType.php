@@ -10,7 +10,7 @@ namespace Sentry;
  *
  * @author Stefano Arlandini <sarlandini@alice.it>
  */
-final class EventType
+final class EventType implements \Stringable
 {
     /**
      * @var string The value of the enum instance
@@ -35,12 +35,22 @@ final class EventType
         return self::getInstance('default');
     }
 
+    public static function event(): self
+    {
+        return self::getInstance('event');
+    }
+
     /**
      * Creates an instance of this enum for the "transaction" value.
      */
     public static function transaction(): self
     {
         return self::getInstance('transaction');
+    }
+
+    public static function checkIn(): self
+    {
+        return self::getInstance('check_in');
     }
 
     public function __toString(): string

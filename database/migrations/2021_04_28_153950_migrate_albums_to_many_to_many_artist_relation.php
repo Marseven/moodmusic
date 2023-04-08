@@ -19,16 +19,19 @@ class MigrateAlbumsToManyToManyArtistRelation extends Migration
     {
         if ( ! Schema::hasColumn('albums', 'artist_type')) return;
 
-        Album::where('artist_type', Artist::class)->chunkById(500, function(Collection $albums) {
-            $records = $albums->map(function(Album $album) {
-                return [
-                    'artist_id' => $album->artist_id,
-                    'album_id' => $album->id,
-                    'primary' => true,
-                ];
+        Album::where('artist_type', Artist::class)
+            ->where('artist_id', '!=', 0)
+            ->chunkById(500, function(Collection $albums) {
+                $records = $albums->map(function(Album $album) {
+                    return [
+                        'artist_id' => $album->artist_id,
+                        'album_id' => $album->id,
+                        'primary' => true,
+                    ];
+                });
+                $this->saveOrUpdate($records->toArray(), 'artist_album');
+                DB::table('albums')->whereIn('id', $albums->pluck('id'))->update(['artist_id' => null]);
             });
-            $this->saveOrUpdate($records->toArray(), 'artist_album');
-        });
     }
 
     /**

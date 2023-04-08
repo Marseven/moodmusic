@@ -1,29 +1,44 @@
 <?php
 
 // Start of ftp v.
+use JetBrains\PhpStorm\ExpectedValues as EV;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 
 /**
+ * append the contents of a file to another file on the ftp server
  * @param resource $ftp
- * @param string $remote_file
- * @param string $local_file
- * @param int $mode [optional]
+ * @param string $remote_filename
+ * @param string $local_filename
+ * @param int $mode Optional since PHP 7.3
  * @return bool
  * @since 7.2
  */
-function ftp_append ($ftp,  $remote_file,  $local_file,  $mode = FTP_BINARY){}
+function ftp_append(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $remote_filename,
+    string $local_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY
+): bool {}
 
 /**
+ * returns a list of files in the given directory
  * @param resource $ftp
  * @param string $directory
- * @return array
+ * @return array|false
  * @since 7.2
  */
-function ftp_mlsd ($ftp,  $directory) {}
+function ftp_mlsd(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory): array|false {}
 
 /**
  * Opens an FTP connection
  * @link https://php.net/manual/en/function.ftp-connect.php
- * @param string $host <p>
+ * @param string $hostname <p>
  * The FTP server address. This parameter shouldn't have any trailing
  * slashes and shouldn't be prefixed with ftp://.
  * </p>
@@ -38,15 +53,14 @@ function ftp_mlsd ($ftp,  $directory) {}
  * <b>ftp_get_option</b>.
  * </p>
  * @return resource|false a FTP stream on success or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
  */
-function ftp_connect ($host, $port = 21, $timeout = 90) {}
+#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection|false'], default: 'resource|false')]
+function ftp_connect(string $hostname, int $port = 21, int $timeout = 90) {}
 
 /**
- * Opens an Secure SSL-FTP connection
+ * Opens a Secure SSL-FTP connection
  * @link https://php.net/manual/en/function.ftp-ssl-connect.php
- * @param string $host <p>
+ * @param string $hostname <p>
  * The FTP server address. This parameter shouldn't have any trailing
  * slashes and shouldn't be prefixed with ftp://.
  * </p>
@@ -61,15 +75,14 @@ function ftp_connect ($host, $port = 21, $timeout = 90) {}
  * <b>ftp_get_option</b>.
  * </p>
  * @return resource|false a SSL-FTP stream on success or <b>FALSE</b> on error.
- * @since 4.3
- * @since 5.0
  */
-function ftp_ssl_connect ($host, $port = 21, $timeout = 90) {}
+#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection|false'], default: 'resource|false')]
+function ftp_ssl_connect(string $hostname, int $port = 21, int $timeout = 90) {}
 
 /**
  * Logs in to an FTP connection
  * @link https://php.net/manual/en/function.ftp-login.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $username <p>
@@ -80,39 +93,33 @@ function ftp_ssl_connect ($host, $port = 21, $timeout = 90) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  * If login fails, PHP will also throw a warning.
- * @since 4.0
- * @since 5.0
  */
-function ftp_login ($ftp_stream, $username, $password) {}
+function ftp_login(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $username, string $password): bool {}
 
 /**
  * Returns the current directory name
  * @link https://php.net/manual/en/function.ftp-pwd.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @return string the current directory name or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
+ * @return string|false the current directory name or <b>FALSE</b> on error.
  */
-function ftp_pwd ($ftp_stream) {}
+function ftp_pwd(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): string|false {}
 
 /**
  * Changes to the parent directory
  * @link https://php.net/manual/en/function.ftp-cdup.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_cdup ($ftp_stream) {}
+function ftp_cdup(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): bool {}
 
 /**
  * Changes the current directory on a FTP server
  * @link https://php.net/manual/en/function.ftp-chdir.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $directory <p>
@@ -120,15 +127,13 @@ function ftp_cdup ($ftp_stream) {}
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  * If changing directory fails, PHP will also throw a warning.
- * @since 4.0
- * @since 5.0
  */
-function ftp_chdir ($ftp_stream, $directory) {}
+function ftp_chdir(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory): bool {}
 
 /**
  * Requests execution of a command on the FTP server
  * @link https://php.net/manual/en/function.ftp-exec.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $command <p>
@@ -136,46 +141,42 @@ function ftp_chdir ($ftp_stream, $directory) {}
  * </p>
  * @return bool <b>TRUE</b> if the command was successful (server sent response code:
  * 200); otherwise returns <b>FALSE</b>.
- * @since 4.0.3
- * @since 5.0
  */
-function ftp_exec ($ftp_stream, $command) {}
+function ftp_exec(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $command): bool {}
 
 /**
  * Sends an arbitrary command to an FTP server
  * @link https://php.net/manual/en/function.ftp-raw.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $command <p>
  * The command to execute.
  * </p>
- * @return array the server's response as an array of strings.
+ * @return string[] the server's response as an array of strings.
  * No parsing is performed on the response string, nor does
  * <b>ftp_raw</b> determine if the command succeeded.
- * @since 5.0
  */
-function ftp_raw ($ftp_stream, $command) {}
+#[LanguageLevelTypeAware(['8.0' => 'array|null'], default: 'array')]
+function ftp_raw(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $command) {}
 
 /**
  * Creates a directory
  * @link https://php.net/manual/en/function.ftp-mkdir.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $directory <p>
  * The name of the directory that will be created.
  * </p>
- * @return string the newly created directory name on success or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
+ * @return string|false the newly created directory name on success or <b>FALSE</b> on error.
  */
-function ftp_mkdir ($ftp_stream, $directory) {}
+function ftp_mkdir(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory): string|false {}
 
 /**
  * Removes a directory
  * @link https://php.net/manual/en/function.ftp-rmdir.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $directory <p>
@@ -183,50 +184,46 @@ function ftp_mkdir ($ftp_stream, $directory) {}
  * path to an empty directory.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_rmdir ($ftp_stream, $directory) {}
+function ftp_rmdir(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory): bool {}
 
 /**
  * Set permissions on a file via FTP
  * @link https://php.net/manual/en/function.ftp-chmod.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param int $mode <p>
+ * @param int $permissions <p>
  * The new permissions, given as an octal value.
  * </p>
  * @param string $filename <p>
  * The remote file.
  * </p>
  * @return int|false the new file permissions on success or <b>FALSE</b> on error.
- * @since 5.0
  */
-function ftp_chmod ($ftp_stream, $mode, $filename) {}
+function ftp_chmod(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, int $permissions, string $filename): int|false {}
 
 /**
  * Allocates space for a file to be uploaded
  * @link https://php.net/manual/en/function.ftp-alloc.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param int $filesize <p>
+ * @param int $size <p>
  * The number of bytes to allocate.
  * </p>
- * @param string $result [optional] <p>
+ * @param string &$response [optional] <p>
  * A textual representation of the servers response will be returned by
  * reference in <i>result</i> if a variable is provided.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 5.0
  */
-function ftp_alloc ($ftp_stream, $filesize, &$result = null) {}
+function ftp_alloc(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, int $size, &$response): bool {}
 
 /**
  * Returns a list of files in the given directory
  * @link https://php.net/manual/en/function.ftp-nlist.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $directory <p>
@@ -235,17 +232,15 @@ function ftp_alloc ($ftp_stream, $filesize, &$result = null) {}
  * Note that this parameter isn't escaped so there may be some issues with
  * filenames containing spaces and other characters.
  * </p>
- * @return array an array of filenames from the specified directory on success or
+ * @return string[]|false an array of filenames from the specified directory on success or
  * <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
  */
-function ftp_nlist ($ftp_stream, $directory) {}
+function ftp_nlist(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory): array|false {}
 
 /**
  * Returns a detailed list of files in the given directory
  * @link https://php.net/manual/en/function.ftp-rawlist.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $directory <p>
@@ -255,208 +250,226 @@ function ftp_nlist ($ftp_stream, $directory) {}
  * @param bool $recursive [optional] <p>
  * If set to <b>TRUE</b>, the issued command will be LIST -R.
  * </p>
- * @return array an array where each element corresponds to one line of text.
- * </p>
+ * @return string[]|false an array where each element corresponds to one line of text.
  * <p>
  * The output is not parsed in any way. The system type identifier returned by
  * <b>ftp_systype</b> can be used to determine how the results
  * should be interpreted.
- * @since 4.0
- * @since 5.0
+ * </p>
  */
-function ftp_rawlist ($ftp_stream, $directory, $recursive = false) {}
+function ftp_rawlist(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $directory, bool $recursive = false): array|false {}
 
 /**
  * Returns the system type identifier of the remote FTP server
  * @link https://php.net/manual/en/function.ftp-systype.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @return string the remote system type, or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
+ * @return string|false the remote system type, or <b>FALSE</b> on error.
  */
-function ftp_systype ($ftp_stream) {}
+function ftp_systype(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): string|false {}
 
 /**
  * Turns passive mode on or off
  * @link https://php.net/manual/en/function.ftp-pasv.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param bool $pasv <p>
+ * @param bool $enable <p>
  * If <b>TRUE</b>, the passive mode is turned on, else it's turned off.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_pasv ($ftp_stream, $pasv) {}
+function ftp_pasv(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, bool $enable): bool {}
 
 /**
  * Downloads a file from the FTP server
  * @link https://php.net/manual/en/function.ftp-get.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $local_file <p>
+ * @param string $local_filename <p>
  * The local file path (will be overwritten if the file already exists).
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $resumepos [optional] <p>
+ * @param int $offset [optional] <p>
  * The position in the remote file to start downloading from.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_get ($ftp_stream, $local_file, $remote_file, $mode = FTP_BINARY, $resumepos = 0) {}
+function ftp_get(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $local_filename,
+    string $remote_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): bool {}
 
 /**
  * Downloads a file from the FTP server and saves to an open file
  * @link https://php.net/manual/en/function.ftp-fget.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param resource $handle <p>
+ * @param resource $stream <p>
  * An open file pointer in which we store the data.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Since PHP 7.3 parameter is optional
  * </p>
- * @param int $resumepos [optional] <p>
+ * @param int $offset [optional] <p>
  * The position in the remote file to start downloading from.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_fget ($ftp_stream, $handle, $remote_file, $mode = FTP_BINARY, $resumepos = 0) {}
+function ftp_fget(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    $stream,
+    string $remote_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): bool {}
 
 /**
  * Uploads a file to the FTP server
  * @link https://php.net/manual/en/function.ftp-put.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param string $local_file <p>
+ * @param string $local_filename <p>
  * The local file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $startpos [optional] <p>The position in the remote file to start uploading to.</p>
+ * @param int $offset [optional] <p>The position in the remote file to start uploading to.</p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_put ($ftp_stream, $remote_file, $local_file, $mode = FTP_BINARY, $startpos = 0) {}
+function ftp_put(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $remote_filename,
+    string $local_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): bool {}
 
 /**
  * Uploads from an open file to the FTP server
  * @link https://php.net/manual/en/function.ftp-fput.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param resource $handle <p>
+ * @param resource $stream <p>
  * An open file pointer on the local file. Reading stops at end of file.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $startpos [optional] <p>The position in the remote file to start uploading to.</p>
+ * @param int $offset [optional] <p>The position in the remote file to start uploading to.</p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_fput ($ftp_stream, $remote_file, $handle, $mode = FTP_BINARY, $startpos = 0) {}
+function ftp_fput(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $remote_filename,
+    $stream,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): bool {}
 
 /**
  * Returns the size of the given file
  * @link https://php.net/manual/en/function.ftp-size.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $filename <p>
  * The remote file.
  * </p>
  * @return int the file size on success, or -1 on error.
- * @since 4.0
- * @since 5.0
  */
-function ftp_size ($ftp_stream, $remote_file) {}
+function ftp_size(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $filename): int {}
 
 /**
  * Returns the last modified time of the given file
  * @link https://php.net/manual/en/function.ftp-mdtm.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $filename <p>
  * The file from which to extract the last modification time.
  * </p>
  * @return int the last modified time as a Unix timestamp on success, or -1 on
  * error.
- * @since 4.0
- * @since 5.0
  */
-function ftp_mdtm ($ftp_stream, $remote_file) {}
+function ftp_mdtm(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $filename): int {}
 
 /**
  * Renames a file or a directory on the FTP server
  * @link https://php.net/manual/en/function.ftp-rename.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $oldname <p>
+ * @param string $from <p>
  * The old file/directory name.
  * </p>
- * @param string $newname <p>
+ * @param string $to <p>
  * The new name.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_rename ($ftp_stream, $oldname, $newname) {}
+function ftp_rename(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $from, string $to): bool {}
 
 /**
  * Deletes a file on the FTP server
  * @link https://php.net/manual/en/function.ftp-delete.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $path <p>
+ * @param string $filename <p>
  * The file to delete.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_delete ($ftp_stream, $path) {}
+function ftp_delete(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $filename): bool {}
 
 /**
  * Sends a SITE command to the server
  * @link https://php.net/manual/en/function.ftp-site.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param string $command <p>
@@ -464,27 +477,23 @@ function ftp_delete ($ftp_stream, $path) {}
  * be some issues with filenames containing spaces and other characters.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function ftp_site ($ftp_stream, $command) {}
+function ftp_site(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, string $command): bool {}
 
 /**
  * Closes an FTP connection
  * @link https://php.net/manual/en/function.ftp-close.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.2
- * @since 5.0
  */
-function ftp_close ($ftp_stream) {}
+function ftp_close(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): bool {}
 
 /**
  * Set miscellaneous runtime FTP options
  * @link https://php.net/manual/en/function.ftp-set-option.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param int $option <p>
@@ -518,15 +527,13 @@ function ftp_close ($ftp_stream) {}
  * message will be thrown if the <i>option</i> is not
  * supported or the passed <i>value</i> doesn't match the
  * expected value for the given <i>option</i>.
- * @since 4.2
- * @since 5.0
  */
-function ftp_set_option ($ftp_stream, $option, $value) {}
+function ftp_set_option(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, #[EV(flags: [FTP_TIMEOUT_SEC, FTP_AUTOSEEK, FTP_USEPASVADDRESS])] int $option, $value): bool {}
 
 /**
  * Retrieves various runtime behaviours of the current FTP stream
  * @link https://php.net/manual/en/function.ftp-get-option.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @param int $option <p>
@@ -547,156 +554,187 @@ function ftp_set_option ($ftp_stream, $option, $value) {}
  * </tr>
  * </table>
  * </p>
- * @return mixed the value on success or <b>FALSE</b> if the given
+ * @return int|bool the value on success or <b>FALSE</b> if the given
  * <i>option</i> is not supported. In the latter case, a
  * warning message is also thrown.
- * @since 4.2
- * @since 5.0
  */
-function ftp_get_option ($ftp_stream, $option) {}
+function ftp_get_option(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp, #[EV(flags: [FTP_TIMEOUT_SEC, FTP_AUTOSEEK])] int $option): int|bool {}
 
 /**
  * Retrieves a file from the FTP server and writes it to an open file (non-blocking)
  * @link https://php.net/manual/en/function.ftp-nb-fget.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param resource $handle <p>
+ * @param resource $stream <p>
  * An open file pointer in which we store the data.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $resumepos [optional] <p>The position in the remote file to start downloading from.</p>
+ * @param int $offset [optional] <p>The position in the remote file to start downloading from.</p>
  * @return int <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
  * or <b>FTP_MOREDATA</b>.
- * @since 4.3
- * @since 5.0
  */
-function ftp_nb_fget ($ftp_stream, $handle, $remote_file, $mode = FTP_BINARY, $resumepos = 0) {}
+#[EV([FTP_FAILED, FTP_FINISHED, FTP_MOREDATA])]
+function ftp_nb_fget(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    $stream,
+    string $remote_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): int {}
 
 /**
  * Retrieves a file from the FTP server and writes it to a local file (non-blocking)
  * @link https://php.net/manual/en/function.ftp-nb-get.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $local_file <p>
+ * @param string $local_filename <p>
  * The local file path (will be overwritten if the file already exists).
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode  <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $resumepos [optional] <p>The position in the remote file to start downloading from.</p>
+ * @param int $offset [optional] <p>The position in the remote file to start downloading from.</p>
  * @return int <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
  * or <b>FTP_MOREDATA</b>.
- * @since 4.3
- * @since 5.0
  */
-function ftp_nb_get ($ftp_stream, $local_file, $remote_file, $mode = FTP_BINARY, $resumepos = 0) {}
+#[EV([FTP_FAILED, FTP_FINISHED, FTP_MOREDATA])]
+function ftp_nb_get(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $local_filename,
+    string $remote_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): int {}
 
 /**
  * Continues retrieving/sending a file (non-blocking)
  * @link https://php.net/manual/en/function.ftp-nb-continue.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
  * @return int <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
  * or <b>FTP_MOREDATA</b>.
- * @since 4.3
- * @since 5.0
  */
-function ftp_nb_continue ($ftp_stream) {}
+#[EV([FTP_FAILED, FTP_FINISHED, FTP_MOREDATA])]
+function ftp_nb_continue(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): int {}
 
 /**
  * Stores a file on the FTP server (non-blocking)
  * @link https://php.net/manual/en/function.ftp-nb-put.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param string $local_file <p>
+ * @param string $local_filename <p>
  * The local file path.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $startpos [optional] <p>The position in the remote file to start uploading to.</p>
- * @return int <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
+ * @param int $offset [optional] <p>The position in the remote file to start uploading to.</p>
+ * @return int|false <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
  * or <b>FTP_MOREDATA</b>.
- * @since 4.3
- * @since 5.0
  */
-function ftp_nb_put ($ftp_stream, $remote_file, $local_file, $mode = FTP_BINARY, $startpos = 0) {}
+#[EV([FTP_FAILED, FTP_FINISHED, FTP_MOREDATA])]
+function ftp_nb_put(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $remote_filename,
+    string $local_filename,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): int|false {}
 
 /**
  * Stores a file from an open file to the FTP server (non-blocking)
  * @link https://php.net/manual/en/function.ftp-nb-fput.php
- * @param resource $ftp_stream <p>
+ * @param resource $ftp <p>
  * The link identifier of the FTP connection.
  * </p>
- * @param string $remote_file <p>
+ * @param string $remote_filename <p>
  * The remote file path.
  * </p>
- * @param resource $handle <p>
+ * @param resource $stream <p>
  * An open file pointer on the local file. Reading stops at end of file.
  * </p>
- * @param int $mode [optional] <p>
- * The transfer mode. Must be either <b>FTP_ASCII</b> or
- * <b>FTP_BINARY</b>.
+ * @param int $mode <p>
+ * The transfer mode. Must be either <b>FTP_ASCII</b> or <b>FTP_BINARY</b>. Optional since PHP 7.3
  * </p>
- * @param int $startpos [optional] <p>The position in the remote file to start uploading to.</p>
+ * @param int $offset [optional] <p>The position in the remote file to start uploading to.</p>
  * @return int <b>FTP_FAILED</b> or <b>FTP_FINISHED</b>
  * or <b>FTP_MOREDATA</b>.
- * @since 4.3
- * @since 5.0
  */
-function ftp_nb_fput ($ftp_stream, $remote_file, $handle, $mode = FTP_BINARY, $startpos = 0) {}
+#[EV([FTP_FAILED, FTP_FINISHED, FTP_MOREDATA])]
+function ftp_nb_fput(
+    #[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp,
+    string $remote_filename,
+    $stream,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '5.3', to: '7.2')]
+    int $mode,
+    #[EV([FTP_ASCII, FTP_BINARY])]
+    #[PhpStormStubsElementAvailable(from: '7.3')]
+    int $mode = FTP_BINARY,
+    int $offset = 0
+): int {}
 
 /**
  * Alias of <b>ftp_close</b>
  * @link https://php.net/manual/en/function.ftp-quit.php
- * @param $ftp
- * @since 4.0
- * @since 5.0
+ * @param resource $ftp
+ * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
  */
-function ftp_quit ($ftp) {}
-
+function ftp_quit(#[LanguageLevelTypeAware(['8.1' => 'FTP\Connection'], default: 'resource')] $ftp): bool {}
 
 /**
  * <p></p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_ASCII', 1);
+define('FTP_ASCII', 1);
 
 /**
  * <p></p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_TEXT', 1);
+define('FTP_TEXT', 1);
 
 /**
  * <p></p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_BINARY', 2);
+define('FTP_BINARY', 2);
 
 /**
  * <p></p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_IMAGE', 2);
+define('FTP_IMAGE', 2);
 
 /**
  * <p>
@@ -705,7 +743,7 @@ define ('FTP_IMAGE', 2);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_AUTORESUME', -1);
+define('FTP_AUTORESUME', -1);
 
 /**
  * <p>
@@ -713,7 +751,7 @@ define ('FTP_AUTORESUME', -1);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_TIMEOUT_SEC', 0);
+define('FTP_TIMEOUT_SEC', 0);
 
 /**
  * <p>
@@ -721,8 +759,7 @@ define ('FTP_TIMEOUT_SEC', 0);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_AUTOSEEK', 1);
-
+define('FTP_AUTOSEEK', 1);
 
 define('FTP_USEPASVADDRESS', 2);
 
@@ -732,7 +769,7 @@ define('FTP_USEPASVADDRESS', 2);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_FAILED', 0);
+define('FTP_FAILED', 0);
 
 /**
  * <p>
@@ -740,7 +777,7 @@ define ('FTP_FAILED', 0);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_FINISHED', 1);
+define('FTP_FINISHED', 1);
 
 /**
  * <p>
@@ -748,7 +785,6 @@ define ('FTP_FINISHED', 1);
  * </p>
  * @link https://php.net/manual/en/ftp.constants.php
  */
-define ('FTP_MOREDATA', 2);
+define('FTP_MOREDATA', 2);
 
 // End of ftp v.
-?>

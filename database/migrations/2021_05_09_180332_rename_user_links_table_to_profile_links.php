@@ -13,6 +13,7 @@ class RenameUserLinksTableToProfileLinks extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('profile_links')) return;
         Schema::table('user_links', function (Blueprint $table) {
             $table->rename('profile_links');
         });

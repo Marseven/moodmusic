@@ -13,6 +13,7 @@ class CreateArtistAlbumTable extends Migration
      */
     public function up()
     {
+        if (Schema::hasTable('artist_album')) return;
         Schema::create('artist_album', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('artist_id')->unsigned()->index();

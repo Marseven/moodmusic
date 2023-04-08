@@ -5,9 +5,11 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\StringCast;
 
 use Roave\BetterReflection\Reflection\ReflectionConstant;
+
 use function assert;
 use function gettype;
-use function is_scalar;
+use function is_array;
+use function is_string;
 use function sprintf;
 
 /**
@@ -17,10 +19,10 @@ use function sprintf;
  */
 final class ReflectionConstantStringCast
 {
-    public static function toString(ReflectionConstant $constantReflection) : string
+    public static function toString(ReflectionConstant $constantReflection): string
     {
+        /** @psalm-var scalar|array<scalar> $value */
         $value = $constantReflection->getValue();
-        assert($value === null || is_scalar($value));
 
         return sprintf(
             'Constant [ <%s> %s %s ] {%s %s }',
@@ -28,25 +30,33 @@ final class ReflectionConstantStringCast
             gettype($value),
             $constantReflection->getName(),
             self::fileAndLinesToString($constantReflection),
-            (string) $value
+            is_array($value) ? 'Array' : (string) $value,
         );
     }
 
-    private static function sourceToString(ReflectionConstant $constantReflection) : string
+    private static function sourceToString(ReflectionConstant $constantReflection): string
     {
         if ($constantReflection->isUserDefined()) {
             return 'user';
         }
 
-        return sprintf('internal:%s', $constantReflection->getExtensionName());
+        $extensionName = $constantReflection->getExtensionName();
+        assert(is_string($extensionName));
+
+        return sprintf('internal:%s', $extensionName);
     }
 
-    private static function fileAndLinesToString(ReflectionConstant $constantReflection) : string
+    private static function fileAndLinesToString(ReflectionConstant $constantReflection): string
     {
         if ($constantReflection->isInternal()) {
             return '';
         }
 
-        return sprintf("\n  @@ %s %d - %d\n", $constantReflection->getFileName(), $constantReflection->getStartLine(), $constantReflection->getEndLine());
+        $fileName = $constantReflection->getFileName();
+        if ($fileName === null) {
+            return '';
+        }
+
+        return sprintf("\n  @@ %s %d - %d\n", $fileName, $constantReflection->getStartLine(), $constantReflection->getEndLine());
     }
 }

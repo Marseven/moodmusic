@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\StringCast;
 
 use Roave\BetterReflection\Reflection\ReflectionParameter;
+
 use function is_array;
 use function is_string;
 use function sprintf;
@@ -12,12 +13,10 @@ use function strlen;
 use function substr;
 use function var_export;
 
-/**
- * @internal
- */
+/** @internal */
 final class ReflectionParameterStringCast
 {
-    public static function toString(ReflectionParameter $parameterReflection) : string
+    public static function toString(ReflectionParameter $parameterReflection): string
     {
         return sprintf(
             'Parameter #%d [ %s %s%s%s$%s%s ]',
@@ -27,33 +26,22 @@ final class ReflectionParameterStringCast
             $parameterReflection->isVariadic() ? '...' : '',
             $parameterReflection->isPassedByReference() ? '&' : '',
             $parameterReflection->getName(),
-            self::valueToString($parameterReflection)
+            self::valueToString($parameterReflection),
         );
     }
 
-    private static function typeToString(ReflectionParameter $parameterReflection) : string
+    private static function typeToString(ReflectionParameter $parameterReflection): string
     {
-        if (! $parameterReflection->hasType()) {
+        $type = $parameterReflection->getType();
+
+        if ($type === null) {
             return '';
         }
 
-        $mapping = [
-            'int' => 'integer',
-            'bool' => 'boolean',
-        ];
-
-        $originalType = (string) $parameterReflection->getType();
-
-        $type = $mapping[$originalType] ?? $originalType;
-
-        if (! $parameterReflection->allowsNull()) {
-            return $type . ' ';
-        }
-
-        return $type . ' or NULL ';
+        return ReflectionTypeStringCast::toString($type) . ' ';
     }
 
-    private static function valueToString(ReflectionParameter $parameterReflection) : string
+    private static function valueToString(ReflectionParameter $parameterReflection): string
     {
         if (! ($parameterReflection->isOptional() && $parameterReflection->isDefaultValueAvailable())) {
             return '';

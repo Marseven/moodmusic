@@ -10,12 +10,12 @@ class BackstageRequestPolicy extends BasePolicy
 {
     public function index(BaseUser $user, $userId = null)
     {
-        return $user->hasPermission('backstageRequest.view') || $user->id === (int) $userId;
+        return $user->hasPermission('backstageRequests.view') || $user->id === (int) $userId;
     }
 
     public function show(BaseUser $user, BackstageRequest $backstageRequest)
     {
-        return $user->hasPermission('backstageRequest.view') || $backstageRequest->user_id === $user->id;
+        return $user->hasPermission('backstageRequests.view') || $backstageRequest->user_id === $user->id;
     }
 
     public function store(BaseUser $user)
@@ -25,12 +25,12 @@ class BackstageRequestPolicy extends BasePolicy
 
     public function update(BaseUser $user, BackstageRequest $backstageRequest)
     {
-        return $user->hasPermission('backstageRequest.update') || $backstageRequest->user_id === $user->id;
+        return $user->hasPermission('backstageRequests.update') || $backstageRequest->user_id === $user->id;
     }
 
     public function destroy(BaseUser $user, $backstageRequestIds)
     {
-        if ($user->hasPermission('backstageRequest.delete')) {
+        if ($user->hasPermission('backstageRequests.delete')) {
             return true;
         } else {
             $dbCount = app(BackstageRequest::class)
@@ -43,6 +43,6 @@ class BackstageRequestPolicy extends BasePolicy
 
     public function handle(BaseUser $user)
     {
-        return $user->hasPermission('backstageRequest.handle');
+        return $user->hasPermission('backstageRequests.handle');
     }
 }

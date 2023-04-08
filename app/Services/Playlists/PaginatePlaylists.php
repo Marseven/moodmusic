@@ -3,27 +3,40 @@
 namespace App\Services\Playlists;
 
 use App\Playlist;
-use Common\Database\Paginator;
+use Arr;
+use Common\Database\Datasource\Datasource;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Database\Eloquent\Relations\Relation;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Str;
 
 class PaginatePlaylists
 {
-    public function execute(array $params, Builder $builder = null): LengthAwarePaginator
-    {
+    public function execute(
+        array $params,
+        Builder|Relation $builder = null,
+    ): AbstractPaginator {
         $builder = $builder ?? Playlist::query();
-        $paginator = (new Paginator($builder, $params))
-            ->with(['editors' => function (BelongsToMany $q) {
-                return $q->compact();
-            }]);
 
-        $order = $paginator->getOrder();
-        if ($order['col'] === 'popularity') {
-            $paginator->dontSort = true;
-            $paginator->query()->orderByPopularity($order['dir']);
+        if (Arr::get($params, 'editors')) {
+            $builder->with([
+                'editors' => fn(BelongsToMany $q) => $q->compact(),
+            ]);
         }
 
-        return $paginator->paginate();
+        if (Arr::get($params, 'compact')) {
+            $builder->compact();
+        }
+
+        $datasource = new Datasource($builder, $params);
+        $order = $datasource->getOrder();
+
+        if (Str::endsWith($order['col'], 'popularity')) {
+            $datasource->order = false;
+            $builder->orderByPopularity($order['dir']);
+        }
+
+        return $datasource->paginate();
     }
 }

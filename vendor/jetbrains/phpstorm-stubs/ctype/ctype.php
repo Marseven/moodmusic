@@ -1,5 +1,8 @@
 <?php
 
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Pure;
+
 /**
  * Check for alphanumeric character(s)
  * @link https://php.net/manual/en/function.ctype-alnum.php
@@ -8,10 +11,9 @@
  * </p>
  * @return bool <b>TRUE</b> if every character in <i>text</i> is either
  * a letter or a digit, <b>FALSE</b> otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_alnum ($text) {}
+#[Pure]
+function ctype_alnum(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for alphabetic character(s)
@@ -21,10 +23,9 @@ function ctype_alnum ($text) {}
  * </p>
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * a letter from the current locale, <b>FALSE</b> otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_alpha ($text) {}
+#[Pure]
+function ctype_alpha(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for control character(s)
@@ -34,10 +35,9 @@ function ctype_alpha ($text) {}
  * </p>
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * a control character from the current locale, <b>FALSE</b> otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_cntrl ($text) {}
+#[Pure]
+function ctype_cntrl(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for numeric character(s)
@@ -47,10 +47,9 @@ function ctype_cntrl ($text) {}
  * </p>
  * @return bool <b>TRUE</b> if every character in the string
  * <i>text</i> is a decimal digit, <b>FALSE</b> otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_digit ($text) {}
+#[Pure]
+function ctype_digit(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for lowercase character(s)
@@ -60,10 +59,9 @@ function ctype_digit ($text) {}
  * </p>
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * a lowercase letter in the current locale.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_lower ($text) {}
+#[Pure]
+function ctype_lower(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for any printable character(s) except space
@@ -74,10 +72,9 @@ function ctype_lower ($text) {}
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * printable and actually creates visible output (no white space), <b>FALSE</b>
  * otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_graph ($text) {}
+#[Pure]
+function ctype_graph(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for printable character(s)
@@ -89,16 +86,13 @@ function ctype_graph ($text) {}
  * will actually create output (including blanks). Returns <b>FALSE</b> if
  * <i>text</i> contains control characters or characters
  * that do not have any output or control function at all.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_print ($text) {}
+#[Pure]
+function ctype_print(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for any printable character which is not whitespace or an
- * @since 4.0.4
- * @since 5.0
-alphanumeric character
+ * alphanumeric character
  * @link https://php.net/manual/en/function.ctype-punct.php
  * @param string $text <p>
  * The tested string.
@@ -106,7 +100,8 @@ alphanumeric character
  * @return bool <b>TRUE</b> if every character in <i>text</i>
  * is printable, but neither letter, digit or blank, <b>FALSE</b> otherwise.
  */
-function ctype_punct ($text) {}
+#[Pure]
+function ctype_punct(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for whitespace character(s)
@@ -118,10 +113,9 @@ function ctype_punct ($text) {}
  * creates some sort of white space, <b>FALSE</b> otherwise. Besides the
  * blank character this also includes tab, vertical tab, line feed,
  * carriage return and form feed characters.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_space ($text) {}
+#[Pure]
+function ctype_space(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for uppercase character(s)
@@ -131,10 +125,9 @@ function ctype_space ($text) {}
  * </p>
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * an uppercase letter in the current locale.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_upper ($text) {}
+#[Pure]
+function ctype_upper(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}
 
 /**
  * Check for character(s) representing a hexadecimal digit
@@ -145,7 +138,6 @@ function ctype_upper ($text) {}
  * @return bool <b>TRUE</b> if every character in <i>text</i> is
  * a hexadecimal 'digit', that is a decimal digit or a character from
  * [A-Fa-f] , <b>FALSE</b> otherwise.
- * @since 4.0.4
- * @since 5.0
  */
-function ctype_xdigit ($text) {}
+#[Pure]
+function ctype_xdigit(#[LanguageLevelTypeAware(['8.1' => 'string'], default: 'mixed')] mixed $text): bool {}

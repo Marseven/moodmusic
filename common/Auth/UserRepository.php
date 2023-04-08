@@ -1,98 +1,42 @@
 <?php namespace Common\Auth;
 
 use App\User;
+use Carbon\Carbon;
 use Common\Auth\Events\UserCreated;
 use Common\Auth\Events\UsersDeleted;
 use Common\Auth\Permissions\Traits\SyncsPermissions;
 use Common\Auth\Roles\Role;
+use Common\Billing\Subscription;
 use Common\Domains\Actions\DeleteCustomDomains;
 use Common\Domains\CustomDomain;
 use Common\Files\Actions\Deletion\PermanentlyDeleteEntries;
+use Common\Pages\CustomPage;
 use Common\Settings\Settings;
 use Exception;
-use Arr;
-use Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Hash;
 
-class UserRepository {
-
+class UserRepository
+{
     use SyncsPermissions;
 
-    /**
-     * User model instance.
-     *
-     * @var User
-     */
-    protected $user;
-
-    /**
-     * Role model instance.
-     *
-     * @var Role
-     */
-    protected $role;
-
-    /**
-     * @var Settings
-     */
-    protected $settings;
-
-    /**
-     * @param User $user
-     * @param Role $role
-     * @param Settings $settings
-     */
     public function __construct(
-        User $user,
-        Role $role,
-        Settings $settings
-    )
-    {
-        $this->user  = $user;
-        $this->role = $role;
-        $this->settings = $settings;
+        protected User $user,
+        protected Role $role,
+        protected Settings $settings
+    ) {
     }
 
-    /**
-     * Find user with given id or throw an error.
-     *
-     * @param integer $id
-     * @param array $lazyLoad
-     * @return User
-     */
-    public function findOrFail($id, $lazyLoad = [])
+    public function create(array $params): User
     {
-        return $this->user->with($lazyLoad)->findOrFail($id);
-    }
-
-    /**
-     * Return first user matching attributes or create a new one.
-     *
-     * @param array $params
-     * @return User
-     */
-    public function firstOrCreate($params)
-    {
-        $user = $this->user->where('email', $params['email'])->first();
-
-        if (is_null($user)) {
-            $user = $this->create($params);
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param array $params
-     * @return User
-     */
-    public function create($params)
-    {
-        /** @var User $user */
-        $params['api_token'] = Str::random(40);
         $user = $this->user->forceCreate($this->formatParams($params));
 
         try {
-            if ( ! isset($params['roles']) || ! $this->attachRoles($user, $params['roles'])) {
+            if (
+                !isset($params['roles']) ||
+                !$this->attachRoles($user, $params['roles'])
+            ) {
                 $this->assignDefaultRole($user);
             }
 
@@ -103,7 +47,7 @@ class UserRepository {
             //delete user if there were any errors creating/assigning
             //purchase codes or roles, so there are no artifacts left
             $user->delete();
-            throw($e);
+            throw $e;
         }
 
         event(new UserCreated($user));
@@ -111,13 +55,7 @@ class UserRepository {
         return $user;
     }
 
-    /**
-     * @param User $user
-     * @param array $params
-     *
-     * @return User
-     */
-    public function update(User $user, $params)
+    public function update(User $user, array $params): User
     {
         $user->forceFill($this->formatParams($params, 'update'))->save();
 
@@ -133,72 +71,100 @@ class UserRepository {
         return $user->load(['roles', 'permissions']);
     }
 
-    /**
-     * @param \Illuminate\Support\Collection $ids
-     * @return integer
-     */
-    public function deleteMultiple($ids)
+    public function deleteMultiple(array|Collection $ids): int
     {
         $users = $this->user->whereIn('id', $ids)->get();
 
-        $users->each(function(User $user) {
+        $users->each(function (User $user) {
             $user->social_profiles()->delete();
             $user->roles()->detach();
             $user->notifications()->delete();
             $user->permissions()->detach();
 
             if ($user->subscribed()) {
-                $user->subscriptions->each->cancelAndDelete();
+                $user->subscriptions->each(function (
+                    Subscription $subscription
+                ) {
+                    $subscription->cancelAndDelete();
+                });
             }
 
             $user->delete();
 
-            $entryIds = $user->entries(['owner' => true])->pluck('file_entries.id');
+            $entryIds = $user
+                ->entries(['owner' => true])
+                ->pluck('file_entries.id');
             app(PermanentlyDeleteEntries::class)->execute($entryIds);
         });
 
-        $domainIds = app(CustomDomain::class)->whereIn('user_id', $ids)->pluck('id');
+        // delete domains
+        $domainIds = app(CustomDomain::class)
+            ->whereIn('user_id', $ids)
+            ->pluck('id');
         app(DeleteCustomDomains::class)->execute($domainIds->toArray());
+
+        // delete custom pages
+        CustomPage::whereIn('user_id', $ids)->delete();
 
         event(new UsersDeleted($users));
 
         return $users->count();
     }
 
-    /**
-     * Prepare given params for inserting into database.
-     *
-     * @param array $params
-     * @param string $type
-     * @return array
-     */
-    protected function formatParams($params, $type = 'create')
-    {
+    protected function formatParams(
+        array $params,
+        string $type = 'create'
+    ): array {
         $formatted = [
-            'first_name'  => isset($params['first_name']) ? $params['first_name'] : null,
-            'last_name'   => isset($params['last_name']) ? $params['last_name'] : null,
-            'language'    => isset($params['language']) ? $params['language'] : config('app.locale'),
-            'country'     => isset($params['country']) ? $params['country'] : null,
-            'timezone'    => isset($params['timezone']) ? $params['timezone'] : null,
+            'first_name' => $params['first_name'] ?? null,
+            'last_name' => $params['last_name'] ?? null,
+            'language' => $params['language'] ?? config('app.locale'),
+            'country' => $params['country'] ?? null,
+            'timezone' => $params['timezone'] ?? null,
         ];
 
-        if (isset($params['api_token'])) {
-            $formatted['api_token'] = $params['api_token'];
+        if ($type === 'update') {
+            $formatted = array_filter(
+                $formatted,
+                fn($value) => !is_null($value),
+            );
         }
 
         if (isset($params['email_verified_at'])) {
-            $formatted['email_verified_at'] = $params['email_verified_at'];
+            if ($params['email_verified_at'] === true) {
+                $formatted['email_verified_at'] = Carbon::now();
+            } elseif ($params['email_verified_at'] === false) {
+                $formatted['email_verified_at'] = null;
+            } else {
+                $formatted['email_verified_at'] = $params['email_verified_at'];
+            }
+        }
+
+        // for registration and social login
+        if (
+            !app(Settings::class)->get('require_email_confirmation') &&
+            !Arr::get($formatted, 'email_verified_at')
+        ) {
+            $formatted['email_verified_at'] = Carbon::now();
+        }
+
+        if (isset($params['avatar'])) {
+            $formatted['avatar'] = $params['avatar'];
         }
 
         if (array_key_exists('available_space', $params)) {
-            $formatted['available_space'] = is_null($params['available_space']) ? null : (int) $params['available_space'];
+            $formatted['available_space'] = is_null($params['available_space'])
+                ? null
+                : (int) $params['available_space'];
         }
 
         if ($type === 'create') {
             $formatted['email'] = $params['email'];
-            $formatted['password'] = Arr::get($params, 'password') ? bcrypt($params['password']) : null;
-        } else if ($type === 'update' && Arr::get($params, 'password')) {
-            $formatted['password'] = bcrypt($params['password']);
+            $formatted['password'] = Arr::get($params, 'password')
+                ? Hash::make($params['password'])
+                : null;
+        } elseif ($type === 'update' && Arr::get($params, 'password')) {
+            $formatted['password'] = Hash::make($params['password']);
         }
 
         return $formatted;
@@ -206,33 +172,21 @@ class UserRepository {
 
     /**
      * Assign roles to user, if any are given.
-     *
-     * @param User  $user
-     * @param array $roles
-     * @type string $type
-     *
-     * @return int
      */
-    public function attachRoles(User $user, $roles, $type = 'sync')
-    {
+    public function attachRoles(
+        User $user,
+        array $roles,
+        string $type = 'sync'
+    ): bool {
         if (empty($roles) && $type === 'attach') {
-            return 0;
+            return false;
         }
-        $roleIds = $this->role->whereIn('id', $roles)->get()->pluck('id');
-        return $user->roles()->$type($roleIds);
-    }
-
-    /**
-     * Detach specified roles from user.
-     *
-     * @param User $user
-     * @param int[] $roles
-     *
-     * @return int
-     */
-    public function detachRoles(User $user, $roles)
-    {
-        return $user->roles()->detach($roles);
+        $roleIds = $this->role
+            ->whereIn('id', $roles)
+            ->get()
+            ->pluck('id');
+        $user->roles()->$type($roleIds);
+        return $roleIds->count();
     }
 
     /**

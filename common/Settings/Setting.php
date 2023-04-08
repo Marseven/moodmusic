@@ -1,36 +1,16 @@
 <?php namespace Common\Settings;
 
-use Carbon\Carbon;
-use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 
-/**
- * @property int $id
- * @property string $name
- * @property string $value
- * @property Carbon $created_at
- * @property Carbon $updated_at
- * @property int $private
- * @mixin Eloquent
- */
-class Setting extends Model {
-
-	/**
-	 * @var string
-	 */
-	protected $table = 'settings';
+class Setting extends Model
+{
+    protected $table = 'settings';
 
     protected $fillable = ['name', 'value'];
 
-    protected $casts = ['private' => 'integer'];
+    protected $casts = ['private' => 'bool'];
 
-    /**
-     * Cast setting value to int, if it's a boolean number.
-     *
-     * @param string $value
-     * @return int|string
-     */
-    public function getValueAttribute($value)
+    public function getValueAttribute(mixed $value): mixed
     {
         if ($value === 'false') {
             return false;
@@ -47,14 +27,11 @@ class Setting extends Model {
         return $value;
     }
 
-    /**
-     * @param $value
-     */
     public function setValueAttribute($value)
     {
         if ($value === true) {
             $value = 'true';
-        } else if ($value === false) {
+        } elseif ($value === false) {
             $value = 'false';
         }
 

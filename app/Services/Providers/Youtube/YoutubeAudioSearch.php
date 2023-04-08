@@ -1,38 +1,25 @@
 <?php namespace App\Services\Providers\Youtube;
 
 use App;
-use App\Artist;
 use App\Services\HttpClient;
 use App\Track;
-use Carbon\Carbon;
 use Common\Settings\Settings;
 use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Symfony\Component\DomCrawler\Crawler;
 
-class YoutubeAudioSearch {
-
-    /**
-     * @var Settings
-     */
-    private $settings;
-
-    /**
-     * @param Settings $settings
-     */
-    public function __construct(Settings $settings) {
-        $this->settings = $settings;
+class YoutubeAudioSearch
+{
+    public function __construct(protected Settings $settings)
+    {
     }
 
-    /**
-     * @param int $trackId
-     * @param string $artistName
-     * @param string $trackName
-     * @return array
-     */
-    public function search($trackId, $artistName, $trackName)
-    {
+    public function search(
+        int $trackId,
+        string $artistName,
+        string $trackName,
+    ): array {
         // track and artist name is double encoded on the frontend
         // as laravel does not support encoded forward slashes in url
         $artistName = urldecode($artistName);
@@ -45,35 +32,47 @@ class YoutubeAudioSearch {
         }
 
         if ($this->settings->get('youtube.store_id') && count($results)) {
-            app(Track::class)->where('id', $trackId)->update(['youtube_id' => $results[0]['id']]);
+            app(Track::class)
+                ->where('id', $trackId)
+                ->update(['youtube_id' => $results[0]['id']]);
         }
 
         return $results;
     }
 
-    /**
-     * Scrape youtube site search page to find a video for specified track.
-     *
-     * @param string $artistName
-     * @param string $trackName
-     * @return array
-     */
-    private function viaScraping($artistName, $trackName)
+    private function viaScraping(string $artistName, string $trackName): array
     {
         $query = $this->buildYoutubeSearchQuery($artistName, $trackName, true);
-        $client = new HttpClient(['exceptions' => true, 'headers' => ['Accept-Language' => 'en']]);
+        $client = new HttpClient([
+            'exceptions' => true,
+            'User-Agent' =>
+                'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
+            'Accept-Language' => 'en-US, en;q=0.5',
+            'Content-Language' => 'en-us',
+        ]);
         $youtubeUrl = "https://www.youtube.com/results?search_query=$query";
 
         $html = $client->get($youtubeUrl);
 
-        // youtube search results page was not rendered yet, need to extract json
+        // YouTube search results page was not rendered yet, need to extract json
         if (Str::contains($html, 'ytInitialData')) {
-            preg_match('/ytInitialData"?]? = (.+?);\s?(\n|<\/script>)/ms', $html, $matches);
+            preg_match(
+                '/ytInitialData"?]? = (.+?);\s?(\n|<\/script>)/ms',
+                $html,
+                $matches,
+            );
             $json = $matches[1];
             $json = json_decode($json, true);
-            $contents = Arr::first($json['contents']['twoColumnSearchResultsRenderer']['primaryContents'])['contents'];
-            $results = Arr::first($contents, function($content) {
-                return !array_key_exists('carouselAdRenderer', Arr::first(Arr::first(Arr::first($content))));
+            $contents = Arr::first(
+                $json['contents']['twoColumnSearchResultsRenderer'][
+                    'primaryContents'
+                ],
+            )['contents'];
+            $results = Arr::first($contents, function ($content) {
+                return !array_key_exists(
+                    'carouselAdRenderer',
+                    Arr::first(Arr::first(Arr::first($content))),
+                );
             });
             $results = Arr::first(Arr::first($results));
 
@@ -81,41 +80,42 @@ class YoutubeAudioSearch {
                 return isset($result['videoRenderer']);
             });
             $results = array_slice($results, 0, 3);
-            $results = array_map(function($result) use($json) {
+            $results = array_map(function ($result) use ($json) {
                 $result = $result['videoRenderer'];
                 return [
                     'title' => $result['title']['runs'][0]['text'],
                     'id' => $result['videoId'],
                 ];
             }, $results);
-        // youtube search results page was rendered, can crawl html
+            // YouTube search results page was rendered, can crawl html
         } else {
             $results = [];
             $crawler = new Crawler($html);
-            $crawler->filter('#results [data-context-item-id]')->slice(0, 3)->each(function(Crawler $node) use(&$results) {
-                $videoId = head($node->extract(['data-context-item-id']));
-                $title = head($node->filter('a[title]')->extract(['_text']));
-                $results[] = ['title' => $title, 'id' => $videoId];
-            });
+            $crawler
+                ->filter('#results [data-context-item-id]')
+                ->slice(0, 3)
+                ->each(function (Crawler $node) use (&$results) {
+                    $videoId = head($node->extract(['data-context-item-id']));
+                    $title = head(
+                        $node->filter('a[title]')->extract(['_text']),
+                    );
+                    $results[] = ['title' => $title, 'id' => $videoId];
+                });
         }
 
         return $results;
     }
 
     /**
-     * Use youtube data api to find a video for specified track.
-     *
-     * @param string $artistName
-     * @param string $trackName
-     * @return array
+     * Use YouTube data api to find a video for specified track.
      */
-    private function viaApi($artistName, $trackName)
+    private function viaApi(string $artistName, string $trackName)
     {
         $params = $this->getParams($artistName, $trackName);
         $client = new HttpClient([
-            'headers' =>  ['Referer' => url('')],
+            'headers' => ['Referer' => url('')],
             'base_uri' => 'https://www.googleapis.com/youtube/v3/',
-            'exceptions' => true
+            'exceptions' => true,
         ]);
 
         try {
@@ -126,8 +126,11 @@ class YoutubeAudioSearch {
             return [];
         }
 
-        return array_map(function($item) {
-            return ['title' => $item['snippet']['title'], 'id' => $item['id']['videoId']];
+        return array_map(function ($item) {
+            return [
+                'title' => $item['snippet']['title'],
+                'id' => $item['id']['videoId'],
+            ];
         }, Arr::get($response, 'items'));
     }
 
@@ -142,7 +145,7 @@ class YoutubeAudioSearch {
             'type' => 'video',
             'videoEmbeddable' => 'true',
             'videoCategoryId' => 10, //music
-            'topicId' => '/m/04rlf' //music (all genres)
+            'topicId' => '/m/04rlf', //music (all genres)
         ];
 
         if ($regionCode = $this->settings->get('youtube.region_code')) {
@@ -152,13 +155,16 @@ class YoutubeAudioSearch {
         return $params;
     }
 
-    private function buildYoutubeSearchQuery($artist, $track, $encode = false)
-    {
+    private function buildYoutubeSearchQuery(
+        string $artist,
+        string $track,
+        bool $encode = false,
+    ): string {
         $append = '';
 
         //if "live" track is not being requested, append "video" to search
         //query to prefer music videos over lyrics and live videos.
-        if ( ! Str::contains(strtolower($track), '- live')) {
+        if (!Str::contains(strtolower($track), '- live')) {
             //$append = 'video';
         }
 

@@ -22,6 +22,13 @@ class ParallelRunner implements RunnerInterface
     protected static $applicationResolver;
 
     /**
+     * The runner resolver callback.
+     *
+     * @var \Closure|null
+     */
+    protected static $runnerResolver;
+
+    /**
      * The original test runner options.
      *
      * @var \ParaTest\Runners\PHPUnit\Options
@@ -57,7 +64,11 @@ class ParallelRunner implements RunnerInterface
             $output = new ParallelConsoleOutput($output);
         }
 
-        $this->runner = new WrapperRunner($options, $output);
+        $runnerResolver = static::$runnerResolver ?: function (Options $options, OutputInterface $output) {
+            return new WrapperRunner($options, $output);
+        };
+
+        $this->runner = $runnerResolver($options, $output);
     }
 
     /**
@@ -69,6 +80,17 @@ class ParallelRunner implements RunnerInterface
     public static function resolveApplicationUsing($resolver)
     {
         static::$applicationResolver = $resolver;
+    }
+
+    /**
+     * Set the runner resolver callback.
+     *
+     * @param  \Closure|null  $resolver
+     * @return void
+     */
+    public static function resolveRunnerUsing($resolver)
+    {
+        static::$runnerResolver = $resolver;
     }
 
     /**
@@ -113,9 +135,7 @@ class ParallelRunner implements RunnerInterface
     {
         collect(range(1, $this->options->processes()))->each(function ($token) use ($callback) {
             tap($this->createApplication(), function ($app) use ($callback, $token) {
-                ParallelTesting::resolveTokenUsing(function () use ($token) {
-                    return $token;
-                });
+                ParallelTesting::resolveTokenUsing(fn () => $token);
 
                 $callback($app);
             })->flush();
@@ -150,6 +170,6 @@ class ParallelRunner implements RunnerInterface
             throw new RuntimeException('Parallel Runner unable to resolve application.');
         };
 
-        return call_user_func($applicationResolver);
+        return $applicationResolver();
     }
 }

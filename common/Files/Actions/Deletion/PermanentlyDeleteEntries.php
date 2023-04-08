@@ -3,21 +3,17 @@
 namespace Common\Files\Actions\Deletion;
 
 use Common\Files\Events\FileEntriesDeleted;
-use DB;
-use League\Flysystem\FileNotFoundException;
-use Storage;
 use Common\Files\FileEntry;
+use DB;
 use Illuminate\Support\Collection;
+use League\Flysystem\FileNotFoundException;
 
 class PermanentlyDeleteEntries extends SoftDeleteEntries
 {
     /**
      * Permanently delete file entries, related records and files from disk.
-     *
-     * @param Collection $entries
-     * @return void
      */
-    protected function delete(Collection $entries)
+    protected function delete(Collection|array $entries): void
     {
         $entries = $this->loadChildEntries($entries, true);
         $this->deleteFiles($entries);
@@ -27,42 +23,40 @@ class PermanentlyDeleteEntries extends SoftDeleteEntries
 
     /**
      * Delete file entries from database.
-     *
-     * @param Collection $entries
-     * @return bool|null
      */
-    private function deleteEntries(Collection $entries) {
+    private function deleteEntries(Collection|array $entries): void
+    {
         $entryIds = $entries->pluck('id');
 
         // detach users
-        DB::table('file_entry_models')->whereIn('file_entry_id', $entryIds)->delete();
+        DB::table('file_entry_models')
+            ->whereIn('file_entry_id', $entryIds)
+            ->delete();
 
         // detach tags
-        DB::table('taggables')->where('taggable_type', FileEntry::class)->whereIn('taggable_id', $entryIds)->delete();
+        DB::table('taggables')
+            ->where('taggable_type', FileEntry::class)
+            ->whereIn('taggable_id', $entryIds)
+            ->delete();
 
-        return $this->entry->whereIn('id', $entries->pluck('id'))->forceDelete();
+        $this->entry->whereIn('id', $entries->pluck('id'))->forceDelete();
     }
 
     /**
      * Delete files from disk.
-     *
-     * @param Collection $entries
-     * @return Collection
      */
-    private function deleteFiles(Collection $entries)
+    private function deleteFiles(Collection $entries): void
     {
-        return $entries->filter(function (FileEntry $entry) {
-            return $entry->type !== 'folder';
-        })->each(function(FileEntry $entry) {
-            try {
+        $entries
+            ->filter(function (FileEntry $entry) {
+                return $entry->type !== 'folder';
+            })
+            ->each(function (FileEntry $entry) {
                 if ($entry->public) {
                     $entry->getDisk()->delete($entry->getStoragePath());
                 } else {
-                    $entry->getDisk()->deleteDir($entry->file_name);
+                    $entry->getDisk()->deleteDirectory($entry->file_name);
                 }
-            } catch (FileNotFoundException $e) {
-                //
-            }
-        });
+            });
     }
 }

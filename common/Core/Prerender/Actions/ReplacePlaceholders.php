@@ -45,6 +45,13 @@ class ReplacePlaceholders
     private function replace($config)
     {
         if (is_array($config)) {
+            if (array_key_exists('_ifNotNull', $config)) {
+                if (is_null(Arr::get($this->allData, $config['_ifNotNull']))) {
+                    return [];
+                }
+                unset($config['_ifExists']);
+            }
+
             if (Arr::get($config, '_type') === 'loop') {
                 return $this->replaceLoop($config);
             } else {

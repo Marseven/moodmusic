@@ -3,6 +3,7 @@
 namespace App;
 
 use Carbon\Carbon;
+use Common\Search\Searchable;
 use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -22,6 +23,11 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class BackstageRequest extends Model
 {
+    use Searchable;
+
+    const MODEL_TYPE = 'backstageRequest';
+
+
     protected $guarded = ['id'];
 
      protected $casts = [
@@ -46,4 +52,22 @@ class BackstageRequest extends Model
          }
          return $this->attributes['data'];
      }
+
+    public static function filterableFields(): array
+    {
+        return [
+            'id',
+            'type',
+        ];
+    }
+
+
+    public function toSearchableArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'type' => $this->type,
+            'artist_name' => $this->artist_name,
+        ];
+    }
 }

@@ -1,6 +1,9 @@
 <?php
 
 // Start of zlib v.2.0
+use JetBrains\PhpStorm\Deprecated;
+use JetBrains\PhpStorm\Internal\LanguageLevelTypeAware;
+use JetBrains\PhpStorm\Pure;
 
 /**
  * Output a gz-file
@@ -13,83 +16,68 @@
  * You can set this optional parameter to 1, if you
  * want to search for the file in the include_path too.
  * </p>
- * @return int the number of (uncompressed) bytes read from the file. If
- * an error occurs, <b>FALSE</b> is returned and unless the function was
- * called as @readgzfile, an error message is
- * printed.
- * @since 4.0
- * @since 5.0
+ * @return int|false the number of (uncompressed) bytes read from the file, or FALSE on error
  */
-function readgzfile ($filename, $use_include_path = 0) {}
+function readgzfile(string $filename, int $use_include_path = 0): int|false {}
 
 /**
  * Rewind the position of a gz-file pointer
  * @link https://php.net/manual/en/function.gzrewind.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function gzrewind ($zp) {}
+function gzrewind($stream): bool {}
 
 /**
  * Close an open gz-file pointer
  * @link https://php.net/manual/en/function.gzclose.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.0
- * @since 5.0
  */
-function gzclose ($zp) {}
+function gzclose($stream): bool {}
 
 /**
  * Test for EOF on a gz-file pointer
  * @link https://php.net/manual/en/function.gzeof.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
- * @return int|bool <b>TRUE</b> if the gz-file pointer is at EOF or an error occurs;
+ * @return bool <b>TRUE</b> if the gz-file pointer is at EOF or an error occurs;
  * otherwise returns <b>FALSE</b>.
- * @since 4.0
- * @since 5.0
  */
-function gzeof ($zp) {}
+function gzeof($stream): bool {}
 
 /**
  * Get character from gz-file pointer
  * @link https://php.net/manual/en/function.gzgetc.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @return string|false The uncompressed character or <b>FALSE</b> on EOF (unlike <b>gzeof</b>).
- * @since 4.0
- * @since 5.0
  */
-function gzgetc ($zp) {}
+function gzgetc($stream): string|false {}
 
 /**
  * Get line from file pointer
  * @link https://php.net/manual/en/function.gzgets.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
- * @param int $length [optional] <p>
+ * @param int|null $length <p>
  * The length of data to get.
  * </p>
  * @return string|false The uncompressed string, or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
  */
-function gzgets ($zp, $length) {}
+function gzgets($stream, ?int $length = null): string|false {}
 
 /**
  * Get line from gz-file pointer and strip HTML tags
@@ -98,7 +86,7 @@ function gzgets ($zp, $length) {}
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
- * @param int $length <p>
+ * @param int $length [optional] <p>
  * The length of data to get.
  * </p>
  * @param string $allowable_tags [optional] <p>
@@ -106,27 +94,24 @@ function gzgets ($zp, $length) {}
  * be stripped.
  * </p>
  * @return string|false The uncompressed and striped string, or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
- * @deprecated 7.3
+ * @removed 8.0
  */
-function gzgetss ($zp, $length, $allowable_tags = null) {}
+#[Deprecated(since: "7.3")]
+function gzgetss($zp, int $length, $allowable_tags) {}
 
 /**
  * Binary-safe gz-file read
  * @link https://php.net/manual/en/function.gzread.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @param int $length <p>
  * The number of bytes to read.
  * </p>
- * @return string The data that have been read.
- * @since 4.0
- * @since 5.0
+ * @return string|false The data that have been read.
  */
-function gzread ($zp, $length) {}
+function gzread($stream, int $length): string|false {}
 
 /**
  * Open gz-file
@@ -154,29 +139,25 @@ function gzread ($zp, $length) {}
  * </p>
  * <p>
  * If the open fails, the function returns <b>FALSE</b>.
- * @since 4.0
- * @since 5.0
  */
-function gzopen ($filename, $mode, $use_include_path = 0) {}
+function gzopen(string $filename, string $mode, int $use_include_path = 0) {}
 
 /**
  * Output all remaining data on a gz-file pointer
  * @link https://php.net/manual/en/function.gzpassthru.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @return int The number of uncompressed characters read from <i>gz</i>
  * and passed through to the input, or <b>FALSE</b> on error.
- * @since 4.0
- * @since 5.0
  */
-function gzpassthru ($zp) {}
+function gzpassthru($stream): int {}
 
 /**
  * Seek on a gz-file pointer
  * @link https://php.net/manual/en/function.gzseek.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
@@ -194,35 +175,31 @@ function gzpassthru ($zp) {}
  * </p>
  * @return int Upon success, returns 0; otherwise, returns -1. Note that seeking
  * past EOF is not considered an error.
- * @since 4.0
- * @since 5.0
  */
-function gzseek ($zp, $offset, $whence = SEEK_SET) {}
+function gzseek($stream, int $offset, int $whence = SEEK_SET): int {}
 
 /**
  * Tell gz-file pointer read/write position
  * @link https://php.net/manual/en/function.gztell.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
  * @return int|false The position of the file pointer or <b>FALSE</b> if an error occurs.
- * @since 4.0
- * @since 5.0
  */
-function gztell ($zp) {}
+function gztell($stream): int|false {}
 
 /**
  * Binary-safe gz-file write
  * @link https://php.net/manual/en/function.gzwrite.php
- * @param resource $zp <p>
+ * @param resource $stream <p>
  * The gz-file pointer. It must be valid, and must point to a file
  * successfully opened by <b>gzopen</b>.
  * </p>
- * @param string $string <p>
+ * @param string $data <p>
  * The string to write.
  * </p>
- * @param int $length [optional] <p>
+ * @param int|null $length [optional] <p>
  * The number of uncompressed bytes to write. If supplied, writing will
  * stop after <i>length</i> (uncompressed) bytes have been
  * written or the end of <i>string</i> is reached,
@@ -234,23 +211,20 @@ function gztell ($zp) {}
  * configuration option will be ignored and no slashes will be
  * stripped from <i>string</i>.
  * </p>
- * @return int the number of (uncompressed) bytes written to the given gz-file
+ * @return int|false the number of (uncompressed) bytes written to the given gz-file
  * stream.
- * @since 4.0
- * @since 5.0
  */
-function gzwrite ($zp, $string, $length = null) {}
+function gzwrite($stream, string $data, ?int $length): int|false {}
 
 /**
  * Alias of <b>gzwrite</b>
  * @link https://php.net/manual/en/function.gzputs.php
- * @param $fp
- * @param $str
- * @param $length [optional]
- * @since 4.0
- * @since 5.0
+ * @param resource $stream
+ * @param string $data
+ * @param int|null $length [optional]
+ * @return int|false
  */
-function gzputs ($fp, $str, $length) {}
+function gzputs($stream, string $data, ?int $length): int|false {}
 
 /**
  * Read entire gz-file into an array
@@ -262,11 +236,9 @@ function gzputs ($fp, $str, $length) {}
  * You can set this optional parameter to 1, if you
  * want to search for the file in the include_path too.
  * </p>
- * @return array An array containing the file, one line per cell.
- * @since 4.0
- * @since 5.0
+ * @return array|false An array containing the file, one line per cell.
  */
-function gzfile ($filename, $use_include_path = 0) {}
+function gzfile(string $filename, int $use_include_path = 0): array|false {}
 
 /**
  * Compress a string
@@ -285,10 +257,9 @@ function gzfile ($filename, $use_include_path = 0) {}
  * One of <b>ZLIB_ENCODING_*</b> constants.
  * </p>
  * @return string|false The compressed string or <b>FALSE</b> if an error occurred.
- * @since 4.0.1
- * @since 5.0
  */
-function gzcompress ($data, $level = -1, $encoding = ZLIB_ENCODING_DEFLATE) {}
+#[Pure]
+function gzcompress(string $data, int $level = -1, int $encoding = ZLIB_ENCODING_DEFLATE): string|false {}
 
 /**
  * Uncompress a compressed string
@@ -296,19 +267,18 @@ function gzcompress ($data, $level = -1, $encoding = ZLIB_ENCODING_DEFLATE) {}
  * @param string $data <p>
  * The data compressed by <b>gzcompress</b>.
  * </p>
- * @param int $length [optional] <p>
+ * @param int $max_length [optional] <p>
  * The maximum length of data to decode.
  * </p>
  * @return string|false The original uncompressed data or <b>FALSE</b> on error.
- * </p>
  * <p>
  * The function will return an error if the uncompressed data is more than
  * 32768 times the length of the compressed input <i>data</i>
  * or more than the optional parameter <i>length</i>.
- * @since 4.0.1
- * @since 5.0
+ * </p>
  */
-function gzuncompress ($data, $length = 0) {}
+#[Pure]
+function gzuncompress(string $data, int $max_length = 0): string|false {}
 
 /**
  * Deflate a string
@@ -325,10 +295,9 @@ function gzuncompress ($data, $length = 0) {}
  * One of <b>ZLIB_ENCODING_*</b> constants.
  * </p>
  * @return string|false The deflated string or <b>FALSE</b> if an error occurred.
- * @since 4.0.4
- * @since 5.0
  */
-function gzdeflate ($data, $level = -1, $encoding = ZLIB_ENCODING_RAW) {}
+#[Pure]
+function gzdeflate(string $data, int $level = -1, int $encoding = ZLIB_ENCODING_RAW): string|false {}
 
 /**
  * Inflate a deflated string
@@ -336,19 +305,18 @@ function gzdeflate ($data, $level = -1, $encoding = ZLIB_ENCODING_RAW) {}
  * @param string $data <p>
  * The data compressed by <b>gzdeflate</b>.
  * </p>
- * @param int $length [optional] <p>
+ * @param int $max_length [optional] <p>
  * The maximum length of data to decode.
  * </p>
  * @return string|false The original uncompressed data or <b>FALSE</b> on error.
- * </p>
  * <p>
  * The function will return an error if the uncompressed data is more than
  * 32768 times the length of the compressed input <i>data</i>
  * or more than the optional parameter <i>length</i>.
- * @since 4.0.4
- * @since 5.0
+ * </p>
  */
-function gzinflate ($data, $length = 0) {}
+#[Pure]
+function gzinflate(string $data, int $max_length = 0): string|false {}
 
 /**
  * Create a gzip compressed string
@@ -361,7 +329,7 @@ function gzinflate ($data, $length = 0) {}
  * for maximum compression. If not given, the default compression level will
  * be the default compression level of the zlib library.
  * </p>
- * @param int $encoding_mode [optional] <p>
+ * @param int $encoding [optional] <p>
  * The encoding mode. Can be <b>FORCE_GZIP</b> (the default)
  * or <b>FORCE_DEFLATE</b>.
  * </p>
@@ -376,10 +344,9 @@ function gzinflate ($data, $length = 0) {}
  * data, and an Adler checksum.
  * </p>
  * @return string|false The encoded string, or <b>FALSE</b> if an error occurred.
- * @since 4.0.4
- * @since 5.0
  */
-function gzencode ($data, $level = -1, $encoding_mode = FORCE_GZIP) {}
+#[Pure]
+function gzencode(string $data, int $level = -1, int $encoding = FORCE_GZIP): string|false {}
 
 /**
  * Decodes a gzip compressed string
@@ -387,60 +354,60 @@ function gzencode ($data, $level = -1, $encoding_mode = FORCE_GZIP) {}
  * @param string $data <p>
  * The data to decode, encoded by <b>gzencode</b>.
  * </p>
- * @param int $length [optional] <p>
+ * @param int $max_length <p>
  * The maximum length of data to decode.
  * </p>
  * @return string|false The decoded string, or <b>FALSE</b> if an error occurred.
  * @since 5.4
  */
-function gzdecode ($data, $length = null) {}
+#[Pure]
+function gzdecode(string $data, int $max_length = 0): string|false {}
 
 /**
  * Compress data with the specified encoding
  * @link https://php.net/manual/en/function.zlib-encode.php
  * @param string $data <p>
  * </p>
- * @param string $encoding <p>
+ * @param int $encoding <p>
  * </p>
- * @param string $level [optional] default -1 <p>
+ * @param int $level [optional] default -1 <p>
  * </p>
- * @return string
+ * @return string|false
  * @since 5.4
  */
-function zlib_encode ($data, $encoding, $level) {}
+#[Pure]
+function zlib_encode(string $data, int $encoding, int $level = -1): string|false {}
 
 /**
  * Uncompress any raw/gzip/zlib encoded data
  * @link https://php.net/manual/en/function.zlib-decode.php
  * @param string $data <p>
  * </p>
- * @param string $max_decoded_len [optional] <p>
+ * @param int $max_length <p>
  * </p>
- * @return string
+ * @return string|false
  * @since 5.4
  */
-function zlib_decode ($data, $max_decoded_len = null) {}
+#[Pure]
+function zlib_decode(string $data, int $max_length = 0): string|false {}
 
 /**
  * Returns the coding type used for output compression
  * @link https://php.net/manual/en/function.zlib-get-coding-type.php
- * @return string Possible return values are gzip, deflate,
+ * @return string|false Possible return values are gzip, deflate,
  * or <b>FALSE</b>.
- * @since 4.3.2
- * @since 5.0
  */
-function zlib_get_coding_type () {}
+#[Pure]
+function zlib_get_coding_type(): string|false {}
 
 /**
  * ob_start callback function to gzip output buffer
  * @link https://php.net/manual/en/function.ob-gzhandler.php
- * @param string $buffer
- * @param int $mode
- * @return string
- * @since 4.0.4
- * @since 5.0
+ * @param string $data
+ * @param int $flags
+ * @return string|false
  */
-function ob_gzhandler ($buffer, $mode) {}
+function ob_gzhandler(string $data, int $flags): string|false {}
 
 /**
  * Initialize an incremental deflate context
@@ -457,18 +424,20 @@ function ob_gzhandler ($buffer, $mode) {}
  * <b>ZLIB_RLE</b>, <b>ZLIB_FIXED</b> or <b>ZLIB_DEFAULT_STRATEGY</b> (the
  * default). <b>dictionary</b>A string or an array of strings of the preset
  * dictionary (default: no preset dictionary).</p>
- * @return resource <p>
+ * @return resource|false|DeflateContext <p>
  * Returns a deflate context resource (zlib.deflate) on success, or
  * <b>FALSE</b> on failure.
  * </p>
  * @since 7.0
  */
-function deflate_init ($encoding, $options = array()) {}
+#[Pure]
+#[LanguageLevelTypeAware(["8.0" => "DeflateContext|false"], default: "resource|false")]
+function deflate_init(int $encoding, array $options = []) {}
 
 /**
  * Incrementally deflate data
  * @link https://php.net/manual/en/function.deflate-add.php
- * @param resource $context <p>
+ * @param DeflateContext|resource $context <p>
  * A context created with <b>deflate_init()</b>.
  * </p>
  * @param string $data <p>
@@ -486,12 +455,12 @@ function deflate_init ($encoding, $options = array()) {}
  * </p>
  * @since 7.0
  */
-function deflate_add ($context, $data, $flush_mode = ZLIB_SYNC_FLUSH) {}
+function deflate_add(#[LanguageLevelTypeAware(["8.0" => "DeflateContext"], default: "resource")] $context, string $data, int $flush_mode = ZLIB_SYNC_FLUSH): string|false {}
 
 /**
  * Initialize an incremental inflate context
  * @link https://php.net/manual/en/function.inflate-init.php
- * @param $encoding <p>
+ * @param int $encoding <p>
  * One of the ZLIB_ENCODING_* constants.
  * </p>
  * @param array $options [optional] <p>
@@ -503,21 +472,23 @@ function deflate_add ($context, $data, $flush_mode = ZLIB_SYNC_FLUSH) {}
  * <b>ZLIB_RLE</b>, <b>ZLIB_FIXED</b> or <b>ZLIB_DEFAULT_STRATEGY</b> (the
  * default). <b>dictionary</b>A string or an array of strings of the preset
  * dictionary (default: no preset dictionary).</p>
- * @return resource <p>
+ * @return resource|false|InflateContext <p>
  * Returns an inflate context resource (zlib.inflate) on success, or
  * <b>FALSE</b> on failure.
  * </p>
  * @since 7.0
  */
-function inflate_init ($encoding, $options = array()) {}
+#[Pure]
+#[LanguageLevelTypeAware(["8.0" => "InflateContext|false"], default: "resource|false")]
+function inflate_init(int $encoding, array $options = []) {}
 
 /**
- * Incrementally inflate data
+ * Incrementally inflate encoded data
  * @link https://php.net/manual/en/function.inflate-add.php
- * @param resource $context <p>
+ * @param InflateContext|resource $context <p>
  * A context created with <b>inflate_init()</b>.
  * </p>
- * @param string $encoded_data <p>
+ * @param string $data <p>
  * A chunk of compressed data.
  * </p>
  * @param int $flush_mode [optional] <p>
@@ -532,24 +503,52 @@ function inflate_init ($encoding, $options = array()) {}
  * </p>
  * @since 7.0
  */
-function inflate_add ($context, $encoded_data, $flush_mode = ZLIB_SYNC_FLUSH) {}
+function inflate_add(#[LanguageLevelTypeAware(["8.0" => "InflateContext"], default: "resource")] $context, string $data, int $flush_mode = ZLIB_SYNC_FLUSH): string|false {}
 
 /**
- * @param resource $context
- * @return bool
+ * Get number of bytes read so far
+ * @param InflateContext|resource $context
+ * @return int
  * @since 7.2
  */
-function inflate_get_read_len ($context){}
+#[Pure]
+function inflate_get_read_len(#[LanguageLevelTypeAware(["8.0" => "InflateContext"], default: "resource")] $context): int {}
 
 /**
- * @param resource $context
- * @return bool
+ * Get decompression status
+ * @param InflateContext|resource $context
+ * @return int
  * @since 7.2
  */
-function  inflate_get_status($context) {}
+#[Pure]
+function inflate_get_status(#[LanguageLevelTypeAware(["8.0" => "InflateContext"], default: "resource")] $context): int {}
 
-define ('FORCE_GZIP', 31);
-define ('FORCE_DEFLATE', 15);
+/**
+ * @since 8.0
+ */
+final class InflateContext
+{
+    /**
+     * Use inflate_init() instead
+     * @see inflate_init()
+     */
+    private function __construct() {}
+}
+
+/**
+ * @since 8.0
+ */
+final class DeflateContext
+{
+    /**
+     * Use deflate_init() instead
+     * @see deflate_init()
+     */
+    private function __construct() {}
+}
+
+define('FORCE_GZIP', 31);
+define('FORCE_DEFLATE', 15);
 /** @link https://php.net/manual/en/zlib.constants.php */
 define('ZLIB_ENCODING_RAW', -15);
 /** @link https://php.net/manual/en/zlib.constants.php */
@@ -557,28 +556,27 @@ define('ZLIB_ENCODING_GZIP', 31);
 /** @link https://php.net/manual/en/zlib.constants.php */
 define('ZLIB_ENCODING_DEFLATE', 15);
 
-define ('ZLIB_NO_FLUSH', 0);
-define ('ZLIB_PARTIAL_FLUSH', 1);
-define ('ZLIB_SYNC_FLUSH', 2);
-define ('ZLIB_FULL_FLUSH', 3);
-define ('ZLIB_BLOCK', 5);
-define ('ZLIB_FINISH', 4);
+define('ZLIB_NO_FLUSH', 0);
+define('ZLIB_PARTIAL_FLUSH', 1);
+define('ZLIB_SYNC_FLUSH', 2);
+define('ZLIB_FULL_FLUSH', 3);
+define('ZLIB_BLOCK', 5);
+define('ZLIB_FINISH', 4);
 
-define ('ZLIB_FILTERED', 1);
-define ('ZLIB_HUFFMAN_ONLY', 2);
-define ('ZLIB_RLE', 3);
-define ('ZLIB_FIXED', 4);
-define ('ZLIB_DEFAULT_STRATEGY', 0);
-define ('ZLIB_OK', 0);
-define ('ZLIB_STREAM_END', 1);
-define ('ZLIB_NEED_DICT', 2);
-define ('ZLIB_ERRNO', -1);
-define ('ZLIB_STREAM_ERROR', -2);
-define ('ZLIB_DATA_ERROR', -3);
-define ('ZLIB_MEM_ERROR', -4);
-define ('ZLIB_BUF_ERROR', -5);
-define ('ZLIB_VERSION_ERROR', -6);
+define('ZLIB_FILTERED', 1);
+define('ZLIB_HUFFMAN_ONLY', 2);
+define('ZLIB_RLE', 3);
+define('ZLIB_FIXED', 4);
+define('ZLIB_DEFAULT_STRATEGY', 0);
+define('ZLIB_OK', 0);
+define('ZLIB_STREAM_END', 1);
+define('ZLIB_NEED_DICT', 2);
+define('ZLIB_ERRNO', -1);
+define('ZLIB_STREAM_ERROR', -2);
+define('ZLIB_DATA_ERROR', -3);
+define('ZLIB_MEM_ERROR', -4);
+define('ZLIB_BUF_ERROR', -5);
+define('ZLIB_VERSION_ERROR', -6);
 
-
-define ('ZLIB_VERSION', 'zlib_version_string'); // This is set to the zlib version
-define ('ZLIB_VERNUM', 'zlib_version_string'); // This is set to the zlib version
+define('ZLIB_VERSION', 'zlib_version_string'); // This is set to the zlib version
+define('ZLIB_VERNUM', 'zlib_version_string'); // This is set to the zlib version

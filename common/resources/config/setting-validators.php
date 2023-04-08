@@ -1,7 +1,8 @@
 <?php
 
 return [
-    Common\Settings\Validators\MailCredentials\MailCredentialsValidator::class,
+    Common\Settings\Validators\MailCredentials\OutgoingMailCredentialsValidator::class,
+    \Common\Settings\Validators\MailCredentials\GmailApiCredentialsValidator::class,
     Common\Settings\Validators\GoogleLoginValidator::class,
     Common\Settings\Validators\FacebookLoginValidator::class,
     Common\Settings\Validators\TwitterLoginValidator::class,

@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Roave\BetterReflection\Reflection\StringCast;
 
 use Roave\BetterReflection\Reflection\ReflectionProperty;
+
 use function sprintf;
 
-/**
- * @internal
- */
+/** @internal */
 final class ReflectionPropertyStringCast
 {
-    public static function toString(ReflectionProperty $propertyReflection) : string
+    public static function toString(ReflectionProperty $propertyReflection): string
     {
         $stateModifier = '';
 
@@ -20,16 +19,20 @@ final class ReflectionPropertyStringCast
             $stateModifier = $propertyReflection->isDefault() ? ' <default>' : ' <dynamic>';
         }
 
+        $type = $propertyReflection->getType();
+
         return sprintf(
-            'Property [%s %s%s $%s ]',
+            'Property [%s %s%s%s%s $%s ]',
             $stateModifier,
             self::visibilityToString($propertyReflection),
             $propertyReflection->isStatic() ? ' static' : '',
-            $propertyReflection->getName()
+            $propertyReflection->isReadOnly() ? ' readonly' : '',
+            $type !== null ? sprintf(' %s', ReflectionTypeStringCast::toString($type)) : '',
+            $propertyReflection->getName(),
         );
     }
 
-    private static function visibilityToString(ReflectionProperty $propertyReflection) : string
+    private static function visibilityToString(ReflectionProperty $propertyReflection): string
     {
         if ($propertyReflection->isProtected()) {
             return 'protected';

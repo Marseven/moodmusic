@@ -27,7 +27,7 @@ class SpotifyRadio {
         } else {
             $seedId = $item->spotify_id ?: $this->getSpotifyId($item, $type);
         }
-        
+
         if ( ! $seedId) {
             return [];
         }

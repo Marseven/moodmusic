@@ -4,179 +4,195 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
-use Exception;
+use ArgumentCountError;
+use OutOfBoundsException;
 use ReflectionException as CoreReflectionException;
 use ReflectionProperty as CoreReflectionProperty;
 use Roave\BetterReflection\Reflection\Exception\NoObjectProvided;
 use Roave\BetterReflection\Reflection\Exception\NotAnObject;
+use Roave\BetterReflection\Reflection\ReflectionAttribute as BetterReflectionAttribute;
 use Roave\BetterReflection\Reflection\ReflectionProperty as BetterReflectionProperty;
 use Throwable;
+use TypeError;
+use ValueError;
 
-class ReflectionProperty extends CoreReflectionProperty
+use function array_map;
+use function gettype;
+use function sprintf;
+
+final class ReflectionProperty extends CoreReflectionProperty
 {
-    /** @var BetterReflectionProperty */
-    private $betterReflectionProperty;
-
-    /** @var bool */
-    private $accessible = false;
-
-    public function __construct(BetterReflectionProperty $betterReflectionProperty)
+    public function __construct(private BetterReflectionProperty $betterReflectionProperty)
     {
-        $this->betterReflectionProperty = $betterReflectionProperty;
+        unset($this->name);
+        unset($this->class);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws Exception
-     */
-    public static function export($class, $name, $return = null)
-    {
-        throw new Exception('Unable to export statically');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->betterReflectionProperty->__toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->betterReflectionProperty->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getValue($object = null)
+    public function getValue(object|null $object = null): mixed
     {
-        if (! $this->isAccessible()) {
-            throw new CoreReflectionException('Property not accessible');
-        }
-
         try {
             return $this->betterReflectionProperty->getValue($object);
-        } catch (NoObjectProvided | NotAnObject $e) {
+        } catch (NoObjectProvided | TypeError) {
             return null;
         } catch (Throwable $e) {
-            throw new CoreReflectionException($e->getMessage(), 0, $e);
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setValue($object, $value = null)
+    /** @psalm-suppress MethodSignatureMismatch */
+    public function setValue(mixed $objectOrValue, mixed $value = null): void
     {
-        if (! $this->isAccessible()) {
-            throw new CoreReflectionException('Property not accessible');
-        }
-
         try {
-            $this->betterReflectionProperty->setValue($object, $value);
-        } catch (NoObjectProvided | NotAnObject $e) {
-            return;
+            $this->betterReflectionProperty->setValue($objectOrValue, $value);
+        } catch (NoObjectProvided) {
+            throw new ArgumentCountError('ReflectionProperty::setValue() expects exactly 2 arguments, 1 given');
+        } catch (NotAnObject) {
+            throw new TypeError(sprintf('ReflectionProperty::setValue(): Argument #1 ($objectOrValue) must be of type object, %s given', gettype($objectOrValue)));
         } catch (Throwable $e) {
-            throw new CoreReflectionException($e->getMessage(), 0, $e);
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasType()
+    public function hasType(): bool
     {
         return $this->betterReflectionProperty->hasType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getType()
+    /** @psalm-mutation-free */
+    public function getType(): ReflectionUnionType|ReflectionNamedType|ReflectionIntersectionType|null
     {
-        return ReflectionNamedType::fromReturnTypeOrNull($this->betterReflectionProperty->getType());
+        /** @psalm-suppress ImpureMethodCall */
+        return ReflectionType::fromTypeOrNull($this->betterReflectionProperty->getType());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->betterReflectionProperty->isPublic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->betterReflectionProperty->isPrivate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isProtected()
+    public function isProtected(): bool
     {
         return $this->betterReflectionProperty->isProtected();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isStatic()
+    public function isStatic(): bool
     {
         return $this->betterReflectionProperty->isStatic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return $this->betterReflectionProperty->isDefault();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getModifiers()
+    public function getModifiers(): int
     {
         return $this->betterReflectionProperty->getModifiers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeclaringClass()
+    public function getDeclaringClass(): ReflectionClass
     {
         return new ReflectionClass($this->betterReflectionProperty->getImplementingClass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDocComment()
+    public function getDocComment(): string|false
     {
         return $this->betterReflectionProperty->getDocComment() ?: false;
     }
 
     /**
-     * {@inheritDoc}
+     * @codeCoverageIgnore
+     * @infection-ignore-all
      */
-    public function setAccessible($accessible)
+    public function setAccessible(bool $accessible): void
     {
-        $this->accessible = true;
     }
 
-    public function isAccessible() : bool
+    /**
+     * @codeCoverageIgnore
+     * @infection-ignore-all
+     */
+    public function isAccessible(): bool
     {
-        return $this->accessible || $this->isPublic();
+        return true;
+    }
+
+    public function hasDefaultValue(): bool
+    {
+        return $this->betterReflectionProperty->hasDefaultValue();
+    }
+
+    public function getDefaultValue(): mixed
+    {
+        return $this->betterReflectionProperty->getDefaultValue();
+    }
+
+    public function isInitialized(object|null $object = null): bool
+    {
+        try {
+            return $this->betterReflectionProperty->isInitialized($object);
+        } catch (Throwable $e) {
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
+        }
+    }
+
+    public function isPromoted(): bool
+    {
+        return $this->betterReflectionProperty->isPromoted();
+    }
+
+    /**
+     * @param class-string|null $name
+     *
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(string|null $name = null, int $flags = 0): array
+    {
+        if ($flags !== 0 && $flags !== ReflectionAttribute::IS_INSTANCEOF) {
+            throw new ValueError('Argument #2 ($flags) must be a valid attribute filter flag');
+        }
+
+        if ($name !== null && $flags & ReflectionAttribute::IS_INSTANCEOF) {
+            $attributes = $this->betterReflectionProperty->getAttributesByInstance($name);
+        } elseif ($name !== null) {
+            $attributes = $this->betterReflectionProperty->getAttributesByName($name);
+        } else {
+            $attributes = $this->betterReflectionProperty->getAttributes();
+        }
+
+        return array_map(static fn (BetterReflectionAttribute $betterReflectionAttribute): ReflectionAttribute => new ReflectionAttribute($betterReflectionAttribute), $attributes);
+    }
+
+    public function isReadOnly(): bool
+    {
+        return $this->betterReflectionProperty->isReadOnly();
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ($name === 'name') {
+            return $this->betterReflectionProperty->getName();
+        }
+
+        if ($name === 'class') {
+            return $this->betterReflectionProperty->getImplementingClass()->getName();
+        }
+
+        throw new OutOfBoundsException(sprintf('Property %s::$%s does not exist.', self::class, $name));
     }
 }

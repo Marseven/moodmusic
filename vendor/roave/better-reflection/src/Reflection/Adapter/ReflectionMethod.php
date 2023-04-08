@@ -4,397 +4,335 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
-use Exception;
+use Closure;
+use OutOfBoundsException;
+use ReflectionClass as CoreReflectionClass;
 use ReflectionException as CoreReflectionException;
+use ReflectionExtension as CoreReflectionExtension;
 use ReflectionMethod as CoreReflectionMethod;
+use ReflectionType as CoreReflectionType;
 use Roave\BetterReflection\Reflection\Adapter\Exception\NotImplemented;
+use Roave\BetterReflection\Reflection\Exception\MethodPrototypeNotFound;
 use Roave\BetterReflection\Reflection\Exception\NoObjectProvided;
-use Roave\BetterReflection\Reflection\Exception\NotAnObject;
+use Roave\BetterReflection\Reflection\ReflectionAttribute as BetterReflectionAttribute;
 use Roave\BetterReflection\Reflection\ReflectionMethod as BetterReflectionMethod;
+use Roave\BetterReflection\Reflection\ReflectionParameter as BetterReflectionParameter;
 use Roave\BetterReflection\Util\FileHelper;
 use Throwable;
-use function func_get_args;
+use TypeError;
+use ValueError;
 
-class ReflectionMethod extends CoreReflectionMethod
+use function array_map;
+use function sprintf;
+
+final class ReflectionMethod extends CoreReflectionMethod
 {
-    /** @var BetterReflectionMethod */
-    private $betterReflectionMethod;
-
-    /** @var bool */
-    private $accessible = false;
-
-    public function __construct(BetterReflectionMethod $betterReflectionMethod)
+    public function __construct(private BetterReflectionMethod $betterReflectionMethod)
     {
-        $this->betterReflectionMethod = $betterReflectionMethod;
+        unset($this->name);
+        unset($this->class);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws Exception
-     */
-    public static function export($class, $name, $return = null)
-    {
-        throw new Exception('Unable to export statically');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->betterReflectionMethod->__toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function inNamespace()
+    public function inNamespace(): bool
     {
         return $this->betterReflectionMethod->inNamespace();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isClosure()
+    public function isClosure(): bool
     {
         return $this->betterReflectionMethod->isClosure();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDeprecated()
+    public function isDeprecated(): bool
     {
         return $this->betterReflectionMethod->isDeprecated();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isInternal()
+    public function isInternal(): bool
     {
         return $this->betterReflectionMethod->isInternal();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isUserDefined()
+    public function isUserDefined(): bool
     {
         return $this->betterReflectionMethod->isUserDefined();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClosureThis()
+    public function getClosureThis(): object|null
     {
         throw new NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClosureScopeClass()
+    public function getClosureScopeClass(): CoreReflectionClass|null
     {
         throw new NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDocComment()
+    public function getClosureCalledClass(): CoreReflectionClass|null
+    {
+        throw new NotImplemented('Not implemented');
+    }
+
+    public function getDocComment(): string|false
     {
         return $this->betterReflectionMethod->getDocComment() ?: false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getEndLine()
+    public function getStartLine(): int|false
+    {
+        return $this->betterReflectionMethod->getStartLine();
+    }
+
+    public function getEndLine(): int|false
     {
         return $this->betterReflectionMethod->getEndLine();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtension()
+    /** @psalm-suppress ImplementedReturnTypeMismatch */
+    public function getExtension(): CoreReflectionExtension|null
     {
         throw new NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getExtensionName()
+    public function getExtensionName(): string
     {
-        return $this->betterReflectionMethod->getExtensionName() ?? false;
+        return $this->betterReflectionMethod->getExtensionName() ?? '';
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getFileName()
+    public function getFileName(): string|false
     {
         $fileName = $this->betterReflectionMethod->getFileName();
 
         return $fileName !== null ? FileHelper::normalizeSystemPath($fileName) : false;
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->betterReflectionMethod->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getNamespaceName()
+    public function getNamespaceName(): string
     {
         return $this->betterReflectionMethod->getNamespaceName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getNumberOfParameters()
+    public function getNumberOfParameters(): int
     {
         return $this->betterReflectionMethod->getNumberOfParameters();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getNumberOfRequiredParameters()
+    public function getNumberOfRequiredParameters(): int
     {
         return $this->betterReflectionMethod->getNumberOfRequiredParameters();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getParameters()
+    /** @return list<ReflectionParameter> */
+    public function getParameters(): array
     {
-        $parameters = $this->betterReflectionMethod->getParameters();
-
-        $wrappedParameters = [];
-        foreach ($parameters as $key => $parameter) {
-            $wrappedParameters[$key] = new ReflectionParameter($parameter);
-        }
-
-        return $wrappedParameters;
+        return array_map(
+            static fn (BetterReflectionParameter $parameter): ReflectionParameter => new ReflectionParameter($parameter),
+            $this->betterReflectionMethod->getParameters(),
+        );
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getReturnType()
+    public function hasReturnType(): bool
     {
-        return ReflectionNamedType::fromReturnTypeOrNull($this->betterReflectionMethod->getReturnType());
+        return $this->betterReflectionMethod->hasReturnType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getShortName()
+    public function getReturnType(): CoreReflectionType|null
+    {
+        return ReflectionType::fromTypeOrNull($this->betterReflectionMethod->getReturnType());
+    }
+
+    public function getShortName(): string
     {
         return $this->betterReflectionMethod->getShortName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getStartLine()
-    {
-        return $this->betterReflectionMethod->getStartLine();
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function getStaticVariables()
+    /** @return array<string, scalar> */
+    public function getStaticVariables(): array
     {
         throw new NotImplemented('Not implemented');
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function returnsReference()
+    public function returnsReference(): bool
     {
         return $this->betterReflectionMethod->returnsReference();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isGenerator()
+    public function isGenerator(): bool
     {
         return $this->betterReflectionMethod->isGenerator();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isVariadic()
+    public function isVariadic(): bool
     {
         return $this->betterReflectionMethod->isVariadic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPublic()
+    public function isPublic(): bool
     {
         return $this->betterReflectionMethod->isPublic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPrivate()
+    public function isPrivate(): bool
     {
         return $this->betterReflectionMethod->isPrivate();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isProtected()
+    public function isProtected(): bool
     {
         return $this->betterReflectionMethod->isProtected();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isAbstract()
+    public function isAbstract(): bool
     {
         return $this->betterReflectionMethod->isAbstract();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isFinal()
+    public function isFinal(): bool
     {
         return $this->betterReflectionMethod->isFinal();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isStatic()
+    public function isStatic(): bool
     {
         return $this->betterReflectionMethod->isStatic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isConstructor()
+    public function isConstructor(): bool
     {
         return $this->betterReflectionMethod->isConstructor();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDestructor()
+    public function isDestructor(): bool
     {
         return $this->betterReflectionMethod->isDestructor();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClosure($object = null)
+    /** @psalm-suppress MethodSignatureMismatch */
+    public function getClosure(object|null $object = null): Closure
     {
         try {
             return $this->betterReflectionMethod->getClosure($object);
-        } catch (NoObjectProvided | NotAnObject $e) {
-            return null;
+        } catch (NoObjectProvided $e) {
+            throw new ValueError($e->getMessage(), previous: $e);
         } catch (Throwable $e) {
-            throw new CoreReflectionException($e->getMessage(), 0, $e);
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getModifiers()
+    public function getModifiers(): int
     {
         return $this->betterReflectionMethod->getModifiers();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function invoke($object = null, $args = null)
+    public function invoke(object|null $object = null, mixed ...$args): mixed
     {
-        if (! $this->isAccessible()) {
-            throw new CoreReflectionException('Method not accessible');
-        }
-
         try {
-            return $this->betterReflectionMethod->invoke(...func_get_args());
-        } catch (NoObjectProvided | NotAnObject $e) {
+            return $this->betterReflectionMethod->invoke($object, ...$args);
+        } catch (NoObjectProvided | TypeError) {
             return null;
         } catch (Throwable $e) {
-            throw new CoreReflectionException($e->getMessage(), 0, $e);
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function invokeArgs($object = null, array $args = [])
+    /** @param list<mixed> $args */
+    public function invokeArgs(object|null $object = null, array $args = []): mixed
     {
-        if (! $this->isAccessible()) {
-            throw new CoreReflectionException('Method not accessible');
-        }
-
         try {
             return $this->betterReflectionMethod->invokeArgs($object, $args);
-        } catch (NoObjectProvided | NotAnObject $e) {
+        } catch (NoObjectProvided | TypeError) {
             return null;
         } catch (Throwable $e) {
-            throw new CoreReflectionException($e->getMessage(), 0, $e);
+            throw new CoreReflectionException($e->getMessage(), previous: $e);
         }
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeclaringClass()
+    public function getDeclaringClass(): ReflectionClass
     {
         return new ReflectionClass($this->betterReflectionMethod->getImplementingClass());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPrototype()
+    public function getPrototype(): ReflectionMethod
     {
         return new self($this->betterReflectionMethod->getPrototype());
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setAccessible($accessible)
+    public function hasPrototype(): bool
     {
-        $this->accessible = true;
+        try {
+            $this->betterReflectionMethod->getPrototype();
+
+            return true;
+        } catch (MethodPrototypeNotFound) {
+            return false;
+        }
     }
 
-    private function isAccessible() : bool
+    /**
+     * @codeCoverageIgnore
+     * @infection-ignore-all
+     */
+    public function setAccessible(bool $accessible): void
     {
-        return $this->accessible || $this->isPublic();
+    }
+
+    /**
+     * @param class-string|null $name
+     *
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(string|null $name = null, int $flags = 0): array
+    {
+        if ($flags !== 0 && $flags !== ReflectionAttribute::IS_INSTANCEOF) {
+            throw new ValueError('Argument #2 ($flags) must be a valid attribute filter flag');
+        }
+
+        if ($name !== null && $flags & ReflectionAttribute::IS_INSTANCEOF) {
+            $attributes = $this->betterReflectionMethod->getAttributesByInstance($name);
+        } elseif ($name !== null) {
+            $attributes = $this->betterReflectionMethod->getAttributesByName($name);
+        } else {
+            $attributes = $this->betterReflectionMethod->getAttributes();
+        }
+
+        return array_map(static fn (BetterReflectionAttribute $betterReflectionAttribute): ReflectionAttribute => new ReflectionAttribute($betterReflectionAttribute), $attributes);
+    }
+
+    public function hasTentativeReturnType(): bool
+    {
+        return $this->betterReflectionMethod->hasTentativeReturnType();
+    }
+
+    public function getTentativeReturnType(): CoreReflectionType|null
+    {
+        return ReflectionType::fromTypeOrNull($this->betterReflectionMethod->getTentativeReturnType());
+    }
+
+    /** @return mixed[] */
+    public function getClosureUsedVariables(): array
+    {
+        throw new Exception\NotImplemented('Not implemented');
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ($name === 'name') {
+            return $this->betterReflectionMethod->getName();
+        }
+
+        if ($name === 'class') {
+            return $this->betterReflectionMethod->getImplementingClass()->getName();
+        }
+
+        throw new OutOfBoundsException(sprintf('Property %s::$%s does not exist.', self::class, $name));
     }
 }

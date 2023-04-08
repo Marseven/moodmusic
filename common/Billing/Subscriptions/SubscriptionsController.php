@@ -1,183 +1,110 @@
 <?php namespace Common\Billing\Subscriptions;
 
-use Closure;
-use Common\Billing\BillingPlan;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
+use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class SubscriptionsController extends BaseController
 {
-    /**
-     * @var Request
-     */
-    private $request;
-
-    /**
-     * @var BillingPlan
-     */
-    private $billingPlan;
-
-    /**
-     * @var Subscription
-     */
-    private $subscription;
-
-    /**
-     * @param Request $request
-     * @param BillingPlan $billingPlan
-     * @param Subscription $subscription
-     */
     public function __construct(
-        Request $request,
-        BillingPlan $billingPlan,
-        Subscription $subscription
-    )
-    {
-        $this->request = $request;
-        $this->billingPlan = $billingPlan;
-        $this->subscription = $subscription;
-
+        protected Request $request,
+        protected Subscription $subscription
+    ) {
         $this->middleware('auth');
     }
 
-    /**
-     * Paginate all existing subscriptions.
-     *
-     * @return JsonResponse
-     */
     public function index()
     {
         $this->authorize('index', Subscription::class);
 
-        $paginator = (new Paginator($this->subscription, $this->request->all()))->with('user');
-        $paginator->filterColumns = ['gateway', 'cancelled'];
+        $dataSource = new Datasource(
+            $this->subscription->with(['user']),
+            $this->request->all(),
+        );
 
-        $paginator->searchCallback = function(Builder $query, $searchTerm) {
-            $query->whereHas('user', function(Builder $query) use($searchTerm) {
-                $query->where('email', 'like', "$searchTerm%");
-            })->orWhere('gateway', 'like', "$searchTerm%");
-        };
-
-        $pagination = $paginator->paginate();
+        $pagination = $dataSource->paginate();
 
         return $this->success(['pagination' => $pagination]);
     }
 
-    /**
-     * Create a new subscription.
-     *
-     * @return JsonResponse
-     */
     public function store()
     {
         $this->authorize('update', Subscription::class);
 
-        $this->validate($this->request, [
+        $data = $this->validate($this->request, [
             'user_id' => 'required|exists:users,id|unique:subscriptions',
             'renews_at' => 'required_without:ends_at|date|nullable',
             'ends_at' => 'required_without:renews_at|date|nullable',
-            'plan_id' => 'required|integer|exists:billing_plans,id',
+            'product_id' => 'required|integer|exists:products,id',
+            'price_id' => 'required|integer|exists:prices,id',
             'description' => 'string|nullable',
         ]);
 
-        $subscription = $this->subscription->create($this->request->all());
+        $subscription = $this->subscription->create($data);
 
         return $this->success(['subscription' => $subscription]);
     }
 
-    /**
-     * Update existing subscription.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function update($id)
+    public function update(Subscription $subscription)
     {
         $this->authorize('update', Subscription::class);
 
-        $this->validate($this->request, [
-            'user_id' => 'exists:users,id|unique:subscriptions',
+        $data = $this->validate($this->request, [
+            'user_id' => [
+                'required',
+                'exists:users,id',
+                Rule::unique('subscriptions')->ignore($subscription->id),
+            ],
             'renews_at' => 'date|nullable',
             'ends_at' => 'date|nullable',
-            'plan_id' => 'integer|exists:billing_plans,id',
-            'description' => 'string|nullable'
+            'product_id' => 'required|integer|exists:products,id',
+            'price_id' => 'required|integer|exists:prices,id',
+            'description' => 'string|nullable',
         ]);
 
-        $subscription = $this->subscription->findOrFail($id);
-
-        $subscription->fill($this->request->all())->save();
+        $subscription->fill($data)->save();
 
         return $this->success(['subscription' => $subscription]);
     }
 
-    /**
-     * Change plan of specified subscription.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function changePlan($id)
+    public function changePlan(Subscription $subscription)
     {
-        $this->validate($this->request, [
-            'newPlanId' => 'required|integer|exists:billing_plans,id'
+        $data = $this->validate($this->request, [
+            'newProductId' => 'required|integer|exists:products,id',
+            'newPriceId' => 'required|integer|exists:prices,id',
         ]);
 
-        /** @var Subscription $subscription */
-        $subscription = $this->subscription->findOrFail($id);
-        $plan = $this->billingPlan->findOrfail($this->request->get('newPlanId'));
+        $newProduct = Product::findOrFail($data['newProductId']);
+        $newPrice = Price::findOrFail($data['newPriceId']);
 
-        $subscription->changePlan($plan);
+        $subscription->changePlan($newProduct, $newPrice);
 
         $user = $subscription->user()->first();
-        return $this->success(['user' => $user->load('subscriptions.plan')]);
+        return $this->success(['user' => $user->load('subscriptions.product')]);
     }
 
-    /**
-     * Cancel specified subscription.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function cancel($id)
+    public function cancel(Subscription $subscription)
     {
         $this->validate($this->request, [
-            'delete' => 'boolean'
+            'delete' => 'boolean',
         ]);
-
-        /** @var Subscription $subscription */
-        $subscription = $this->subscription->findOrFail($id);
-        $user = $subscription->user()->first();
 
         if ($this->request->get('delete')) {
             $subscription->cancelAndDelete();
-            $user->update([
-                'card_last_four' => null,
-                'card_brand' => null,
-                'stripe_id' => null,
-            ]);
         } else {
             $subscription->cancel();
         }
 
-        return $this->success(['user' => $user->load('subscriptions.plan')]);
+        return $this->success();
     }
 
-    /**
-     * Resume specified subscription.
-     *
-     * @param int $id
-     * @return JsonResponse
-     */
-    public function resume($id)
+    public function resume(Subscription $subscription)
     {
-        /** @var Subscription $subscription */
-        $subscription = $this->subscription->with('plan')->findOrFail($id);
         $subscription->resume();
-
         return $this->success(['subscription' => $subscription]);
     }
 }

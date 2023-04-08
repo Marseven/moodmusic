@@ -4,12 +4,13 @@ namespace App\Services\Albums;
 
 use App\Album;
 use App\Genre;
-use Common\Database\Paginator;
-use Illuminate\Pagination\LengthAwarePaginator;
+use Common\Database\Datasource\Datasource;
+use Illuminate\Pagination\AbstractPaginator;
+use Illuminate\Support\Str;
 
 class PaginateAlbums
 {
-    public function execute(array $params, Genre $genre = null): LengthAwarePaginator
+    public function execute(array $params, Genre $genre = null): AbstractPaginator
     {
         if ($genre) {
             $builder = $genre
@@ -19,15 +20,17 @@ class PaginateAlbums
             $builder = Album::query();
         }
 
-        $paginator = (new Paginator($builder, $params))
-            ->with('artists');
+        $builder->with(['artists']);
 
-        $order = $paginator->getOrder();
-        if ($order['col'] === 'popularity') {
-            $paginator->dontSort = true;
-            $paginator->query()->orderByPopularity($order['dir']);
+        $datasource = (new Datasource($builder, $params));
+        $order = $datasource->getOrder();
+
+
+        if (Str::endsWith($order['col'], 'popularity')) {
+            $datasource->order = false;
+            $builder->orderByPopularity($order['dir']);
         }
 
-        return $paginator->paginate();
+        return $datasource->paginate();
     }
 }

@@ -1,167 +1,90 @@
 <?php namespace Common\Billing\Gateways\Paypal;
 
-use Common\Billing\BillingPlan;
-use Illuminate\Support\Arr;
-use Omnipay\PayPal\RestGateway;
 use Common\Billing\GatewayException;
-use Common\Billing\Gateways\Contracts\GatewayPlansInterface;
+use Common\Billing\Models\Price;
+use Common\Billing\Models\Product;
+use Illuminate\Support\Str;
 
-class PaypalPlans implements GatewayPlansInterface
+class PaypalPlans
 {
-    /**
-     * @var RestGateway
-     */
-    private $gateway;
+    use InteractsWithPaypalRestApi;
 
-    /**
-     * PaypalPlans constructor.
-     *
-     * @param RestGateway $gateway
-     */
-    public function __construct(RestGateway $gateway)
+    public function sync(Product $product): bool
     {
-        $this->gateway = $gateway;
-    }
+        $product->load('prices');
 
-    /**
-     * Find specified plan on paypal.
-     *
-     * @param BillingPlan $plan
-     * @param int $page
-     * @return array|null
-     */
-    public function find(BillingPlan $plan, $page = 0)
-    {
-        if ($plan->paypal_id) {
-            $response = $this->gateway
-                ->createRequest(PaypalFetchPlanRequest::class)
-                ->setPlanId($plan->paypal_id)
-                ->send(['planId' => $plan->paypal_id]);
+        // there's only one global product on PayPal and not one per plan as on stripe
+        $productId = config('services.paypal.product_id');
+        $response = $this->paypal()->get("catalogs/products/$productId");
+        if (!$response->successful()) {
+            $this->paypal()->post('catalogs/products', [
+                'id' => $productId,
+                'name' => config('services.paypal.product_name'),
+                'type' => 'DIGITAL',
+            ]);
+        }
 
-            $paypalPlan = $response->getData();
-
-            if (empty($paypalPlan) || ! $response->isSuccessful()) {
-                return null;
-            } else {
-                return $paypalPlan;
+        // create any local product prices (plans) on PayPal, that don't exist there already
+        $product->prices->each(function (Price $price) use ($product) {
+            if (!$price->paypal_id) {
+                $this->create($product, $price);
             }
-        }
-
-        // legacy, before paypal plan ID was stored on billing plan model
-
-        $response = $this->gateway->listPlan(
-            ['pageSize' => 20, 'page' => $page, 'totalRequired' => 'yes', 'status' => RestGateway::BILLING_PLAN_STATE_ACTIVE]
-        )->send();
-
-        // there are no plans created on paypal at all
-        if ( ! isset($response->getData()['plans'])) return null;
-
-        // match plan by UUID stored in description
-        $paypalPlan = collect($response->getData()['plans'])->first(function ($paypalPlan) use ($plan) {
-            return $paypalPlan['description'] === $plan->uuid;
         });
-
-        // found a match
-        if ($paypalPlan) {
-            return $paypalPlan;
-        }
-
-        // if there are more plans to paginate, do a recursive loop
-        $totalPages = Arr::get($response->getData(), 'total_pages', 1);
-        if ($page < (int) $totalPages) {
-            return $this->find($plan, $page + 1);
-        }
-
-        // count not find matching plan
-        return null;
-    }
-
-    /**
-     * Get specified plan's PayPal ID.
-     *
-     * @param BillingPlan $plan
-     * @return string
-     * @throws GatewayException
-     */
-    public function getPlanId(BillingPlan $plan)
-    {
-        if ($plan->paypal_id) {
-            return $plan->paypal_id;
-        }
-
-        // legacy, before paypal plan ID was stored on billing plan model
-        if ( ! $paypalPlan = $this->find($plan)) {
-            throw new GatewayException("Could not find plan '{$plan->name}' on paypal. Try to sync plans from 'admin -> plans' page.");
-        }
-
-        return $paypalPlan['id'];
-    }
-
-    /**
-     * Create a new subscription plan on paypal.
-     *
-     * @param BillingPlan $plan
-     * @throws GatewayException
-     * @return bool
-     */
-    public function create(BillingPlan $plan)
-    {
-        $response = $this->gateway->createPlan([
-            'name'  => $plan->name,
-            'description'  => $plan->uuid,
-            'type' => RestGateway::BILLING_PLAN_TYPE_INFINITE,
-            'paymentDefinitions' => [
-                [
-                    'name'               => $plan->name.' definition',
-                    'type'               => RestGateway::PAYMENT_REGULAR,
-                    'frequency'          => strtoupper($plan->interval),
-                    'frequency_interval' => $plan->interval_count,
-                    'cycles'             => 0,
-                    'amount'             => ['value' => number_format($plan->amount, 2), 'currency' => strtoupper($plan->currency)], // paypal does not accept floats, need to convert amount to string
-                ],
-            ],
-            'merchant_preferences' => [
-                'return_url' => url('billing/paypal/callback/approved'),
-                'cancel_url' => url('billing/paypal/callback/canceled'),
-                'auto_bill_amount' => 'YES',
-                'initial_fail_amount_action' => 'CONTINUE',
-                'max_fail_attempts' => '3',
-            ]
-        ])->send();
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException($response->getMessage());
-        }
-
-        $paypalId = $response->getData()['id'];
-
-        //set plan to active on paypal
-        $response = $this->gateway->updatePlan([
-            'state' => RestGateway::BILLING_PLAN_STATE_ACTIVE,
-            'transactionReference' => $paypalId,
-        ])->send();
-
-        if ( ! $response->isSuccessful()) {
-            throw new GatewayException($response->getMessage());
-        }
-
-        $plan->fill(['paypal_id' => $paypalId])->save();
 
         return true;
     }
 
-    /**
-     * Delete specified billing plan from currently active gateway.
-     *
-     * @param BillingPlan $plan
-     * @return bool
-     * @throws GatewayException
-     */
-    public function delete(BillingPlan $plan)
+    protected function create(Product $product, Price $price): bool
     {
-        return $this->gateway->updatePlan([
-            'transactionReference' => $this->getPlanId($plan),
-            'state' => RestGateway::BILLING_PLAN_STATE_DELETED
-        ])->send()->isSuccessful();
+        $response = $this->paypal()->post('billing/plans', [
+            'name' => $product->name,
+            'product_id' => config('services.paypal.product_id'),
+            'status' => 'ACTIVE',
+            'payment_preferences' => [
+                'auto_bill_outstanding' => true,
+                'payment_failure_threshold' => 2,
+            ],
+            'billing_cycles' => [
+                [
+                    'frequency' => [
+                        'interval_unit' => Str::upper($price->interval),
+                        'interval_count' => $price->interval_count,
+                    ],
+                    'tenure_type' => 'REGULAR',
+                    'sequence' => 1,
+                    'total_cycles' => 0, // infinite
+                    'pricing_scheme' => [
+                        'fixed_price' => [
+                            'value' => number_format(
+                                $price->amount,
+                                2,
+                                '.',
+                                '',
+                            ),
+                            'currency_code' => Str::upper($price->currency),
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        if (!$response->successful()) {
+            throw new GatewayException('Could not create plan on PayPal');
+        }
+
+        $price->fill(['paypal_id' => $response['id']])->save();
+        return true;
+    }
+
+    public function delete(Product $product): bool
+    {
+        $statuses = $product->prices->map(function (Price $price) {
+            $response = $this->paypal()->post(
+                "billing/plans/{$price->paypal_id}/deactivate",
+            );
+            return $response->successful();
+        });
+
+        return $statuses->every(fn($status) => $status);
     }
 }

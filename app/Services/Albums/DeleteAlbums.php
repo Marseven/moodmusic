@@ -10,18 +10,22 @@ use Illuminate\Support\Collection;
 
 class DeleteAlbums
 {
-    /**
-     * @param array[]|Collection $albumIds
-     */
-    public function execute($albumIds)
+    public function execute(array|Collection $albumIds): void
     {
-        $albums =  app(Album::class)->whereIn('id', $albumIds)->get();
+        $albums = Album::query()
+            ->whereIn('id', $albumIds)
+            ->get();
         app(DeleteEntries::class)->execute([
-            'paths' => $albums->pluck('image')->filter()->toArray(),
+            'paths' => $albums
+                ->pluck('image')
+                ->filter()
+                ->toArray(),
         ]);
         app(Album::class)->destroy($albums->pluck('id'));
 
-        $trackIds = app(Track::class)->whereIn('album_id', $albumIds)->pluck('id');
+        $trackIds = Track::query()
+            ->whereIn('album_id', $albumIds)
+            ->pluck('id');
         app(DeleteTracks::class)->execute($trackIds->toArray());
     }
 }

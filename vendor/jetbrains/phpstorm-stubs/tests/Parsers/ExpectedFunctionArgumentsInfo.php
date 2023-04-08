@@ -1,49 +1,26 @@
 <?php
 declare(strict_types=1);
+
 namespace StubTests\Parsers;
+
+use JetBrains\PhpStorm\Pure;
 use PhpParser\Node\Expr;
 
 class ExpectedFunctionArgumentsInfo
 {
     /**
-     * @var Expr|null
-     */
-    private $functionReference;
-
-    /**
-     * @var Expr[]
-     */
-    private $expectedArguments;
-    /**
-     * @var int
-     */
-    private $index;
-
-    /**
      * ExpectedFunctionArgumentsInfo constructor.
-     * @param Expr $functionReference
+     * @param Expr|null $functionReference
      * @param Expr[] $expectedArguments
      * @param int $index
      */
-    public function __construct(?Expr $functionReference, array $expectedArguments, int $index)
-    {
-        $this->functionReference = $functionReference;
-        $this->expectedArguments = $expectedArguments;
-        $this->index = $index;
-    }
+    public function __construct(private ?Expr $functionReference, private array $expectedArguments, private int $index) {}
 
-
-    /**
-     * @return Expr|null
-     */
     public function getFunctionReference(): ?Expr
     {
         return $this->functionReference;
     }
 
-    /**
-     * @param Expr $functionReference
-     */
     public function setFunctionReference(Expr $functionReference): void
     {
         $this->functionReference = $functionReference;
@@ -65,15 +42,13 @@ class ExpectedFunctionArgumentsInfo
         $this->expectedArguments = $expectedArguments;
     }
 
-    /**
-     * @return int
-     */
     public function getIndex(): int
     {
         return $this->index;
     }
 
-    public function __toString()
+    #[Pure]
+    public function __toString(): string
     {
         if ($this->functionReference === null) {
             return '';

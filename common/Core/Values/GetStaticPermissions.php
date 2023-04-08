@@ -2,9 +2,9 @@
 
 namespace Common\Core\Values;
 
+use Arr;
 use Common\Settings\Settings;
 use Illuminate\Filesystem\Filesystem;
-use Arr;
 use Str;
 
 class GetStaticPermissions
@@ -25,24 +25,30 @@ class GetStaticPermissions
     public function execute()
     {
         $permissions = array_merge_recursive(
-            $this->fs->getRequire(app('path.common') . '/resources/defaults/permissions.php'),
-            $this->fs->getRequire(resource_path('defaults/permissions.php'))
+            $this->fs->getRequire(
+                app('path.common') . '/resources/defaults/permissions.php',
+            ),
+            $this->fs->getRequire(resource_path('defaults/permissions.php')),
         )['all'];
 
         $compiled = [];
         foreach ($permissions as $key => $permissionGroup) {
             // format permissions and add generic description, if needed
-            $compiled[$key] = collect($permissionGroup)->map(function($item) {
-                if ( ! is_array($item)) {
+            $compiled[$key] = collect($permissionGroup)->map(function ($item) {
+                if (!is_array($item)) {
                     $item = ['name' => $item];
                 }
 
-                if ( ! Arr::get($item, 'display_name')) {
-                    $item['display_name'] = $this->getDisplayName($item['name']);
+                if (!Arr::get($item, 'display_name')) {
+                    $item['display_name'] = $this->getDisplayName(
+                        $item['name'],
+                    );
                 }
 
-                if ( ! Arr::get($item, 'description')) {
-                    $item['description'] = $this->getGenericDescription($item['name']);
+                if (!Arr::get($item, 'description')) {
+                    $item['description'] = $this->getGenericDescription(
+                        $item['name'],
+                    );
                 }
 
                 return $item;
@@ -50,7 +56,10 @@ class GetStaticPermissions
         }
 
         // remove billing permissions, if billing functionality is disabled
-        if (isset($compiled['billing_plans']) && ! app(Settings::class)->get('billing.enable')) {
+        if (
+            isset($compiled['billing_plans']) &&
+            !app(Settings::class)->get('billing.enable')
+        ) {
             unset($compiled['billing_plans']);
         }
 
@@ -60,9 +69,13 @@ class GetStaticPermissions
     private function getDisplayName($original)
     {
         // files.create => Create Files
-        if ( ! \Str::contains($original, '.')) return $original;
-        list($resource, $action) = explode('.', $original);
-        return ucfirst($action) . ' ' . ucwords(str_replace('_', ' ', $resource));
+        if (!\Str::contains($original, '.')) {
+            return $original;
+        }
+        [$resource, $action] = explode('.', $original);
+        return ucfirst($action) .
+            ' ' .
+            ucwords(str_replace('_', ' ', $resource));
     }
 
     /**
@@ -71,13 +84,15 @@ class GetStaticPermissions
      */
     private function getGenericDescription($permission)
     {
-        if ( ! Str::contains($permission, '.')) return null;
+        if (!Str::contains($permission, '.')) {
+            return null;
+        }
 
-        list($resource, $action) = explode('.', $permission);
+        [$resource, $action] = explode('.', $permission);
         $pluralAction = Str::plural(str_replace('_', ' ', $resource));
         $verb = $this->getGenericVerb($action, $resource);
 
-        return "Allow $verb $pluralAction.";
+        return "Allow $verb $pluralAction, regardless of who is the owner.";
     }
 
     /**

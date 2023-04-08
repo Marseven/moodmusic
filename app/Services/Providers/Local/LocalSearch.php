@@ -13,21 +13,14 @@ use Illuminate\Support\Collection;
 
 class LocalSearch implements SearchInterface {
 
-    /**
-     * @var int
-     */
-    protected $query;
+    protected string $query;
+    protected int $limit;
 
-    /**
-     * @var int
-     */
-    protected $limit;
-
-    public function search(string $q, int $limit, array $modelTypes): array {
+    public function search(string $q, int $limit, array $modelTypes): Collection {
         $this->query = urldecode($q);
         $this->limit = $limit ?: 10;
 
-        $results = [];
+        $results = collect();
 
         foreach ($modelTypes as $modelType) {
             if ($modelType === Artist::MODEL_TYPE) {
@@ -93,8 +86,6 @@ class LocalSearch implements SearchInterface {
             ->search($this->query)
             ->take($this->limit)
             ->get()
-            ->loadCount('followers')
-            ->map
-            ->only(['email', 'id', 'avatar', 'model_type', 'display_name']);
+            ->loadCount('followers');
     }
 }

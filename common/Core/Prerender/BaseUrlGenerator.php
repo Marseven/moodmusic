@@ -2,40 +2,43 @@
 
 namespace Common\Core\Prerender;
 
-use Common\Pages\CustomPage;
 use Common\Core\Contracts\AppUrlGenerator;
+use Common\Pages\CustomPage;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
 class BaseUrlGenerator implements AppUrlGenerator
 {
     const SEPARATOR = '-';
 
-    /**
-     * @param array|CustomPage $page
-     * @return string
-     */
-    public function page($page)
+    public function customPage(array|CustomPage $page): string
     {
-        $slug = slugify($page['slug']);
-        return url("pages/{$page['id']}/$slug");
+        if (isset($page['page'])) {
+            $originalSlug = $page['page']['slug'];
+        } else {
+            $originalSlug = $page['slug'];
+        }
+
+        $slug = slugify($originalSlug);
+        return url("pages/$slug");
     }
 
-    /**
-     * @return string
-     */
-    public function home()
+    public function home(): string
     {
         return url('');
     }
 
     /**
-     * Generate url based on called method name, if there's no specific method.
-     *
-     * @param string $name
-     * @param array $arguments
-     * @return string
+     * @param Model|array $model
      */
-    public function __call($name, $arguments)
+    public function generate($model): string
+    {
+        $method =
+            $model instanceof Model ? $model::MODEL_TYPE : $model['modelType'];
+        return $this->$method($model);
+    }
+
+    public function __call(string $name, array $arguments): string
     {
         return url(Str::kebab($name));
     }

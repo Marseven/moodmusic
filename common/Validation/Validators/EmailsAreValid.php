@@ -35,22 +35,32 @@ class EmailsAreValid implements Rule
      */
     public function passes($attribute, $emails)
     {
-        $invalidEmails = array_filter($emails, function($email) use($attribute) {
+        $invalidEmails = array_filter($emails, function ($email) use (
+            $attribute
+        ) {
             return !$this->validateEmail($attribute, $email, []);
         });
 
-        if ( ! empty($invalidEmails)) {
-            $this->validationMessage = $this->invalidEmailsMessage($invalidEmails);
+        if (!empty($invalidEmails)) {
+            $this->validationMessage = $this->invalidEmailsMessage(
+                $invalidEmails,
+            );
             return false;
         }
 
         if ($this->validateExistence) {
-            $dbEmails = app(User::class)->whereIn('email', $emails)->pluck('email');
-            $nonExistentEmails = array_filter($emails, function($email) use($dbEmails) {
+            $dbEmails = app(User::class)
+                ->whereIn('email', $emails)
+                ->pluck('email');
+            $nonExistentEmails = array_filter($emails, function ($email) use (
+                $dbEmails
+            ) {
                 return !$dbEmails->contains($email);
             });
-            if ( ! empty($nonExistentEmails)) {
-                $this->validationMessage = $this->emailsDontExistMessage($nonExistentEmails);
+            if (!empty($nonExistentEmails)) {
+                $this->validationMessage = $this->emailsDontExistMessage(
+                    $nonExistentEmails,
+                );
                 return false;
             }
         }
@@ -64,7 +74,7 @@ class EmailsAreValid implements Rule
         if (count($emails) > $this->maxEmails) {
             $emailString .= '...';
         }
-        return trans("Invalid emails: :emails", ['emails' => $emailString]);
+        return trans('Invalid emails: :emails', ['emails' => $emailString]);
     }
 
     private function emailsDontExistMessage(array $emails): string
@@ -73,7 +83,9 @@ class EmailsAreValid implements Rule
         if (count($emails) > $this->maxEmails) {
             $emailString .= '...';
         }
-        return trans("Could not find users for emails: :emails", ['emails' => $emailString]);
+        return trans('Could not find users for emails: :emails', [
+            'emails' => $emailString,
+        ]);
     }
 
     /**
@@ -81,6 +93,6 @@ class EmailsAreValid implements Rule
      */
     public function message()
     {
-       return $this->validationMessage;
+        return $this->validationMessage;
     }
 }

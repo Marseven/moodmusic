@@ -2,49 +2,38 @@
 
 namespace Common\Settings\Validators;
 
-use Config;
+use Common\Admin\Analytics\Actions\BuildGoogleAnalyticsReport;
 use Exception;
-use Arr;
-Use Str;
-use Google_Service_Exception;
-use Common\Admin\Analytics\Actions\GetGoogleAnalyticsData;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
 
 class AnalyticsCredentialsValidator
 {
-    const KEYS = ['analytics_view_id', 'analytics_service_email', 'analytics.tracking_code', 'certificate'];
+    const KEYS = [
+        'analytics_property_id',
+        'analytics.tracking_code',
+        'certificate',
+    ];
 
-    public function fails($settings)
+    public function fails($settings): array|false
     {
         $this->setConfigDynamically($settings);
 
         try {
-            app(GetGoogleAnalyticsData::class)->execute(null);
+            app(BuildGoogleAnalyticsReport::class)->execute([]);
         } catch (Exception $e) {
-            return $this->getErrorMessage($e);
+            return [
+                'analytics_group' => "Invalid credentials: {$e->getMessage()}",
+            ];
         }
+
+        return false;
     }
 
-    private function setConfigDynamically($settings)
+    private function setConfigDynamically(array $settings): void
     {
-        if ($viewId = Arr::get($settings, 'analytics_view_id')) {
-            Config::set('analytics.view_id', $viewId);
+        if ($propertyId = Arr::get($settings, 'analytics_property_id')) {
+            Config::set('services.google.analytics_property_id', $propertyId);
         }
-    }
-
-    /**
-     * @param Exception $e
-     * @return array
-     */
-    private function getErrorMessage($e)
-    {
-        if ($e instanceof Google_Service_Exception) {
-            $message = Arr::get($e->getErrors(), '0.message');
-        } else if (Str::contains($e->getMessage(), "Could not find a credentials file at")) {
-            return ['certificate' => 'Google Service Account Key File is required and has not been uploaded yet.'];
-        } else {
-            $message = $e->getMessage();
-        }
-
-        return ['analytics_group' => 'Invalid credentials: ' . $message];
     }
 }

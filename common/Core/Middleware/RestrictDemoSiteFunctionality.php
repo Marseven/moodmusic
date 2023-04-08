@@ -1,28 +1,28 @@
 <?php namespace Common\Core\Middleware;
 
-use Auth;
 use Closure;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
-use Arr;
-use Str;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Str;
 use Symfony\Component\HttpFoundation\Response;
 
 class RestrictDemoSiteFunctionality
 {
-
-    /**
-     * @param  Request $request
-     * @param  Closure $next
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
-        if (Auth::user() && Auth::user()->email === 'Ic0OdCIodqz8q1r@demo.com') {
+        if (
+            Auth::user() &&
+            Auth::user()->email === 'Ic0OdCIodqz8q1r@demo.com'
+        ) {
             return $next($request);
         }
 
-        $uri = str_replace('secure/', '', $request->route()->uri());
+        $uri = str_replace(
+            ['secure/', 'api/v1/'],
+            '',
+            $request->route()->uri(),
+        );
 
         if ($this->shouldForbidRequest($request, $uri)) {
             abort(403, "You can't do that on demo site.");
@@ -36,7 +36,11 @@ class RestrictDemoSiteFunctionality
             return $this->mangleUserEmails($next($request));
         }
 
-        if (($uri === 'billing/stripe/cards/add' || $uri === 'billing/subscriptions/paypal/agreement/create') && (Auth::user() && Auth::user()->email === 'admin@admin.com')) {
+        if (
+            ($uri === 'billing/stripe/cards/add' ||
+                $uri === 'billing/subscriptions/paypal/agreement/create') &&
+            (Auth::user() && Auth::user()->email === 'admin@admin.com')
+        ) {
             abort(403, "Demo admin account can't subscribe to plans.");
         }
 
@@ -45,34 +49,40 @@ class RestrictDemoSiteFunctionality
 
     /**
      * Check if specified request should be forbidden on demo site.
-     *
-     * @param Request $request
-     * @param string $uri
-     * @return bool
      */
-    private function shouldForbidRequest(Request $request, $uri)
+    private function shouldForbidRequest(Request $request, string $uri): bool
     {
         $method = $request->method();
 
         foreach (config('common.demo-blocked-routes') as $route) {
-            if ($method === $route['method'] && trim($uri) === trim($route['name'])) {
+            if (
+                $method === $route['method'] &&
+                trim($uri) === trim($route['name'])
+            ) {
                 $originMatches = true;
                 $paramsMatch = true;
 
                 //block this request only if it originated from specified origin, for example: admin area
                 if (isset($route['origin'])) {
-                    $originMatches = \Str::contains($request->server('HTTP_REFERER'), $route['origin']);
+                    $originMatches = Str::contains(
+                        $request->server('HTTP_REFERER'),
+                        $route['origin'],
+                    );
                 }
 
                 if (isset($route['params'])) {
-                    $paramsMatch = collect($route['params'])->first(function($param, $key) use($request) {
-                        $routeParam = $request->route($key);
-                        if (is_array($param)) {
-                            return in_array($routeParam, $param);
-                        } else {
-                            return $routeParam == $param;
-                        }
-                    }) !== null;
+                    $paramsMatch =
+                        collect($route['params'])->first(function (
+                            $param,
+                            $key
+                        ) use ($request) {
+                            $routeParam = $request->route($key);
+                            if (is_array($param)) {
+                                return in_array($routeParam, $param);
+                            } else {
+                                return $routeParam == $param;
+                            }
+                        }) !== null;
                 }
 
                 return $originMatches && $paramsMatch;
@@ -84,20 +94,44 @@ class RestrictDemoSiteFunctionality
 
     /**
      * Mangle settings values, so they are not visible on demo site.
-     *
-     * @param Response $response
-     * @return Response
      */
-    private function manglePrivateSettings(Response $response)
+    private function manglePrivateSettings(Response $response): Response
     {
-        $serverKeys = ['google_id', 'google_secret', 'twitter_id', 'twitter_secret', 'facebook_id',
-            'facebook_secret', 'spotify_id', 'spotify_secret', 'lastfm_api_key', 'soundcloud_api_key',
-            'sentry_dns', 'mailgun_secret', 'sentry_dsn', 'paypal_client_id', 'pusher_key', 'pusher_secret',
-            'paypal_secret', 'stripe_key', 'stripe_secret', 'mail_password', 'tmdb_api_key'
+        $serverKeys = [
+            'google_id',
+            'google_secret',
+            'twitter_id',
+            'twitter_secret',
+            'facebook_id',
+            'facebook_secret',
+            'spotify_id',
+            'spotify_secret',
+            'lastfm_api_key',
+            'soundcloud_api_key',
+            'sentry_dns',
+            'mailgun_secret',
+            'sentry_dsn',
+            'paypal_client_id',
+            'pusher_key',
+            'pusher_secret',
+            'paypal_secret',
+            'stripe_key',
+            'stripe_secret',
+            'mail_password',
+            'tmdb_api_key',
+            'storage_digitalocean_key',
+            'storage_digitalocean_secret',
+            'stripe_webhook_secret',
         ];
 
-        $clientKeys = ['youtube_api_key', 'logging.sentry_public', 'analytics.google_id',
-            'builder.google_fonts_api_key', 'recaptcha.site_key', 'recaptcha.secret_key'];
+        $clientKeys = [
+            'youtube_api_key',
+            'logging.sentry_public',
+            'analytics.google_id',
+            'builder.google_fonts_api_key',
+            'recaptcha.site_key',
+            'recaptcha.secret_key',
+        ];
 
         $settings = json_decode($response->getContent(), true);
 
@@ -120,18 +154,15 @@ class RestrictDemoSiteFunctionality
 
     /**
      * Mangle settings values, so they are not visible on demo site.
-     *
-     * @param Response|JsonResponse $response
-     * @return Response
      */
-    private function mangleUserEmails($response)
+    private function mangleUserEmails(Response $response): Response
     {
         $pagination = json_decode($response->getContent(), true);
 
-        $pagination['data'] = array_map(function($item) {
+        $pagination['data'] = array_map(function ($item) {
             if (isset($item['email'])) {
                 $item['email'] = 'hidden@demo.com';
-            } else if (isset($item['user']['email'])) {
+            } elseif (isset($item['user']['email'])) {
                 $item['user']['email'] = 'hidden@demo.com';
             }
 

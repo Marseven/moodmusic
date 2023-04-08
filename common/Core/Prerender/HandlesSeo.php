@@ -2,27 +2,26 @@
 
 namespace Common\Core\Prerender;
 
-use Common\Core\AppUrl;
-use Illuminate\Http\Response;
 use Arr;
-use Str;
+use Common\Core\AppUrl;
+use Illuminate\Support\Collection;
 use Request;
+use Str;
 
 trait HandlesSeo
 {
-    /**
-     * @param array $data
-     * @param array $options
-     * @return Response|void
-     */
-    protected function handleSeo(&$data = [], $options = [])
-    {
+    protected function handleSeo(
+        array|Collection &$data = [],
+        array $options = []
+    ) {
         if (Request::method() === 'GET') {
             $data['seo'] = $this->getMetaTags($data, $options) ?: null;
         }
 
         if (defined('SHOULD_PRERENDER')) {
-            $viewName = Arr::get($options, 'prerender.view') ?: $this->namespaceFromRouteAction();
+            $viewName =
+                Arr::get($options, 'prerender.view') ?:
+                $this->namespaceFromRouteAction();
             $viewPath = "prerender.$viewName";
             $view = null;
 
@@ -33,13 +32,22 @@ trait HandlesSeo
                 $view = view("common::$viewPath");
             }
 
-            return response($view->with(['meta' =>  $data['seo'], 'htmlBaseUri' => app(AppUrl::class)->htmlBaseUri]));
+            return response(
+                $view->with([
+                    'meta' => $data['seo'],
+                    'htmlBaseUri' => app(AppUrl::class)->htmlBaseUri,
+                ]),
+            );
         }
     }
 
     protected function getMetaTags($data = [], $options = []): ?MetaTags
     {
-        $namespace = Arr::get($options, 'prerender.config', $this->namespaceFromRouteAction());
+        $namespace = Arr::get(
+            $options,
+            'prerender.config',
+            $this->namespaceFromRouteAction(),
+        );
 
         if ($seoConfig = config("seo.$namespace")) {
             $dataForSeo = Arr::get($options, 'prerender.dataForSeo') ?: $data;

@@ -18,7 +18,7 @@
         <script>
             installerBaseUrl = '<?= $installer->getBaseUrl() ?>';
         </script>
-    <?php endif ?>
+    <?php endif; ?>
 
     <style>
         [v-cloak] {
@@ -34,7 +34,7 @@
         </div>
     <?php else: ?>
         <v-app v-cloak>
-            <img class="logo" src="../client/assets/images/logo-dark.png" alt="logo">
+            <img class="logo" src="../images/logo-dark.png" alt="logo">
             <v-stepper v-model="currentStep">
                 <v-stepper-header>
                     <v-stepper-step :complete="steps.introduction.completed" step="1">Introduction</v-stepper-step>
@@ -155,7 +155,7 @@
 
                             <div class="input-container">
                                 <label for="prefix">Database Prefix</label>
-                                <input id="prefix" type="text" v-model="databaseForm.prefix" placeholder="Optional">
+                                <input id="prefix" type="text" v-model="databaseForm.db_prefix" placeholder="Optional">
                             </div>
 
                             <v-btn type="submit" color="primary" :disabled="loading">Continue</v-btn>
@@ -225,7 +225,7 @@
                 </v-stepper-items>
             </v-stepper>
         </v-app>
-    <?php endif ?>
+    <?php endif; ?>
 </div>
 
 <!-- Load Vue.js -->

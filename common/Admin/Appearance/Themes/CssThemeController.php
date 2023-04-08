@@ -3,12 +3,8 @@
 namespace Common\Admin\Appearance\Themes;
 
 use Common\Core\BaseController;
-use Common\Database\Paginator;
+use Common\Database\Datasource\Datasource;
 use Illuminate\Http\Request;
-use Common\Admin\Appearance\Themes\CssTheme;
-use Illuminate\Http\Response;
-use Common\Admin\Appearance\Themes\CrupdateCssThemeRequest;
-use Common\Admin\Appearance\Themes\CrupdateCssTheme;
 
 class CssThemeController extends BaseController
 {
@@ -22,39 +18,28 @@ class CssThemeController extends BaseController
      */
     private $request;
 
-    /**
-     * @param CssTheme $cssTheme
-     * @param Request $request
-     */
     public function __construct(CssTheme $cssTheme, Request $request)
     {
         $this->cssTheme = $cssTheme;
         $this->request = $request;
     }
 
-    /**
-     * @return Response
-     */
     public function index()
     {
         $userId = $this->request->get('userId');
         $this->authorize('index', [CssTheme::class, $userId]);
 
-        $paginator = new Paginator($this->cssTheme, $this->request->all());
-
-        if ($userId = $paginator->param('userId')) {
-            $paginator->where('user_id', $userId);
+        $builder = $this->cssTheme->newQuery();
+        if ($userId) {
+            $builder->where('user_id', $userId);
         }
 
-        $pagination = $paginator->paginate();
+        $dataSource = new Datasource($this->cssTheme, $this->request->all());
+        $pagination = $dataSource->paginate();
 
         return $this->success(['pagination' => $pagination]);
     }
 
-    /**
-     * @param CssTheme $cssTheme
-     * @return Response
-     */
     public function show(CssTheme $cssTheme)
     {
         $this->authorize('show', $cssTheme);
@@ -62,10 +47,6 @@ class CssThemeController extends BaseController
         return $this->success(['theme' => $cssTheme]);
     }
 
-    /**
-     * @param CrupdateCssThemeRequest $request
-     * @return Response
-     */
     public function store(CrupdateCssThemeRequest $request)
     {
         $this->authorize('store', CssTheme::class);
@@ -75,11 +56,6 @@ class CssThemeController extends BaseController
         return $this->success(['theme' => $cssTheme]);
     }
 
-    /**
-     * @param CssTheme $cssTheme
-     * @param CrupdateCssThemeRequest $request
-     * @return Response
-     */
     public function update(CssTheme $cssTheme, CrupdateCssThemeRequest $request)
     {
         $this->authorize('store', $cssTheme);
@@ -89,10 +65,6 @@ class CssThemeController extends BaseController
         return $this->success(['theme' => $cssTheme]);
     }
 
-    /**
-     * @param CssTheme $cssTheme
-     * @return Response
-     */
     public function destroy(CssTheme $cssTheme)
     {
         $this->authorize('destroy', $cssTheme);

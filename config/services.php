@@ -33,42 +33,4 @@ return [
     'sparkpost' => [
         'secret' => env('SPARKPOST_SECRET'),
     ],
-
-    'stripe' => [
-        'model' => App\User::class,
-        'key' => env('STRIPE_KEY'),
-        'secret' => env('STRIPE_SECRET'),
-    ],
-
-    'paypal' => [
-        'client_id' => env('PAYPAL_CLIENT_ID'),
-        'secret' => env('PAYPAL_SECRET'),
-        'webhook_id' => env('PAYPAL_WEBHOOK_ID'),
-    ],
-
-    'slack' => [
-        'webhook_url' => env('SLACK_WEBHOOK_URL'),
-    ],
-
-    /**
-     * Socialite login credentials
-     */
-
-    'google' => [
-        'client_id' => env('GOOGLE_ID'),
-        'client_secret' => env('GOOGLE_SECRET'),
-        'redirect' =>   env('APP_URL').'/secure/auth/social/google/callback'
-    ],
-
-    'twitter' => [
-        'client_id' => env('TWITTER_ID'),
-        'client_secret' => env('TWITTER_SECRET'),
-        'redirect' =>   env('APP_URL').'/secure/auth/social/twitter/callback'
-    ],
-
-    'facebook' => [
-        'client_id' => env('FACEBOOK_ID'),
-        'client_secret' => env('FACEBOOK_SECRET'),
-        'redirect' =>   env('APP_URL').'/secure/auth/social/facebook/callback'
-    ],
 ];

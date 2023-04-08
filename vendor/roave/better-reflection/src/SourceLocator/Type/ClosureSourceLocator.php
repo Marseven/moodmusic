@@ -8,6 +8,7 @@ use Closure;
 use PhpParser\Node;
 use PhpParser\Node\Stmt\Namespace_;
 use PhpParser\NodeTraverser;
+use PhpParser\NodeVisitor\NameResolver;
 use PhpParser\NodeVisitorAbstract;
 use PhpParser\Parser;
 use ReflectionFunction as CoreFunctionReflection;
@@ -19,32 +20,25 @@ use Roave\BetterReflection\Reflector\Reflector;
 use Roave\BetterReflection\SourceLocator\Ast\Exception\ParseToAstFailure;
 use Roave\BetterReflection\SourceLocator\Ast\Strategy\NodeToReflection;
 use Roave\BetterReflection\SourceLocator\Exception\EvaledClosureCannotBeLocated;
+use Roave\BetterReflection\SourceLocator\Exception\NoClosureOnLine;
 use Roave\BetterReflection\SourceLocator\Exception\TwoClosuresOnSameLine;
 use Roave\BetterReflection\SourceLocator\FileChecker;
-use Roave\BetterReflection\SourceLocator\Located\LocatedSource;
+use Roave\BetterReflection\SourceLocator\Located\AnonymousLocatedSource;
 use Roave\BetterReflection\Util\FileHelper;
+
 use function array_filter;
-use function array_values;
 use function assert;
 use function file_get_contents;
-use function is_array;
 use function strpos;
 
-/**
- * @internal
- */
+/** @internal */
 final class ClosureSourceLocator implements SourceLocator
 {
-    /** @var CoreFunctionReflection */
-    private $coreFunctionReflection;
+    private CoreFunctionReflection $coreFunctionReflection;
 
-    /** @var Parser */
-    private $parser;
-
-    public function __construct(Closure $closure, Parser $parser)
+    public function __construct(Closure $closure, private Parser $parser)
     {
         $this->coreFunctionReflection = new CoreFunctionReflection($closure);
-        $this->parser                 = $parser;
     }
 
     /**
@@ -52,7 +46,7 @@ final class ClosureSourceLocator implements SourceLocator
      *
      * @throws ParseToAstFailure
      */
-    public function locateIdentifier(Reflector $reflector, Identifier $identifier) : ?Reflection
+    public function locateIdentifier(Reflector $reflector, Identifier $identifier): Reflection|null
     {
         return $this->getReflectionFunction($reflector, $identifier->getType());
     }
@@ -62,12 +56,12 @@ final class ClosureSourceLocator implements SourceLocator
      *
      * @throws ParseToAstFailure
      */
-    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType) : array
+    public function locateIdentifiersByType(Reflector $reflector, IdentifierType $identifierType): array
     {
         return array_filter([$this->getReflectionFunction($reflector, $identifierType)]);
     }
 
-    private function getReflectionFunction(Reflector $reflector, IdentifierType $identifierType) : ?ReflectionFunction
+    private function getReflectionFunction(Reflector $reflector, IdentifierType $identifierType): ReflectionFunction|null
     {
         if (! $identifierType->isFunction()) {
             return null;
@@ -83,24 +77,15 @@ final class ClosureSourceLocator implements SourceLocator
 
         $fileName = FileHelper::normalizeWindowsPath($fileName);
 
-        $nodeVisitor = new class($fileName, $this->coreFunctionReflection->getStartLine()) extends NodeVisitorAbstract
+        $nodeVisitor = new class ($fileName, $this->coreFunctionReflection->getStartLine()) extends NodeVisitorAbstract
         {
-            /** @var string */
-            private $fileName;
+            /** @var list<array{node: Node\Expr\Closure|Node\Expr\ArrowFunction, namespace: Namespace_|null}> */
+            private array $closureNodes = [];
 
-            /** @var int */
-            private $startLine;
+            private Namespace_|null $currentNamespace = null;
 
-            /** @var (Node|null)[][] */
-            private $closureNodes = [];
-
-            /** @var Namespace_|null */
-            private $currentNamespace;
-
-            public function __construct(string $fileName, int $startLine)
+            public function __construct(private string $fileName, private int $startLine)
             {
-                $this->fileName  = $fileName;
-                $this->startLine = $startLine;
             }
 
             /**
@@ -114,11 +99,12 @@ final class ClosureSourceLocator implements SourceLocator
                     return null;
                 }
 
-                if (! ($node instanceof Node\Expr\Closure)) {
-                    return null;
+                if (
+                    $node->getStartLine() === $this->startLine
+                    && ($node instanceof Node\Expr\Closure || $node instanceof Node\Expr\ArrowFunction)
+                ) {
+                    $this->closureNodes[] = ['node' => $node, 'namespace' => $this->currentNamespace];
                 }
-
-                $this->closureNodes[] = [$node, $this->currentNamespace];
 
                 return null;
             }
@@ -138,47 +124,43 @@ final class ClosureSourceLocator implements SourceLocator
             }
 
             /**
-             * @return Node[]|null[]|null
+             * @return array{node: Node\Expr\Closure|Node\Expr\ArrowFunction, namespace: Namespace_|null}
              *
+             * @throws NoClosureOnLine
              * @throws TwoClosuresOnSameLine
              */
-            public function getClosureNodes() : ?array
+            public function getClosureNodes(): array
             {
-                /** @var (Node|null)[][] $closureNodesDataOnSameLine */
-                $closureNodesDataOnSameLine = array_values(array_filter($this->closureNodes, function (array $nodes) : bool {
-                    return $nodes[0]->getLine() === $this->startLine;
-                }));
-
-                if (! $closureNodesDataOnSameLine) {
-                    return null;
+                if ($this->closureNodes === []) {
+                    throw NoClosureOnLine::create($this->fileName, $this->startLine);
                 }
 
-                if (isset($closureNodesDataOnSameLine[1])) {
+                if (isset($this->closureNodes[1])) {
                     throw TwoClosuresOnSameLine::create($this->fileName, $this->startLine);
                 }
 
-                return $closureNodesDataOnSameLine[0];
+                return $this->closureNodes[0];
             }
         };
 
         $fileContents = file_get_contents($fileName);
-        $ast          = $this->parser->parse($fileContents);
+        /** @var list<Node\Stmt> $ast */
+        $ast = $this->parser->parse($fileContents);
 
         $nodeTraverser = new NodeTraverser();
+        $nodeTraverser->addVisitor(new NameResolver());
         $nodeTraverser->addVisitor($nodeVisitor);
         $nodeTraverser->traverse($ast);
 
         $closureNodes = $nodeVisitor->getClosureNodes();
-        assert(is_array($closureNodes));
-        assert($closureNodes[1] instanceof Namespace_ || $closureNodes[1] === null);
 
         $reflectionFunction = (new NodeToReflection())->__invoke(
             $reflector,
-            $closureNodes[0],
-            new LocatedSource($fileContents, $fileName),
-            $closureNodes[1]
+            $closureNodes['node'],
+            new AnonymousLocatedSource($fileContents, $fileName),
+            $closureNodes['namespace'],
         );
-        assert($reflectionFunction instanceof ReflectionFunction || $reflectionFunction === null);
+        assert($reflectionFunction instanceof ReflectionFunction);
 
         return $reflectionFunction;
     }

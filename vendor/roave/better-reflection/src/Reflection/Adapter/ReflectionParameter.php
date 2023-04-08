@@ -4,71 +4,49 @@ declare(strict_types=1);
 
 namespace Roave\BetterReflection\Reflection\Adapter;
 
-use Exception;
+use OutOfBoundsException;
+use ReflectionClass as CoreReflectionClass;
+use ReflectionFunctionAbstract as CoreReflectionFunctionAbstract;
 use ReflectionParameter as CoreReflectionParameter;
+use Roave\BetterReflection\Reflection\ReflectionAttribute as BetterReflectionAttribute;
 use Roave\BetterReflection\Reflection\ReflectionMethod as BetterReflectionMethod;
 use Roave\BetterReflection\Reflection\ReflectionParameter as BetterReflectionParameter;
-use function assert;
+use ValueError;
 
-class ReflectionParameter extends CoreReflectionParameter
+use function array_map;
+use function sprintf;
+
+/** @psalm-suppress MissingImmutableAnnotation */
+final class ReflectionParameter extends CoreReflectionParameter
 {
-    /** @var BetterReflectionParameter */
-    private $betterReflectionParameter;
-
-    public function __construct(BetterReflectionParameter $betterReflectionParameter)
+    public function __construct(private BetterReflectionParameter $betterReflectionParameter)
     {
-        $this->betterReflectionParameter = $betterReflectionParameter;
+        unset($this->name);
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @throws Exception
-     */
-    public static function export($function, $parameter, $return = null)
-    {
-        throw new Exception('Unable to export statically');
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function __toString()
+    public function __toString(): string
     {
         return $this->betterReflectionParameter->__toString();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->betterReflectionParameter->getName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isPassedByReference()
+    public function isPassedByReference(): bool
     {
         return $this->betterReflectionParameter->isPassedByReference();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function canBePassedByValue()
+    public function canBePassedByValue(): bool
     {
         return $this->betterReflectionParameter->canBePassedByValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeclaringFunction()
+    public function getDeclaringFunction(): CoreReflectionFunctionAbstract
     {
         $function = $this->betterReflectionParameter->getDeclaringFunction();
-        assert($function instanceof BetterReflectionMethod || $function instanceof \Roave\BetterReflection\Reflection\ReflectionFunction);
 
         if ($function instanceof BetterReflectionMethod) {
             return new ReflectionMethod($function);
@@ -77,10 +55,7 @@ class ReflectionParameter extends CoreReflectionParameter
         return new ReflectionFunction($function);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDeclaringClass()
+    public function getDeclaringClass(): CoreReflectionClass|null
     {
         $declaringClass = $this->betterReflectionParameter->getDeclaringClass();
 
@@ -91,10 +66,7 @@ class ReflectionParameter extends CoreReflectionParameter
         return new ReflectionClass($declaringClass);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getClass()
+    public function getClass(): CoreReflectionClass|null
     {
         $class = $this->betterReflectionParameter->getClass();
 
@@ -105,99 +77,99 @@ class ReflectionParameter extends CoreReflectionParameter
         return new ReflectionClass($class);
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isArray()
+    public function isArray(): bool
     {
         return $this->betterReflectionParameter->isArray();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isCallable()
+    public function isCallable(): bool
     {
         return $this->betterReflectionParameter->isCallable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function allowsNull()
+    public function allowsNull(): bool
     {
         return $this->betterReflectionParameter->allowsNull();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getPosition()
+    public function getPosition(): int
     {
         return $this->betterReflectionParameter->getPosition();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isOptional()
+    public function isOptional(): bool
     {
         return $this->betterReflectionParameter->isOptional();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isVariadic()
+    public function isVariadic(): bool
     {
         return $this->betterReflectionParameter->isVariadic();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDefaultValueAvailable()
+    public function isDefaultValueAvailable(): bool
     {
         return $this->betterReflectionParameter->isDefaultValueAvailable();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultValue()
+    public function getDefaultValue(): mixed
     {
         return $this->betterReflectionParameter->getDefaultValue();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function isDefaultValueConstant()
+    public function isDefaultValueConstant(): bool
     {
         return $this->betterReflectionParameter->isDefaultValueConstant();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getDefaultValueConstantName()
+    public function getDefaultValueConstantName(): string
     {
         return $this->betterReflectionParameter->getDefaultValueConstantName();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function hasType()
+    public function hasType(): bool
     {
         return $this->betterReflectionParameter->hasType();
     }
 
-    /**
-     * {@inheritDoc}
-     */
-    public function getType()
+    public function getType(): ReflectionNamedType|ReflectionUnionType|ReflectionIntersectionType|ReflectionType|null
     {
-        return ReflectionNamedType::fromReturnTypeOrNull($this->betterReflectionParameter->getType());
+        return ReflectionType::fromTypeOrNull($this->betterReflectionParameter->getType());
+    }
+
+    public function isPromoted(): bool
+    {
+        return $this->betterReflectionParameter->isPromoted();
+    }
+
+    /**
+     * @param class-string|null $name
+     *
+     * @return list<ReflectionAttribute>
+     */
+    public function getAttributes(string|null $name = null, int $flags = 0): array
+    {
+        if ($flags !== 0 && $flags !== ReflectionAttribute::IS_INSTANCEOF) {
+            throw new ValueError('Argument #2 ($flags) must be a valid attribute filter flag');
+        }
+
+        if ($name !== null && $flags & ReflectionAttribute::IS_INSTANCEOF) {
+            $attributes = $this->betterReflectionParameter->getAttributesByInstance($name);
+        } elseif ($name !== null) {
+            $attributes = $this->betterReflectionParameter->getAttributesByName($name);
+        } else {
+            $attributes = $this->betterReflectionParameter->getAttributes();
+        }
+
+        return array_map(static fn (BetterReflectionAttribute $betterReflectionAttribute): ReflectionAttribute => new ReflectionAttribute($betterReflectionAttribute), $attributes);
+    }
+
+    public function __get(string $name): mixed
+    {
+        if ($name === 'name') {
+            return $this->betterReflectionParameter->getName();
+        }
+
+        throw new OutOfBoundsException(sprintf('Property %s::$%s does not exist.', self::class, $name));
     }
 }

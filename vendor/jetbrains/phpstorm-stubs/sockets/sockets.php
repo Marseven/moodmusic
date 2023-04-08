@@ -1,6 +1,7 @@
 <?php
 
 // Start of sockets v.
+use JetBrains\PhpStorm\Internal\PhpStormStubsElementAvailable;
 
 /**
  * (PHP 7 &gt;= 7.2.0)<br/>
@@ -12,71 +13,70 @@
  * @param string $service [optional] <p>
  * The service to connect to. If service is a name, it is translated to the corresponding port number.
  * </p>
- * @param array $hints [optional] <p>
+ * @param array $hints <p>
  * Hints provide criteria for selecting addresses returned. You may specify the hints as defined by getadrinfo.
  * </p>
- * @return array of AddrInfo resource handles that can be used with the other socket_addrinfo functions.
+ * @return AddressInfo[]|false of AddrInfo resource handles that can be used with the other socket_addrinfo functions.
  * @since 7.2
  */
-function socket_addrinfo_lookup($host, $service, $hints) {}
+function socket_addrinfo_lookup(string $host, ?string $service, array $hints = []): array|false {}
 
 /**
- * (PHP 7 &gt;= 7.2.0)<br/>
  * Create a Socket resource, and connect it to the provided AddrInfo resource.<br/>
  * The return value of this function may be used with the rest of the socket functions.
  * @link https://www.php.net/manual/en/function.socket-addrinfo-connect.php
- * @param resource $addr <p>
+ * @param resource|AddressInfo $address <p>
  * Resource created from {@see socket_addrinfo_lookup()}
  * </p>
- * @return resource Socket resource on success or NULL on failure.
+ * @return resource|Socket|null|false Socket resource on success or NULL on failure.
  * @since 7.2
  */
-function socket_addrinfo_connect($addr) {}
+function socket_addrinfo_connect(AddressInfo $address): Socket|false {}
 
 /**
  * (PHP 7 &gt;= 7.2.0)<br/>
  * Create a Socket resource, and bind it to the provided AddrInfo resource.<br/>
  * The return value of this function may be used with {@see socket_listen()}.
  * @link https://www.php.net/manual/en/function.socket-addrinfo-bind.php
- * @param resource $addr <p>
+ * @param resource|AddressInfo $address <p>
  * Resource created from {@see socket_addrinfo_lookup()}
  * </p>
- * @return resource Socket resource on success or NULL on failure.
+ * @return resource|Socket|null|false Socket resource on success or NULL on failure.
  * @since 7.2
  */
-function socket_addrinfo_bind($addr) {}
+function socket_addrinfo_bind(AddressInfo $address): Socket|false {}
 
 /**
  * (PHP 7 &gt;= 7.2.0)<br/>
  * Get information about addrinfo
  * @link https://www.php.net/manual/en/function.socket-addrinfo-explain.php
- * @param resource $addr <p>
+ * @param resource|AddressInfo $address <p>
  * Resource created from {@see socket_addrinfo_lookup()}
  * </p>
  * @return array containing the fields in the addrinfo structure.
  * @since 7.2
  */
-function socket_addrinfo_explain($addr) {}
+function socket_addrinfo_explain(AddressInfo $address): array {}
 
 /**
  * Runs the select() system call on the given arrays of sockets with a specified timeout
  * @link https://php.net/manual/en/function.socket-select.php
- * @param array $read <p>
+ * @param array|null &$read <p>
  * The sockets listed in the <i>read</i> array will be
  * watched to see if characters become available for reading (more
  * precisely, to see if a read will not block - in particular, a socket
  * resource is also ready on end-of-file, in which case a
  * <b>socket_read</b> will return a zero length string).
  * </p>
- * @param array $write <p>
+ * @param array|null &$write <p>
  * The sockets listed in the <i>write</i> array will be
  * watched to see if a write will not block.
  * </p>
- * @param array $except <p>
+ * @param array|null &$except <p>
  * The sockets listed in the <i>except</i> array will be
  * watched for exceptions.
  * </p>
- * @param int $tv_sec <p>
+ * @param int|null $seconds <p>
  * The <i>tv_sec</i> and <i>tv_usec</i>
  * together form the timeout parameter. The
  * timeout is an upper bound on the amount of time
@@ -86,7 +86,7 @@ function socket_addrinfo_explain($addr) {}
  * for polling. If <i>tv_sec</i> is <b>NULL</b> (no timeout),
  * <b>socket_select</b> can block indefinitely.
  * </p>
- * @param int $tv_usec [optional]
+ * @param int $microseconds [optional]
  * @return int|false On success <b>socket_select</b> returns the number of
  * socket resources contained in the modified arrays, which may be zero if
  * the timeout expires before anything interesting happens. On error <b>FALSE</b>
@@ -105,10 +105,8 @@ function socket_addrinfo_explain($addr) {}
  * socket_strerror(socket_last_error()) . "\n";
  * }
  * </code>
- * @since 4.1
- * @since 5.0
  */
-function socket_select (array &$read, array &$write, array &$except, $tv_sec, $tv_usec = 0) {}
+function socket_select(?array &$read, ?array &$write, ?array &$except, ?int $seconds, int $microseconds = 0): int|false {}
 
 /**
  * Create a socket (endpoint for communication)
@@ -240,21 +238,19 @@ function socket_select (array &$read, array &$write, array &$except, $tv_sec, $t
  * </td>
  * </tr>
  * </table>
- * @return resource|false <b>socket_create</b> returns a socket resource on success,
+ * @return resource|Socket|false <b>socket_create</b> returns a socket resource on success,
  * or <b>FALSE</b> on error. The actual error code can be retrieved by calling
  * <b>socket_last_error</b>. This error code may be passed to
  * <b>socket_strerror</b> to get a textual explanation of the
  * error.
- * @since 4.1
- * @since 5.0
  */
-function socket_create ($domain, $type, $protocol) {}
+function socket_create(int $domain, int $type, int $protocol): Socket|false {}
 
 /**
- * @param resource $socket
- * @return resource|false
+ * @param resource|Socket $socket
+ * @return resource|Socket|false
  */
-function socket_export_stream($socket) {}
+function socket_export_stream(Socket $socket) {}
 
 /**
  * Opens a socket on port to accept connections
@@ -269,15 +265,13 @@ function socket_export_stream($socket) {}
  * <i>backlog</i> parameter, see
  * <b>socket_listen</b> for more information.
  * </p>
- * @return resource|false <b>socket_create_listen</b> returns a new socket resource
+ * @return resource|Socket|false <b>socket_create_listen</b> returns a new socket resource
  * on success or <b>FALSE</b> on error. The error code can be retrieved with
  * <b>socket_last_error</b>. This code may be passed to
  * <b>socket_strerror</b> to get a textual explanation of the
  * error.
- * @since 4.1
- * @since 5.0
  */
-function socket_create_listen ($port, $backlog = 128) {}
+function socket_create_listen(int $port, int $backlog = 128): Socket|false {}
 
 /**
  * Creates a pair of indistinguishable sockets and stores them in an array
@@ -305,61 +299,53 @@ function socket_create_listen ($port, $backlog = 128) {}
  * See <b>socket_create</b> for the full list of supported
  * protocols.
  * </p>
- * @param array $fd <p>
+ * @param array &$pair <p>
  * Reference to an array in which the two socket resources will be inserted.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.1
- * @since 5.0
  */
-function socket_create_pair ($domain, $type, $protocol, array &$fd) {}
+function socket_create_pair(int $domain, int $type, int $protocol, &$pair): bool {}
 
 /**
  * Accepts a connection on a socket
  * @link https://php.net/manual/en/function.socket-accept.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
- * @return resource|false a new socket resource on success, or <b>FALSE</b> on error. The actual
+ * @return resource|Socket|false a new socket resource on success, or <b>FALSE</b> on error. The actual
  * error code can be retrieved by calling
  * <b>socket_last_error</b>. This error code may be passed to
  * <b>socket_strerror</b> to get a textual explanation of the
  * error.
- * @since 4.1
- * @since 5.0
  */
-function socket_accept ($socket) {}
+function socket_accept(Socket $socket): Socket|false {}
 
 /**
  * Sets nonblocking mode for file descriptor fd
  * @link https://php.net/manual/en/function.socket-set-nonblock.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.1
- * @since 5.0
  */
-function socket_set_nonblock ($socket) {}
+function socket_set_nonblock(Socket $socket): bool {}
 
 /**
  * Sets blocking mode on a socket resource
  * @link https://php.net/manual/en/function.socket-set-block.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.2
- * @since 5.0
  */
-function socket_set_block ($socket) {}
+function socket_set_block(Socket $socket): bool {}
 
 /**
  * Listens for a connection on a socket
  * @link https://php.net/manual/en/function.socket-listen.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
  * @param int $backlog [optional] <p>
@@ -382,35 +368,31 @@ function socket_set_block ($socket) {}
  * <b>socket_last_error</b>. This code may be passed to
  * <b>socket_strerror</b> to get a textual explanation of the
  * error.
- * @since 4.1
- * @since 5.0
  */
-function socket_listen ($socket, $backlog = 0) {}
+function socket_listen(Socket $socket, int $backlog = 0): bool {}
 
 /**
  * Closes a socket resource
  * @link https://php.net/manual/en/function.socket-close.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
  * @return void No value is returned.
- * @since 4.1
- * @since 5.0
  */
-function socket_close ($socket) {}
+function socket_close(Socket $socket): void {}
 
 /**
  * Write to a socket
  * @link https://php.net/manual/en/function.socket-write.php
- * @param resource $socket
- * @param string $buffer <p>
+ * @param resource|Socket $socket
+ * @param string $data <p>
  * The buffer to be written.
  * </p>
- * @param int $length [optional] <p>
+ * @param int|null $length <p>
  * The optional parameter <i>length</i> can specify an
  * alternate length of bytes written to the socket. If this length is
- * greater then the buffer length, it is silently truncated to the length
+ * greater than the buffer length, it is silently truncated to the length
  * of the buffer.
  * </p>
  * @return int|false the number of bytes successfully written to the socket or <b>FALSE</b> on failure.
@@ -424,15 +406,13 @@ function socket_close ($socket) {}
  * return zero which means no bytes have been written. Be sure to use the
  * === operator to check for <b>FALSE</b> in case of an
  * error.
- * @since 4.1
- * @since 5.0
  */
-function socket_write ($socket, $buffer, $length = 0) {}
+function socket_write(Socket $socket, string $data, ?int $length = null): int|false {}
 
 /**
  * Reads a maximum of length bytes from a socket
  * @link https://php.net/manual/en/function.socket-read.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
@@ -443,7 +423,7 @@ function socket_write ($socket, $buffer, $length = 0) {}
  * or <b>&#92;0</b> to end reading (depending on the <i>type</i>
  * parameter, see below).
  * </p>
- * @param int $type [optional] <p>
+ * @param int $mode [optional] <p>
  * Optional <i>type</i> parameter is a named constant:
  * <b>PHP_BINARY_READ</b> (Default) - use the system
  * recv() function. Safe for reading binary data.
@@ -456,20 +436,18 @@ function socket_write ($socket, $buffer, $length = 0) {}
  * </p>
  * <p>
  * <b>socket_read</b> returns a zero length string ("")
- * when there is no more data to read.
- * @since 4.1
- * @since 5.0
+ * when there is no more data to read.</p>
  */
-function socket_read ($socket, $length, $type = PHP_BINARY_READ) {}
+function socket_read(Socket $socket, int $length, int $mode = PHP_BINARY_READ): string|false {}
 
 /**
  * Queries the local side of the given socket which may either result in host/port or in a Unix filesystem path, dependent on its type
  * @link https://php.net/manual/en/function.socket-getsockname.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
- * @param string $addr <p>
+ * @param string &$address <p>
  * If the given socket is of type <b>AF_INET</b>
  * or <b>AF_INET6</b>, <b>socket_getsockname</b>
  * will return the local IP address in appropriate notation (e.g.
@@ -483,26 +461,24 @@ function socket_read ($socket, $length, $type = PHP_BINARY_READ) {}
  * path (e.g. /var/run/daemon.sock) in the
  * <i>address</i> parameter.
  * </p>
- * @param int $port [optional] <p>
+ * @param int &$port [optional] <p>
  * If provided, this will hold the associated port.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure. <b>socket_getsockname</b> may also return
  * <b>FALSE</b> if the socket type is not any of <b>AF_INET</b>,
  * <b>AF_INET6</b>, or <b>AF_UNIX</b>, in which
  * case the last socket error code is not updated.
- * @since 4.1
- * @since 5.0
  */
-function socket_getsockname ($socket, &$addr, &$port = null) {}
+function socket_getsockname(Socket $socket, &$address, &$port = null): bool {}
 
 /**
  * Queries the remote side of the given socket which may either result in host/port or in a Unix filesystem path, dependent on its type
  * @link https://php.net/manual/en/function.socket-getpeername.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
- * @param string $address <p>
+ * @param string &$address <p>
  * If the given socket is of type <b>AF_INET</b> or
  * <b>AF_INET6</b>, <b>socket_getpeername</b>
  * will return the peers (remote) IP address in
@@ -517,7 +493,7 @@ function socket_getsockname ($socket, &$addr, &$port = null) {}
  * path (e.g. /var/run/daemon.sock) in the
  * <i>address</i> parameter.
  * </p>
- * @param int $port [optional] <p>
+ * @param int &$port [optional] <p>
  * If given, this will hold the port associated to
  * <i>address</i>.
  * </p>
@@ -525,15 +501,13 @@ function socket_getsockname ($socket, &$addr, &$port = null) {}
  * <b>FALSE</b> if the socket type is not any of <b>AF_INET</b>,
  * <b>AF_INET6</b>, or <b>AF_UNIX</b>, in which
  * case the last socket error code is not updated.
- * @since 4.1
- * @since 5.0
  */
-function socket_getpeername ($socket, &$address, &$port = null) {}
+function socket_getpeername(Socket $socket, &$address, &$port = null): bool {}
 
 /**
  * Initiates a connection on a socket
  * @link https://php.net/manual/en/function.socket-connect.php
- * @param resource $socket
+ * @param resource|Socket $socket
  * @param string $address <p>
  * The <i>address</i> parameter is either an IPv4 address
  * in dotted-quad notation (e.g. 127.0.0.1) if
@@ -543,7 +517,7 @@ function socket_getpeername ($socket, &$address, &$port = null) {}
  * or the pathname of a Unix domain socket, if the socket family is
  * <b>AF_UNIX</b>.
  * </p>
- * @param int $port [optional] <p>
+ * @param int|null $port <p>
  * The <i>port</i> parameter is only used and is mandatory
  * when connecting to an <b>AF_INET</b> or an
  * <b>AF_INET6</b> socket, and designates
@@ -557,29 +531,25 @@ function socket_getpeername ($socket, &$address, &$port = null) {}
  * <p>
  * If the socket is non-blocking then this function returns <b>FALSE</b> with an
  * error Operation now in progress.
- * @since 4.1
- * @since 5.0
  */
-function socket_connect ($socket, $address, $port = 0) {}
+function socket_connect(Socket $socket, string $address, ?int $port = null): bool {}
 
 /**
  * Return a string describing a socket error
  * @link https://php.net/manual/en/function.socket-strerror.php
- * @param int $errno <p>
+ * @param int $error_code <p>
  * A valid socket error number, likely produced by
  * <b>socket_last_error</b>.
  * </p>
  * @return string the error message associated with the <i>errno</i>
  * parameter.
- * @since 4.1
- * @since 5.0
  */
-function socket_strerror ($errno) {}
+function socket_strerror(int $error_code): string {}
 
 /**
  * Binds a name to a socket
  * @link https://php.net/manual/en/function.socket-bind.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
  * @param string $address <p>
@@ -598,30 +568,28 @@ function socket_strerror ($errno) {}
  * the port on which to listen for connections.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * </p>
  * <p>
  * The error code can be retrieved with <b>socket_last_error</b>.
  * This code may be passed to <b>socket_strerror</b> to get a
  * textual explanation of the error.
- * @since 4.1
- * @since 5.0
+ * </p>
  */
-function socket_bind ($socket, $address, $port = 0) {}
+function socket_bind(Socket $socket, string $address, int $port = 0): bool {}
 
 /**
  * Receives data from a connected socket
  * @link https://php.net/manual/en/function.socket-recv.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * The <i>socket</i> must be a socket resource previously
  * created by socket_create().
  * </p>
- * @param string $buf <p>
+ * @param string &$data <p>
  * The data received will be fetched to the variable specified with
  * <i>buf</i>. If an error occurs, if the
  * connection is reset, or if no data is
  * available, <i>buf</i> will be set to <b>NULL</b>.
  * </p>
- * @param int $len <p>
+ * @param int $length <p>
  * Up to <i>len</i> bytes will be fetched from remote host.
  * </p>
  * @param int $flags <p>
@@ -669,22 +637,20 @@ function socket_bind ($socket, $address, $port = 0) {}
  * calling <b>socket_last_error</b>. This error code may be
  * passed to <b>socket_strerror</b> to get a textual explanation
  * of the error.
- * @since 4.1
- * @since 5.0
  */
-function socket_recv ($socket, &$buf, $len, $flags) {}
+function socket_recv(Socket $socket, &$data, int $length, int $flags): int|false {}
 
 /**
  * Sends data to a connected socket
  * @link https://php.net/manual/en/function.socket-send.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
- * @param string $buf <p>
+ * @param string $data <p>
  * A buffer containing the data that will be sent to the remote host.
  * </p>
- * @param int $len <p>
+ * @param int $length <p>
  * The number of bytes that will be sent to the remote host from
  * <i>buf</i>.
  * </p>
@@ -723,35 +689,38 @@ function socket_recv ($socket, &$buf, $len, $flags) {}
  * </table>
  * </p>
  * @return int|false <b>socket_send</b> returns the number of bytes sent, or <b>FALSE</b> on error.
- * @since 4.1
- * @since 5.0
  */
-function socket_send ($socket, $buf, $len, $flags) {}
+function socket_send(Socket $socket, string $data, int $length, int $flags): int|false {}
 
 /**
  * (PHP 5 &gt;=5.5.0)<br/>
  * Send a message
  * @link https://secure.php.net/manual/en/function.socket-sendmsg.php
- * @param resource $socket
+ * @param resource|Socket $socket
  * @param array $message
  * @param int $flags
  * @return int|false
  * @since 5.5
  */
-function socket_sendmsg ($socket, array $message, $flags ) {}
+function socket_sendmsg(
+    Socket $socket,
+    array $message,
+    #[PhpStormStubsElementAvailable(from: '5.5', to: '7.4')] int $flags,
+    #[PhpStormStubsElementAvailable(from: '8.0')] int $flags = 0
+): int|false {}
 
 /**
  * Receives data from a socket whether or not it is connection-oriented
  * @link https://php.net/manual/en/function.socket-recvfrom.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * The <i>socket</i> must be a socket resource previously
  * created by socket_create().
  * </p>
- * @param string $buf <p>
+ * @param string &$data <p>
  * The data received will be fetched to the variable specified with
  * <i>buf</i>.
  * </p>
- * @param int $len <p>
+ * @param int $length <p>
  * Up to <i>len</i> bytes will be fetched from remote host.
  * </p>
  * @param int $flags <p>
@@ -794,13 +763,13 @@ function socket_sendmsg ($socket, array $message, $flags ) {}
  * </td>
  * </tr>
  * </table>
- * @param string $name <p>
+ * @param string &$address <p>
  * If the socket is of the type <b>AF_UNIX</b> type,
  * <i>name</i> is the path to the file. Else, for
  * unconnected sockets, <i>name</i> is the IP address of,
  * the remote host, or <b>NULL</b> if the socket is connection-oriented.
  * </p>
- * @param int $port [optional] <p>
+ * @param int &$port [optional] <p>
  * This argument only applies to <b>AF_INET</b> and
  * <b>AF_INET6</b> sockets, and specifies the remote port
  * from which the data is received. If the socket is connection-oriented,
@@ -811,32 +780,35 @@ function socket_sendmsg ($socket, array $message, $flags ) {}
  * calling <b>socket_last_error</b>. This error code may be
  * passed to <b>socket_strerror</b> to get a textual explanation
  * of the error.
- * @since 4.1
- * @since 5.0
  */
-function socket_recvfrom ($socket, &$buf, $len, $flags, &$name, &$port = null) {}
+function socket_recvfrom(Socket $socket, &$data, int $length, int $flags, &$address, &$port = null): int|false {}
 
 /**
  * Read a message
  * @link https://secure.php.net/manual/en/function.socket-recvmsg.php
- * @param resource $socket
- * @param string $message
- * @param int $flags [optional]
+ * @param resource|Socket $socket
+ * @param array &$message
+ * @param int $flags
  * @return int|false
  * @since 5.5
  */
-function socket_recvmsg ($socket , $message, $flags) {}
+function socket_recvmsg(
+    Socket $socket,
+    array &$message,
+    #[PhpStormStubsElementAvailable(from: '5.5', to: '7.4')] int $flags,
+    #[PhpStormStubsElementAvailable(from: '8.0')] int $flags = 0
+): int|false {}
 
 /**
  * Sends a message to a socket, whether it is connected or not
  * @link https://php.net/manual/en/function.socket-sendto.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created using <b>socket_create</b>.
  * </p>
- * @param string $buf <p>
+ * @param string $data <p>
  * The sent data will be taken from buffer <i>buf</i>.
  * </p>
- * @param int $len <p>
+ * @param int $length <p>
  * <i>len</i> bytes from <i>buf</i> will be
  * sent.
  * </p>
@@ -874,24 +846,22 @@ function socket_recvmsg ($socket , $message, $flags) {}
  * </tr>
  * </table>
  * </p>
- * @param string $addr <p>
+ * @param string $address <p>
  * IP address of the remote host.
  * </p>
- * @param int $port [optional] <p>
+ * @param int|null $port <p>
  * <i>port</i> is the remote port number at which the data
  * will be sent.
  * </p>
  * @return int|false <b>socket_sendto</b> returns the number of bytes sent to the
  * remote host, or <b>FALSE</b> if an error occurred.
- * @since 4.1
- * @since 5.0
  */
-function socket_sendto ($socket, $buf, $len, $flags, $addr, $port = 0) {}
+function socket_sendto(Socket $socket, string $data, int $length, int $flags, string $address, ?int $port = null): int|false {}
 
 /**
  * Gets socket options for the socket
  * @link https://php.net/manual/en/function.socket-get-option.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
@@ -904,7 +874,7 @@ function socket_sendto ($socket, $buf, $len, $flags, $addr, $port = 0) {}
  * specifying the protocol number of that level. Protocol numbers can be
  * found by using the <b>getprotobyname</b> function.
  * </p>
- * @param int $optname <table>
+ * @param int $option <table>
  * Available Socket Options
  * <tr valign="top">
  * <td>Option</td>
@@ -1250,16 +1220,14 @@ function socket_sendto ($socket, $buf, $len, $flags, $addr, $port = 0) {}
  * </td>
  * </tr>
  * </table>
- * @return mixed|false the value of the given option, or <b>FALSE</b> on errors.
- * @since 4.3
- * @since 5.0
+ * @return array|int|false the value of the given option, or <b>FALSE</b> on errors.
  */
-function socket_get_option ($socket, $level, $optname) {}
+function socket_get_option(Socket $socket, int $level, int $option): array|int|false {}
 
 /**
  * Sets socket options for the socket
  * @link https://php.net/manual/en/function.socket-set-option.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>
  * or <b>socket_accept</b>.
  * </p>
@@ -1272,26 +1240,24 @@ function socket_get_option ($socket, $level, $optname) {}
  * Protocol numbers can be found by using the
  * <b>getprotobyname</b> function.
  * </p>
- * @param int $optname <p>
+ * @param int $option <p>
  * The available socket options are the same as those for the
  * <b>socket_get_option</b> function.
  * </p>
- * @param mixed $optval <p>
+ * @param mixed $value <p>
  * The option value.
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.3
- * @since 5.0
  */
-function socket_set_option ($socket, $level, $optname, $optval) {}
+function socket_set_option(Socket $socket, int $level, int $option, $value): bool {}
 
 /**
  * Shuts down a socket for receiving, sending, or both
  * @link https://php.net/manual/en/function.socket-shutdown.php
- * @param resource $socket <p>
+ * @param resource|Socket $socket <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
- * @param int $how [optional] <p>
+ * @param int $mode [optional] <p>
  * The value of <i>how</i> can be one of the following:
  * <table>
  * possible values for <i>how</i>
@@ -1316,112 +1282,150 @@ function socket_set_option ($socket, $level, $optname, $optval) {}
  * </table>
  * </p>
  * @return bool <b>TRUE</b> on success or <b>FALSE</b> on failure.
- * @since 4.1
- * @since 5.0
  */
-function socket_shutdown ($socket, $how = 2) {}
+function socket_shutdown(Socket $socket, int $mode = 2): bool {}
 
 /**
  * Returns the last error on the socket
  * @link https://php.net/manual/en/function.socket-last-error.php
- * @param resource $socket [optional] <p>
+ * @param resource|Socket $socket [optional] <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
  * @return int This function returns a socket error code.
- * @since 4.1
- * @since 5.0
  */
-function socket_last_error ($socket = null) {}
+function socket_last_error(?Socket $socket = null): int {}
 
 /**
  * Clears the error on the socket or the last error code
  * @link https://php.net/manual/en/function.socket-clear-error.php
- * @param resource $socket [optional] <p>
+ * @param resource|Socket|null $socket [optional] <p>
  * A valid socket resource created with <b>socket_create</b>.
  * </p>
  * @return void No value is returned.
- * @since 4.2
- * @since 5.0
  */
-function socket_clear_error ($socket = null) {}
+function socket_clear_error(?Socket $socket = null): void {}
 
 /**
  * Import a stream
  * @link https://php.net/manual/en/function.socket-import-stream.php
- * @param resource $stream <p>
+ * @param resource|Socket $stream <p>
  * The stream resource to import.
  * </p>
- * @return resource|false|null <b>FALSE</b> or <b>NULL</b> on failure.
+ * @return resource|Socket|false|null <b>FALSE</b> or <b>NULL</b> on failure.
  * @since 5.4
  */
-function socket_import_stream ($stream) {}
+function socket_import_stream($stream): Socket|false {}
 
 /**
  * Calculate message buffer size
  * @link https://php.net/manual/en/function.socket-cmsg-space.php
  * @param int $level
  * @param int $type
- * @param int $n [optional]
- * @return int
+ * @param int $num [optional]
+ * @return int|null
  * @since 5.5
  */
-function socket_cmsg_space ($level, $type, $n = 0) {}
+function socket_cmsg_space(
+    int $level,
+    int $type,
+    #[PhpStormStubsElementAvailable(from: '8.0')] int $num = 0
+): ?int {}
 
 /**
- * @param $socket
- * @param $level
- * @param $optname
+ * Alias of {@see socket_get_option}
+ * @param Socket $socket
+ * @param int $level
+ * @param int $option
  */
-function socket_getopt ($socket, $level, $optname) {}
+function socket_getopt(Socket $socket, int $level, int $option): array|int|false {}
 
 /**
- * @param $socket
- * @param $level
- * @param $optname
- * @param $optval
+ * Alias of {@see socket_set_option}
+ * @param Socket $socket
+ * @param int $level
+ * @param int $option
+ * @param $value
+ * @return bool
  */
-function socket_setopt ($socket, $level, $optname, $optval) {}
+function socket_setopt(Socket $socket, int $level, int $option, $value): bool {}
 
-define ('AF_UNIX', 1);
-define ('AF_INET', 2);
+/**
+ * Exports the WSAPROTOCOL_INFO Structure
+ *
+ * @link https://www.php.net/manual/en/function.socket-wsaprotocol-info-export.php
+ *
+ * @param resource|Socket $socket
+ * @param int $target_pid
+ * @return string|false
+ *
+ * @since 7.3
+ */
+function socket_wsaprotocol_info_export($socket, $target_pid) {}
+
+/**
+ * Imports a Socket from another Process
+ *
+ * @link https://www.php.net/manual/en/function.socket-wsaprotocol-info-import.php
+ *
+ * @param string $info_id
+ * @return resource|Socket|false
+ *
+ * @since 7.3
+ */
+function socket_wsaprotocol_info_import($info_id) {}
+
+/**
+ * Releases an exported WSAPROTOCOL_INFO Structure
+ *
+ * @link https://www.php.net/manual/en/function.socket-wsaprotocol-info-release.php
+ *
+ * @param string $info_id
+ * @return bool
+ *
+ * @since 7.3
+ */
+function socket_wsaprotocol_info_release($info_id) {}
+
+define('AF_UNIX', 1);
+define('AF_INET', 2);
 
 /**
  * Only available if compiled with IPv6 support.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('AF_INET6', 10);
-define ('SOCK_STREAM', 1);
-define ('SOCK_DGRAM', 2);
-define ('SOCK_RAW', 3);
-define ('SOCK_SEQPACKET', 5);
-define ('SOCK_RDM', 4);
-define ('MSG_OOB', 1);
-define ('MSG_WAITALL', 256);
-define ('MSG_CTRUNC', 8);
-define ('MSG_TRUNC', 32);
-define ('MSG_PEEK', 2);
-define ('MSG_DONTROUTE', 4);
+define('AF_INET6', 10);
+define('SOCK_STREAM', 1);
+define('SOCK_DGRAM', 2);
+define('SOCK_RAW', 3);
+define('SOCK_SEQPACKET', 5);
+define('SOCK_RDM', 4);
+define('MSG_OOB', 1);
+define('MSG_WAITALL', 256);
+define('MSG_CTRUNC', 8);
+define('MSG_TRUNC', 32);
+define('MSG_PEEK', 2);
+define('MSG_DONTROUTE', 4);
 
 /**
  * Not available on Windows platforms.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('MSG_EOR', 128);
+define('MSG_EOR', 128);
 
 /**
  * Not available on Windows platforms.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('MSG_EOF', 512);
-define ('MSG_CONFIRM', 2048);
-define ('MSG_ERRQUEUE', 8192);
-define ('MSG_NOSIGNAL', 16384);
-define ('MSG_DONTWAIT', 64);
-define ('MSG_MORE', 32768);
-define ('MSG_WAITFORONE', 65536);
-define ('MSG_CMSG_CLOEXEC', 1073741824);
-define ('SO_DEBUG', 1);
-define ('SO_REUSEADDR', 2);
+define('MSG_EOF', 512);
+define('MSG_CONFIRM', 2048);
+define('MSG_ERRQUEUE', 8192);
+define('MSG_NOSIGNAL', 16384);
+define('MSG_DONTWAIT', 64);
+define('MSG_MORE', 32768);
+define('MSG_WAITFORONE', 65536);
+define('MSG_CMSG_CLOEXEC', 1073741824);
+define('SO_DEBUG', 1);
+define('SO_REUSEADDR', 2);
 
 /**
  * This constant is only available in PHP 5.4.10 or later on platforms that
@@ -1429,32 +1433,35 @@ define ('SO_REUSEADDR', 2);
  * includes Mac OS X and FreeBSD, but does not include Linux or Windows.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SO_REUSEPORT', 15);
-define ('SO_KEEPALIVE', 9);
-define ('SO_DONTROUTE', 5);
-define ('SO_LINGER', 13);
-define ('SO_BROADCAST', 6);
-define ('SO_OOBINLINE', 10);
-define ('SO_SNDBUF', 7);
-define ('SO_RCVBUF', 8);
-define ('SO_SNDLOWAT', 19);
-define ('SO_RCVLOWAT', 18);
-define ('SO_SNDTIMEO', 21);
-define ('SO_RCVTIMEO', 20);
-define ('SO_TYPE', 3);
-define ('SO_ERROR', 4);
-define ('SO_BINDTODEVICE', 25);
-define ('SOL_SOCKET', 1);
-define ('SOMAXCONN', 128);
-
+define('SO_REUSEPORT', 15);
+define('SO_KEEPALIVE', 9);
+define('SO_DONTROUTE', 5);
+define('SO_LINGER', 13);
+define('SO_BROADCAST', 6);
+define('SO_OOBINLINE', 10);
+define('SO_SNDBUF', 7);
+define('SO_RCVBUF', 8);
+define('SO_SNDLOWAT', 19);
+define('SO_RCVLOWAT', 18);
+define('SO_SNDTIMEO', 21);
+define('SO_RCVTIMEO', 20);
+define('SO_TYPE', 3);
+define('SO_ERROR', 4);
+define('SO_BINDTODEVICE', 25);
+define('SOL_SOCKET', 1);
+define('SOMAXCONN', 128);
+/**
+ * @since 8.1
+ */
+define('SO_MARK', 36);
 /**
  * Used to disable Nagle TCP algorithm.
  * Added in PHP 5.2.7.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('TCP_NODELAY', 1);
-define ('PHP_NORMAL_READ', 1);
-define ('PHP_BINARY_READ', 2);
+define('TCP_NODELAY', 1);
+define('PHP_NORMAL_READ', 1);
+define('PHP_BINARY_READ', 2);
 /**
  * Joins a multicast group.
  * @since 5.4
@@ -1538,617 +1545,793 @@ define('IPV6_MULTICAST_HOPS', 18);
  * @link https://php.net/manual/en/function.socket-get-option.php
  */
 define('IPV6_MULTICAST_LOOP', 19);
-define ('IPV6_V6ONLY', 26);
+define('IPV6_V6ONLY', 26);
 
 /**
  * Operation not permitted.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPERM', 1);
+define('SOCKET_EPERM', 1);
 
 /**
  * No such file or directory.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOENT', 2);
+define('SOCKET_ENOENT', 2);
 
 /**
  * Interrupted system call.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EINTR', 4);
+define('SOCKET_EINTR', 4);
 
 /**
  * I/O error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EIO', 5);
+define('SOCKET_EIO', 5);
 
 /**
  * No such device or address.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENXIO', 6);
+define('SOCKET_ENXIO', 6);
 
 /**
  * Arg list too long.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_E2BIG', 7);
+define('SOCKET_E2BIG', 7);
 
 /**
  * Bad file number.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADF', 9);
+define('SOCKET_EBADF', 9);
 
 /**
  * Try again.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EAGAIN', 11);
+define('SOCKET_EAGAIN', 11);
 
 /**
  * Out of memory.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOMEM', 12);
+define('SOCKET_ENOMEM', 12);
 
 /**
  * Permission denied.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EACCES', 13);
+define('SOCKET_EACCES', 13);
 
 /**
  * Bad address.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EFAULT', 14);
+define('SOCKET_EFAULT', 14);
 
 /**
  * Block device required.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTBLK', 15);
+define('SOCKET_ENOTBLK', 15);
 
 /**
  * Device or resource busy.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBUSY', 16);
+define('SOCKET_EBUSY', 16);
 
 /**
  * File exists.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EEXIST', 17);
+define('SOCKET_EEXIST', 17);
 
 /**
  * Cross-device link.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EXDEV', 18);
+define('SOCKET_EXDEV', 18);
 
 /**
  * No such device.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENODEV', 19);
+define('SOCKET_ENODEV', 19);
 
 /**
  * Not a directory.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTDIR', 20);
+define('SOCKET_ENOTDIR', 20);
 
 /**
  * Is a directory.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EISDIR', 21);
+define('SOCKET_EISDIR', 21);
 
 /**
  * Invalid argument.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EINVAL', 22);
+define('SOCKET_EINVAL', 22);
 
 /**
  * File table overflow.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENFILE', 23);
+define('SOCKET_ENFILE', 23);
 
 /**
  * Too many open files.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EMFILE', 24);
+define('SOCKET_EMFILE', 24);
 
 /**
  * Not a typewriter.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTTY', 25);
+define('SOCKET_ENOTTY', 25);
 
 /**
  * No space left on device.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOSPC', 28);
+define('SOCKET_ENOSPC', 28);
 
 /**
  * Illegal seek.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ESPIPE', 29);
+define('SOCKET_ESPIPE', 29);
 
 /**
  * Read-only file system.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EROFS', 30);
+define('SOCKET_EROFS', 30);
 
 /**
  * Too many links.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EMLINK', 31);
+define('SOCKET_EMLINK', 31);
 
 /**
  * Broken pipe.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPIPE', 32);
+define('SOCKET_EPIPE', 32);
 
 /**
  * File name too long.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENAMETOOLONG', 36);
+define('SOCKET_ENAMETOOLONG', 36);
 
 /**
  * No record locks available.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOLCK', 37);
+define('SOCKET_ENOLCK', 37);
 
 /**
  * Function not implemented.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOSYS', 38);
+define('SOCKET_ENOSYS', 38);
 
 /**
  * Directory not empty.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTEMPTY', 39);
+define('SOCKET_ENOTEMPTY', 39);
 
 /**
  * Too many symbolic links encountered.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ELOOP', 40);
+define('SOCKET_ELOOP', 40);
 
 /**
  * Operation would block.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EWOULDBLOCK', 11);
+define('SOCKET_EWOULDBLOCK', 11);
 
 /**
  * No message of desired type.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOMSG', 42);
+define('SOCKET_ENOMSG', 42);
 
 /**
  * Identifier removed.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EIDRM', 43);
+define('SOCKET_EIDRM', 43);
 
 /**
  * Channel number out of range.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ECHRNG', 44);
+define('SOCKET_ECHRNG', 44);
 
 /**
  * Level 2 not synchronized.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EL2NSYNC', 45);
+define('SOCKET_EL2NSYNC', 45);
 
 /**
  * Level 3 halted.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EL3HLT', 46);
+define('SOCKET_EL3HLT', 46);
 
 /**
  * Level 3 reset.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EL3RST', 47);
+define('SOCKET_EL3RST', 47);
 
 /**
  * Link number out of range.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ELNRNG', 48);
+define('SOCKET_ELNRNG', 48);
 
 /**
  * Protocol driver not attached.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EUNATCH', 49);
+define('SOCKET_EUNATCH', 49);
 
 /**
  * No CSI structure available.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOCSI', 50);
+define('SOCKET_ENOCSI', 50);
 
 /**
  * Level 2 halted.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EL2HLT', 51);
+define('SOCKET_EL2HLT', 51);
 
 /**
  * Invalid exchange.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADE', 52);
+define('SOCKET_EBADE', 52);
 
 /**
  * Invalid request descriptor.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADR', 53);
+define('SOCKET_EBADR', 53);
 
 /**
  * Exchange full.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EXFULL', 54);
+define('SOCKET_EXFULL', 54);
 
 /**
  * No anode.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOANO', 55);
+define('SOCKET_ENOANO', 55);
 
 /**
  * Invalid request code.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADRQC', 56);
+define('SOCKET_EBADRQC', 56);
 
 /**
  * Invalid slot.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADSLT', 57);
+define('SOCKET_EBADSLT', 57);
 
 /**
  * Device not a stream.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOSTR', 60);
+define('SOCKET_ENOSTR', 60);
 
 /**
  * No data available.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENODATA', 61);
+define('SOCKET_ENODATA', 61);
 
 /**
  * Timer expired.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ETIME', 62);
+define('SOCKET_ETIME', 62);
 
 /**
  * Out of streams resources.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOSR', 63);
+define('SOCKET_ENOSR', 63);
 
 /**
  * Machine is not on the network.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENONET', 64);
+define('SOCKET_ENONET', 64);
 
 /**
  * Object is remote.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EREMOTE', 66);
+define('SOCKET_EREMOTE', 66);
 
 /**
  * Link has been severed.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOLINK', 67);
+define('SOCKET_ENOLINK', 67);
 
 /**
  * Advertise error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EADV', 68);
+define('SOCKET_EADV', 68);
 
 /**
  * Srmount error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ESRMNT', 69);
+define('SOCKET_ESRMNT', 69);
 
 /**
  * Communication error on send.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ECOMM', 70);
+define('SOCKET_ECOMM', 70);
 
 /**
  * Protocol error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPROTO', 71);
+define('SOCKET_EPROTO', 71);
 
 /**
  * Multihop attempted.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EMULTIHOP', 72);
+define('SOCKET_EMULTIHOP', 72);
 
 /**
  * Not a data message.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADMSG', 74);
+define('SOCKET_EBADMSG', 74);
 
 /**
  * Name not unique on network.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTUNIQ', 76);
+define('SOCKET_ENOTUNIQ', 76);
 
 /**
  * File descriptor in bad state.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EBADFD', 77);
+define('SOCKET_EBADFD', 77);
 
 /**
  * Remote address changed.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EREMCHG', 78);
+define('SOCKET_EREMCHG', 78);
 
 /**
  * Interrupted system call should be restarted.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ERESTART', 85);
+define('SOCKET_ERESTART', 85);
 
 /**
  * Streams pipe error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ESTRPIPE', 86);
+define('SOCKET_ESTRPIPE', 86);
 
 /**
  * Too many users.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EUSERS', 87);
+define('SOCKET_EUSERS', 87);
 
 /**
  * Socket operation on non-socket.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTSOCK', 88);
+define('SOCKET_ENOTSOCK', 88);
 
 /**
  * Destination address required.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EDESTADDRREQ', 89);
+define('SOCKET_EDESTADDRREQ', 89);
 
 /**
  * Message too long.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EMSGSIZE', 90);
+define('SOCKET_EMSGSIZE', 90);
 
 /**
  * Protocol wrong type for socket.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPROTOTYPE', 91);
-define ('SOCKET_ENOPROTOOPT', 92);
+define('SOCKET_EPROTOTYPE', 91);
+define('SOCKET_ENOPROTOOPT', 92);
 
 /**
  * Protocol not supported.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPROTONOSUPPORT', 93);
+define('SOCKET_EPROTONOSUPPORT', 93);
 
 /**
  * Socket type not supported.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ESOCKTNOSUPPORT', 94);
+define('SOCKET_ESOCKTNOSUPPORT', 94);
 
 /**
  * Operation not supported on transport endpoint.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EOPNOTSUPP', 95);
+define('SOCKET_EOPNOTSUPP', 95);
 
 /**
  * Protocol family not supported.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EPFNOSUPPORT', 96);
+define('SOCKET_EPFNOSUPPORT', 96);
 
 /**
  * Address family not supported by protocol.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EAFNOSUPPORT', 97);
-define ('SOCKET_EADDRINUSE', 98);
+define('SOCKET_EAFNOSUPPORT', 97);
+define('SOCKET_EADDRINUSE', 98);
 
 /**
  * Cannot assign requested address.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EADDRNOTAVAIL', 99);
+define('SOCKET_EADDRNOTAVAIL', 99);
 
 /**
  * Network is down.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENETDOWN', 100);
+define('SOCKET_ENETDOWN', 100);
 
 /**
  * Network is unreachable.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENETUNREACH', 101);
+define('SOCKET_ENETUNREACH', 101);
 
 /**
  * Network dropped connection because of reset.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENETRESET', 102);
+define('SOCKET_ENETRESET', 102);
 
 /**
  * Software caused connection abort.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ECONNABORTED', 103);
+define('SOCKET_ECONNABORTED', 103);
 
 /**
  * Connection reset by peer.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ECONNRESET', 104);
+define('SOCKET_ECONNRESET', 104);
 
 /**
  * No buffer space available.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOBUFS', 105);
+define('SOCKET_ENOBUFS', 105);
 
 /**
  * Transport endpoint is already connected.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EISCONN', 106);
+define('SOCKET_EISCONN', 106);
 
 /**
  * Transport endpoint is not connected.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOTCONN', 107);
+define('SOCKET_ENOTCONN', 107);
 
 /**
  * Cannot send after transport endpoint shutdown.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ESHUTDOWN', 108);
+define('SOCKET_ESHUTDOWN', 108);
 
 /**
  * Too many references: cannot splice.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ETOOMANYREFS', 109);
+define('SOCKET_ETOOMANYREFS', 109);
 
 /**
  * Connection timed out.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ETIMEDOUT', 110);
+define('SOCKET_ETIMEDOUT', 110);
 
 /**
  * Connection refused.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ECONNREFUSED', 111);
+define('SOCKET_ECONNREFUSED', 111);
 
 /**
  * Host is down.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EHOSTDOWN', 112);
+define('SOCKET_EHOSTDOWN', 112);
 
 /**
  * No route to host.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EHOSTUNREACH', 113);
+define('SOCKET_EHOSTUNREACH', 113);
 
 /**
  * Operation already in progress.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EALREADY', 114);
+define('SOCKET_EALREADY', 114);
 
 /**
  * Operation now in progress.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EINPROGRESS', 115);
+define('SOCKET_EINPROGRESS', 115);
 
 /**
  * Is a named type file.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EISNAM', 120);
+define('SOCKET_EISNAM', 120);
 
 /**
  * Remote I/O error.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EREMOTEIO', 121);
+define('SOCKET_EREMOTEIO', 121);
 
 /**
  * Quota exceeded.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EDQUOT', 122);
+define('SOCKET_EDQUOT', 122);
 
 /**
  * No medium found.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_ENOMEDIUM', 123);
+define('SOCKET_ENOMEDIUM', 123);
 
 /**
  * Wrong medium type.
  * @link https://php.net/manual/en/sockets.constants.php
  */
-define ('SOCKET_EMEDIUMTYPE', 124);
-define ('IPPROTO_IP', 0);
-define ('IPPROTO_IPV6', 41);
-define ('SOL_TCP', 6);
-define ('SOL_UDP', 17);
-define ('IPV6_UNICAST_HOPS', 16);
-define ('IPV6_RECVPKTINFO', 49);
-define ('IPV6_PKTINFO', 50);
-define ('IPV6_RECVHOPLIMIT', 51);
-define ('IPV6_HOPLIMIT', 52);
-define ('IPV6_RECVTCLASS', 66);
-define ('IPV6_TCLASS', 67);
-define ('SCM_RIGHTS', 1);
-define ('SCM_CREDENTIALS', 2);
-define ('SO_PASSCRED', 16);
+define('SOCKET_EMEDIUMTYPE', 124);
+define('IPPROTO_IP', 0);
+define('IPPROTO_IPV6', 41);
+define('SOL_TCP', 6);
+define('SOL_UDP', 17);
+define('IPV6_UNICAST_HOPS', 16);
+define('IPV6_RECVPKTINFO', 49);
+define('IPV6_PKTINFO', 50);
+define('IPV6_RECVHOPLIMIT', 51);
+define('IPV6_HOPLIMIT', 52);
+define('IPV6_RECVTCLASS', 66);
+define('IPV6_TCLASS', 67);
+define('SCM_RIGHTS', 1);
+define('SCM_CREDENTIALS', 2);
+define('SO_PASSCRED', 16);
 
-// End of sockets v.
-?>
+define('SOCKET_EPROCLIM', 10067);
+define('SOCKET_ESTALE', 10070);
+define('SOCKET_EDISCON', 10101);
+define('SOCKET_SYSNOTREADY', 10091);
+define('SOCKET_VERNOTSUPPORTED', 10092);
+define('SOCKET_NOTINITIALISED', 10093);
+define('SOCKET_HOST_NOT_FOUND', 11001);
+define('SOCKET_TRY_AGAIN', 11002);
+define('SOCKET_NO_RECOVERY', 11003);
+define('SOCKET_NO_DATA', 11004);
+define('SOCKET_NO_ADDRESS', 11004);
+
+define('AI_PASSIVE', 1);
+define('AI_CANONNAME', 2);
+define('AI_NUMERICHOST', 4);
+define('AI_ADDRCONFIG', 32);
+define('AI_NUMERICSERV', 1024);
+define('AI_V4MAPPED', 8);
+define('AI_ALL', 16);
+
+/**
+ * @since 8.1
+ */
+define('TCP_DEFER_ACCEPT', 9);
+
+/**
+ * @since 8.2
+ */
+define('SO_INCOMING_CPU', 49);
+
+/**
+ * @since 8.2
+ */
+define('SO_MEMINFO', 55);
+
+/**
+ * @since 8.2
+ */
+define('SO_BPF_EXTENSIONS', 48);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_OFF', -4096);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_PROTOCOL', 0);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_PKTTYPE', 4);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_IFINDEX', 8);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_NLATTR', 12);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_NLATTR_NEST', 16);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_MARK', 20);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_QUEUE', 24);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_HATYPE', 28);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_RXHASH', 32);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_CPU', 36);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_ALU_XOR_X', 40);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_VLAN_TAG', 44);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_VLAN_TAG_PRESENT', 48);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_PAY_OFFSET', 52);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_RANDOM', 56);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_VLAN_TPID', 60);
+
+/**
+ * @since 8.2
+ */
+define('SKF_AD_MAX', 64);
+
+/**
+ * @since 8.2
+ */
+define('TCP_CONGESTION', 13);
+
+/**
+ * @since 8.2
+ */
+define('TCP_NOTSENT_LOWAT', 25);
+
+/**
+ * @since 8.2
+ */
+define('TCP_KEEPIDLE', 4);
+
+/**
+ * @since 8.2
+ */
+define('TCP_KEEPINTVL', 5);
+
+/**
+ * @since 8.2
+ */
+define('TCP_KEEPCNT', 6);
+
+/**
+ * @since 8.0
+ */
+final class Socket
+{
+    /**
+     * Cannot directly construct Socket, use socket_create() instead
+     * @see socket_create()
+     */
+    private function __construct() {}
+}
+
+/**
+ * @since 8.0
+ */
+final class AddressInfo
+{
+    /**
+     * Cannot directly construct AddressInfo, use socket_addrinfo_lookup() instead
+     * @see socket_addrinfo_lookup()
+     */
+    private function __construct() {}
+}

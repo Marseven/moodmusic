@@ -4,9 +4,10 @@ namespace App\Services\Settings\Validators;
 
 use App\Services\HttpClient;
 use Common\Settings\Settings;
-use GuzzleHttp\Exception\ClientException;
-use Illuminate\Support\Arr;
 use Common\Settings\Validators\SettingsValidator;
+use Illuminate\Http\Client\RequestException;
+use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Http;
 
 class YoutubeCredentialsValidator implements SettingsValidator
 {
@@ -26,25 +27,39 @@ class YoutubeCredentialsValidator implements SettingsValidator
     {
         $this->settings = $settings;
         $this->httpClient = new HttpClient([
-            'headers' =>  ['Referer' => url('')],
+            'headers' => ['Referer' => url('')],
             'base_uri' => 'https://www.googleapis.com/youtube/v3/',
-            'exceptions' => true
+            'exceptions' => true,
         ]);
     }
 
     public function fails($settings)
     {
         try {
-            $this->httpClient->get('search', ['query' => $this->getApiParams($settings)]);
-        } catch(ClientException $e) {
+            $response = Http::withHeaders(['Referer' => url('')])->get(
+                'https://www.googleapis.com/youtube/v3/search',
+                $this->getApiParams($settings),
+            );
+            if ($response->status() !== 200) {
+                $response->throw();
+            }
+        } catch (RequestException $e) {
             return $this->getMessage($e);
         }
     }
 
-    private function getApiParams($settings)
+    private function getApiParams($settings): array
     {
-        $apiKey = Arr::get($settings, 'youtube_api_key', $this->settings->getRandom('youtube_api_key', ''));
-        $regionCode = Arr::get($settings, 'youtube.region_code', $this->settings->get('youtube.region_code', ''));
+        $apiKey = Arr::get(
+            $settings,
+            'youtube_api_key',
+            $this->settings->getRandom('youtube_api_key', ''),
+        );
+        $regionCode = Arr::get(
+            $settings,
+            'youtube.region_code',
+            $this->settings->get('youtube.region_code', ''),
+        );
 
         $apiKey = head(explode("\n", $apiKey));
 
@@ -56,7 +71,7 @@ class YoutubeCredentialsValidator implements SettingsValidator
             'type' => 'video',
             'videoEmbeddable' => 'true',
             'videoCategoryId' => 10, //music
-            'topicId' => '/m/04rlf' //music (all genres)
+            'topicId' => '/m/04rlf', //music (all genres)
         ];
 
         if ($regionCode && $regionCode !== 'none') {
@@ -66,23 +81,28 @@ class YoutubeCredentialsValidator implements SettingsValidator
         return $params;
     }
 
-    /**
-     * @param ClientException $e
-     * @return array
-     */
-    private function getMessage(ClientException $e)
+    private function getMessage(RequestException $e): array
     {
-        $errResponse = json_decode($e->getResponse()->getBody()->getContents(), true);
+        $errResponse = json_decode($e->response->body(), true);
         $reason = Arr::get($errResponse, 'error.errors.0.reason');
         $message = Arr::get($errResponse, 'error.errors.0.message');
-        $defaultMsg = 'Could not validate youtube API credentials. Please double check them.';
-
-        if ($reason === 'accessNotConfigured' || $reason === 'ipRefererBlocked') {
-            return ['youtube_api_key' => $message ?: $defaultMsg];
-        } else if ($reason === 'keyInvalid') {
-            return ['youtube_api_key' => 'This youtube API key is not valid.'];
-        } else if ($reason === 'invalidRegionCode') {
-            return ['youtube.region_code' => 'This youtube region code is not valid.'];
+        $defaultMsg =
+            'Could not validate youtube API credentials. Please double check them.';
+        if (
+            $reason === 'accessNotConfigured' ||
+            $reason === 'ipRefererBlocked'
+        ) {
+            return ['client.youtube_api_key' => $message ?: $defaultMsg];
+        } elseif ($reason === 'keyInvalid') {
+            return [
+                'client.youtube_api_key' =>
+                    'This youtube API key is not valid.',
+            ];
+        } elseif ($reason === 'invalidRegionCode') {
+            return [
+                'client.youtube.region_code' =>
+                    'This youtube region code is not valid.',
+            ];
         }
 
         return ['youtube_group' => $defaultMsg];

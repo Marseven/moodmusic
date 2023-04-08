@@ -3,6 +3,7 @@
 namespace Laravel\Socialite\Two;
 
 use GuzzleHttp\Client;
+use GuzzleHttp\RequestOptions;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Arr;
@@ -166,7 +167,7 @@ abstract class AbstractProvider implements ProviderContract
         }
 
         if ($this->usesPKCE()) {
-            $this->request->session()->put('code_verifier', $codeVerifier = $this->getCodeVerifier());
+            $this->request->session()->put('code_verifier', $this->getCodeVerifier());
         }
 
         return new RedirectResponse($this->getAuthUrl($state));
@@ -244,7 +245,8 @@ abstract class AbstractProvider implements ProviderContract
 
         return $this->user->setToken($token)
                     ->setRefreshToken(Arr::get($response, 'refresh_token'))
-                    ->setExpiresIn(Arr::get($response, 'expires_in'));
+                    ->setExpiresIn(Arr::get($response, 'expires_in'))
+                    ->setApprovedScopes(explode($this->scopeSeparator, Arr::get($response, 'scope', '')));
     }
 
     /**
@@ -273,7 +275,7 @@ abstract class AbstractProvider implements ProviderContract
 
         $state = $this->request->session()->pull('state');
 
-        return ! (strlen($state) > 0 && $this->request->input('state') === $state);
+        return empty($state) || $this->request->input('state') !== $state;
     }
 
     /**
@@ -285,11 +287,22 @@ abstract class AbstractProvider implements ProviderContract
     public function getAccessTokenResponse($code)
     {
         $response = $this->getHttpClient()->post($this->getTokenUrl(), [
-            'headers' => ['Accept' => 'application/json'],
-            'form_params' => $this->getTokenFields($code),
+            RequestOptions::HEADERS => $this->getTokenHeaders($code),
+            RequestOptions::FORM_PARAMS => $this->getTokenFields($code),
         ]);
 
         return json_decode($response->getBody(), true);
+    }
+
+    /**
+     * Get the headers for the access token request.
+     *
+     * @param  string  $code
+     * @return array
+     */
+    protected function getTokenHeaders($code)
+    {
+        return ['Accept' => 'application/json'];
     }
 
     /**
@@ -471,7 +484,7 @@ abstract class AbstractProvider implements ProviderContract
      *
      * @return $this
      */
-    protected function enablePKCE()
+    public function enablePKCE()
     {
         $this->usesPKCE = true;
 

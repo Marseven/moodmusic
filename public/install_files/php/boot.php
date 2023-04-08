@@ -1,6 +1,6 @@
 <?php
 
-define('MINIMUM_VERSION', '7.2.5');
+define('MINIMUM_VERSION', '7.3');
 if ( ! version_compare(PHP_VERSION, MINIMUM_VERSION)) exit('You need at least PHP '.MINIMUM_VERSION.' to install this application.');
 
 /*
@@ -58,7 +58,7 @@ function installerShutdown()
 {
     global $installer;
     $error = error_get_last();
-    if (isset($error['type']) && $error['type'] == 1) {
+    if (isset($error['type']) && in_array($error['type'], [E_COMPILE_ERROR, E_CORE_ERROR, E_ERROR, E_PARSE])) {
         header('HTTP/1.1 500 Internal Server Error');
         $errorMsg = htmlspecialchars_decode(strip_tags($error['message']));
         echo $errorMsg;

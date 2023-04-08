@@ -2,20 +2,13 @@
 
 namespace Common\Core\Middleware;
 
-use Auth;
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class EnableDebugIfLoggedInAsAdmin
 {
-    /**
-     * Handle an incoming request.
-     *
-     * @param  Request  $request
-     * @param Closure $next
-     * @return mixed
-     */
-    public function handle($request, Closure $next)
+    public function handle(Request $request, Closure $next)
     {
         if ($this->loggedInAsAdmin()) {
             config(['app.debug' => true]);
@@ -24,10 +17,7 @@ class EnableDebugIfLoggedInAsAdmin
         return $next($request);
     }
 
-    /**
-     * @return bool
-     */
-    protected function loggedInAsAdmin()
+    protected function loggedInAsAdmin(): bool
     {
         return Auth::user() && Auth::user()->hasPermission('admin');
     }

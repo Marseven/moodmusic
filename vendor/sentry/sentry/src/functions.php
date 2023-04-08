@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sentry;
 
+use Sentry\State\Scope;
+use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\Transaction;
 use Sentry\Tracing\TransactionContext;
 
@@ -28,7 +30,6 @@ function init(array $options = []): void
  */
 function captureMessage(string $message, ?Severity $level = null, ?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureMessage($message, $level, $hint);
 }
 
@@ -40,7 +41,6 @@ function captureMessage(string $message, ?Severity $level = null, ?EventHint $hi
  */
 function captureException(\Throwable $exception, ?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureException($exception, $hint);
 }
 
@@ -62,7 +62,6 @@ function captureEvent(Event $event, ?EventHint $hint = null): ?EventId
  */
 function captureLastError(?EventHint $hint = null): ?EventId
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->captureLastError($hint);
 }
 
@@ -94,10 +93,18 @@ function configureScope(callable $callback): void
  * is automatically removed once the operation finishes or throws.
  *
  * @param callable $callback The callback to be executed
+ *
+ * @return mixed|void The callback's return value, upon successful execution
+ *
+ * @psalm-template T
+ *
+ * @psalm-param callable(Scope): T $callback
+ *
+ * @psalm-return T
  */
-function withScope(callable $callback): void
+function withScope(callable $callback)
 {
-    SentrySdk::getCurrentHub()->withScope($callback);
+    return SentrySdk::getCurrentHub()->withScope($callback);
 }
 
 /**
@@ -120,6 +127,43 @@ function withScope(callable $callback): void
  */
 function startTransaction(TransactionContext $context, array $customSamplingContext = []): Transaction
 {
-    /** @psalm-suppress TooManyArguments */
     return SentrySdk::getCurrentHub()->startTransaction($context, $customSamplingContext);
+}
+
+/**
+ * Execute the given callable while wrapping it in a span added as a child to the current transaction and active span.
+ *
+ * If there is no transaction active this is a no-op and the scope passed to the trace callable will be unused.
+ *
+ * @template T
+ *
+ * @param callable(Scope): T $trace   The callable that is going to be traced
+ * @param SpanContext        $context The context of the span to be created
+ *
+ * @return T
+ */
+function trace(callable $trace, SpanContext $context)
+{
+    return SentrySdk::getCurrentHub()->withScope(function (Scope $scope) use ($context, $trace) {
+        $parentSpan = $scope->getSpan();
+
+        // If there's a span set on the scope there is a transaction
+        // active currently. If that is the case we create a child span
+        // and set it on the scope. Otherwise we only execute the callable
+        if (null !== $parentSpan) {
+            $span = $parentSpan->startChild($context);
+
+            $scope->setSpan($span);
+        }
+
+        try {
+            return $trace($scope);
+        } finally {
+            if (isset($span)) {
+                $span->finish();
+
+                $scope->setSpan($parentSpan);
+            }
+        }
+    });
 }

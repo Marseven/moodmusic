@@ -2,7 +2,7 @@
 
 namespace Matchish\ScoutElasticSearch\Jobs\Stages;
 
-use Elasticsearch\Client;
+use Elastic\Elasticsearch\Client;
 use Matchish\ScoutElasticSearch\ElasticSearch\DefaultAlias;
 use Matchish\ScoutElasticSearch\ElasticSearch\Index;
 use Matchish\ScoutElasticSearch\ElasticSearch\Params\Indices\Create;
@@ -24,8 +24,8 @@ final class CreateWriteIndex
     private $index;
 
     /**
-     * @param ImportSource $source
-     * @param Index $index
+     * @param  ImportSource  $source
+     * @param  Index  $index
      */
     public function __construct(ImportSource $source, Index $index)
     {

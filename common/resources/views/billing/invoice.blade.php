@@ -1,11 +1,10 @@
-
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>{{__('Invoice')}}</title>
     <base href="{{ $htmlBaseUri }}">
-    <link rel="stylesheet" href="client/assets/css/invoice.css">
+    <link rel="stylesheet" href="invoice.css">
     <style>
         h1 {
             display: inline-block;
@@ -22,7 +21,7 @@
         .total { float: right; }
         .total .amount { font-weight: normal; }
 
-        table { margin-top: 50px; }
+        table { margin-top: 50px; border-radius: 4px; overflow: hidden }
         thead { background: #4662fa; color: white; }
         thead th { border: none !important; }
 
@@ -31,6 +30,7 @@
             padding: 2em;
             clear: both;
             margin-top: 6em;
+            border-radius: 4px;
         }
 
         .col {
@@ -75,14 +75,14 @@
             </thead>
             <tbody>
             <tr contenteditable>
-                <td>{{config('app.name')}} {{__('Subscription Dues')}} ({{$invoice['subscription']['plan']['name']}} {{__('plan')}})</td>
+                <td>{{config('app.name')}} {{__('Subscription Dues')}} ({{$invoice['subscription']['product']['name']}} {{__('plan')}})</td>
                 <td>1</td>
-                <td>{{$invoice['currency_symbol']}}{{$invoice['subscription']['plan']['amount']}}</td>
+                <td>{{$invoice['currency_symbol']}}{{$invoice['subscription']['price']['amount']}}</td>
             </tr>
             </tbody>
         </table>
         <div class="total">
-            <h4>{{__('Total')}}: <span class="amount">{{$invoice['subscription']['plan']['currency_symbol']}}{{$invoice['subscription']['plan']['amount']}} {{$invoice['subscription']['plan']['currency']}}</span></h4>
+            <h4>{{__('Total')}}: <span class="amount">{{$invoice['subscription']['price']['currency_symbol']}}{{$invoice['subscription']['price']['amount']}} {{$invoice['subscription']['price']['currency']}}</span></h4>
         </div>
         @if($notes = $settings->get('billing.invoice.notes'))
             <div class="notes notice" contenteditable>

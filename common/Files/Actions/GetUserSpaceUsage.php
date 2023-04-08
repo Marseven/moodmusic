@@ -1,63 +1,48 @@
 <?php namespace Common\Files\Actions;
 
 use App\User;
-use Auth;
-use Common\Billing\BillingPlan;
+use Common\Billing\Models\Product;
 use Common\Settings\Settings;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 
-class GetUserSpaceUsage {
+class GetUserSpaceUsage
+{
+    protected User $user;
 
-    /**
-     * @var Settings
-     */
-    protected $settings;
-
-    /**
-     * @var User
-     */
-    protected $user;
-
-    public function __construct(Settings $settings) {
-        $this->settings = $settings;
+    public function __construct(protected Settings $settings)
+    {
         $this->user = Auth::user();
     }
 
-    /**
-     * @param User|null $user
-     * @param Builder|null $query
-     * @return array
-     */
-    public function execute(User $user = null, $query = null): array {
+    public function execute(User $user = null): array
+    {
         $this->user = $user ?? Auth::user();
         return [
-            'used' => $this->getSpaceUsed($query),
+            'used' => $this->getSpaceUsed(),
             'available' => $this->getAvailableSpace(),
         ];
     }
 
-    /**
-     * @param Builder|null $query
-     * @return int
-     */
-    private function getSpaceUsed($query = null): int
+    private function getSpaceUsed(): int|float
     {
-        $query = $query ?? $this->user->entries(['owner' => true]);
-        return (int) $query->where('type', '!=', 'folder')
+        return (int) $this->user
+            ->entries(['owner' => true])
+            ->where('type', '!=', 'folder')
             ->withTrashed()
             ->sum('file_size');
     }
 
-    public function getAvailableSpace(): ?int {
+    public function getAvailableSpace(): int|float|null
+    {
         $space = null;
 
-        if ( ! is_null($this->user->available_space)) {
+        if (!is_null($this->user->available_space)) {
             $space = $this->user->available_space;
-        } else if (app(Settings::class)->get('billing.enable')) {
+        } elseif (app(Settings::class)->get('billing.enable')) {
             if ($this->user->subscribed()) {
-                $space = $this->user->subscriptions->first()->mainPlan()->available_space;
-            } else if ($freePlan = BillingPlan::where('free', true)->first()) {
+                $space = $this->user->subscriptions->first()->product
+                    ->available_space;
+            } elseif ($freePlan = Product::where('free', true)->first()) {
                 $space = $freePlan->available_space;
             }
         }
@@ -71,19 +56,14 @@ class GetUserSpaceUsage {
         }
     }
 
-    /**
-     * Return if user has used up his disk space.
-     *
-     * @param UploadedFile $file
-     * @return bool
-     */
-    public function userIsOutOfSpace(UploadedFile $file) {
+    public function hasEnoughSpaceToUpload(int $bytes): bool
+    {
         $availableSpace = $this->getAvailableSpace();
 
         // unlimited space
         if (is_null($availableSpace)) {
-            return false;
+            return true;
         }
-        return ($this->getSpaceUsed() + $file->getSize()) > $availableSpace;
+        return $this->getSpaceUsed() + $bytes <= $availableSpace;
     }
 }
