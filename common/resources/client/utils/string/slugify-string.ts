@@ -10,7 +10,7 @@ export function slugifyString(
     lower: true,
     replacement,
     strict,
-    remove: /[*+~.()'"!:@?\|/]/g,
+    remove: /[*+~.()'"!:@?\|/\\]/g,
   });
   // some chinese text might not get slugified properly,
   // just replace whitespace with dash in that case

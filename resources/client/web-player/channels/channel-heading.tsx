@@ -30,7 +30,9 @@ export function ChannelHeading({
         <div
           className={clsx('flex gap-24 items-center justify-between', margin)}
         >
-          <h1 className="text-3xl flex-auto">{channel.name}</h1>
+          <h1 className="text-3xl flex-auto">
+            <Trans message={channel.name} />
+          </h1>
           <Tooltip label={<Trans message="Genre radio" />}>
             <IconButton
               className="flex-shrink-0"
@@ -43,7 +45,11 @@ export function ChannelHeading({
         </div>
       );
     }
-    return <h1 className={clsx('text-3xl', margin)}>{channel.name}</h1>;
+    return (
+      <h1 className={clsx('text-3xl', margin)}>
+        <Trans message={channel.name} />
+      </h1>
+    );
   }
 
   return (
@@ -68,7 +74,7 @@ function NestedChannelLink({channel}: ChannelLinkProps) {
           : `/channel/${channel.slug}`
       }
     >
-      {channel.name}
+      <Trans message={channel.name} />
     </Link>
   );
 }

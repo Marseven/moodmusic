@@ -26,26 +26,35 @@ export interface UpdateAlbumPayload extends CreateAlbumPayload {
 
 const Endpoint = (id: number) => `albums/${id}`;
 
-export function useUpdateAlbum(form: UseFormReturn<UpdateAlbumPayload>) {
+export function useUpdateAlbum(
+  form: UseFormReturn<UpdateAlbumPayload>,
+  albumId: number
+) {
   const {trans} = useTrans();
   const navigate = useNavigate();
   const {pathname} = useLocation();
-  return useMutation((payload: UpdateAlbumPayload) => updateAlbum(payload), {
-    onSuccess: response => {
-      toast(trans(message('Album updated')));
-      queryClient.invalidateQueries(DatatableDataQueryKey('albums'));
-      if (pathname.includes('admin')) {
-        navigate('/admin/artists');
-      } else {
-        navigate(getAlbumLink(response.album));
-      }
-    },
-    onError: err => onFormQueryError(err, form),
-  });
+  return useMutation(
+    (payload: UpdateAlbumPayload) => updateAlbum(albumId, payload),
+    {
+      onSuccess: response => {
+        toast(trans(message('Album updated')));
+        queryClient.invalidateQueries(DatatableDataQueryKey('albums'));
+        if (pathname.includes('admin')) {
+          navigate('/admin/albums');
+        } else {
+          navigate(getAlbumLink(response.album));
+        }
+      },
+      onError: err => onFormQueryError(err, form),
+    }
+  );
 }
 
-function updateAlbum({id, ...payload}: UpdateAlbumPayload): Promise<Response> {
+function updateAlbum(
+  id: number,
+  payload: UpdateAlbumPayload
+): Promise<Response> {
   return apiClient
-    .put(Endpoint(id), prepareAlbumPayload(payload as CreateAlbumPayload))
+    .put(Endpoint(id), prepareAlbumPayload(payload))
     .then(r => r.data);
 }

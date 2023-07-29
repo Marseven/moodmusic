@@ -59,10 +59,19 @@ return [
     ],
 
     // users
-    ['method' => 'POST', 'name' => 'users/{id}/password/change'],
+    ['method' => 'PUT', 'name' => 'auth/user/password'],
     ['method' => 'PUT', 'origin' => 'admin', 'name' => 'users/{user}'],
     ['method' => 'POST', 'origin' => 'admin', 'name' => 'users'],
     ['method' => 'DELETE', 'name' => 'users/{ids}'],
+    ['method' => 'POST', 'name' => 'user-sessions/logout-other'],
+    [
+        'method' => 'POST',
+        'name' => 'auth/user/confirmed-two-factor-authentication',
+    ],
+
+    // bans
+    ['method' => 'POST', 'name' => 'users/{user}/ban'],
+    ['method' => 'DELETE', 'name' => 'users/{user}/unban'],
 
     // tags
     ['method' => 'POST', 'origin' => 'admin', 'name' => 'tags'],

@@ -64,6 +64,12 @@ function outline({color, border}: SharedButtonStyleProps) {
       ];
     case 'paper':
       return [`text bg-paper ${border}`, 'hover:bg-hover', disabled];
+    case 'white':
+      return [
+        'text-white bg-transparent border border-white',
+        'hover:bg-white/20',
+        'disabled:text-white/70 disabled:border-white/70 disabled:bg-transparent',
+      ];
     default:
       return [`bg-transparent ${border}`, 'hover:bg-hover', disabled];
   }
@@ -86,9 +92,9 @@ function text({color}: SharedButtonStyleProps) {
       ];
     case 'white':
       return [
-        `text-white bg-transparent border-transparent`,
-        'hover:bg-white/4',
-        disabled,
+        'text-white bg-transparent border-transparent',
+        'hover:bg-white/20',
+        'disabled:text-white/70 disabled:bg-transparent',
       ];
     default:
       return ['bg-transparent border-transparent', 'hover:bg-hover', disabled];

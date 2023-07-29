@@ -24,8 +24,8 @@ class WaveController extends BaseController
 
         try {
             $isDemoSite = config('common.site.demo');
-            if ($isDemoSite && Str::contains($track->url, 'storage/samples')) {
-                preg_match_all('!\d+!', $track->url, $matches);
+            if ($isDemoSite && Str::contains($track->src, 'storage/samples')) {
+                preg_match_all('!\d+!', $track->src, $matches);
                 $trackId = $matches[0][0];
                 $waveData = json_decode(
                     Storage::disk('local')->get("waves/{$trackId}.json"),

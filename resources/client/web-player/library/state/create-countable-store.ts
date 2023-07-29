@@ -1,4 +1,4 @@
-import create from 'zustand';
+import {create} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {TRACK_MODEL} from '@app/web-player/tracks/track';
 import {ALBUM_MODEL} from '@app/web-player/albums/album';

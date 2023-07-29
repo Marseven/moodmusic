@@ -19,7 +19,10 @@ export function useRemoveItemsFromLibrary() {
       toast(getMessage(payload.likeables[0]));
       userLibrary().remove(payload.likeables);
       // tracks/albums/artists
-      queryClient.invalidateQueries([`${payload.likeables[0]}s`, 'library']);
+      queryClient.invalidateQueries([
+        `${payload.likeables[0].model_type}s`,
+        'library',
+      ]);
     },
     onError: r => showHttpErrorToast(r),
   });

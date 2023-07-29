@@ -7,12 +7,14 @@ import {FormRadioGroup} from '../../../ui/forms/radio-group/radio-group';
 import {DateFormatPresets, FormattedDate} from '../../../i18n/formatted-date';
 import {FormSwitch} from '../../../ui/forms/toggle/switch';
 import {Trans} from '../../../i18n/trans';
-import {FormComboBox} from '../../../ui/forms/combobox/form-combobox';
 import {useCurrentDateTime} from '../../../i18n/use-current-date-time';
+import {useTrans} from '@common/i18n/use-trans';
+import {message} from '@common/i18n/message';
 
 export function LocalizationSettings() {
   const {data} = useValueLists(['timezones', 'localizations']);
   const today = useCurrentDateTime();
+  const {trans} = useTrans();
   return (
     <SettingsPanel
       title={<Trans message="Localization" />}
@@ -20,12 +22,14 @@ export function LocalizationSettings() {
         <Trans message="Configure global date, time and language settings." />
       }
     >
-      <FormComboBox
+      <FormSelect
         className="mb-30"
         required
         name="client.dates.default_timezone"
-        openMenuOnFocus
+        showSearchField
+        selectionMode="single"
         label={<Trans message="Default timezone" />}
+        searchPlaceholder={trans(message('Search timezones'))}
         description={
           <Trans message="Which timezone should be selected by default for new users and guests." />
         }
@@ -42,7 +46,7 @@ export function LocalizationSettings() {
             ))}
           </Section>
         ))}
-      </FormComboBox>
+      </FormSelect>
       <FormSelect
         name="client.locale.default"
         className="mb-30"

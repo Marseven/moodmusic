@@ -64,7 +64,7 @@ class SeedSampleData extends Command
         Artisan::call('down');
 
         ini_set('memory_limit', '-1');
-        set_time_limit(300);
+        set_time_limit(0);
 
         $originalScoutDriver = config('scout.driver');
         config()->set('scout.driver', 'null');
@@ -378,7 +378,7 @@ class SeedSampleData extends Command
             'punk',
             'soul',
             'metalcore',
-            'hard rock',
+            'hard-rock',
             'piano',
             'classical',
             'funk',
@@ -618,10 +618,12 @@ class SeedSampleData extends Command
 
     public function createAdminAccount()
     {
-        $demoAdmin = app(User::class)->firstOrNew([
-            'email' => 'admin@admin.com',
-            'email_verified_at' => now(),
-        ]);
+        $demoAdmin = app(User::class)->firstOrNew(
+            [
+                'email' => 'admin@admin.com',
+            ],
+            ['email_verified_at' => now()],
+        );
         $demoAdmin->username = 'admin';
         $demoAdmin->password = Hash::make('admin');
         $demoAdmin->save();

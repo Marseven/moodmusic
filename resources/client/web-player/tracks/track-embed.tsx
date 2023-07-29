@@ -1,18 +1,14 @@
-import React, {
-  memo,
-  MutableRefObject,
-  useContext,
-  useMemo,
-  useRef,
-} from 'react';
+import React, {useMemo} from 'react';
 import {playerStoreOptions} from '@app/web-player/state/player-store-options';
-import {PlayerContext, PlayerStoreContext} from '@common/player/player-context';
+import {PlayerContext} from '@common/player/player-context';
 import {TrackListItem} from '@app/web-player/tracks/track-list/track-list-item';
 import {useTrack} from '@app/web-player/tracks/requests/use-track';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
 import {Track} from '@app/web-player/tracks/track';
-import {PlayerStoreOptions} from '@common/player/player-store-options';
 import {trackToMediaItem} from '@app/web-player/tracks/utils/track-to-media-item';
+import {PlayerStoreOptions} from '@common/player/state/player-store-options';
+import {PlayerOutlet} from '@common/player/ui/player-outlet';
+import {PlayerPoster} from '@common/player/ui/controls/player-poster';
 
 export function TrackEmbed() {
   const {data} = useTrack({
@@ -29,12 +25,10 @@ interface EmbedContentProps {
   track: Track;
 }
 function EmbedContent({track}: EmbedContentProps) {
-  const playerRef = useRef<HTMLDivElement>(null);
   const options: PlayerStoreOptions = useMemo(() => {
     const mediaItem = trackToMediaItem(track);
     return {
       ...playerStoreOptions,
-      ref: playerRef,
       initialData: {
         queue: [mediaItem],
         cuedMediaId: mediaItem.id,
@@ -47,32 +41,18 @@ function EmbedContent({track}: EmbedContentProps) {
   return (
     <PlayerContext id="web-player" options={options}>
       <div className="flex gap-24">
-        <div className="flex-shrink-0 rounded bg-black overflow-hidden">
-          <PlayerContainer playerRef={playerRef} />
+        <div className="relative flex-shrink-0 rounded bg-black overflow-hidden">
+          <PlayerPoster className="absolute inset-0" />
+          <PlayerOutlet className="w-144 h-144" />
         </div>
-        <TrackListItem track={track} hideArtwork hideActions linksInNewTab />
+        <TrackListItem
+          track={track}
+          hideArtwork
+          hideActions
+          linksInNewTab
+          className="flex-auto"
+        />
       </div>
     </PlayerContext>
   );
 }
-
-interface PlayerContainerProps {
-  playerRef: MutableRefObject<HTMLDivElement | null>;
-}
-const PlayerContainer = memo(({playerRef}: PlayerContainerProps) => {
-  const {getState} = useContext(PlayerStoreContext);
-
-  return (
-    <div
-      className="w-144 h-144 player-container"
-      ref={el => {
-        if (el) {
-          playerRef.current = el;
-          getState().init();
-        } else {
-          getState().destroy();
-        }
-      }}
-    />
-  );
-});

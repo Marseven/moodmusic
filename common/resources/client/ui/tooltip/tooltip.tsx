@@ -1,6 +1,7 @@
 import {
   cloneElement,
   forwardRef,
+  Fragment,
   HTMLAttributes,
   ReactNode,
   Ref,
@@ -168,7 +169,7 @@ export const Tooltip = forwardRef<HTMLElement, Props>(
     }, [isOpen, hideTooltip]);
 
     return (
-      <>
+      <Fragment>
         {cloneElement(
           children,
           // pass dom props down to child element, in case tooltip is wrapped in menu trigger
@@ -239,7 +240,7 @@ export const Tooltip = forwardRef<HTMLElement, Props>(
             </AnimatePresence>,
             rootEl
           )}
-      </>
+      </Fragment>
     );
   }
 );

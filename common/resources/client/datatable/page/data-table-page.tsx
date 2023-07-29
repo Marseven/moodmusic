@@ -31,7 +31,7 @@ export function DataTablePage<T extends TableDataItem>({
           )}
         >
           <StaticPageTitle>{title}</StaticPageTitle>
-          <h1 className="text-3xl font-light" id={titleId}>
+          <h1 className="text-3xl font-light capitalize" id={titleId}>
             {title}
           </h1>
           {headerContent}

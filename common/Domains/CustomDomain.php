@@ -25,7 +25,7 @@ class CustomDomain extends Model
     ];
 
     protected $appends = ['model_type'];
-    
+
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
@@ -41,7 +41,16 @@ class CustomDomain extends Model
      */
     public function scopeForUser(Builder $query, int $userId): Builder
     {
-        return $query->where('user_id', $userId)->orWhere('global', true);
+        return $query
+            ->join(
+                'workspace_user',
+                'workspace_user.workspace_id',
+                '=',
+                'custom_domains.workspace_id',
+            )
+            ->where($query->qualifyColumn('user_id'), $userId)
+            ->orWhere('global', true)
+            ->orWhere('workspace_user.user_id', $userId);
     }
 
     public function getHostAttribute(?string $value): ?string

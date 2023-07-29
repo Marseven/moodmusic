@@ -47,7 +47,7 @@
     "symfony/http-client": "^6.0",
     "symfony/mailgun-mailer": "^6.0",
     "symfony/postmark-mailer": "^6.0",
-    "teamtnt/laravel-scout-tntsearch-driver": "^11.6",
+    "teamtnt/laravel-scout-tntsearch-driver": "^12.4",
     "torann/geoip": "^3.0",
     "willdurand/negotiation": "^3.1",
     "james-heinrich/getid3": "^1.9",

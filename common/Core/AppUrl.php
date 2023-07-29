@@ -40,12 +40,14 @@ class AppUrl
 
     public function init()
     {
-        $this->maybeDynamicallyUpdate();
+        if (config('common.site.dynamic_app_url')) {
+          $this->maybeDynamicallyUpdate();
+        }
         $this->registerHtmlBaseUri();
         return $this;
     }
 
-    private function maybeDynamicallyUpdate()
+    private function maybeDynamicallyUpdate(): void
     {
         $request = app('request');
         $requestHost = $request->getHost();

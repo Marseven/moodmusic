@@ -139,7 +139,7 @@ const TrackUploadItem = memo(
           type="submit"
           variant="flat"
           color="primary"
-          disabled={createTrack.isLoading || !form.watch('url')}
+          disabled={createTrack.isLoading || !form.watch('src')}
         >
           <Trans message="Save" />
         </Button>

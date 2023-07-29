@@ -36,7 +36,8 @@ export interface UseSliderProps<T = number[]> {
   className?: string;
   width?: string;
   showValueLabel?: boolean;
-  trackColor?: 'primary' | 'neutral';
+  fillColor?: 'primary' | string;
+  trackColor?: 'primary' | 'neutral' | string;
   showThumbOnHoverOnly?: boolean;
   thumbSize?: string;
 }
@@ -160,8 +161,13 @@ export function useSlider({
     undefined
   );
 
-  const getValuePercent = (value: number) =>
-    Math.min(1, (value - minValue) / (maxValue - minValue));
+  const getValuePercent = (value: number) => {
+    const x = Math.min(1, (value - minValue) / (maxValue - minValue));
+    if (isNaN(x)) {
+      return 0;
+    }
+    return x;
+  };
 
   const getThumbPercent = (index: number) =>
     getValuePercent(valuesRef.current![index]);

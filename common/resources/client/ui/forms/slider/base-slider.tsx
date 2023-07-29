@@ -7,6 +7,7 @@ export interface BaseSliderProps extends UseSliderProps {
   slider: UseSliderReturn;
   children: ReactNode;
 }
+
 export function BaseSlider(props: BaseSliderProps) {
   const {
     size = 'md',
@@ -18,6 +19,7 @@ export function BaseSlider(props: BaseSliderProps) {
     slider,
     children,
     trackColor = 'primary',
+    fillColor = 'primary',
   } = props;
 
   const {
@@ -115,22 +117,50 @@ export function BaseSlider(props: BaseSliderProps) {
         role="presentation"
       >
         <div
-          className={`absolute inset-0 m-auto h-4 rounded ${
+          className={`absolute inset-0 m-auto h-4 rounded ${getTrackColor(
+            trackColor,
             isDisabled
-              ? 'bg-disabled'
-              : trackColor === 'primary'
-              ? 'bg-primary-light'
-              : 'bg-divider'
-          }`}
+          )}`}
         />
         <div
-          className={`absolute inset-0 my-auto h-4 rounded ${
-            isDisabled ? 'bg-disabled-fg' : 'bg-primary'
-          }`}
+          className={`absolute inset-0 my-auto h-4 rounded ${getFillColor(
+            fillColor,
+            isDisabled
+          )}`}
           style={{width: `${getThumbPercent(0) * 100}%`}}
         />
         {children}
       </div>
     </div>
   );
+}
+
+function getTrackColor(color: string, isDisabled: boolean): string {
+  if (isDisabled) {
+    color = 'disabled';
+  }
+  switch (color) {
+    case 'disabled':
+      return 'bg-slider-disabled/60';
+    case 'primary':
+      return 'bg-primary-light';
+    case 'neutral':
+      return 'bg-divider';
+    default:
+      return color;
+  }
+}
+
+function getFillColor(color: string, isDisabled: boolean): string {
+  if (isDisabled) {
+    color = 'disabled';
+  }
+  switch (color) {
+    case 'disabled':
+      return 'bg-slider-disabled';
+    case 'primary':
+      return 'bg-primary';
+    default:
+      return color;
+  }
 }

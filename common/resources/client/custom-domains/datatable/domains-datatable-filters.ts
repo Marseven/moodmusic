@@ -1,33 +1,40 @@
 import {
   BackendFilter,
   FilterControlType,
+  FilterOperator,
 } from '@common/datatable/filters/backend-filter';
 import {message} from '@common/i18n/message';
-import {
-  CreatedAtFilter,
-  UpdatedAtFilter,
-} from '@common/datatable/filters/timestamp-filters';
 import {USER_MODEL} from '@common/auth/user';
+import {
+  createdAtFilter,
+  updatedAtFilter,
+} from '@common/datatable/filters/timestamp-filters';
 
 export const DomainsDatatableFilters: BackendFilter[] = [
-  new BackendFilter({
-    type: FilterControlType.BooleanToggle,
+  {
     key: 'global',
-    defaultValue: true,
     label: message('Global'),
     description: message('Whether domain is marked as global'),
-  }),
-  new CreatedAtFilter({
+    defaultOperator: FilterOperator.eq,
+    control: {
+      type: FilterControlType.BooleanToggle,
+      defaultValue: true,
+    },
+  },
+  createdAtFilter({
     description: message('Date domain was created'),
   }),
-  new UpdatedAtFilter({
+  updatedAtFilter({
     description: message('Date domain was last updated'),
   }),
-  new BackendFilter({
-    type: FilterControlType.SelectModel,
-    model: USER_MODEL,
+  {
     key: 'user_id',
     label: message('Owner'),
     description: message('User domain belongs to'),
-  }),
+    defaultOperator: FilterOperator.eq,
+    control: {
+      type: FilterControlType.SelectModel,
+      model: USER_MODEL,
+    },
+  },
 ];

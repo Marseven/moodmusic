@@ -23,6 +23,9 @@ import {ContentGrid} from '@app/web-player/playable-item/content-grid';
 import {SmallArtistImage} from '@app/web-player/artists/artist-image/small-artist-image';
 import {ArtistLink, getArtistLink} from '@app/web-player/artists/artist-link';
 import {PlayableMediaGridSkeleton} from '@app/web-player/playable-item/player-media-grid-skeleton';
+import {useTrans} from '@common/i18n/use-trans';
+import {message} from '@common/i18n/message';
+import {useLightThemeVariables} from '@common/ui/themes/use-light-theme-variables';
 
 interface ContentProps {
   content: LandingPageContent;
@@ -31,6 +34,7 @@ export function LandingPage() {
   const settings = useSettings();
   const appearance = settings.homepage.appearance;
   const showPricing = settings.homepage?.pricing && settings.billing.enable;
+  const showTrending = settings.homepage?.trending;
 
   return (
     <Fragment>
@@ -39,7 +43,7 @@ export function LandingPage() {
         <HeroHeader content={appearance} />
         <PrimaryFeatures content={appearance} />
         <SecondaryFeatures content={appearance} />
-        <TrendingArtistsSection />
+        {showTrending && <TrendingArtistsSection />}
         <BottomCta content={appearance} />
         {showPricing && <PricingSection content={appearance} />}
         <Footer className="landing-container" />
@@ -49,6 +53,8 @@ export function LandingPage() {
 }
 
 function HeroHeader({content}: ContentProps) {
+  const lightThemeVars = useLightThemeVariables();
+  const {trans} = useTrans();
   const navigate = useNavigate();
   const {
     headerTitle,
@@ -93,8 +99,8 @@ function HeroHeader({content}: ContentProps) {
           color="transparent"
           darkModeColor="transparent"
           className="flex-shrink-0"
-          menuPosition="homepage-navbar"
-          primaryButtonColor="paper"
+          menuPosition="landing-page-navbar"
+          primaryButtonColor="white"
         />
         <div className="flex-auto flex flex-col items-center justify-center text-white max-w-850 mx-auto text-center px-14 py-50 lg:py-90">
           {headerTitle && (
@@ -114,6 +120,7 @@ function HeroHeader({content}: ContentProps) {
             </div>
           )}
           <form
+            style={lightThemeVars}
             className="w-full mt-60 md:mt-80"
             onSubmit={e => {
               e.preventDefault();
@@ -126,8 +133,7 @@ function HeroHeader({content}: ContentProps) {
               background="bg-white"
               inputRadius="rounded-full"
               size="lg"
-              inputClassName="bg-white"
-              placeholder={content.actions.inputText}
+              placeholder={trans(message(content.actions.inputText))}
               startAdornment={<SearchIcon />}
               adornmentPosition="left-10"
             />

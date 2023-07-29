@@ -21,7 +21,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
                 'datasets' => [
                     [
                         'label' => __('Sessions'),
-                        'data' => $this->buildTopBrowsersMetric(),
+                        'data' => $this->buildBrowsersMetric(),
                     ],
                 ],
             ],
@@ -30,7 +30,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
                 'datasets' => [
                     [
                         'label' => __('Sessions'),
-                        'data' => $this->buildTopLocationsMetric(),
+                        'data' => $this->buildLocationsMetric(),
                     ],
                 ],
             ],
@@ -39,7 +39,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
                 'datasets' => [
                     [
                         'label' => __('Sessions'),
-                        'data' => $this->buildTopDevicesMetric(),
+                        'data' => $this->buildDevicesMetric(),
                     ],
                 ],
             ],
@@ -48,14 +48,14 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
                 'datasets' => [
                     [
                         'label' => __('Sessions'),
-                        'data' => $this->buildTopPlatformsMetric(),
+                        'data' => $this->buildPlatformsMetric(),
                     ],
                 ],
             ],
         ];
     }
 
-    protected function buildPageviewsMetric(): array
+    public function buildPageviewsMetric(): array
     {
         $current = (new DemoTrend(
             User::query(),
@@ -83,7 +83,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
         ];
     }
 
-    private function buildTopBrowsersMetric(): array
+    public function buildBrowsersMetric(): array
     {
         return [
             ['label' => 'Chrome', 'value' => random_int(300, 500)],
@@ -94,7 +94,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
         ];
     }
 
-    private function buildTopDevicesMetric(): array
+    public function buildDevicesMetric(): array
     {
         return [
             ['label' => 'Mobile', 'value' => random_int(300, 500)],
@@ -103,7 +103,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
         ];
     }
 
-    private function buildTopPlatformsMetric(): array
+    public function buildPlatformsMetric(): array
     {
         return [
             ['label' => 'Windows', 'value' => random_int(300, 500)],
@@ -113,7 +113,7 @@ class BuildDemoAnalyticsReport implements BuildAnalyticsReport
         ];
     }
 
-    private function buildTopLocationsMetric(): array
+    public function buildLocationsMetric(): array
     {
         $data = [
             ['label' => 'United States', 'code' => 'US', 'value' => random_int(300, 500)],

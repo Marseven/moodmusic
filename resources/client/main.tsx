@@ -33,6 +33,8 @@ import {DynamicHomepage} from '@common/ui/dynamic-homepage';
 import {LandingPage} from '@app/landing-page/landing-page';
 import {LandingPageContent} from '@app/landing-page/landing-page-content';
 import {useAppearanceEditorMode} from '@common/admin/appearance/commands/use-appearance-editor-mode';
+import {ignoredSentryErrors} from '@common/errors/ignored-sentry-errors';
+import {DialogStoreOutlet} from '@common/ui/overlays/store/dialog-store-outlet';
 
 const AdminRoutes = React.lazy(() => import('@common/admin/admin-routes'));
 const WebPlayerRoutes = React.lazy(
@@ -84,6 +86,7 @@ declare module '@common/core/settings/settings' {
       value?: string;
       pricing?: boolean;
       appearance: LandingPageContent;
+      trending?: boolean;
     };
     ads?: {
       general_top?: string;
@@ -133,11 +136,14 @@ declare module '@common/core/bootstrap-data/bootstrap-data' {
 }
 
 const sentryDsn = getBootstrapData().settings.logging.sentry_public;
+const version = getBootstrapData().settings.version;
 if (sentryDsn && import.meta.env.PROD) {
   Sentry.init({
     dsn: sentryDsn,
     integrations: [new BrowserTracing()],
     tracesSampleRate: 1.0,
+    ignoreErrors: ignoredSentryErrors,
+    release: version,
   });
 }
 
@@ -167,6 +173,7 @@ function Router() {
         <Routes>
           <Route path="*" element={<EmailVerificationPage />} />
         </Routes>
+        <DialogStoreOutlet />
       </BrowserRouter>
     );
   }
@@ -180,11 +187,14 @@ function Router() {
         <Route
           path="/*"
           element={
-            <React.Suspense fallback={<FullPageLoader />}>
-              <WebPlayerRoutes />
-            </React.Suspense>
+            <AuthRoute requireLogin={false} permission="music.view">
+              <React.Suspense fallback={<FullPageLoader />}>
+                <WebPlayerRoutes />
+              </React.Suspense>
+            </AuthRoute>
           }
         />
+
         <Route
           path="backstage/*"
           element={
@@ -195,7 +205,7 @@ function Router() {
             </AuthRoute>
           }
         />
-        {homepage?.type !== 'channel' &&
+        {!homepage?.type.startsWith('channel') &&
           (user == null || isAppearanceEditorActive) && (
             <Route
               path="/"
@@ -232,6 +242,7 @@ function Router() {
         <Route path="pages/:pageId/:pageSlug" element={<CustomPageLayout />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
+      <DialogStoreOutlet />
     </BrowserRouter>
   );
 }

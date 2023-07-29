@@ -53,7 +53,7 @@ class CreateThumbnailForUploadedFile implements ShouldQueue
         $new = 512;
         $current = (int) ini_get('memory_limit');
         if ($current < $new) {
-            @ini_set('memory_limit', "${$new}M");
+            @ini_set('memory_limit', "{$new}M");
         }
     }
 }

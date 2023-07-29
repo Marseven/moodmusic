@@ -39,7 +39,7 @@ return [
             "name" => "{{artist.name}}",
             "url" => "{{url.artist}}",
             "description" => "{{artist.profile.description}}",
-            "image" => "{{artist.image_large}}"
+            "image" => "{{artist.image_small}}"
         ],
     ]
 ];

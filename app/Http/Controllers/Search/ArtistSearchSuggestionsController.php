@@ -30,8 +30,8 @@ class ArtistSearchSuggestionsController extends BaseController
         $user = Auth::user();
 
         $shouldListAll =
-            $user->hasPermission('music.update') ||
-            $user->getRestrictionValue('music.create', 'artist_selection') ||
+            $user?->hasPermission('music.update') ||
+            $user?->getRestrictionValue('music.create', 'artist_selection') ||
             request()->has('listAll');
 
         $builder = $shouldListAll ? Artist::query() : $user->artists();

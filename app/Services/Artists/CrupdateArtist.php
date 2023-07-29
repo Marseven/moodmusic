@@ -25,7 +25,6 @@ class CrupdateArtist
                 'name' => $data['name'],
                 'verified' => $data['verified'] ?? false,
                 'image_small' => Arr::get($data, 'image_small'),
-                'auto_update' => $data['auto_update'] ?? false,
                 'spotify_id' =>
                     $data['spotify_id'] ?? Arr::get($artist, 'spotify_id'),
             ])

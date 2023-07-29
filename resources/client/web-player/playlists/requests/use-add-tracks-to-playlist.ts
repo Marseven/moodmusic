@@ -25,6 +25,11 @@ export function useAddTracksToPlaylist() {
         })
       );
       queryClient.invalidateQueries(['playlists', response.playlist.id]);
+      queryClient.invalidateQueries([
+        'tracks',
+        'playlist',
+        response.playlist.id,
+      ]);
     },
     onError: r => showHttpErrorToast(r),
   });

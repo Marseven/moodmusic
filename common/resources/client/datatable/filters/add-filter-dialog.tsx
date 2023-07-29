@@ -1,8 +1,14 @@
 import {Dialog} from '../../ui/overlays/dialog/dialog';
 import {
   BackendFilter,
+  DatePickerFilterControl,
+  FilterBooleanToggleControl,
+  FilterChipFieldControl,
   FilterControlType,
   FilterOperator,
+  FilterSelectControl,
+  FilterSelectModelControl,
+  FilterTextInputControl,
 } from './backend-filter';
 import {Trans} from '../../i18n/trans';
 import {Key, useState} from 'react';
@@ -16,11 +22,12 @@ import {useForm} from 'react-hook-form';
 import {Form} from '../../ui/forms/form';
 import {Checkbox} from '../../ui/forms/toggle/checkbox';
 import {SelectFilterPanel} from './panels/select-filter-panel';
-import {DateFilterPanel} from './panels/date-filter-panel';
+import {DateRangeFilterPanel} from './panels/date-range-filter-panel';
 import {NormalizedModelFilterPanel} from './panels/normalized-model-filter-panel';
 import {InputFilterPanel} from './panels/input-filter-panel';
 import {BooleanFilterPanel} from './panels/boolean-filter-panel';
 import clsx from 'clsx';
+import {ChipFieldFilterPanel} from '@common/datatable/filters/panels/chip-field-filter-panel';
 
 export interface FilterItemFormValue<T = any> {
   value: T;
@@ -47,7 +54,6 @@ export function AddFilterDialog({filters}: AddFilterDialogProps) {
       onClick={() => {
         setExpandedFilters([]);
       }}
-      data-testid="clear-filters-button"
     >
       <Trans message="Clear" />
     </Button>
@@ -61,7 +67,6 @@ export function AddFilterDialog({filters}: AddFilterDialogProps) {
       className="ml-auto"
       type="submit"
       form={formId}
-      data-testid="apply-filters-button"
     >
       <Trans message="Apply" />
     </Button>
@@ -105,8 +110,13 @@ function FilterList({
     const appliedFilter = decodedFilters.find(f => f.key === filter.key);
     defaultValues[filter.key] =
       appliedFilter?.value !== undefined
-        ? {value: appliedFilter.value, operator: appliedFilter.operator}
-        : {value: filter.defaultValue, operator: filter.defaultOperator};
+        ? // there might be some extra keys set on filter besides
+          // "value" and "operator", so add the whole object to form
+          appliedFilter
+        : {
+            value: filter.control.defaultValue,
+            operator: filter.defaultOperator,
+          };
   });
   const form = useForm<Record<string, FilterItemFormValue>>({defaultValues});
   const {formId, close} = useDialogContext();
@@ -145,13 +155,15 @@ function FilterList({
             key={filter.key}
             value={filter.key}
             label={<Trans {...filter.label} />}
+            bodyClassName="max-h-288 overflow-y-auto compact-scrollbar"
           >
             {filter.description && (
               <div
                 className={clsx(
                   'text-muted text-xs',
                   // boolean filter will have nothing in the panel, no need to add margin
-                  filter.type !== FilterControlType.BooleanToggle && 'mb-14'
+                  filter.control.type !== FilterControlType.BooleanToggle &&
+                    'mb-14'
                 )}
               >
                 <Trans {...filter.description} />
@@ -169,16 +181,47 @@ interface ActiveFilterPanelProps {
   filter: BackendFilter;
 }
 export function AddFilterDialogPanel({filter}: ActiveFilterPanelProps) {
-  switch (filter.type) {
+  switch (filter.control.type) {
     case FilterControlType.Select:
-      return <SelectFilterPanel filter={filter} />;
-    case FilterControlType.DatePicker:
-      return <DateFilterPanel filter={filter} />;
+      return (
+        <SelectFilterPanel
+          filter={filter as BackendFilter<FilterSelectControl>}
+        />
+      );
+    case FilterControlType.ChipField:
+      return (
+        <ChipFieldFilterPanel
+          filter={filter as BackendFilter<FilterChipFieldControl>}
+        />
+      );
+    case FilterControlType.DateRangePicker:
+      return (
+        <DateRangeFilterPanel
+          filter={filter as BackendFilter<DatePickerFilterControl>}
+        />
+      );
     case FilterControlType.SelectModel:
-      return <NormalizedModelFilterPanel filter={filter} />;
+      return (
+        <NormalizedModelFilterPanel
+          filter={filter as BackendFilter<FilterSelectModelControl>}
+        />
+      );
     case FilterControlType.Input:
-      return <InputFilterPanel filter={filter} />;
+      return (
+        <InputFilterPanel
+          filter={filter as BackendFilter<FilterTextInputControl>}
+        />
+      );
     case FilterControlType.BooleanToggle:
-      return <BooleanFilterPanel filter={filter} />;
+      return (
+        <BooleanFilterPanel
+          filter={filter as BackendFilter<FilterBooleanToggleControl>}
+        />
+      );
+    case 'custom':
+      const CustomComponent = filter.control.panel;
+      return <CustomComponent filter={filter} />;
+    default:
+      return null;
   }
 }

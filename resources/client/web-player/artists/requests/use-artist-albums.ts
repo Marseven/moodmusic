@@ -18,10 +18,7 @@ export function useArtistAlbums(
   return useInfiniteData<Album>({
     endpoint: `artists/${artistId}/albums`,
     queryKey: ['artists', +artistId!, 'albums', viewMode],
-    queryParams: {
-      albumsPerPage:
-        viewMode === 'list' ? albumListViewPerPage : albumGridViewPerPage,
-    },
+    paginate: 'simple',
     initialPage,
     transformResponse: response => {
       response.pagination.data = response.pagination.data.map(album =>

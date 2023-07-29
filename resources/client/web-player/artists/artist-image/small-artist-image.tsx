@@ -9,18 +9,22 @@ import clsx from 'clsx';
 interface SmallArtistImageProps {
   artist: Artist;
   className?: string;
+  wrapperClassName?: string;
   size?: string;
   showVerifiedBadge?: boolean;
 }
 export function SmallArtistImage({
   artist,
   className,
+  wrapperClassName,
   size,
   showVerifiedBadge = false,
 }: SmallArtistImageProps) {
   const {trans} = useTrans();
   return (
-    <div className={clsx('relative flex-shrink-0 isolate', size)}>
+    <div
+      className={clsx('relative flex-shrink-0 isolate', size, wrapperClassName)}
+    >
       <img
         className={clsx(size, className, 'object-cover bg-fg-base/4')}
         draggable={false}

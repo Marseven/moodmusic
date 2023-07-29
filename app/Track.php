@@ -14,7 +14,6 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Support\Facades\Storage;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 class Track extends Model
 {
@@ -28,11 +27,7 @@ class Track extends Model
         'fully_scraped',
         'temp_id',
         'pivot',
-        'artists_legacy',
-        'album_name',
         'album_id',
-        'auto_update',
-        'local_only',
         'spotify_id',
         'updated_at',
         'user_id',
@@ -45,7 +40,6 @@ class Track extends Model
         'number' => 'integer',
         'spotify_popularity' => 'integer',
         'duration' => 'integer',
-        'auto_update' => 'boolean',
         'position' => 'integer',
         'added_at' => 'datetime',
     ];
@@ -56,9 +50,8 @@ class Track extends Model
     {
         parent::__construct($attributes);
 
-        if (!EnsureFrontendRequestsAreStateful::fromFrontend(request())) {
-            $this->hidden[] = 'url';
-            $this->hidden[] = 'youtube_id';
+        if (!requestIsFromFrontend()) {
+            $this->hidden[] = 'src';
             $this->hidden[] = 'spotify_popularity';
         }
     }
@@ -133,6 +126,24 @@ class Track extends Model
         return $this->hasOne(Lyric::class);
     }
 
+    public function srcIsLocal(): bool
+    {
+        return $this->getSourceFileEntryId() !== null;
+    }
+
+    public function getSourceFileEntryId(): ?string
+    {
+        if (!$this->exists || !$this->src) {
+            return null;
+        }
+        preg_match(
+            '/.*?\/?storage\/track_media\/(.+?\.[a-z0-9]+)/',
+            $this->src,
+            $matches,
+        );
+        return $matches[1] ?? null;
+    }
+
     public function getWaveStorageDisk(): Filesystem
     {
         return Storage::disk(config('common.site.wave_storage_disk'));
@@ -161,15 +172,16 @@ class Track extends Model
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'album_name' => $this->album_name,
+            'album' => $this->album?->name,
             'spotify_id' => $this->spotify_id,
             'artists' => $this->artists->pluck('name'),
+            'tags' => $this->tags->pluck('display_name'),
         ];
     }
 
     protected function makeAllSearchableUsing($query)
     {
-        return $query->with(['artists']);
+        return $query->with(['artists', 'album']);
     }
 
     public static function filterableFields(): array

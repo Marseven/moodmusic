@@ -2,25 +2,10 @@
 
 namespace App;
 
-use Carbon\Carbon;
 use Common\Search\Searchable;
-use Eloquent;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/**
- * App\BecomeArtistRequest
- *
- * @property int $id
- * @property int $user_id
- * @property User $user
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * @property array data
- * @property string type
- * @property int artist_id
- * @mixin Eloquent
- */
 class BackstageRequest extends Model
 {
     use Searchable;

@@ -26,14 +26,22 @@ class UserProfileController extends BaseController
             ['followers', 'followedUsers'],
         );
 
+        if (Auth::id() === $user->id) {
+            $relations[] = 'tokens';
+            $user->makeVisible([
+                'two_factor_confirmed_at',
+                'two_factor_recovery_codes',
+            ]);
+            if ($user->two_factor_confirmed_at) {
+                $user->two_factor_recovery_codes = $user->recoveryCodes();
+                $user->syncOriginal();
+            }
+        }
+
         $user
             ->load($relations)
             ->loadCount($loadCount)
             ->setGravatarSize(220);
-
-        if ($user->id === Auth::id()) {
-            $user->load(['tokens']);
-        }
 
         if (!$user->getRelation('profile')) {
             $user->setRelation('profile', new UserProfile());

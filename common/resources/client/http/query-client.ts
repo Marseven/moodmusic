@@ -45,6 +45,9 @@ apiClient.interceptors.request.use((config: AxiosRequestConfig) => {
   if (method === 'GET' && Array.isArray(config.params?.with)) {
     config.params.with = config.params.with.join(',');
   }
+  if (method === 'GET' && Array.isArray(config.params?.load)) {
+    config.params.load = config.params.load.join(',');
+  }
 
   // add workspace query parameter
   const workspaceId = getActiveWorkspaceId();

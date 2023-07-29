@@ -38,7 +38,7 @@ class CssTheme extends Model
         $colors = $this->attributes['colors'];
         $colors = preg_replace('/"/', '', $colors);
         $colors = preg_replace('/[{}]/', '', $colors);
-        return preg_replace('/,--/', ';--', $colors);
+        return preg_replace('/, ?--/', ';--', $colors);
     }
 
     public function getHtmlThemeColor()

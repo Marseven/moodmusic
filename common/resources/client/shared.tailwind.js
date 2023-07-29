@@ -40,6 +40,7 @@ module.exports = {
       70: '4.375rem',
       76: '4.75rem',
       80: '5rem',
+      82: '5.125rem',
       84: '5.25rem',
       86: '5.375rem',
       90: '5.625rem',
@@ -48,6 +49,7 @@ module.exports = {
       100: '6.25rem',
       110: '6.875rem',
       112: '7rem',
+      120: '7.5rem',
       124: '7.75rem',
       128: '8rem',
       132: '8.25rem',
@@ -74,6 +76,7 @@ module.exports = {
       384: '24rem',
       400: '25rem',
       440: '27.5rem',
+      450: '28.125rem',
       500: '31.25rem',
       512: '32rem',
       580: '36.25rem',
@@ -167,6 +170,10 @@ module.exports = {
     }),
   },
   sharedExtend: {
+    flex: {
+      2: '2 1 0%',
+      3: '3 1 0%',
+    },
     outlineColor: {
       DEFAULT: 'rgb(var(--be-primary-lighter) / <alpha-value>)',
     },
@@ -205,6 +212,7 @@ module.exports = {
       modal: 110,
     },
     opacity: {
+      2: '2%',
       4: '4%',
       6: '6%',
       8: '8%',

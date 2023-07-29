@@ -1,12 +1,14 @@
-import React, {ReactElement, ReactNode, useRef, useState} from 'react';
+import React, {forwardRef, ReactElement, ReactNode, useState} from 'react';
 import {FocusScope, useFocusManager} from '@react-aria/focus';
 import {ListItemBase, ListItemBaseProps} from './list-item-base';
 import clsx from 'clsx';
 
+type Child = ReactElement<ListItemProps> | ReactElement<ListItemProps>[];
+
 interface Props {
   className?: string;
   padding?: string;
-  children: ReactElement<ListItemProps> | ReactElement<ListItemProps>[];
+  children: ReactNode;
   dataTestId?: string;
 }
 
@@ -32,66 +34,71 @@ interface ListItemProps extends ListItemBaseProps {
   onSelected?: () => void;
   borderRadius?: string;
 }
-export function ListItem({
-  children,
-  onSelected,
-  borderRadius,
-  ...listItemProps
-}: ListItemProps) {
-  const focusManager = useFocusManager();
-  const isSelectable = !!onSelected;
-  const ref = useRef<HTMLDivElement>(null);
-  const [isActive, setIsActive] = useState(false);
+export const ListItem = forwardRef<HTMLDivElement, ListItemProps>(
+  (
+    {
+      children,
+      onSelected,
+      borderRadius = 'rounded',
+      className,
+      ...listItemProps
+    },
+    ref
+  ) => {
+    const focusManager = useFocusManager();
+    const isSelectable = !!onSelected;
+    const [isActive, setIsActive] = useState(false);
 
-  const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        focusManager.focusNext();
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        focusManager.focusPrevious();
-        break;
-      case 'Home':
-        e.preventDefault();
-        focusManager.focusFirst();
-        break;
-      case 'End':
-        e.preventDefault();
-        focusManager.focusLast();
-        break;
-      case 'Enter':
-      case 'Space':
-        e.preventDefault();
-        onSelected?.();
-        break;
-    }
-  };
-
-  return (
-    <li>
-      <ListItemBase
-        className={borderRadius || 'rounded'}
-        isActive={isActive}
-        isDisabled={listItemProps.isDisabled}
-        {...listItemProps}
-        onFocus={e => {
-          setIsActive((e.target as HTMLElement).matches(':focus-visible'));
-        }}
-        onBlur={() => {
-          setIsActive(false);
-        }}
-        onClick={() => {
+    const onKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
+      switch (e.key) {
+        case 'ArrowDown':
+          e.preventDefault();
+          focusManager.focusNext();
+          break;
+        case 'ArrowUp':
+          e.preventDefault();
+          focusManager.focusPrevious();
+          break;
+        case 'Home':
+          e.preventDefault();
+          focusManager.focusFirst();
+          break;
+        case 'End':
+          e.preventDefault();
+          focusManager.focusLast();
+          break;
+        case 'Enter':
+        case 'Space':
+          e.preventDefault();
           onSelected?.();
-        }}
-        ref={ref}
-        role={isSelectable ? 'button' : undefined}
-        onKeyDown={isSelectable ? onKeyDown : undefined}
-        tabIndex={isSelectable && !listItemProps.isDisabled ? 0 : undefined}
-      >
-        {children}
-      </ListItemBase>
-    </li>
-  );
-}
+          break;
+      }
+    };
+
+    return (
+      <li>
+        <ListItemBase
+          className={clsx(className, borderRadius)}
+          isActive={isActive}
+          isDisabled={listItemProps.isDisabled}
+          {...listItemProps}
+          onFocus={e => {
+            setIsActive((e.target as HTMLElement).matches(':focus-visible'));
+          }}
+          onBlur={() => {
+            setIsActive(false);
+          }}
+          onClick={() => {
+            onSelected?.();
+          }}
+          ref={ref}
+          role={isSelectable ? 'button' : undefined}
+          onKeyDown={isSelectable ? onKeyDown : undefined}
+          tabIndex={isSelectable && !listItemProps.isDisabled ? 0 : undefined}
+        >
+          {children}
+        </ListItemBase>
+      </li>
+    );
+  }
+);

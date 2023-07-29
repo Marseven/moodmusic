@@ -41,7 +41,7 @@ export function Checkout() {
         <h1 className="text-4xl mb-40">
           <Trans message="Checkout" />
         </h1>
-        {stripe.enable && (
+        {stripe.enable ? (
           <Fragment>
             <StripeElementsForm
               productId={productId}
@@ -51,7 +51,7 @@ export function Checkout() {
             />
             <Separator />
           </Fragment>
-        )}
+        ) : null}
         <div ref={paypalElementRef} />
         <div className="text-xs text-muted mt-30">
           <Trans message="You’ll be charged until you cancel your subscription. Previous charges won’t be refunded when you cancel unless it’s legally required. Your payment data is encrypted and secure. By subscribing your agree to our terms of service and privacy policy." />

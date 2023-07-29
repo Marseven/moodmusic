@@ -36,6 +36,7 @@ export const AlbumUploader = forwardRef<UploaderActions, UploaderProps>(
     const tracks = form.watch('tracks') || [];
 
     const abortUpload = useFileUploadStore(s => s.abortUpload);
+    const uploadIsInProgress = !!useFileUploadStore(s => s.activeUploadsCount);
     const {openFilePicker, uploadTracks, validateUploads} = useTrackUploader({
       onUploadStart: data => {
         setIsVisible(true);
@@ -100,7 +101,7 @@ export const AlbumUploader = forwardRef<UploaderActions, UploaderProps>(
             type="submit"
             variant="flat"
             color="primary"
-            disabled={createAlbum.isLoading}
+            disabled={uploadIsInProgress || createAlbum.isLoading}
           >
             <Trans message="Save" />
           </Button>

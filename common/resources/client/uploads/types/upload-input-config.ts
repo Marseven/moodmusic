@@ -8,6 +8,7 @@ export interface UploadInputConfig {
 export enum UploadInputType {
   image = 'image/*',
   audio = 'audio/*',
+  text = 'text/*',
   json = 'application/json',
   video = 'video/mp4,video/mpeg,video/x-m4v,video/*',
 }

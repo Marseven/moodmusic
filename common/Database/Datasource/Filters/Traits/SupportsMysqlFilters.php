@@ -3,11 +3,11 @@
 namespace Common\Database\Datasource\Filters\Traits;
 
 use Common\Database\Datasource\DatasourceFilters;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Query\Builder;
+use Illuminate\Support\Facades\DB;
 
 trait SupportsMysqlFilters
 {
@@ -50,6 +50,32 @@ trait SupportsMysqlFilters
                         $filter,
                     );
                 }
+            } elseif ($filter['operator'] === 'hasAll') {
+                $genreIds = $filter['value'];
+                $relName = $filter['key'];
+                $relation = $query->getModel()->$relName();
+                $query->whereIn(
+                    $query->getModel()->qualifyColumn('id'),
+                    fn(Builder $query) => $query
+                        ->select($relation->getQualifiedForeignPivotKeyName())
+                        ->from($relation->getTable())
+                        ->whereIn(
+                            $relation->getQualifiedRelatedPivotKeyName(),
+                            $genreIds,
+                        )
+                        ->when(
+                            count($genreIds) > 1,
+                            fn(Builder $query) => $query
+                                ->groupBy(
+                                    $relation->getQualifiedForeignPivotKeyName(),
+                                )
+                                ->having(
+                                    DB::raw('COUNT(*)'),
+                                    '=',
+                                    count($genreIds),
+                                ),
+                        ),
+                );
             } elseif (
                 $query->hasNamedScope('where' . ucfirst($filter['key']))
             ) {
@@ -70,75 +96,69 @@ trait SupportsMysqlFilters
         return $query;
     }
 
-    /**
-     * @param HasOne|HasMany $relation
-     * @return Model|Builder
-     */
     private function filterByHasManyRelation($query, $relation, array $filter)
     {
+        $related = $relation->getRelated()->getTable();
+        $foreignKey = $relation->getQualifiedForeignKeyName();
+        $parentKey = $relation->getQualifiedParentKeyName();
+
         // use left join to check if model has any of specified relations
         if ($filter['value'] === '*') {
             $query
-                ->leftJoin(
-                    $relation->getRelated()->getTable(),
-                    $relation->getQualifiedForeignKeyName(),
-                    '=',
-                    $relation->getQualifiedParentKeyName(),
-                )
+                ->leftJoin($related, $foreignKey, '=', $parentKey)
                 ->where(
-                    $relation->getQualifiedForeignKeyName(),
+                    $foreignKey,
                     $filter['operator'] === 'doesntHave' ? '=' : '!=',
                     null,
                 );
             // use left join to check if model has relation with specified ID
         } else {
-            $relatedTable = $relation->getRelated()->getTable();
             $query
-                ->leftJoin(
-                    $relatedTable,
-                    $relation->getQualifiedForeignKeyName(),
-                    '=',
-                    $relation->getQualifiedParentKeyName(),
-                )
+                ->leftJoin($related, $foreignKey, '=', $parentKey)
                 ->where(
-                    "$relatedTable.id",
+                    "$related.id",
                     $filter['operator'] === 'has' ? '=' : '!=',
                     $filter['value'],
                 );
             if ($filter['operator'] === 'doesntHave') {
-                $this->query->orWhere("$relatedTable.id", null);
+                $this->query->orWhere("$related.id", null);
             }
         }
 
         return $query;
     }
 
-    /**
-     * @param Builder|Model $query
-     */
     private function filterByManyToManyRelation(
         $query,
-        BelongsToMany $relation,
-        array $filter
+        $relation,
+        array $filter,
     ) {
         if ($filter['operator'] === 'has') {
+            $values = is_array($filter['value'])
+                ? $filter['value']
+                : [$filter['value']];
             $query
-                ->leftJoin(
+                ->select($query->getModel()->getTable() . '.*')
+                ->join(
                     $relation->getTable(),
                     $relation->getQualifiedParentKeyName(),
                     '=',
                     $relation->getQualifiedForeignPivotKeyName(),
-                )
-                ->where(
-                    $relation->getQualifiedRelatedPivotKeyName(),
-                    '=',
-                    $filter['value'],
                 );
+            foreach ($values as $value) {
+                $query
+                    ->orWhere(
+                        $relation->getQualifiedRelatedPivotKeyName(),
+                        '=',
+                        $value,
+                    )
+                    ->groupBy($query->getModel()->getTable() . '.id');
+            }
         } elseif ($filter['operator'] === 'doesntHave') {
             $table = $query->getModel()->getTable();
             $query->whereNotIn("$table.id", function (Builder $builder) use (
                 $filter,
-                $query
+                $query,
             ) {
                 $relName = $filter['key'];
                 $relation = $query->getModel()->$relName();

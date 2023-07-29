@@ -23,6 +23,8 @@ class AssistantDevicesPlatformProtoSupportedDeviceOps extends \Google\Model
   protected $callCallDataType = '';
   protected $clientReconnectType = AssistantDevicesPlatformProtoClientReconnectCapability::class;
   protected $clientReconnectDataType = '';
+  protected $coreDismissAssistantType = AssistantDevicesPlatformProtoCoreDismissAssistantCapability::class;
+  protected $coreDismissAssistantDataType = '';
   protected $deviceModifySettingType = AssistantDevicesPlatformProtoDeviceModifySettingCapability::class;
   protected $deviceModifySettingDataType = '';
   protected $deviceTakePhotoType = AssistantDevicesPlatformProtoDeviceTakePhotoCapability::class;
@@ -37,8 +39,12 @@ class AssistantDevicesPlatformProtoSupportedDeviceOps extends \Google\Model
   protected $mediaPreviousDataType = '';
   protected $mediaResumeType = AssistantDevicesPlatformProtoMediaResumeCapability::class;
   protected $mediaResumeDataType = '';
+  protected $mediaShowControlsType = AssistantDevicesPlatformProtoMediaShowControlsCapability::class;
+  protected $mediaShowControlsDataType = '';
   protected $mediaStopType = AssistantDevicesPlatformProtoMediaStopCapability::class;
   protected $mediaStopDataType = '';
+  protected $providerFulfillType = AssistantDevicesPlatformProtoProviderFulfillCapability::class;
+  protected $providerFulfillDataType = '';
   protected $providerOpenType = AssistantDevicesPlatformProtoProviderOpenCapability::class;
   protected $providerOpenDataType = '';
   protected $sendChatMessageType = AssistantDevicesPlatformProtoSendChatMessageCapability::class;
@@ -71,6 +77,20 @@ class AssistantDevicesPlatformProtoSupportedDeviceOps extends \Google\Model
   public function getClientReconnect()
   {
     return $this->clientReconnect;
+  }
+  /**
+   * @param AssistantDevicesPlatformProtoCoreDismissAssistantCapability
+   */
+  public function setCoreDismissAssistant(AssistantDevicesPlatformProtoCoreDismissAssistantCapability $coreDismissAssistant)
+  {
+    $this->coreDismissAssistant = $coreDismissAssistant;
+  }
+  /**
+   * @return AssistantDevicesPlatformProtoCoreDismissAssistantCapability
+   */
+  public function getCoreDismissAssistant()
+  {
+    return $this->coreDismissAssistant;
   }
   /**
    * @param AssistantDevicesPlatformProtoDeviceModifySettingCapability
@@ -171,6 +191,20 @@ class AssistantDevicesPlatformProtoSupportedDeviceOps extends \Google\Model
     return $this->mediaResume;
   }
   /**
+   * @param AssistantDevicesPlatformProtoMediaShowControlsCapability
+   */
+  public function setMediaShowControls(AssistantDevicesPlatformProtoMediaShowControlsCapability $mediaShowControls)
+  {
+    $this->mediaShowControls = $mediaShowControls;
+  }
+  /**
+   * @return AssistantDevicesPlatformProtoMediaShowControlsCapability
+   */
+  public function getMediaShowControls()
+  {
+    return $this->mediaShowControls;
+  }
+  /**
    * @param AssistantDevicesPlatformProtoMediaStopCapability
    */
   public function setMediaStop(AssistantDevicesPlatformProtoMediaStopCapability $mediaStop)
@@ -183,6 +217,20 @@ class AssistantDevicesPlatformProtoSupportedDeviceOps extends \Google\Model
   public function getMediaStop()
   {
     return $this->mediaStop;
+  }
+  /**
+   * @param AssistantDevicesPlatformProtoProviderFulfillCapability
+   */
+  public function setProviderFulfill(AssistantDevicesPlatformProtoProviderFulfillCapability $providerFulfill)
+  {
+    $this->providerFulfill = $providerFulfill;
+  }
+  /**
+   * @return AssistantDevicesPlatformProtoProviderFulfillCapability
+   */
+  public function getProviderFulfill()
+  {
+    return $this->providerFulfill;
   }
   /**
    * @param AssistantDevicesPlatformProtoProviderOpenCapability

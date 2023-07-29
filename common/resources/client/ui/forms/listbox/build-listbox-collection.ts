@@ -3,6 +3,7 @@ import memoize from 'nano-memoize';
 import {ListboxItemProps} from './item';
 import {ListboxSectionProps, Section} from './section';
 import {ListBoxChildren} from './types';
+import {MessageDescriptor} from '@common/i18n/message-descriptor';
 
 export type ListboxCollection = Map<string | number, CollectionItem<any>>;
 
@@ -66,9 +67,7 @@ const childrenToCollection = memoize(
   ({children, items}: ListBoxChildren<any>) => {
     let reactChildren: ReactNode;
     if (items && typeof children === 'function') {
-      reactChildren = items.map(item => {
-        return children(item);
-      });
+      reactChildren = items.map(item => children(item));
     } else {
       reactChildren = children as ReactNode;
     }
@@ -119,13 +118,13 @@ const childrenToCollection = memoize(
 );
 
 function getTextLabel(item: ReactElement<ListboxItemProps>): string {
-  const content = item.props.children;
+  const content = item.props.children as any;
 
   if (item.props.textLabel) {
     return item.props.textLabel;
   }
-  if (content && (content as any).props?.defaultMessage) {
-    return (content as any).props.defaultMessage[0].value;
+  if ((content?.props as MessageDescriptor)?.message) {
+    return content.props.message;
   }
 
   return `${content}` || '';

@@ -27,7 +27,6 @@ class SearchController extends BaseController
             'search',
             request('localOnly') ? 'local' : null,
         );
-
         $response = [
             'query' => e($query),
             'results' => [],
@@ -44,8 +43,15 @@ class SearchController extends BaseController
             $results = $contentProvider->search($query, $limit, $modelTypes);
 
             if ($this->request->get('normalize')) {
-                $results = $results->mapWithKeys(function($models, $modelName) {
-                    return [$modelName => $models->map(fn($model) => $model->toNormalizedArray())];
+                $results = $results->mapWithKeys(function (
+                    $models,
+                    $modelName,
+                ) {
+                    return [
+                        $modelName => $models->map(
+                            fn($model) => $model->toNormalizedArray(),
+                        ),
+                    ];
                 });
             }
 

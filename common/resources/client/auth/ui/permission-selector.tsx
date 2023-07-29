@@ -51,7 +51,7 @@ export const PermissionSelector = React.forwardRef<
       <Accordion variant="outline" ref={ref}>
         {groupedPermissions.map(({groupName, items, anyChecked}) => (
           <AccordionItem
-            label={prettyName(groupName)}
+            label={<Trans message={prettyName(groupName)} />}
             key={groupName}
             startIcon={anyChecked ? <DoneAllIcon size="sm" /> : undefined}
           >
@@ -79,9 +79,11 @@ export const PermissionSelector = React.forwardRef<
                           onChange={() => {}}
                         />
                       }
-                      description={permission.description}
+                      description={<Trans message={permission.description} />}
                     >
-                      {permission.display_name || permission.name}
+                      <Trans
+                        message={permission.display_name || permission.name}
+                      />
                     </ListItem>
                     {isChecked && (
                       <Restrictions
@@ -134,10 +136,15 @@ function Restrictions({permission, onChange}: RestrictionsProps) {
       {permission.restrictions.map((restriction, index) => {
         const isLast = index === permission.restrictions.length - 1;
 
+        const name = <Trans message={prettyName(restriction.name)} />;
+        const description = restriction.description ? (
+          <Trans message={restriction.description} />
+        ) : undefined;
+
         if (restriction.type === 'bool') {
           return (
             <Switch
-              description={restriction.description}
+              description={description}
               key={restriction.name}
               className={clsx(!isLast && 'mb-30')}
               checked={Boolean(restriction.value)}
@@ -145,7 +152,7 @@ function Restrictions({permission, onChange}: RestrictionsProps) {
                 setRestrictionValue(restriction.name, e.target.checked);
               }}
             >
-              {prettyName(restriction.name)}
+              {name}
             </Switch>
           );
         }
@@ -153,8 +160,8 @@ function Restrictions({permission, onChange}: RestrictionsProps) {
         return (
           <TextField
             size="sm"
-            label={prettyName(restriction.name)}
-            description={restriction.description}
+            label={name}
+            description={description}
             type="number"
             key={restriction.name}
             className={clsx(!isLast && 'mb-30')}

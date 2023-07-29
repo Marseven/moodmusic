@@ -4,7 +4,6 @@ namespace Common\Files\Providers;
 
 use Illuminate\Filesystem\FilesystemManager;
 use Illuminate\Support\ServiceProvider;
-use League\Flysystem\AwsS3v3\AwsS3Adapter;
 use Storage;
 
 class BackblazeServiceProvider extends ServiceProvider

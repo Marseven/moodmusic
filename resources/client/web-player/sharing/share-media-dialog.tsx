@@ -23,9 +23,12 @@ import {ShareMediaButtons} from '@app/web-player/sharing/share-media-buttons';
 import {DialogFooter} from '@common/ui/overlays/dialog/dialog-footer';
 import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
+import {Playlist} from '@app/web-player/playlists/playlist';
+import {PlaylistImage} from '@app/web-player/playlists/playlist-image';
+import {getPlaylistLink} from '@app/web-player/playlists/playlist-link';
 
 interface Props {
-  item: Artist | Album | Track;
+  item: Artist | Album | Track | Playlist;
 }
 export function ShareMediaDialog({item}: Props) {
   const {close} = useDialogContext();
@@ -35,7 +38,7 @@ export function ShareMediaDialog({item}: Props) {
         <Trans message="Share :name" values={{name: item.name}} />
       </DialogHeader>
       <DialogBody>
-        {item.model_type === 'artist' ? (
+        {item.model_type === 'artist' || item.model_type === 'playlist' ? (
           <SharePanel item={item} />
         ) : (
           <Tabs>
@@ -109,7 +112,7 @@ function SharePanel({item}: Props) {
       <MediaImage
         item={item}
         size="w-128 h-128"
-        className="rounded object-cover flex-shrink-0 hidden md:block"
+        className="rounded object-cover flex-shrink-0 max-md:hidden"
       />
       <div className="flex-auto">
         <div className="text-xl mb-8">{item.name}</div>
@@ -154,12 +157,21 @@ function MediaImage({item, className, size}: MediaImageProps) {
   switch (item.model_type) {
     case 'artist':
       return (
-        <SmallArtistImage size={size} className={className} artist={item} />
+        <SmallArtistImage
+          size={size}
+          className={className}
+          wrapperClassName="max-md:hidden"
+          artist={item}
+        />
       );
     case 'album':
       return <AlbumImage size={size} className={className} album={item} />;
     case 'track':
       return <TrackImage size={size} className={className} track={item} />;
+    case 'playlist':
+      return (
+        <PlaylistImage size={size} className={className} playlist={item} />
+      );
   }
 }
 
@@ -171,5 +183,7 @@ function getLink(item: Props['item']) {
       return getAlbumLink(item, {absolute: true});
     case 'track':
       return getTrackLink(item, {absolute: true});
+    case 'playlist':
+      return getPlaylistLink(item, {absolute: true});
   }
 }

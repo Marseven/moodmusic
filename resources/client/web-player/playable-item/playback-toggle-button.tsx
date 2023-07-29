@@ -14,6 +14,7 @@ import {
 import {Button} from '@common/ui/buttons/button';
 import {Trans} from '@common/i18n/trans';
 import {Track} from '@app/web-player/tracks/track';
+import {ButtonSize} from '@common/ui/buttons/button-size';
 
 interface PlaybackToggleButtonProps {
   queueId?: string;
@@ -28,6 +29,7 @@ interface PlaybackToggleButtonProps {
   className?: string;
   buttonType: 'icon' | 'text';
   equalizerColor?: 'white' | 'black';
+  size?: ButtonSize;
 }
 export function PlaybackToggleButton({
   queueId,
@@ -40,6 +42,7 @@ export function PlaybackToggleButton({
   className,
   buttonType,
   equalizerColor = buttonType === 'text' ? 'white' : 'black',
+  size,
 }: PlaybackToggleButtonProps) {
   const [isHover, setIsHover] = useState(false);
   const modelIsQueued = usePlayerStore(s => {
@@ -53,7 +56,7 @@ export function PlaybackToggleButton({
     }
     return false;
   });
-  const isPlaying = usePlayerStore(s => s.status === 'playing');
+  const isPlaying = usePlayerStore(s => s.isPlaying);
   const modelIsPlaying = isPlaying && modelIsQueued;
   const player = usePlayerActions();
 
@@ -108,6 +111,7 @@ export function PlaybackToggleButton({
         variant={variant}
         color={color}
         radius={radius}
+        size={size}
         className={className}
       >
         {statusIcon}
@@ -122,6 +126,7 @@ export function PlaybackToggleButton({
       color={color || 'primary'}
       radius={radius || 'rounded-full'}
       startIcon={statusIcon}
+      size={size}
       className={className}
     >
       {modelIsPlaying ? <Trans message="Pause" /> : <Trans message="Play" />}

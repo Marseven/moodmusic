@@ -1,4 +1,4 @@
-import React, {StrictMode} from 'react';
+import React from 'react';
 import {QueryClientProvider} from '@tanstack/react-query';
 import {domAnimation, LazyMotion} from 'framer-motion';
 import {queryClient} from '../http/query-client';
@@ -17,16 +17,14 @@ const mergedConfig = deepMerge(BaseSiteConfig, SiteConfig);
 
 export function CommonProvider({children}: ProvidersProps) {
   return (
-    <StrictMode>
-      <QueryClientProvider client={queryClient}>
-        <LazyMotion features={domAnimation}>
-          <SiteConfigContext.Provider value={mergedConfig}>
-            <BootstrapDataProvider>
-              <ThemeProvider>{children}</ThemeProvider>
-            </BootstrapDataProvider>
-          </SiteConfigContext.Provider>
-        </LazyMotion>
-      </QueryClientProvider>
-    </StrictMode>
+    <QueryClientProvider client={queryClient}>
+      <LazyMotion features={domAnimation}>
+        <SiteConfigContext.Provider value={mergedConfig}>
+          <BootstrapDataProvider>
+            <ThemeProvider>{children}</ThemeProvider>
+          </BootstrapDataProvider>
+        </SiteConfigContext.Provider>
+      </LazyMotion>
+    </QueryClientProvider>
   );
 }

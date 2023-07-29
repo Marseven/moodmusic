@@ -37,7 +37,7 @@ class Groups
     {
         $this->groups = (array) $groups;
 
-        if (!$this->groups) {
+        if (empty($this->groups)) {
             throw new InvalidArgumentException(sprintf('Parameter of annotation "%s" cannot be empty.', static::class));
         }
 

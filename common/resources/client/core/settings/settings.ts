@@ -91,6 +91,7 @@ export interface Settings {
     facebook: {
       enable: boolean;
     };
+    compact_buttons: boolean;
   };
   workspaces: {
     integrated: boolean;

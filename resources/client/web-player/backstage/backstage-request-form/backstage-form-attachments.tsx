@@ -4,7 +4,7 @@ import {useSocialLogin} from '@common/auth/requests/use-social-login';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
 import {TwitterIcon} from '@common/icons/social/twitter';
-import {invalidateUseUserQuery, useUser} from '@common/auth/ui/use-user';
+import {useUser} from '@common/auth/ui/use-user';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
 import {FacebookIcon} from '@common/icons/social/facebook';
@@ -17,8 +17,11 @@ import {CloseIcon} from '@common/icons/material/Close';
 import {useActiveUpload} from '@common/uploads/uploader/use-active-upload';
 import {UploadInputType} from '@common/uploads/types/upload-input-config';
 import {Disk} from '@common/uploads/types/backend-metadata';
+import {queryClient} from '@common/http/query-client';
+import {useSettings} from '@common/core/settings/use-settings';
 
 export function BackstageFormAttachments() {
+  const {social} = useSettings();
   const {watch, setValue} = useFormContext<CreateBackstageRequestPayload>();
   const {connectSocial} = useSocialLogin();
   const passportScan = watch('passportScan');
@@ -28,34 +31,38 @@ export function BackstageFormAttachments() {
       <div className="mb-14 text-sm">
         <Trans message="Speed up the process by connecting artist social media accounts or uploading your passport scan." />
       </div>
-      <Button
-        variant="outline"
-        startIcon={<TwitterIcon className="text-twitter" />}
-        className="mr-10 mb-10 md:mb-0"
-        onClick={async () => {
-          const e = await connectSocial('twitter');
-          if (e?.status === 'SUCCESS') {
-            invalidateUseUserQuery('me');
-            toast(message('Connected twitter account'));
-          }
-        }}
-      >
-        <Trans message="Connect to twitter" />
-      </Button>
-      <Button
-        variant="outline"
-        startIcon={<FacebookIcon className="text-facebook" />}
-        className="mr-10 mb-10 md:mb-0"
-        onClick={async () => {
-          const e = await connectSocial('facebook');
-          if (e?.status === 'SUCCESS') {
-            invalidateUseUserQuery('me');
-            toast(message('Connected facebook account'));
-          }
-        }}
-      >
-        <Trans message="Connect to facebook" />
-      </Button>
+      {social?.twitter?.enable && (
+        <Button
+          variant="outline"
+          startIcon={<TwitterIcon className="text-twitter" />}
+          className="mr-10 mb-10 md:mb-0"
+          onClick={async () => {
+            const e = await connectSocial('twitter');
+            if (e?.status === 'SUCCESS') {
+              queryClient.invalidateQueries(['users']);
+              toast(message('Connected twitter account'));
+            }
+          }}
+        >
+          <Trans message="Connect to twitter" />
+        </Button>
+      )}
+      {social?.facebook?.enable && (
+        <Button
+          variant="outline"
+          startIcon={<FacebookIcon className="text-facebook" />}
+          className="mr-10 mb-10 md:mb-0"
+          onClick={async () => {
+            const e = await connectSocial('facebook');
+            if (e?.status === 'SUCCESS') {
+              queryClient.invalidateQueries(['users']);
+              toast(message('Connected facebook account'));
+            }
+          }}
+        >
+          <Trans message="Connect to facebook" />
+        </Button>
+      )}
       <PassportScanButton />
       <div className="mt-20">
         {passportScan && (
@@ -111,7 +118,7 @@ function SocialServiceAttachment({service}: SocialServiceAttachmentProps) {
           {service: 'twitter'},
           {
             onSuccess: () => {
-              invalidateUseUserQuery('me');
+              queryClient.invalidateQueries(['users']);
             },
           }
         );

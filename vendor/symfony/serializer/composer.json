@@ -16,7 +16,7 @@
         }
     ],
     "require": {
-        "php": ">=8.1",
+        "php": ">=8.0.2",
         "symfony/polyfill-ctype": "~1.8"
     },
     "require-dev": {
@@ -42,7 +42,7 @@
     "conflict": {
         "doctrine/annotations": "<1.12",
         "phpdocumentor/reflection-docblock": "<3.2.2",
-        "phpdocumentor/type-resolver": "<1.4.0",
+        "phpdocumentor/type-resolver": "<1.4.0|>=1.7.0",
         "symfony/dependency-injection": "<5.4",
         "symfony/property-access": "<5.4",
         "symfony/property-info": "<5.4",

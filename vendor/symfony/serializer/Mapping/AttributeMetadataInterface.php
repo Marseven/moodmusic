@@ -11,8 +11,6 @@
 
 namespace Symfony\Component\Serializer\Mapping;
 
-use Symfony\Component\PropertyAccess\PropertyPath;
-
 /**
  * Stores metadata needed for serializing and deserializing attributes.
  *
@@ -54,16 +52,12 @@ interface AttributeMetadataInterface
     /**
      * Sets the serialization name for this attribute.
      */
-    public function setSerializedName(?string $serializedName);
+    public function setSerializedName(string $serializedName = null);
 
     /**
      * Gets the serialization name for this attribute.
      */
     public function getSerializedName(): ?string;
-
-    public function setSerializedPath(?PropertyPath $serializedPath): void;
-
-    public function getSerializedPath(): ?PropertyPath;
 
     /**
      * Sets if this attribute must be ignored or not.

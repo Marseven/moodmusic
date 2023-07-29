@@ -103,14 +103,14 @@ export const TrackListItem = memo(
             </div>
             <div className="ml-auto text-sm">
               <FormattedRelativeTime date={track.created_at} />
-              {track.genres?.length && (
+              {track.genres?.length ? (
                 <Chip className="mt-6 w-max" size="xs">
                   <GenreLink
                     genre={track.genres[0]}
                     target={linksInNewTab ? '_blank' : undefined}
                   />
                 </Chip>
-              )}
+              ) : null}
             </div>
           </div>
           <div className="mt-20">

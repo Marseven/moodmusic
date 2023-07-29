@@ -24,11 +24,10 @@ class LoadChildComments
             ->where('commentable_id', $commentable->id)
             ->where('commentable_type', get_class($commentable))
             ->childrenOnly()
-            ->where(function (Builder $builder) use ($paths) {
-                $builder->whereRaw("path $paths");
-            })
+            ->where(fn(Builder $builder) => $builder->whereRaw("path $paths"))
             ->orderBy('path', 'asc')
             ->orderBy('created_at', 'desc')
+            ->orderByWeightedScore()
             ->limit(100)
             ->get();
 

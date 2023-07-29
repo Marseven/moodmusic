@@ -5,7 +5,7 @@ import {
   InteractableRect,
 } from './interactable-event';
 import {usePointerEvents, UsePointerEventsProps} from './use-pointer-events';
-import {setActiveInteraction} from './active-interaction';
+import {activeInteraction, setActiveInteraction} from './active-interaction';
 import {domRectToObj} from './utils/dom-rect-to-obj';
 
 interface RotateState {
@@ -28,7 +28,7 @@ export function useRotate(props: UseRotateProps) {
   const pointerProps: UsePointerEventsProps = {
     onMoveStart: (e, rotatable) => {
       const target = e.target as HTMLElement;
-      if (!target.dataset.rotateHandle) {
+      if (!target.dataset.rotateHandle || activeInteraction) {
         return false;
       }
 

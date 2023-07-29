@@ -18,4 +18,7 @@ export interface ColumnConfig<T extends TableDataItem> {
   allowsSorting?: boolean;
   sortingKey?: string;
   width?: string;
+  maxWidth?: string;
+  minWidth?: string;
+  visibleInMode?: 'compact' | 'regular' | 'all';
 }

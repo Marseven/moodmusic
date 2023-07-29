@@ -69,7 +69,7 @@ export function Dialog(props: DialogProps) {
   return (
     <div
       {...mergeProps({role: 'dialog', tabIndex: -1}, dialogProps, domProps)}
-      style={{'--be-dialog-padding': '24px'} as CSSProperties}
+      style={{...props.style, '--be-dialog-padding': '24px'} as CSSProperties}
       aria-modal
       className={mergedClassName}
     >

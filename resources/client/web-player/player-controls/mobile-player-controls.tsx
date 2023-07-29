@@ -1,16 +1,7 @@
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
-import {usePlayerActions} from '@common/player/hooks/use-player-actions';
-import {useTrans} from '@common/i18n/use-trans';
-import {IconButton} from '@common/ui/buttons/icon-button';
-import {message} from '@common/i18n/message';
-import {SkipPreviousFilledIcon} from '@app/web-player/tracks/track-table/skip-previous-filled';
-import {SkipNextFilledIcon} from '@app/web-player/tracks/track-table/skip-next-filled';
-import {PauseIcon} from '@common/icons/material/Pause';
-import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
-import {useBaseSeekbar} from '@app/web-player/player-controls/seekbar/use-base-seekbar';
-import React, {useEffect} from 'react';
+import React, {useMemo} from 'react';
 import {ProgressBar} from '@common/ui/progress/progress-bar';
 import {CustomMenuItem} from '@common/menus/custom-menu';
 import clsx from 'clsx';
@@ -20,11 +11,23 @@ import {NavbarAuthMenu} from '@common/ui/navigation/navbar/navbar-auth-menu';
 import {PersonIcon} from '@common/icons/material/Person';
 import {Badge} from '@common/ui/badge/badge';
 import {useAuth} from '@common/auth/use-auth';
-import {Menu, MenuTrigger} from '@common/ui/navigation/menu/menu-trigger';
+import {
+  Menu,
+  MenuItem,
+  MenuTrigger,
+} from '@common/ui/navigation/menu/menu-trigger';
 import {Item} from '@common/ui/forms/listbox/item';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {useSettings} from '@common/core/settings/use-settings';
 import {playerOverlayState} from '@app/web-player/state/player-overlay-store';
+import {usePrimaryArtistForCurrentUser} from '@app/web-player/backstage/use-primary-artist-for-current-user';
+import {MicIcon} from '@common/icons/material/Mic';
+import {getArtistLink} from '@app/web-player/artists/artist-link';
+import {useCurrentTime} from '@common/player/hooks/use-current-time';
+import {PlayButton} from '@common/player/ui/controls/play-button';
+import {PreviousButton} from '@common/player/ui/controls/previous-button';
+import {NextButton} from '@common/player/ui/controls/next-button';
+import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indicator';
 
 export function MobilePlayerControls() {
   return (
@@ -76,84 +79,21 @@ function QueuedTrack() {
 }
 
 function PlaybackButtons() {
-  const isUninitialized = usePlayerStore(s => s.status === 'uninitialized');
-  const player = usePlayerActions();
-  const {trans} = useTrans();
-
   return (
     <div className="flex items-center justify-center">
-      <IconButton
-        disabled={isUninitialized}
-        size="md"
-        aria-label={trans(message('Previous'))}
-        onClick={e => {
-          e.stopPropagation();
-          player.playPrevious();
-        }}
-      >
-        <SkipPreviousFilledIcon />
-      </IconButton>
-      <PlayButton />
-      <IconButton
-        disabled={isUninitialized}
-        aria-label={trans(message('Next'))}
-        size="md"
-        onClick={e => {
-          e.stopPropagation();
-          player.playNext();
-        }}
-      >
-        <SkipNextFilledIcon />
-      </IconButton>
+      <PreviousButton stopPropagation />
+      <div className="relative">
+        <BufferingIndicator />
+        <PlayButton size="md" iconSize="lg" stopPropagation />
+      </div>
+      <NextButton stopPropagation />
     </div>
-  );
-}
-
-function PlayButton() {
-  const status = usePlayerStore(s => s.status);
-  const player = usePlayerActions();
-  const {trans} = useTrans();
-  const label =
-    status === 'playing' ? trans(message('Pause')) : trans(message('Play'));
-
-  return (
-    <IconButton
-      aria-label={label}
-      size="md"
-      iconSize="lg"
-      disabled={status === 'uninitialized'}
-      onClick={e => {
-        e.stopPropagation();
-        if (status === 'playing') {
-          player.pause();
-        } else {
-          player.play();
-        }
-      }}
-    >
-      {status === 'playing' ? <PauseIcon /> : <PlayArrowFilledIcon />}
-    </IconButton>
   );
 }
 
 function PlayerProgressBar() {
   const duration = usePlayerStore(s => s.mediaDuration);
-  const {time, player, listeners, stopTimer, setTime} = useBaseSeekbar();
-
-  useEffect(() => {
-    const unsubscribe = player.subscribe({
-      ...listeners,
-      // stop timer and set time to zero when cueing a new track
-      onCued: () => {
-        stopTimer();
-        setTime(0);
-      },
-    });
-    return () => {
-      unsubscribe();
-    };
-  }, [player, listeners, stopTimer, setTime]);
-
+  const currentTime = useCurrentTime();
   return (
     <ProgressBar
       size="xs"
@@ -164,7 +104,7 @@ function PlayerProgressBar() {
       radius="rounded-none"
       minValue={0}
       maxValue={duration}
-      value={time}
+      value={currentTime}
     />
   );
 }
@@ -180,7 +120,12 @@ function MobileNavbar() {
           unstyled
           iconClassName="block mx-auto mb-6"
           iconSize="md"
-          className={({isActive}) => clsx('text-xs', isActive && 'font-bold')}
+          className={({isActive}) =>
+            clsx(
+              'text-xs whitespace-nowrap overflow-hidden',
+              isActive && 'font-bold'
+            )
+          }
           key={item.id}
           item={item}
         />
@@ -195,6 +140,41 @@ function AccountButton() {
   const hasUnreadNotif = !!user?.unread_notifications_count;
   const navigate = useNavigate();
   const {registration} = useSettings();
+
+  const primaryArtist = usePrimaryArtistForCurrentUser();
+  const {player} = useSettings();
+  const menuItems = useMemo(() => {
+    if (primaryArtist) {
+      return [
+        <MenuItem
+          value="author"
+          key="author"
+          startIcon={<MicIcon />}
+          onSelected={() => {
+            navigate(getArtistLink(primaryArtist));
+          }}
+        >
+          <Trans message="Artist profile" />
+        </MenuItem>,
+      ];
+    }
+    if (player?.show_become_artist_btn) {
+      return [
+        <MenuItem
+          value="author"
+          key="author"
+          startIcon={<MicIcon />}
+          onSelected={() => {
+            navigate('/backstage/requests');
+          }}
+        >
+          <Trans message="Become an author" />
+        </MenuItem>,
+      ];
+    }
+
+    return [];
+  }, [primaryArtist, navigate, player?.show_become_artist_btn]);
 
   const button = (
     <button className="text-xs">
@@ -229,5 +209,5 @@ function AccountButton() {
     );
   }
 
-  return <NavbarAuthMenu>{button}</NavbarAuthMenu>;
+  return <NavbarAuthMenu items={menuItems}>{button}</NavbarAuthMenu>;
 }

@@ -25,6 +25,9 @@ class InformationalChunk extends DataChunk
         $this->status = [$statusCode, $headers];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getInformationalStatus(): ?array
     {
         return $this->status;

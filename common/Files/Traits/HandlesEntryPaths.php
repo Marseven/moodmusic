@@ -31,8 +31,11 @@ trait HandlesEntryPaths
         $this->attributes['path'] = $this->encodePath($value);
     }
 
-    public function updatePaths(string $oldPath, string $newPath, $entryIds = null): void
-    {
+    public function updatePaths(
+        string $oldPath,
+        string $newPath,
+        $entryIds = null,
+    ): void {
         $oldPath = $this->encodePath($oldPath);
         $newPath = $this->encodePath($newPath);
 
@@ -55,11 +58,16 @@ trait HandlesEntryPaths
         return $builder->where('path', 'like', $this->attributes['path'] . '%');
     }
 
-    public function scopeAllParents(Builder $builder): Builder
+    public function getParentIds(): array
     {
         $folderIds = explode('/', $this->path);
         array_pop($folderIds);
-        return $builder->whereIn('id', $folderIds);
+        return $folderIds;
+    }
+
+    public function scopeAllParents(Builder $builder): Builder
+    {
+        return $builder->whereIn('id', $this->getParentIds());
     }
 
     /**

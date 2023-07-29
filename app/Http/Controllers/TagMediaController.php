@@ -42,7 +42,7 @@ class TagMediaController extends BaseController
                             'name',
                             'plays',
                             'image',
-                            'url',
+                            'src',
                             'duration',
                         );
                 },

@@ -27,7 +27,7 @@ export function useBackendFilterUrlParams(
         const config = filters.find(f => f.key === key)!;
         decoded.push({
           key,
-          value: config.defaultValue,
+          value: config.control.defaultValue,
           operator: config.defaultOperator,
           isInactive: true,
         });

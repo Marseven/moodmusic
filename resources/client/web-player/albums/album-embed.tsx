@@ -1,14 +1,7 @@
-import React, {
-  memo,
-  MutableRefObject,
-  useContext,
-  useMemo,
-  useRef,
-} from 'react';
+import React, {useMemo} from 'react';
 import {playerStoreOptions} from '@app/web-player/state/player-store-options';
-import {PlayerContext, PlayerStoreContext} from '@common/player/player-context';
+import {PlayerContext} from '@common/player/player-context';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
-import {PlayerStoreOptions} from '@common/player/player-store-options';
 import {
   tracksToMediaItems,
   trackToMediaItem,
@@ -16,6 +9,8 @@ import {
 import {useAlbum} from '@app/web-player/albums/requests/use-album';
 import {Album} from '@app/web-player/albums/album';
 import {AlbumListItem} from '@app/web-player/albums/album-list/album-list-item';
+import {PlayerStoreOptions} from '@common/player/state/player-store-options';
+import {PlayerOutlet} from '@common/player/ui/player-outlet';
 
 export function AlbumEmbed() {
   const {data} = useAlbum({
@@ -33,11 +28,9 @@ interface EmbedContentProps {
   album: Album;
 }
 function EmbedContent({album}: EmbedContentProps) {
-  const playerRef = useRef<HTMLDivElement>(null);
   const options: PlayerStoreOptions = useMemo(() => {
     return {
       ...playerStoreOptions,
-      ref: playerRef,
       initialData: {
         queue: album.tracks?.length ? tracksToMediaItems(album.tracks) : [],
         cuedMediaId: album.tracks?.length
@@ -53,11 +46,12 @@ function EmbedContent({album}: EmbedContentProps) {
     <PlayerContext id="web-player" options={options}>
       <div className="flex gap-24 items-start h-full">
         <div className="flex-shrink-0 rounded bg-black overflow-hidden">
-          <PlayerContainer playerRef={playerRef} />
+          <PlayerOutlet className="w-144 h-144" />
         </div>
         <AlbumListItem
           album={album}
           maxHeight="h-full"
+          className="flex-auto"
           hideArtwork
           hideActions
           linksInNewTab
@@ -66,23 +60,3 @@ function EmbedContent({album}: EmbedContentProps) {
     </PlayerContext>
   );
 }
-
-interface PlayerContainerProps {
-  playerRef: MutableRefObject<HTMLDivElement | null>;
-}
-const PlayerContainer = memo(({playerRef}: PlayerContainerProps) => {
-  const {getState} = useContext(PlayerStoreContext);
-  return (
-    <div
-      className="w-144 h-144 player-container"
-      ref={el => {
-        if (el) {
-          playerRef.current = el;
-          getState().init();
-        } else {
-          getState().destroy();
-        }
-      }}
-    />
-  );
-});

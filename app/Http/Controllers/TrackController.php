@@ -60,7 +60,7 @@ class TrackController extends BaseController
                     },
                 ]);
             } else {
-                $track->load($relation);
+                $track->load(trim($relation));
             }
         }
 

@@ -6,6 +6,6 @@ export function useIsTrackPlaying(
   groupId?: string | number
 ): boolean {
   const isCued = useIsTrackCued(trackId, groupId);
-  const isPlaying = usePlayerStore(s => s.status === 'playing');
+  const isPlaying = usePlayerStore(s => s.isPlaying);
   return isCued && isPlaying;
 }

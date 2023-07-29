@@ -1,14 +1,14 @@
 import {
-  CreatedAtFilter,
-  UpdatedAtFilter,
+  createdAtFilter,
+  updatedAtFilter,
 } from '@common/datatable/filters/timestamp-filters';
 import {message} from '@common/i18n/message';
 
 export const LyricDatatablePageFilters = [
-  new CreatedAtFilter({
+  createdAtFilter({
     description: message('Date lyric was created'),
   }),
-  new UpdatedAtFilter({
+  updatedAtFilter({
     description: message('Date lyric was last updated'),
   }),
 ];

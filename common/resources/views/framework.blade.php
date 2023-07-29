@@ -30,6 +30,22 @@
         @endif
     @endif
 
+    @if ($code = $settings->get('analytics.tracking_code'))
+        <!-- Google tag (gtag.js) -->
+        <script async
+                src="https://www.googletagmanager.com/gtag/js?id={{$settings->get('analytics.tracking_code')}}" />
+        <script>
+            window.dataLayer = window.dataLayer || [];
+
+            function gtag() {
+                dataLayer.push(arguments);
+            }
+
+            gtag('js', new Date());
+            gtag('config', '{{$settings->get('analytics.tracking_code')}}');
+        </script>
+    @endif
+
     @yield('head-end')
 </head>
 
@@ -38,7 +54,7 @@
 <div
     id="root"
     style="{{ $bootstrapData->getSelectedTheme()->getColorsForCss() }}"
-    @class(['dark' => $bootstrapData->getSelectedTheme('name') === 'dark'])
+    @class(['dark' => $bootstrapData->getSelectedTheme('is_dark')])
 >
 </div>
 
@@ -48,22 +64,6 @@
 
 @viteReactRefresh
 @vite('resources/client/main.tsx')
-
-@if ($code = $settings->get('analytics.tracking_code'))
-    <!-- Google tag (gtag.js) -->
-    <script async
-            src="https://www.googletagmanager.com/gtag/js?id={{$settings->get('analytics.tracking_code')}}" />
-    <script>
-        window.dataLayer = window.dataLayer || [];
-
-        function gtag() {
-            dataLayer.push(arguments);
-        }
-
-        gtag('js', new Date());
-        gtag('config', {{$settings->get('analytics.tracking_code')}});
-    </script>
-@endif
 
 <noscript>You need to have javascript enabled in order to use
     <strong>{{config('app.name')}}</strong>.

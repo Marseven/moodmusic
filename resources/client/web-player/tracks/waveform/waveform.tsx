@@ -64,14 +64,13 @@ export function Waveform({track, queue, className}: WaveformProps) {
     }
   }, [data, themeSelector.selectedTheme]);
 
-  const {value, onChange, duration, ...sliderProps} = useTrackSeekbar(
-    track,
-    queue
-  );
+  const {value, onChange, onChangeEnd, duration, ...sliderProps} =
+    useTrackSeekbar(track, queue);
   const {domProps, groupId, thumbIds, trackRef, getThumbPercent} = useSlider({
     ...sliderProps,
     value: [value],
     onChange: ([newValue]: number[]) => onChange(newValue),
+    onChangeEnd: () => onChangeEnd(),
   });
 
   return (

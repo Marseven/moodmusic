@@ -1,14 +1,12 @@
 import {useMutation} from '@tanstack/react-query';
 import {UseFormReturn} from 'react-hook-form';
-import {User} from '../../../auth/user';
-import {BackendResponse} from '../../../http/backend-response/backend-response';
-import {toast} from '../../../ui/toast/toast';
-import {apiClient, queryClient} from '../../../http/query-client';
-import {DatatableDataQueryKey} from '../../../datatable/requests/paginated-resources';
-import {onFormQueryError} from '../../../errors/on-form-query-error';
-import {message} from '../../../i18n/message';
-import {useNavigate} from '../../../utils/hooks/use-navigate';
-import {invalidateUseUserQuery} from '../../../auth/ui/use-user';
+import {User} from '@common/auth/user';
+import {BackendResponse} from '@common/http/backend-response/backend-response';
+import {toast} from '@common/ui/toast/toast';
+import {apiClient, queryClient} from '@common/http/query-client';
+import {onFormQueryError} from '@common/errors/on-form-query-error';
+import {message} from '@common/i18n/message';
+import {useNavigate} from '@common/utils/hooks/use-navigate';
 
 interface Response extends BackendResponse {
   user: User;
@@ -25,8 +23,7 @@ export function useUpdateUser(form: UseFormReturn<UpdateUserPayload>) {
   return useMutation((props: UpdateUserPayload) => updateUser(props), {
     onSuccess: (response, props) => {
       toast(message('User updated'));
-      queryClient.invalidateQueries([DatatableDataQueryKey('users')]);
-      invalidateUseUserQuery(props.id);
+      queryClient.invalidateQueries(['users']);
       navigate('/admin/users');
     },
     onError: r => onFormQueryError(r, form),

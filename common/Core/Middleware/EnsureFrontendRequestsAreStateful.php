@@ -2,6 +2,7 @@
 
 namespace Common\Core\Middleware;
 
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful as LaravelMiddleware;
 
@@ -13,16 +14,32 @@ class EnsureFrontendRequestsAreStateful extends LaravelMiddleware
             $request->headers->get('referer') ?:
             $request->headers->get('origin');
 
-        // make sure api calls from api docs page are not considered stateful to avoid 419 errors on POST requests
-        if (
-            !is_null($domain) &&
-            Str::is(config('app.url') . '/api-docs*', $domain)
-        ) {
+        if (is_null($domain)) {
             return false;
         }
 
-        // todo: allow both www and non-www versions of url
+        $domain = parse_url($domain, PHP_URL_HOST);
+        $domain = Str::replaceFirst('www.', '', $domain);
+        $domain = Str::endsWith($domain, '/') ? $domain : "{$domain}/";
 
-        return parent::fromFrontend($request);
+        $stateful = [
+            ...array_filter(config('sanctum.stateful', [])),
+            parse_url(config('app.url'), PHP_URL_HOST)
+        ];
+
+        // make sure api calls from api docs page are not considered stateful to avoid 419 errors on POST requests
+        if (Str::contains($domain, '/api-docs/')) {
+            return false;
+        }
+
+        return Str::is(
+            Collection::make($stateful)
+                ->map(
+                    fn($uri) => Str::replaceFirst('www.', '', trim($uri)) .
+                        '/*',
+                )
+                ->all(),
+            $domain,
+        );
     }
 }

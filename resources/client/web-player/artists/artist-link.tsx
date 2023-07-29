@@ -19,7 +19,7 @@ export function ArtistLink({artist, className, ...linkProps}: AlbumLinkProps) {
     <Link
       {...linkProps}
       className={clsx(
-        'hover:underline outline-none focus-visible:underline',
+        'hover:underline outline-none focus-visible:underline overflow-x-hidden overflow-ellipsis',
         className
       )}
       to={finalUri}

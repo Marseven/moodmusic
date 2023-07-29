@@ -13,7 +13,7 @@ import {useContext, useMemo} from 'react';
 import {useAddTracksToPlaylist} from '@app/web-player/playlists/requests/use-add-tracks-to-playlist';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
-import {openGlobalDialog} from '@app/web-player/state/global-dialog-store';
+import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import {CreatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/create-playlist-dialog';
 import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
 import {useAuth} from '@common/auth/use-auth';
@@ -56,7 +56,7 @@ export function PlaylistPanel() {
           onClick={async () => {
             closeMenu();
             const [playlist, tracks] = await Promise.all([
-              openGlobalDialog(CreatePlaylistDialog),
+              openDialog(CreatePlaylistDialog),
               loadTracks(),
             ]);
             if (tracks.length && playlist) {

@@ -9,6 +9,7 @@ use Common\Core\BaseController;
 use Common\Database\Datasource\Datasource;
 use Common\Domains\Actions\DeleteCustomDomains;
 use Exception;
+use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Http;
@@ -152,9 +153,15 @@ class CustomDomainController extends BaseController
         }
 
         $host = trim($this->request->get('host'), '/');
-        $response = Http::get(
-            "$host/" . self::VALIDATE_CUSTOM_DOMAIN_PATH,
-        )->json();
+        try {
+            $response = Http::get(
+                "$host/" . self::VALIDATE_CUSTOM_DOMAIN_PATH,
+            )->json();
+        } catch (ConnectionException $e) {
+            $response = [];
+            $failReason = 'serverNotConfigured';
+        }
+        
         if (Arr::get($response, 'result') === 'connected') {
             return $response;
         } else {

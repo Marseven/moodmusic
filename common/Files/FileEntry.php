@@ -26,6 +26,7 @@ class FileEntry extends Model
         Searchable,
         BelongsToWorkspace;
 
+    public const MODEL_TYPE = 'fileEntry';
     protected $guarded = ['id'];
     protected $hidden = ['pivot', 'preview_token'];
     protected $appends = ['hash', 'url'];
@@ -244,6 +245,17 @@ class FileEntry extends Model
             'type' => $this->type,
             'workspace_id' => $this->workspace_id ?? '_null',
             'tags' => $this->tags->pluck('name'),
+        ];
+    }
+
+    public function toNormalizedArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->name,
+            'description' => $this->type,
+            'image' => null,
+            'model_type' => self::MODEL_TYPE,
         ];
     }
 

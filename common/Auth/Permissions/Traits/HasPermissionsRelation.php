@@ -2,7 +2,6 @@
 
 namespace Common\Auth\Permissions\Traits;
 
-
 use Common\Auth\Permissions\Permission;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
@@ -17,7 +16,8 @@ trait HasPermissionsRelation
 
     public function hasPermission(string $name): bool
     {
-        return !is_null($this->getPermission($name)) || !is_null($this->getPermission('admin'));
+        return !is_null($this->getPermission($name)) ||
+            !is_null($this->getPermission('admin'));
     }
 
     public function hasExactPermission(string $name): bool
@@ -25,7 +25,7 @@ trait HasPermissionsRelation
         return !is_null($this->getPermission($name));
     }
 
-    public function getPermission(string $name): Permission | null
+    public function getPermission(string $name): Permission|null
     {
         if (method_exists($this, 'loadPermissions')) {
             $this->loadPermissions();
@@ -38,5 +38,13 @@ trait HasPermissionsRelation
         }
 
         return null;
+    }
+
+    public function getRestrictionValue(
+        string $permissionName,
+        string $restriction,
+    ): int|bool|null {
+        $permission = $this->getPermission($permissionName);
+        return $permission?->getRestrictionValue($restriction);
     }
 }

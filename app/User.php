@@ -16,11 +16,7 @@ class User extends BaseUser
 
     const MODEL_TYPE = 'user';
 
-    protected $appends = [
-        'display_name',
-        'has_password',
-        'model_type',
-    ];
+    protected $appends = ['display_name', 'has_password', 'model_type'];
 
     protected $casts = [
         'id' => 'integer',
@@ -29,26 +25,32 @@ class User extends BaseUser
         'artist_id' => 'integer',
     ];
 
-    public function getOrCreateArtist(array $values = []): Artist {
+    public function getOrCreateArtist(array $values = []): Artist
+    {
         $primaryArtist = $this->primaryArtist();
         if ($primaryArtist) {
             return $primaryArtist;
         } else {
-            return $this->artists()->create([
-                'name' => $values['artist_name'] ?? $this->display_name,
-                'image_small' => $values['image'] ?? $this->avatar,
-                'fully_scraped' => true,
-                'auto_update' => false,
-            ], ['role' => 'artist']);
+            return $this->artists()->create(
+                [
+                    'name' => $values['artist_name'] ?? $this->display_name,
+                    'image_small' => $values['image'] ?? $this->avatar,
+                    'fully_scraped' => true,
+                ],
+                ['role' => 'artist'],
+            );
         }
     }
 
     public function primaryArtist(): ?Artist
     {
-        return $this->artists()->wherePivot('role', 'artist')->first();
+        return $this->artists()
+            ->wherePivot('role', 'artist')
+            ->first();
     }
 
-    public function artists(): BelongsToMany {
+    public function artists(): BelongsToMany
+    {
         return $this->belongsToMany(Artist::class, 'user_artist')
             ->orderByRaw("FIELD(role, 'artist') ASC")
             ->withPivot(['role']);
@@ -59,25 +61,16 @@ class User extends BaseUser
         return $this->hasOne(UserProfile::class);
     }
 
-    public function followedUsers()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'follower_id', 'followed_id')
-            ->select(['users.id', 'first_name', 'last_name', 'avatar', 'email']);
-    }
-
-    public function followers()
-    {
-        return $this->belongsToMany(User::class, 'follows', 'followed_id', 'follower_id')
-            ->select(['users.id', 'first_name', 'last_name', 'avatar', 'email']);
-    }
-
     /**
      * @return BelongsToMany
      */
     public function likedTracks()
     {
-        return $this->morphedByMany(Track::class, 'likeable', 'likes')
-            ->withTimestamps();
+        return $this->morphedByMany(
+            Track::class,
+            'likeable',
+            'likes',
+        )->withTimestamps();
     }
 
     /**
@@ -85,8 +78,11 @@ class User extends BaseUser
      */
     public function likedAlbums()
     {
-        return $this->morphedByMany(Album::class, 'likeable', 'likes')
-            ->withTimestamps();
+        return $this->morphedByMany(
+            Album::class,
+            'likeable',
+            'likes',
+        )->withTimestamps();
     }
 
     /**
@@ -94,8 +90,11 @@ class User extends BaseUser
      */
     public function likedArtists()
     {
-        return $this->morphedByMany(Artist::class, 'likeable', 'likes')
-            ->withTimestamps();
+        return $this->morphedByMany(
+            Artist::class,
+            'likeable',
+            'likes',
+        )->withTimestamps();
     }
 
     public function uploadedTracks(): HasMany

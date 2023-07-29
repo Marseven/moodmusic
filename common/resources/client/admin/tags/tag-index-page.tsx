@@ -20,9 +20,10 @@ const columnConfig: ColumnConfig<Tag>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    visibleInMode: 'all',
+    width: 'flex-3 min-w-200',
     header: () => <Trans message="Name" />,
     body: tag => tag.name,
-    width: 'col-w-2',
   },
   {
     key: 'type',
@@ -35,11 +36,11 @@ const columnConfig: ColumnConfig<Tag>[] = [
     allowsSorting: true,
     header: () => <Trans message="Display name" />,
     body: tag => tag.display_name,
-    width: 'col-w-2',
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: tag => <FormattedDate date={tag.updated_at} />,
   },
@@ -48,6 +49,8 @@ const columnConfig: ColumnConfig<Tag>[] = [
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    width: 'w-42 flex-shrink-0',
+    visibleInMode: 'all',
     body: tag => {
       return (
         <DialogTrigger type="modal">

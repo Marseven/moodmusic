@@ -15,13 +15,14 @@ class LogTrackPlay
 {
     public function execute(Track $track, ?string $queueId): ?TrackPlay
     {
-        // only log play every minute for same track
+        // only log play every minute for same track and user
         $existing = $track
             ->plays()
             ->whereBetween('created_at', [
                 Carbon::now()->subMinute(),
                 Carbon::now(),
             ])
+            ->where('user_id', Auth::id())
             ->first();
         if (!$existing) {
             return $this->log($track, $queueId);

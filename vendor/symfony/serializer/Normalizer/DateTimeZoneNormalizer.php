@@ -23,6 +23,8 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterface, CacheableSupportsMethodInterface
 {
     /**
+     * {@inheritdoc}
+     *
      * @throws InvalidArgumentException
      */
     public function normalize(mixed $object, string $format = null, array $context = []): string
@@ -35,14 +37,16 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     }
 
     /**
-     * @param array $context
+     * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */): bool
+    public function supportsNormalization(mixed $data, string $format = null): bool
     {
         return $data instanceof \DateTimeZone;
     }
 
     /**
+     * {@inheritdoc}
+     *
      * @throws NotNormalizableValueException
      */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = []): \DateTimeZone
@@ -59,13 +63,16 @@ class DateTimeZoneNormalizer implements NormalizerInterface, DenormalizerInterfa
     }
 
     /**
-     * @param array $context
+     * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */): bool
+    public function supportsDenormalization(mixed $data, string $type, string $format = null): bool
     {
         return \DateTimeZone::class === $type;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasCacheableSupportsMethod(): bool
     {
         return __CLASS__ === static::class;

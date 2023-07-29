@@ -5,7 +5,10 @@ import {
   UseFloatingReturn,
   VirtualElement,
 } from '@floating-ui/react-dom';
-import {ListboxCollection} from './build-listbox-collection';
+import {
+  buildListboxCollection,
+  ListboxCollection,
+} from './build-listbox-collection';
 import {Options as OffsetOptions} from '@floating-ui/core/src/middleware/offset';
 import {ListboxItemProps} from './item';
 
@@ -13,7 +16,7 @@ export type PrimitiveValue = string | number;
 type SingleSelectionProps = {
   selectionMode?: 'single';
   onSelectionChange?: (value: PrimitiveValue) => void;
-  selectedValue?: PrimitiveValue;
+  selectedValue?: PrimitiveValue | null;
   defaultSelectedValue?: PrimitiveValue;
 };
 type MultipleSelectionProps = {
@@ -50,11 +53,13 @@ export type ListboxProps = SelectionProps & {
   allowEmptySelection?: boolean;
   // fired whenever user selects an item (via click or keyboard), regardless of current selection mode
   onItemSelected?: (value: PrimitiveValue) => void;
+  clearSelectionOnInputClear?: boolean;
   clearInputOnItemSelection?: boolean;
   blurReferenceOnItemSelection?: boolean;
   inputValue?: string;
   defaultInputValue?: string;
   onInputValueChange?: (value: string) => void;
+  allowCustomValue?: boolean; // for combobox
   isLoading?: boolean;
   showEmptyMessage?: boolean;
   showCheckmark?: boolean;
@@ -71,12 +76,15 @@ export interface UseListboxReturn {
     newIndex: number
   ) => void;
 
+  allowCustomValue: ListboxProps['allowCustomValue']; // for combobox
   loopFocus: ListboxProps['loopFocus'];
   floatingWidth: ListboxProps['floatingWidth'];
   floatingMinWidth: ListboxProps['floatingMinWidth'];
   floatingMaxHeight: ListboxProps['floatingMaxHeight'];
   showCheckmark: ListboxProps['showCheckmark'];
+  // active collection, either filtered or all provided items
   collection: ListboxCollection;
+  collections: ReturnType<typeof buildListboxCollection>;
   virtualFocus: ListboxProps['virtualFocus'];
   showEmptyMessage: ListboxProps['showEmptyMessage'];
   refs: {

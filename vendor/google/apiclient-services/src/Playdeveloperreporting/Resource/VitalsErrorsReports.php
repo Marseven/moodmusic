@@ -43,12 +43,14 @@ class VitalsErrorsReports extends \Google\Service\Resource
    * versions (specified as the numeric API level) only. Example: `apiLevel = 28
    * OR apiLevel = 29`. * `versionCode`: Matches error reports that occurred in
    * the requested app version codes only. Example: `versionCode = 123 OR
-   * versionCode = 456`. * `deviceModel`: Matches error reports that occurred in
-   * the requested devices. Example: `deviceModel = "walleye" OR deviceModel =
-   * "marlin"`. * `deviceType`: Matches error reports that occurred in the
-   * requested device types. Example: `deviceType = "PHONE"`. * `errorIssueType`:
-   * Matches error reports of the requested types only. Valid candidates:
-   * `JAVA_CRASH`, `NATIVE_CRASH`, `ANR`. Example: `errorIssueType = JAVA_CRASH OR
+   * versionCode = 456`. * `deviceModel`: Matches error issues that occurred in
+   * the requested devices. Example: `deviceModel = "google/walleye" OR
+   * deviceModel = "google/marlin"`. * `deviceBrand`: Matches error issues that
+   * occurred in the requested device brands. Example: `deviceBrand = "Google". *
+   * `deviceType`: Matches error reports that occurred in the requested device
+   * types. Example: `deviceType = "PHONE"`. * `errorIssueType`: Matches error
+   * reports of the requested types only. Valid candidates: `JAVA_CRASH`,
+   * `NATIVE_CRASH`, `ANR`. Example: `errorIssueType = JAVA_CRASH OR
    * errorIssueType = NATIVE_CRASH`. * `errorIssueId`: Matches error reports
    * belonging to the requested error issue ids only. Example: `errorIssueId =
    * 1234 OR errorIssueId = 4567`. * `appProcessState`: Matches error reports on

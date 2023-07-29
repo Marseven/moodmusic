@@ -28,9 +28,6 @@
         "symfony/psr-http-message-bridge": "^1.0 | ^2.0",
         "nyholm/psr7": "^1.0"
     },
-    "conflict": {
-        "laravel/lumen-framework": "*"
-    },
     "autoload": {
         "psr-0": {
             "Sentry\\Laravel\\": "src/"
@@ -49,17 +46,11 @@
         }
     },
     "scripts": {
-        "tests": [
-            "vendor/bin/phpunit --verbose"
-        ],
-        "tests-travis": [
-            "XDEBUG_MODE=coverage vendor/bin/phpunit --verbose --configuration phpunit.xml --coverage-clover test/clover.xml"
-        ],
-        "tests-report": [
-            "XDEBUG_MODE=coverage vendor/bin/phpunit --verbose --configuration phpunit.xml --coverage-html test/html-report"
-        ],
         "phpcs": [
             "vendor/bin/php-cs-fixer fix --verbose --diff --dry-run"
+        ],
+        "tests": [
+            "vendor/bin/phpunit --verbose"
         ]
     },
     "extra": {

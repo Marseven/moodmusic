@@ -28,7 +28,7 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
 {
     use HttpClientTrait;
 
-    private ResponseInterface|\Closure|iterable|null $responseFactory;
+    private $responseFactory;
     private int $requestsCount = 0;
     private array $defaultOptions = [];
 
@@ -56,9 +56,12 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
             })();
         }
 
-        $this->responseFactory = !\is_callable($responseFactory) ? $responseFactory : $responseFactory(...);
+        $this->responseFactory = !\is_callable($responseFactory) || $responseFactory instanceof \Closure ? $responseFactory : \Closure::fromCallable($responseFactory);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         [$url, $options] = $this->prepareRequest($method, $url, $options, $this->defaultOptions, true);
@@ -78,12 +81,15 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         ++$this->requestsCount;
 
         if (!$response instanceof ResponseInterface) {
-            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', get_debug_type($response)));
+            throw new TransportException(sprintf('The response factory passed to MockHttpClient must return/yield an instance of ResponseInterface, "%s" given.', \is_object($response) ? \get_class($response) : \gettype($response)));
         }
 
         return MockResponse::fromRequest($method, $url, $options, $response);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof ResponseInterface) {
@@ -98,6 +104,9 @@ class MockHttpClient implements HttpClientInterface, ResetInterface
         return $this->requestsCount;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function withOptions(array $options): static
     {
         $clone = clone $this;

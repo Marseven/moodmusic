@@ -3,14 +3,11 @@ import {mergeProps} from '@react-aria/utils';
 import React from 'react';
 import {ComboBox, ComboboxProps} from './combobox';
 
-type FormComboBoxProps<T extends object> = ComboboxProps<T> & {
+type Props<T extends object> = ComboboxProps<T> & {
   name: string;
   selectionMode?: 'single';
 };
-export function FormComboBox<T extends object>({
-  children,
-  ...props
-}: FormComboBoxProps<T>) {
+export function FormComboBox<T extends object>({children, ...props}: Props<T>) {
   const {
     field: {onChange, onBlur, value = '', ref},
     fieldState: {invalid, error},

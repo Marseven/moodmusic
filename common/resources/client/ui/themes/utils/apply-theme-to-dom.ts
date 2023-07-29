@@ -1,6 +1,6 @@
 import {CssTheme} from '../css-theme';
 import {setThemeColor} from './set-theme-color';
-import {rootEl} from '../../../core/root-el';
+import {rootEl} from '@common/core/root-el';
 
 export function applyThemeToDom(theme: CssTheme) {
   Object.entries(theme.colors).forEach(([key, value]) => {

@@ -33,4 +33,16 @@ export interface User {
   card_brand?: string;
   card_expires?: string;
   model_type: typeof USER_MODEL;
+  banned_at?: string;
+  followed_users?: this[];
+  followers_count?: number;
+  followed_users_count?: number;
+  followers?: this[];
+  bans?: {
+    id: number;
+    comment: string;
+    expired_at?: string;
+  }[];
+  two_factor_confirmed_at?: string;
+  two_factor_recovery_codes?: string[];
 }

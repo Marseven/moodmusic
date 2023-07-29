@@ -19,7 +19,7 @@ namespace Google\Service\CloudWorkstations;
 
 class WorkstationConfig extends \Google\Collection
 {
-  protected $collection_key = 'persistentDirectories';
+  protected $collection_key = 'readinessChecks';
   /**
    * @var string[]
    */
@@ -44,6 +44,10 @@ class WorkstationConfig extends \Google\Collection
    * @var string
    */
   public $displayName;
+  /**
+   * @var bool
+   */
+  public $enableAuditAgent;
   protected $encryptionKeyType = CustomerEncryptionKey::class;
   protected $encryptionKeyDataType = '';
   /**
@@ -66,6 +70,8 @@ class WorkstationConfig extends \Google\Collection
   public $name;
   protected $persistentDirectoriesType = PersistentDirectory::class;
   protected $persistentDirectoriesDataType = 'array';
+  protected $readinessChecksType = ReadinessCheck::class;
+  protected $readinessChecksDataType = 'array';
   /**
    * @var bool
    */
@@ -182,6 +188,20 @@ class WorkstationConfig extends \Google\Collection
     return $this->displayName;
   }
   /**
+   * @param bool
+   */
+  public function setEnableAuditAgent($enableAuditAgent)
+  {
+    $this->enableAuditAgent = $enableAuditAgent;
+  }
+  /**
+   * @return bool
+   */
+  public function getEnableAuditAgent()
+  {
+    return $this->enableAuditAgent;
+  }
+  /**
    * @param CustomerEncryptionKey
    */
   public function setEncryptionKey(CustomerEncryptionKey $encryptionKey)
@@ -278,6 +298,20 @@ class WorkstationConfig extends \Google\Collection
   public function getPersistentDirectories()
   {
     return $this->persistentDirectories;
+  }
+  /**
+   * @param ReadinessCheck[]
+   */
+  public function setReadinessChecks($readinessChecks)
+  {
+    $this->readinessChecks = $readinessChecks;
+  }
+  /**
+   * @return ReadinessCheck[]
+   */
+  public function getReadinessChecks()
+  {
+    return $this->readinessChecks;
   }
   /**
    * @param bool

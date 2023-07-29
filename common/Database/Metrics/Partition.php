@@ -16,20 +16,22 @@ class Partition extends BaseMetric
         string|Expression|null $column = null,
         ?string $dateColumn = null,
         int $limit = 50,
+        protected array $additionalColumns = [],
     ) {
         parent::__construct($model, $dateRange, $column, $dateColumn, $limit);
     }
 
     protected function aggregate(string $function): array
     {
+        $select = [
+            $this->groupBy,
+            DB::raw("{$function}({$this->getWrappedColumn()}) as aggregate"),
+            ...$this->additionalColumns,
+        ];
+
         $results = $this->query
-            ->select(
-                $this->groupBy,
-                DB::raw(
-                    "{$function}({$this->getWrappedColumn()}) as aggregate",
-                ),
-            )
-            ->groupBy($this->groupBy)
+            ->select($select)
+            ->groupBy($this->groupBy, ...$this->additionalColumns)
             ->when(
                 $this->dateRange,
                 fn($query) => $query->whereBetween($this->dateColumn, [
@@ -40,12 +42,16 @@ class Partition extends BaseMetric
             ->limit($this->limit)
             ->get();
 
-        $data = $results->map(
-            fn($result) => [
+        $data = $results->map(function ($result) {
+            $finalResult = [
                 'label' => $this->getLabel($result),
                 'value' => $this->round($result->aggregate),
-            ],
-        );
+            ];
+            foreach ($this->additionalColumns as $column) {
+              $finalResult[$column] = $result->{$column};
+            }
+            return $finalResult;
+        });
         $total = $data->sum('value');
         $data = $data
             ->map(function ($item) use ($total) {

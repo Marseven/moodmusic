@@ -103,8 +103,8 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
 
     // TRACK PLAYS
     Route::post('player/tracks', [PlayerTracksController::class, 'index']);
-    Route::get('track/plays/{userId}', [TrackPlaysController::class, 'index']);
-    Route::post('track/plays/{track}/log', [TrackPlaysController::class, 'create']);
+    Route::get('tracks/plays/{userId}', [TrackPlaysController::class, 'index']);
+    Route::post('tracks/plays/{track}/log', [TrackPlaysController::class, 'create']);
 
     // LYRICS
     Route::get('lyrics', [LyricsController::class, 'index']);
@@ -128,7 +128,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     Route::get('genres/{name}', [GenreController::class, 'show']);
 
     // USER PROFILE
-    Route::get('users/{user}', [UserProfileController::class, 'show']);
+    Route::get('users/{user}', [UserProfileController::class, 'show'])->withoutMiddleware('verified');
     Route::get('users/{user}/minutes-left', MinutesLimitController::class);
     Route::get('users/{user}/liked-tracks', [UserLibraryTracksController::class, 'index']);
     Route::get('users/{user}/liked-albums', [UserLibraryAlbumsController::class, 'index']);

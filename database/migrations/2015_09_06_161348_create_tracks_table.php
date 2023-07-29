@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateTracksTable extends Migration {
 
@@ -15,7 +15,6 @@ class CreateTracksTable extends Migration {
 		Schema::create('tracks', function(Blueprint $table) {
 			$table->increments('id');
 			$table->string('name');
-			$table->string('album_name');
             $table->integer('album_id')->unsigned()->index()->nullable();
 			$table->tinyInteger('number')->unsigned()->index();
 			$table->integer('duration')->unsigned()->nullable();

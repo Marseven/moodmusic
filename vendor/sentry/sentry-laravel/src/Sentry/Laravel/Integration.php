@@ -2,11 +2,15 @@
 
 namespace Sentry\Laravel;
 
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\LazyLoadingViolationException;
 use Illuminate\Routing\Route;
 use Sentry\EventHint;
 use Sentry\EventId;
 use Sentry\ExceptionMechanism;
+use Sentry\Laravel\Features\Concerns\ResolvesEventOrigin;
 use Sentry\SentrySdk;
+use Sentry\Severity;
 use Sentry\Tracing\TransactionSource;
 use Throwable;
 use function Sentry\addBreadcrumb;
@@ -113,12 +117,42 @@ class Integration implements IntegrationInterface
      *
      * @return array{0: string, 1: \Sentry\Tracing\TransactionSource}
      *
-     * @internal This helper is used in various places to extra meaninful info from a Laravel Route object.
+     * @internal This helper is used in various places to extract meaningful info from a Laravel Route object.
      */
     public static function extractNameAndSourceForRoute(Route $route): array
     {
         return [
             '/' . ltrim($route->uri(), '/'),
+            TransactionSource::route(),
+        ];
+    }
+
+    /**
+     * Extract the readable name for a Lumen route and the transaction source for where that route name came from.
+     *
+     * @param array $routeData The array of route data
+     * @param string $path The path of the request
+     *
+     * @return array{0: string, 1: \Sentry\Tracing\TransactionSource}
+     *
+     * @internal This helper is used in various places to extract meaningful info from Lumen route data.
+     */
+    public static function extractNameAndSourceForLumenRoute(array $routeData, string $path): array
+    {
+        $routeUri = array_reduce(
+            array_keys($routeData[2]),
+            static function ($carry, $key) use ($routeData) {
+                $search = '/' . preg_quote($routeData[2][$key], '/') . '/';
+
+                // Replace the first occurrence of the route parameter value with the key name
+                // This is by no means a perfect solution, but it's the best we can do with the data we have
+                return preg_replace($search, "{{$key}}", $carry, 1);
+            },
+            $path
+        );
+
+        return [
+            '/' . ltrim($routeUri, '/'),
             TransactionSource::route(),
         ];
     }
@@ -188,6 +222,54 @@ class Integration implements IntegrationInterface
         ]);
 
         return SentrySdk::getCurrentHub()->captureException($throwable, $hint);
+    }
+
+    /**
+     * Returns a callback that can be passed to `Model::handleLazyLoadingViolationUsing` to report lazy loading violations to Sentry.
+     *
+     * @param callable|null $callback Optional callback to be called after the violation is reported to Sentry.
+     *
+     * @return callable
+     */
+    public static function lazyLoadingViolationReporter(?callable $callback = null): callable
+    {
+        return new class($callback) {
+            use ResolvesEventOrigin;
+
+            /** @var callable|null $callback */
+            private $callback;
+
+            public function __construct(?callable $callback)
+            {
+                $this->callback = $callback;
+            }
+
+            public function __invoke(Model $model, string $relation): void
+            {
+                SentrySdk::getCurrentHub()->withScope(function (Scope $scope) use ($model, $relation) {
+                    $scope->setContext('violation', [
+                        'model'    => get_class($model),
+                        'relation' => $relation,
+                        'origin'   => $this->resolveEventOrigin(),
+                    ]);
+
+                    SentrySdk::getCurrentHub()->captureEvent(
+                        tap(Event::createEvent(), static function (Event $event) {
+                            $event->setLevel(Severity::warning());
+                        }),
+                        EventHint::fromArray([
+                            'exception' => new LazyLoadingViolationException($model, $relation),
+                            'mechanism' => new ExceptionMechanism(ExceptionMechanism::TYPE_GENERIC, true),
+                        ])
+                    );
+                });
+
+                // Forward the violation to the next handler if there is one
+                if ($this->callback !== null) {
+                    call_user_func($this->callback, $model, $relation);
+                }
+            }
+        };
     }
 
     /**

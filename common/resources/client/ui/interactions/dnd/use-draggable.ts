@@ -120,22 +120,6 @@ export function useDraggable({
     // appear under the pointer while dragging. If not, the element itself is dragged by the browser.
     if (preview?.current) {
       preview.current(draggable, node => {
-        // Compute the offset that the preview will appear under the mouse.
-        // If possible, this is based on the point the user clicked on the target.
-        // If the preview is much smaller, then just use the center point of the preview.
-        const size = node.getBoundingClientRect();
-        const rect = e.currentTarget.getBoundingClientRect();
-        let x = e.clientX - rect.x;
-        let y = e.clientY - rect.y;
-        if (x > size.width || y > size.height) {
-          x = size.width / 2;
-          y = size.height / 2;
-        }
-
-        // Rounding height to an even number prevents blurry preview seen on some screens
-        const height = 2 * Math.round(rect.height / 2);
-        node.style.height = `${height}px`;
-
         e.dataTransfer.setDragImage(node, 0, 0);
       });
     }

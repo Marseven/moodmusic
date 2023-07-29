@@ -42,6 +42,9 @@ class MobileBootstrapData extends BaseBootstrapData
             ],
             'locales' => Localization::get(),
         ];
+
+        $this->logActiveSession();
+
         return $this;
     }
 

@@ -1,4 +1,4 @@
-import {MenuItemConfig} from '../../../../core/settings/settings';
+import {MenuItemConfig} from '@common/core/settings/settings';
 
 export interface MenuItemCategory {
   name: string;

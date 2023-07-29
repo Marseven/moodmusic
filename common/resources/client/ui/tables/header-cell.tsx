@@ -2,26 +2,22 @@ import {useContext, useState} from 'react';
 import clsx from 'clsx';
 import {AnimatePresence, m} from 'framer-motion';
 import {TableContext} from './table-context';
-import {cellStyle} from './table-style';
 import {SortDescriptor} from './types/sort-descriptor';
 import {ArrowDownwardIcon} from '../../icons/material/ArrowDownward';
+import {useTableCellStyle} from '@common/ui/tables/style/use-table-cell-style';
 
 interface HeaderCellProps {
   index: number;
 }
 export function HeaderCell({index}: HeaderCellProps) {
-  const {
-    enableSelection,
-    columns,
-    sortDescriptor,
-    onSortChange,
-    enableSorting,
-  } = useContext(TableContext);
-  const isFirst = enableSelection ? false : index === 0;
-  const isLast = index === columns.length - 1;
+  const {columns, sortDescriptor, onSortChange, enableSorting} =
+    useContext(TableContext);
   const column = columns[index];
 
-  const style = cellStyle({isFirst, isLast, column});
+  const style = useTableCellStyle({
+    index: index,
+    isHeader: true,
+  });
 
   const [isHovered, setIsHovered] = useState(false);
 
@@ -68,7 +64,16 @@ export function HeaderCell({index}: HeaderCellProps) {
   };
 
   return (
-    <th
+    <div
+      role="columnheader"
+      tabIndex={-1}
+      aria-colindex={index + 1}
+      aria-sort={ariaSort}
+      className={clsx(
+        style,
+        'text-muted font-medium text-xs',
+        allowSorting && 'cursor-pointer'
+      )}
       onMouseEnter={() => {
         setIsHovered(true);
       }}
@@ -82,14 +87,6 @@ export function HeaderCell({index}: HeaderCellProps) {
         }
       }}
       onClick={toggleSorting}
-      tabIndex={-1}
-      aria-sort={ariaSort}
-      data-testid={`header-col-${column.key}`}
-      className={clsx(
-        style,
-        'text-muted font-medium text-xs',
-        allowSorting && 'cursor-pointer'
-      )}
     >
       {column.hideHeader ? (
         <div className="sr-only">{column.header()}</div>
@@ -120,6 +117,6 @@ export function HeaderCell({index}: HeaderCellProps) {
           </m.span>
         )}
       </AnimatePresence>
-    </th>
+    </div>
   );
 }

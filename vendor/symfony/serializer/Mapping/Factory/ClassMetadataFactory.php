@@ -36,6 +36,9 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         $this->loader = $loader;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getMetadataFor(string|object $value): ClassMetadataInterface
     {
         $class = $this->getClass($value);
@@ -62,6 +65,9 @@ class ClassMetadataFactory implements ClassMetadataFactoryInterface
         return $this->loadedClasses[$class] = $classMetadata;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasMetadataFor(mixed $value): bool
     {
         return \is_object($value) || (\is_string($value) && (class_exists($value) || interface_exists($value, false)));

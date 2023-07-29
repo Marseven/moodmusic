@@ -20,6 +20,7 @@ class Tag extends Model
     protected $hidden = ['pivot'];
     protected $guarded = ['id'];
     protected $casts = ['id' => 'integer'];
+    protected $appends = ['model_type'];
 
     public function files(): MorphToMany
     {
@@ -137,7 +138,7 @@ class Tag extends Model
         ];
     }
 
-    public function toSearchableArray(): array
+    public function toSearchableArray()
     {
         return [
             'id' => $this->id,
@@ -156,6 +157,6 @@ class Tag extends Model
 
     public static function getModelTypeAttribute(): string
     {
-        return Tag::MODEL_TYPE;
+        return static::MODEL_TYPE;
     }
 }

@@ -7,7 +7,6 @@ import {IconButton} from '../buttons/icon-button';
 import {EditIcon} from '../../icons/material/Edit';
 import {message} from '../../i18n/message';
 import {Item} from './listbox/item';
-import {ComboBox} from './combobox/combobox';
 import {useController} from 'react-hook-form';
 import {useControlledState} from '@react-stately/utils';
 import {getInputFieldClassNames} from './input-field/get-input-field-class-names';
@@ -17,6 +16,7 @@ import {useNormalizedModels} from '../../users/queries/use-normalized-models';
 import {useNormalizedModel} from '../../users/queries/use-normalized-model';
 import {AnimatePresence, m} from 'framer-motion';
 import {opacityAnimation} from '../animation/opacity-animation';
+import {Select} from '@common/ui/forms/select/select';
 
 interface NormalizedModelFieldProps {
   modelType: string;
@@ -50,7 +50,7 @@ export function NormalizedModelField({
   customEndpoint,
   disabled,
 }: NormalizedModelFieldProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
+  const inputRef = useRef<HTMLButtonElement>(null);
   const [inputValue, setInputValue] = useState('');
   const [selectedValue, setSelectedValue] = useControlledState(
     value,
@@ -105,24 +105,24 @@ export function NormalizedModelField({
   }
 
   return (
-    <ComboBox
+    <Select
       className={className}
+      showSearchField
       invalid={invalid}
       errorMessage={errorMessage}
       description={description}
       isAsync
-      placeholder={trans(message('Find item..'))}
+      placeholder={trans(message('Select item...'))}
+      searchPlaceholder={trans(message('Find an item...'))}
       label={label}
       isLoading={query.isFetching}
       items={query.data?.results}
       inputValue={inputValue}
       onInputValueChange={setInputValue}
-      clearInputOnItemSelection
       selectionMode="single"
       selectedValue={selectedValue}
       onSelectionChange={setSelectedValue}
       ref={inputRef}
-      openMenuOnFocus={openMenuOnFocus}
       autoFocus={autoFocus}
       disabled={disabled}
     >
@@ -136,7 +136,7 @@ export function NormalizedModelField({
           {model.name}
         </Item>
       )}
-    </ComboBox>
+    </Select>
   );
 }
 

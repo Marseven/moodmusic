@@ -11,10 +11,9 @@ export interface Track {
   name: string;
   duration?: number;
   artists?: Artist[];
-  youtube_id?: string;
   plays?: number;
   popularity?: number;
-  url?: string;
+  src?: string;
   image?: string;
   lyric?: Lyric;
   album?: Album;

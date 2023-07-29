@@ -8,8 +8,9 @@ import {useUpdateTrackForm} from '@app/admin/tracks-datatable-page/crupdate/use-
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
 import {PageStatus} from '@common/http/page-status';
-import {useLocation} from 'react-router-dom';
+import {Navigate, useLocation} from 'react-router-dom';
 import {getTrackLink} from '@app/web-player/tracks/track-link';
+import {useTrackPermissions} from '@app/web-player/tracks/hooks/use-track-permissions';
 
 interface Props {
   wrapInContainer?: boolean;
@@ -29,6 +30,7 @@ interface PageContentProps {
   wrapInContainer?: boolean;
 }
 function PageContent({track, wrapInContainer}: PageContentProps) {
+  const {canEdit} = useTrackPermissions([track]);
   const navigate = useNavigate();
   const {pathname} = useLocation();
   const {form, updateTrack} = useUpdateTrackForm(track, {
@@ -40,6 +42,11 @@ function PageContent({track, wrapInContainer}: PageContentProps) {
       }
     },
   });
+
+  if (!canEdit) {
+    return <Navigate to="/" replace />;
+  }
+
   return (
     <CrupdateResourceLayout
       form={form}

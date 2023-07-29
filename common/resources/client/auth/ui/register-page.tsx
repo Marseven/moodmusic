@@ -18,6 +18,7 @@ export function RegisterPage() {
   const {
     branding,
     registration: {disable},
+    social,
   } = useSettings();
   const {verify, isVerifying} = useRecaptcha('register');
 
@@ -110,7 +111,13 @@ export function RegisterPage() {
           <Trans message="Create account" />
         </Button>
         <SocialAuthSection
-          dividerMessage={<Trans message="Or sign up with" />}
+          dividerMessage={
+            social.compact_buttons ? (
+              <Trans message="Or sign up with" />
+            ) : (
+              <Trans message="OR" />
+            )
+          }
         />
       </Form>
     </AuthLayout>

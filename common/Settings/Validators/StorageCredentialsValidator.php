@@ -20,7 +20,9 @@ class StorageCredentialsValidator
 
         // dropbox
         'storage_dropbox_access_token',
-        'storage_dropbox_root',
+        'storage_dropbox_refresh_token',
+        'storage_dropbox_app_key',
+        'storage_dropbox_app_secret',
 
         // s3
         'storage_s3_key',

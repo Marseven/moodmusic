@@ -40,7 +40,7 @@ class DatasourceFilters
     public function getAndRemove(
         string $key,
         string $operator = null,
-        $value = null
+        $value = null,
     ): ?array {
         // use func_get_args as "null" is a valid value, need
         // to check whether if it was actually passed by user
@@ -68,7 +68,7 @@ class DatasourceFilters
                 true,
             );
             return collect($filters)
-                ->map(fn($filter) => $this->normalizeFilter($filter))
+                ->flatMap(fn($filter) => $this->normalizeFilter($filter))
                 ->filter()
                 ->toArray();
         } else {
@@ -95,11 +95,21 @@ class DatasourceFilters
             }
         }
 
-        return [
-            'key' => $filter['key'],
-            'operator' => $operator,
-            'value' => $value,
+        $filters = [
+            // preserve any extra keys that might be present
+            array_merge($filter, [
+                'key' => $filter['key'],
+                'operator' => $operator,
+                'value' => $value,
+            ]),
         ];
+
+        // filter might have some extra static filters, for example to restrict by model type
+        if (isset($filter['extraFilters'])) {
+            $filters[] = $filter['extraFilters'];
+        }
+
+        return $filters;
     }
 
     private function replaceValuePlaceholders($value)

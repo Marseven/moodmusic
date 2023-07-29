@@ -28,7 +28,7 @@ export function TogglePlaybackColumn({
   const isCued = useIsTrackCued(track.id, queueGroupId);
 
   return (
-    <div className="w-24 h-24">
+    <div className="w-24 h-24 text-center">
       {isHovered || isPlaying ? (
         <TogglePlaybackButton
           track={track}

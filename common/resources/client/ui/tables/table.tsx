@@ -1,6 +1,7 @@
 import React, {
   cloneElement,
   ComponentPropsWithoutRef,
+  Fragment,
   JSXElementConstructor,
   MutableRefObject,
   ReactElement,
@@ -9,7 +10,6 @@ import React, {
   useMemo,
 } from 'react';
 import {useControlledState} from '@react-stately/utils';
-import {rowStyle} from './table-style';
 import {SortDescriptor} from './types/sort-descriptor';
 import {useGridNavigation} from './navigate-grid';
 import {RowElementProps, TableRow} from './table-row';
@@ -18,14 +18,15 @@ import {
   TableContextValue,
   TableSelectionStyle,
 } from './table-context';
-import {HeaderCell} from './header-cell';
-import {SelectAllCell} from './select-all-cell';
 import {ColumnConfig} from '../../datatable/column-config';
 import {TableDataItem} from './types/table-data-item';
 import clsx from 'clsx';
 import {useInteractOutside} from '@react-aria/interactions';
 import {mergeProps, useObjectRef} from '@react-aria/utils';
 import {isCtrlKeyPressed} from '@common/utils/keybinds/is-ctrl-key-pressed';
+import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
+import {CheckboxColumnConfig} from '@common/ui/tables/checkbox-column-config';
+import {TableHeaderRow} from '@common/ui/tables/table-header-row';
 
 export interface TableProps<T extends TableDataItem>
   extends ComponentPropsWithoutRef<'table'> {
@@ -51,11 +52,15 @@ export interface TableProps<T extends TableDataItem>
   tableBody?: ReactElement<TableBodyProps>;
   hideBorder?: boolean;
   closeOnInteractOutside?: boolean;
+  collapseOnMobile?: boolean;
+  cellHeight?: string;
 }
 export function Table<T extends TableDataItem>({
   className,
-  columns,
-  hideHeaderRow,
+  columns: userColumns,
+  collapseOnMobile = true,
+  hideHeaderRow = false,
+  hideBorder = false,
   data,
   selectedRows: propsSelectedRows,
   defaultSelectedRows: propsDefaultSelectedRows,
@@ -73,10 +78,17 @@ export function Table<T extends TableDataItem>({
   tableBody,
   meta,
   tableRef: propsTableRef,
-  hideBorder = false,
   closeOnInteractOutside = false,
+  cellHeight,
   ...domProps
 }: TableProps<T>) {
+  const isMobile = useIsMobileMediaQuery();
+  const isCollapsedMode = !!isMobile && collapseOnMobile;
+  if (isCollapsedMode) {
+    hideHeaderRow = true;
+    hideBorder = true;
+  }
+
   const [selectedRows, onSelectionChange] = useControlledState(
     propsSelectedRows,
     propsDefaultSelectedRows || [],
@@ -117,63 +129,63 @@ export function Table<T extends TableDataItem>({
     [selectedRows, onSelectionChange]
   );
 
-  const contextValue: TableContextValue<T> = useMemo(() => {
-    return {
-      selectedRows,
-      onSelectionChange,
-      enableSorting,
-      enableSelection,
-      selectionStyle,
-      data,
-      columns,
-      sortDescriptor,
-      onSortChange,
-      toggleRow,
-      selectRow,
-      onAction,
-      selectRowOnContextMenu,
-      meta,
-    };
-  }, [
-    columns,
-    data,
-    enableSelection,
-    enableSorting,
-    selectionStyle,
-    onAction,
-    selectRowOnContextMenu,
-    onSelectionChange,
-    onSortChange,
+  // add checkbox columns to config, if selection is enabled
+  const columns = useMemo(() => {
+    const filteredColumns = userColumns.filter(c => {
+      const visibleInMode = c.visibleInMode || 'regular';
+      if (visibleInMode === 'all') {
+        return true;
+      }
+      if (visibleInMode === 'compact' && isCollapsedMode) {
+        return true;
+      }
+      if (visibleInMode === 'regular' && !isCollapsedMode) {
+        return true;
+      }
+    });
+    const showCheckboxCell =
+      enableSelection && selectionStyle !== 'highlight' && !isMobile;
+    if (showCheckboxCell) {
+      filteredColumns.unshift(CheckboxColumnConfig);
+    }
+    return filteredColumns;
+  }, [isMobile, userColumns, enableSelection, selectionStyle, isCollapsedMode]);
+
+  const contextValue: TableContextValue<T> = {
+    isCollapsedMode,
+    cellHeight,
+    hideBorder,
+    hideHeaderRow,
     selectedRows,
+    onSelectionChange,
+    enableSorting,
+    enableSelection,
+    selectionStyle,
+    data,
+    columns,
     sortDescriptor,
+    onSortChange,
     toggleRow,
     selectRow,
+    onAction,
+    selectRowOnContextMenu,
     meta,
-  ]);
+    collapseOnMobile,
+  };
 
   const navProps = useGridNavigation({
     cellCount: enableSelection ? columns.length + 1 : columns.length,
     rowCount: data.length + 1,
   });
 
-  const headerRow = hideHeaderRow ? null : (
-    <thead>
-      <tr aria-rowindex={1} className={rowStyle({isHeader: true})}>
-        <SelectAllCell />
-        {columns.map((column, columnIndex) => (
-          <HeaderCell index={columnIndex} key={column.key} />
-        ))}
-      </tr>
-    </thead>
-  );
+  const tableBodyProps: TableBodyProps = {
+    renderRowAs: renderRowAs as any,
+  };
 
-  const rowRenderer = renderRowAs as any;
   if (!tableBody) {
-    tableBody = (
-      <BasicTableBody renderRowAs={rowRenderer} hideBorder={hideBorder} />
-    );
+    tableBody = <BasicTableBody {...tableBodyProps} />;
   } else {
-    tableBody = cloneElement(tableBody, {renderRowAs: rowRenderer, hideBorder});
+    tableBody = cloneElement(tableBody, tableBodyProps);
   }
 
   // deselect rows when clicking outside the table
@@ -195,7 +207,7 @@ export function Table<T extends TableDataItem>({
 
   return (
     <TableContext.Provider value={contextValue as any}>
-      <table
+      <div
         {...mergeProps(domProps, navProps, {
           onKeyDown: (e: KeyboardEvent) => {
             if (e.key === 'Escape') {
@@ -221,38 +233,40 @@ export function Table<T extends TableDataItem>({
             }
           },
         })}
+        role="grid"
+        tabIndex={0}
+        aria-rowcount={data.length + 1}
+        aria-colcount={columns.length + 1}
         ref={tableRef}
         aria-multiselectable={enableSelection ? true : undefined}
         aria-labelledby={ariaLabelledBy}
         className={clsx(
           className,
-          'select-none isolate outline-none text-sm w-full max-w-full align-top'
+          'select-none isolate outline-none text-sm focus-visible:ring-2'
         )}
       >
-        {headerRow}
+        {!hideHeaderRow && <TableHeaderRow />}
         {tableBody}
-      </table>
+      </div>
     </TableContext.Provider>
   );
 }
 
 export interface TableBodyProps {
   renderRowAs?: TableProps<TableDataItem>['renderRowAs'];
-  hideBorder?: boolean;
 }
-function BasicTableBody({renderRowAs, hideBorder}: TableBodyProps) {
+function BasicTableBody({renderRowAs}: TableBodyProps) {
   const {data} = useContext(TableContext);
   return (
-    <tbody>
+    <Fragment>
       {data.map((item, rowIndex) => (
         <TableRow
           item={item}
           index={rowIndex}
           key={item.id}
           renderAs={renderRowAs}
-          hideBorder={hideBorder}
         />
       ))}
-    </tbody>
+    </Fragment>
   );
 }

@@ -88,7 +88,7 @@ interface ImageContainerProps {
 }
 function EditableImage({playlist, size, className}: ImageContainerProps) {
   const updatePlaylist = useUpdatePlaylist();
-  const canEdit = usePlaylistPermissions(playlist);
+  const {canEdit} = usePlaylistPermissions(playlist);
 
   if (!canEdit) {
     return (

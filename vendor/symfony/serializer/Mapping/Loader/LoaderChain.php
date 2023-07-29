@@ -47,6 +47,9 @@ class LoaderChain implements LoaderInterface
         $this->loaders = $loaders;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function loadClassMetadata(ClassMetadataInterface $metadata): bool
     {
         $success = false;

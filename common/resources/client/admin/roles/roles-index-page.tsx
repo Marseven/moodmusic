@@ -18,33 +18,40 @@ const columnConfig: ColumnConfig<Role>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    visibleInMode: 'all',
     header: () => <Trans message="Role" />,
     body: role => (
       <div>
-        <div>{role.name}</div>
-        <div className="text-muted text-xs">{role.description}</div>
+        <div>
+          <Trans message={role.name} />
+        </div>
+        <div className="text-muted text-xs overflow-x-hidden overflow-ellipsis">
+          {role.description ? <Trans message={role.description} /> : undefined}
+        </div>
       </div>
     ),
   },
   {
     key: 'type',
+    maxWidth: 'max-w-100',
     allowsSorting: true,
     header: () => <Trans message="Type" />,
-    body: role => role.type,
-    width: 'w-1',
+    body: role => <Trans message={role.type} />,
   },
   {
     key: 'updated_at',
+    maxWidth: 'max-w-100',
     allowsSorting: true,
     header: () => <Trans message="Last updated" />,
     body: role => <FormattedDate date={role.updated_at} />,
-    width: 'w-1',
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
+    visibleInMode: 'all',
     align: 'end',
+    width: 'w-42 flex-shrink-0',
     body: role => {
       return (
         <Link to={`${role.id}/edit`}>

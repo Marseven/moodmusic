@@ -31,6 +31,9 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         $this->lowerCamelCase = $lowerCamelCase;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function normalize(string $propertyName): string
     {
         if (null === $this->attributes || \in_array($propertyName, $this->attributes)) {
@@ -40,6 +43,9 @@ class CamelCaseToSnakeCaseNameConverter implements NameConverterInterface
         return $propertyName;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function denormalize(string $propertyName): string
     {
         $camelCasedName = preg_replace_callback('/(^|_|\.)+(.)/', function ($match) {

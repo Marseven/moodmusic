@@ -1,15 +1,19 @@
 import {AccountSettingsPanel} from '../account-settings-panel';
-import {Button} from '../../../../ui/buttons/button';
-import {DialogTrigger} from '../../../../ui/overlays/dialog/dialog-trigger';
-import {ConfirmationDialog} from '../../../../ui/overlays/dialog/confirmation-dialog';
+import {Button} from '@common/ui/buttons/button';
+import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
+import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
 import {useDeleteAccount} from './delete-account';
-import {Trans} from '../../../../i18n/trans';
+import {Trans} from '@common/i18n/trans';
+import {AccountSettingsId} from '@common/auth/ui/account-settings/account-settings-sidenav';
 
 export function DangerZonePanel() {
   const deleteAccount = useDeleteAccount();
 
   return (
-    <AccountSettingsPanel title={<Trans message="Danger zone" />}>
+    <AccountSettingsPanel
+      id={AccountSettingsId.DeleteAccount}
+      title={<Trans message="Danger zone" />}
+    >
       <DialogTrigger
         type="modal"
         onClose={isConfirmed => {

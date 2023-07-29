@@ -2,7 +2,7 @@ import {useContext} from 'react';
 import {TableContext} from '@common/ui/tables/table-context';
 
 export interface TrackTableMeta {
-  queueGroupId?: string;
+  queueGroupId?: string | number;
   hideTrackImage?: boolean;
 }
 

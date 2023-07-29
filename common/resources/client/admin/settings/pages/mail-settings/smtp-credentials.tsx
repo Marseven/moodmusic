@@ -39,7 +39,6 @@ export function SmtpCredentials({isInvalid}: SmtpCredentialsProps) {
       <FormTextField
         invalid={isInvalid}
         className="mb-30"
-        type="password"
         name="server.mail_encryption"
         label={<Trans message="SMTP encryption" />}
       />

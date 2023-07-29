@@ -22,7 +22,7 @@ export function TrackOptionsColumn({track, isHovered}: Props) {
         <IconButton
           size={isMobile ? 'sm' : 'md'}
           className={clsx(
-            isMobile ? 'ml-8 -mr-8 text-muted' : 'mr-8',
+            isMobile ? 'text-muted' : 'mr-8',
             !isMobile && !isHovered && 'invisible'
           )}
         >

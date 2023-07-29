@@ -21,12 +21,18 @@ class FileEntriesController extends BaseController
         protected Request $request,
         protected FileEntry $entry,
     ) {
+        $this->middleware('auth')->only(['index']);
     }
 
     public function index()
     {
         $params = $this->request->all();
         $params['userId'] = $this->request->get('userId');
+
+        // scope files to current user by default if it's an API request
+        if (!requestIsFromFrontend() && !$params['userId']) {
+            $params['userId'] = Auth::id();
+        }
 
         $this->authorize('index', FileEntry::class);
 
@@ -46,6 +52,13 @@ class FileEntriesController extends BaseController
         } catch (FileNotFoundException $e) {
             abort(404);
         }
+    }
+
+    public function showModel(FileEntry $fileEntry)
+    {
+        $this->authorize('show', $fileEntry);
+
+        return $this->success(['fileEntry' => $fileEntry]);
     }
 
     public function store()

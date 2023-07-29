@@ -79,7 +79,6 @@ function FeatureForm({index}: FeatureFormProps) {
         name={`settings.homepage.appearance.secondaryFeatures.${index}.image`}
         className="mb-30"
         label={<Trans message="Image" />}
-        highlightSelector={`[data-testid="secondary-image-${index}"]`}
         defaultValue={getDefaultImage(index)}
         diskPrefix="homepage"
       />

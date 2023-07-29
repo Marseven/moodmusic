@@ -23,6 +23,7 @@ export interface UseArtistParams {
   withCount?: string | string[];
   loadAlbumTracks?: boolean;
   albumsPerPage?: number;
+  paginate?: 'simple';
 }
 
 export function useArtist(params: UseArtistParams) {

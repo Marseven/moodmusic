@@ -4,26 +4,19 @@ namespace Common\Core\Policies;
 
 use App\User;
 use Common\Settings\Settings;
-use Illuminate\Auth\Access\HandlesAuthorization;
 use Illuminate\Auth\Access\Response;
 
-class ProductPolicy
-{
-    use HandlesAuthorization;
+class ProductPolicy extends BasePolicy {
 
-    public function __construct(protected Settings $settings)
+    public function index(?User $user): bool|Response
     {
-    }
-
-    public function index(User $user): bool|Response
-    {
-        return $this->settings->get('billing.enable') ||
+        return app(Settings::class)->get('billing.enable') ||
             $user->hasPermission('plans.view');
     }
 
-    public function show(User $user): bool|Response
+    public function show(?User $user): bool|Response
     {
-        return $this->settings->get('billing.enable') ||
+        return app(Settings::class)->get('billing.enable') ||
             $user->hasPermission('plans.view');
     }
 

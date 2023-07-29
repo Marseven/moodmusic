@@ -3,7 +3,6 @@ import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import clsx from 'clsx';
 import {Genre} from '@app/web-player/genres/genre';
-import {getBootstrapData} from '@common/core/bootstrap-data/use-backend-bootstrap-data';
 
 interface GenreImageProps {
   genre: Genre;
@@ -24,8 +23,5 @@ export function GenreImage({genre, className, size}: GenreImageProps) {
 }
 
 export function getGenreImage(genre: Genre): string {
-  const data = getBootstrapData();
-  return genre?.image
-    ? `${data.settings.base_url}/${genre?.image}`
-    : defaultImage;
+  return genre?.image ? genre.image : defaultImage;
 }

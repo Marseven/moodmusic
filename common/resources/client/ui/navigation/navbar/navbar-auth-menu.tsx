@@ -31,7 +31,7 @@ export function NavbarAuthMenu({children, items}: Props) {
   const logout = useLogout();
   const menu = useCustomMenu('auth-dropdown');
   const isMobile = useIsMobileMediaQuery();
-  const {notifications} = useSettings();
+  const {notifications, themes} = useSettings();
   const {user, isSubscribed} = useAuth();
   const navigate = useNavigate();
   const {selectedTheme, selectTheme} = useThemeSelector();
@@ -101,7 +101,7 @@ export function NavbarAuthMenu({children, items}: Props) {
         {items?.map(item => item)}
         {isMobile && notifications?.integrated ? notifMenuItem : undefined}
         {isSubscribed && billingMenuItem}
-        {!selectedTheme.is_dark && (
+        {themes?.user_change && !selectedTheme.is_dark && (
           <MenuItem
             value="light"
             startIcon={<DarkModeIcon />}
@@ -112,7 +112,7 @@ export function NavbarAuthMenu({children, items}: Props) {
             <Trans message="Dark mode" />
           </MenuItem>
         )}
-        {selectedTheme.is_dark && (
+        {themes?.user_change && selectedTheme.is_dark && (
           <MenuItem
             value="dark"
             startIcon={<LightModeIcon />}

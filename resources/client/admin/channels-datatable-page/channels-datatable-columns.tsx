@@ -11,26 +11,36 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    width: 'flex-3',
+    visibleInMode: 'all',
     header: () => <Trans message="Name" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
-    body: channel => (
-      <a
-        className="hover:underline focus-visible:underline outline-none"
-        href={`channel/${channel.slug}`}
-        target="_blank"
-        rel="noreferrer"
-      >
-        {channel.name}
-      </a>
-    ),
+    body: channel => {
+      // link will not work without specific genre name in channel url
+      if (channel.config.connectToGenreViaUrl) {
+        return channel.name;
+      }
+      return (
+        <a
+          className="hover:underline focus-visible:underline outline-none"
+          href={`channel/${channel.slug}`}
+          target="_blank"
+          rel="noreferrer"
+        >
+          {channel.name}
+        </a>
+      );
+    },
   },
   {
     key: 'content_type',
     allowsSorting: false,
     header: () => <Trans message="Content type" />,
     body: channel => (
-      <span className="capitalize">{channel.config.contentModel}</span>
+      <span className="capitalize">
+        {channel.config.contentModel ? (
+          <Trans message={channel.config.contentModel} />
+        ) : undefined}
+      </span>
     ),
   },
   {
@@ -38,7 +48,11 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
     allowsSorting: false,
     header: () => <Trans message="Layout" />,
     body: channel => (
-      <span className="capitalize">{channel.config.layout}</span>
+      <span className="capitalize">
+        {channel.config.layout ? (
+          <Trans message={channel.config.layout} />
+        ) : undefined}
+      </span>
     ),
   },
   {
@@ -52,6 +66,7 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
   {
     key: 'updated_at',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Last updated" />,
     body: channel =>
       channel.updated_at ? <FormattedDate date={channel.updated_at} /> : '',
@@ -60,7 +75,9 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
+    visibleInMode: 'all',
     align: 'end',
+    width: 'w-42 flex-shrink-0',
     body: channel => (
       <Link to={`${channel.id}/edit`} className="text-muted">
         <IconButton size="md">

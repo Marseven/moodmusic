@@ -58,7 +58,7 @@ class UriResolver
         }
 
         // absolute URL with relative schema
-        if (str_starts_with($uri, '//')) {
+        if (0 === strpos($uri, '//')) {
             return preg_replace('#^([^/]*)//.*$#', '$1', $baseUriCleaned).$uri;
         }
 
@@ -85,7 +85,7 @@ class UriResolver
             return $path;
         }
 
-        if (str_ends_with($path, '.')) {
+        if ('.' === substr($path, -1)) {
             $path .= '/';
         }
 

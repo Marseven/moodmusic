@@ -150,6 +150,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hasCacheableSupportsMethod(): bool
     {
         return false;
@@ -205,9 +208,9 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
      *
      * @param bool $attributesAsString If false, return an array of {@link AttributeMetadataInterface}
      *
-     * @return string[]|AttributeMetadataInterface[]|bool
-     *
      * @throws LogicException if the 'allow_extra_attributes' context variable is false and no class metadata factory is provided
+     *
+     * @return string[]|AttributeMetadataInterface[]|bool
      */
     protected function getAllowedAttributes(string|object $classOrObject, array $context, bool $attributesAsString = false)
     {
@@ -331,7 +334,6 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
             $params = [];
             foreach ($constructorParameters as $constructorParameter) {
                 $paramName = $constructorParameter->name;
-                $attributeContext = $this->getAttributeDenormalizationContext($class, $paramName, $context);
                 $key = $this->nameConverter ? $this->nameConverter->normalize($paramName, $class, $format, $context) : $paramName;
 
                 $allowed = false === $allowedAttributes || \in_array($paramName, $allowedAttributes);
@@ -343,8 +345,8 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
                         }
 
                         $variadicParameters = [];
-                        foreach ($data[$paramName] as $parameterKey => $parameterData) {
-                            $variadicParameters[$parameterKey] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $attributeContext, $format);
+                        foreach ($data[$paramName] as $parameterData) {
+                            $variadicParameters[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
                         }
 
                         $params = array_merge($params, $variadicParameters);
@@ -361,7 +363,7 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
 
                     // Don't run set for a parameter passed to the constructor
                     try {
-                        $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $attributeContext, $format);
+                        $params[] = $this->denormalizeParameter($reflectionClass, $constructorParameter, $paramName, $parameterData, $context, $format);
                     } catch (NotNormalizableValueException $exception) {
                         if (!isset($context['not_normalizable_value_exceptions'])) {
                             throw $exception;
@@ -482,47 +484,5 @@ abstract class AbstractNormalizer implements NormalizerInterface, DenormalizerIn
         $callback = $context[self::CALLBACKS][$attribute] ?? $this->defaultContext[self::CALLBACKS][$attribute] ?? null;
 
         return $callback ? $callback($value, $object, $attribute, $format, $context) : $value;
-    }
-
-    /**
-     * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
-     *
-     * @internal
-     */
-    protected function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
-    {
-        if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
-            return $context;
-        }
-
-        return array_merge($context, $metadata->getNormalizationContextForGroups($this->getGroups($context)));
-    }
-
-    /**
-     * Computes the denormalization context merged with current one. Metadata always wins over global context, as more specific.
-     *
-     * @internal
-     */
-    protected function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
-    {
-        $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
-
-        if (null === $metadata = $this->getAttributeMetadata($class, $attribute)) {
-            return $context;
-        }
-
-        return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
-    }
-
-    /**
-     * @internal
-     */
-    protected function getAttributeMetadata(object|string $objectOrClass, string $attribute): ?AttributeMetadataInterface
-    {
-        if (!$this->classMetadataFactory) {
-            return null;
-        }
-
-        return $this->classMetadataFactory->getMetadataFor($objectOrClass)->getAttributesMetadata()[$attribute] ?? null;
     }
 }

@@ -163,6 +163,12 @@ function getRadius(props: InputFieldStyleProps): {
       append: startAppend ? 'rounded-l-full' : 'rounded-r-full',
     };
   }
+  if (inputRadius === 'rounded-none') {
+    return {
+      input: '',
+      append: '',
+    };
+  }
   return {
     input: clsx(
       !isInputGroup && 'rounded',

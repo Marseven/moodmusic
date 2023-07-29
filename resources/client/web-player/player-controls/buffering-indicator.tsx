@@ -1,8 +1,32 @@
 import clsx from 'clsx';
-import {usePlayerStore} from '@common/player/hooks/use-player-store';
+import {useContext, useEffect, useState} from 'react';
+import {PlayerStoreContext} from '@common/player/player-context';
+import {isSearchingForYoutubeVideo} from '@app/web-player/tracks/requests/find-youtube-videos-for-track';
 
 export function BufferingIndicator() {
-  const status = usePlayerStore(s => s.status);
+  const store = useContext(PlayerStoreContext);
+
+  const [isVisible, setIsVisible] = useState(false);
+  const [animationActive, setAnimationActive] = useState(false);
+
+  useEffect(() => {
+    return store.subscribe(
+      s => s.isBuffering,
+      isBuffering => {
+        const isLoading = isBuffering || isSearchingForYoutubeVideo;
+        if (isLoading) {
+          // make loader visible only after animation is running
+          setAnimationActive(true);
+          setTimeout(() => {
+            setIsVisible(true);
+          });
+        } else {
+          setIsVisible(false);
+        }
+      }
+    );
+  }, [store]);
+
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -11,8 +35,15 @@ export function BufferingIndicator() {
       fill="none"
       className={clsx(
         'absolute -top-3 -left-3 z-10 transition-opacity duration-300 pointer-events-none',
-        status === 'buffering' ? 'animate-spin opacity-100' : 'opacity-0'
+        isVisible ? 'opacity-100' : 'opacity-0',
+        animationActive && 'animate-spin'
       )}
+      onTransitionEnd={() => {
+        // stop animation only after opacity transition is done to avoid flickering
+        if (!isVisible) {
+          setAnimationActive(false);
+        }
+      }}
     >
       <g clipPath="url(#a)">
         <path

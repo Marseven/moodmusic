@@ -29,7 +29,15 @@ class CrupdateChannel
             ),
         ];
 
-        $channel->fill($attributes)->save();
+        $channel
+            ->fill(
+                array_merge($attributes, [
+                    // make sure updated_at is always changed, event if model is
+                    // not dirty otherwise channel cache will not be cleared
+                    'updated_at' => now(),
+                ]),
+            )
+            ->save();
 
         if (
             $channel->config['contentType'] === 'manual' &&

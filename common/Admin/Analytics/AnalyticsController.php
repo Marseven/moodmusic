@@ -35,14 +35,11 @@ class AnalyticsController extends BaseController
         $reportParams = ['dateRange' => $dateRange];
         if (in_array('visitors', $types)) {
             try {
-                $report = $this->getDataAction->execute($reportParams);
-                if ($report) {
-                    Cache::put(
-                        "adminReport.main.$cacheKey",
-                        $report,
-                        CarbonImmutable::now()->addDay(),
-                    );
-                }
+                $response['visitorsReport'] = Cache::remember(
+                    "adminReport.main.$cacheKey",
+                    CarbonImmutable::now()->addDay(),
+                    fn() => $this->getDataAction->execute($reportParams),
+                );
             } catch (Exception $e) {
                 $response['visitorsReport'] = app(
                     BuildNullAnalyticsReport::class,

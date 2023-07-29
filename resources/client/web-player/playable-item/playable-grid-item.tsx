@@ -40,7 +40,10 @@ export function PlayableGridItem({
         triggerOnContextMenu
       >
         <div className="w-full relative isolate group">
-          <div className="w-full aspect-square" onClick={() => navigate(link)}>
+          <div
+            className="w-full aspect-square this"
+            onClick={() => navigate(link)}
+          >
             {cloneElement(image, {
               size: 'w-full h-full',
               className: `${radius} shadow-md z-10`,
@@ -53,13 +56,15 @@ export function PlayableGridItem({
           <div
             className={clsx(
               'absolute bottom-0 left-0 w-full p-12 z-30 flex items-center gap-14',
-              radius === 'rounded-full' && 'justify-center'
+              radius === 'rounded-full' &&
+                'justify-center top-0 right-0 pointer-events-none'
             )}
           >
             <PlaybackToggleButton
+              size={radius === 'rounded-full' ? 'lg' : 'md'}
               radius="rounded-full"
               className={clsx(
-                'shadow-md',
+                'shadow-md pointer-events-auto',
                 radius === 'rounded-full' && 'invisible group-hover:visible'
               )}
               variant="flat"
@@ -70,15 +75,17 @@ export function PlayableGridItem({
               queueId={queueGroupId(model)}
             />
 
-            <DialogTrigger type="popover">
-              <IconButton
-                className="invisible md:group-hover:visible"
-                color="white"
-              >
-                <MoreHorizIcon />
-              </IconButton>
-              {contextDialog}
-            </DialogTrigger>
+            {radius !== 'rounded-full' && (
+              <DialogTrigger type="popover">
+                <IconButton
+                  className="invisible md:group-hover:visible"
+                  color="white"
+                >
+                  <MoreHorizIcon />
+                </IconButton>
+                {contextDialog}
+              </DialogTrigger>
+            )}
             {radius !== 'rounded-full' &&
               likeButton &&
               // 3 buttons won't fit if item is fully rounded

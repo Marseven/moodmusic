@@ -1,6 +1,11 @@
-import React, {useContext} from 'react';
+import React, {useContext, useMemo} from 'react';
 import {FileEntry} from '../file-entry';
 import {useSettings} from '../../core/settings/use-settings';
+import {isAbsoluteUrl} from '@common/utils/urls/is-absolute-url';
+
+export const FileEntryUrlsContext = React.createContext<
+  Record<string, string | number | null | undefined>
+>(null!);
 
 export function useFileEntryUrls(
   entry?: FileEntry,
@@ -9,35 +14,48 @@ export function useFileEntryUrls(
   const {base_url} = useSettings();
   const urlSearchParams = useContext(FileEntryUrlsContext);
 
-  if (!entry) {
-    return {};
-  }
+  return useMemo(() => {
+    if (!entry) {
+      return {};
+    }
 
-  const urls = {
-    previewUrl: entry.url, // either relative or absolute
-    downloadUrl: `${base_url}/api/v1/file-entries/download/${
-      options?.downloadHashes || entry.hash
-    }`,
-  };
+    let previewUrl: string | undefined;
+    if (entry.url) {
+      previewUrl = isAbsoluteUrl(entry.url)
+        ? entry.url
+        : `${base_url}/${entry.url}`;
+    }
 
-  if (urlSearchParams) {
-    // preview url
-    urls.previewUrl = addParams(
-      urls.previewUrl,
-      {...urlSearchParams, thumbnail: options?.thumbnail ? 'true' : ''},
-      base_url
-    );
+    const urls = {
+      previewUrl,
+      downloadUrl: `${base_url}/api/v1/file-entries/download/${
+        options?.downloadHashes || entry.hash
+      }`,
+    };
 
-    // download url
-    urls.downloadUrl = addParams(urls.downloadUrl, urlSearchParams, base_url);
-  }
+    if (urlSearchParams) {
+      // preview url
+      if (urls.previewUrl) {
+        urls.previewUrl = addParams(
+          urls.previewUrl,
+          {...urlSearchParams, thumbnail: options?.thumbnail ? 'true' : ''},
+          base_url
+        );
+      }
 
-  return urls;
+      // download url
+      urls.downloadUrl = addParams(urls.downloadUrl, urlSearchParams, base_url);
+    }
+
+    return urls;
+  }, [
+    base_url,
+    entry,
+    options?.downloadHashes,
+    options?.thumbnail,
+    urlSearchParams,
+  ]);
 }
-
-export const FileEntryUrlsContext = React.createContext<
-  Record<string, string | number | null | undefined>
->(null!);
 
 function addParams(urlString: string, params: object, baseUrl: string): string {
   const url = new URL(urlString, baseUrl);

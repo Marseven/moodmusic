@@ -1,5 +1,5 @@
 import {useForm} from 'react-hook-form';
-import {Fragment, ReactNode} from 'react';
+import {Fragment, ReactElement, ReactNode} from 'react';
 import {
   ConnectSocialPayload,
   useConnectSocialWithPassword,
@@ -24,12 +24,17 @@ import {useAuth} from '../use-auth';
 import {useTrans} from '../../i18n/use-trans';
 import {message} from '../../i18n/message';
 import {useSettings} from '../../core/settings/use-settings';
+import {MessageDescriptor} from '@common/i18n/message-descriptor';
+import clsx from 'clsx';
+
+const googleLabel = message('Continue with google');
+const facebookLabel = message('Continue with facebook');
+const twitterLabel = message('Continue with twitter');
 
 interface SocialAuthSectionProps {
   dividerMessage: ReactNode;
 }
 export function SocialAuthSection({dividerMessage}: SocialAuthSectionProps) {
-  const {trans} = useTrans();
   const {social, registration} = useSettings();
   const navigate = useNavigate();
   const {getRedirectUri} = useAuth();
@@ -59,42 +64,32 @@ export function SocialAuthSection({dividerMessage}: SocialAuthSectionProps) {
           {dividerMessage}
         </span>
       </div>
-      <div className="flex items-center justify-center gap-14">
+      <div
+        className={clsx(
+          'flex items-center justify-center gap-14',
+          !social.compact_buttons && 'flex-col'
+        )}
+      >
         {social?.google?.enable ? (
-          <IconButton
-            variant="outline"
-            radius="rounded"
-            aria-label={trans(message('Sign in with google'))}
-            onClick={() => {
-              handleSocialLogin('google');
-            }}
-          >
-            <GoogleIcon viewBox="0 0 48 48" />
-          </IconButton>
+          <SocialLoginButton
+            label={googleLabel}
+            icon={<GoogleIcon viewBox="0 0 48 48" />}
+            onClick={() => handleSocialLogin('google')}
+          />
         ) : null}
         {social?.facebook?.enable ? (
-          <IconButton
-            variant="outline"
-            radius="rounded"
-            aria-label={trans(message('Sign in with facebook'))}
-            onClick={() => {
-              handleSocialLogin('facebook');
-            }}
-          >
-            <FacebookIcon className="text-facebook" />
-          </IconButton>
+          <SocialLoginButton
+            label={facebookLabel}
+            icon={<FacebookIcon className="text-facebook" />}
+            onClick={() => handleSocialLogin('facebook')}
+          />
         ) : null}
         {social?.twitter?.enable ? (
-          <IconButton
-            variant="outline"
-            radius="rounded"
-            aria-label={trans(message('Sign in with twitter'))}
-            onClick={() => {
-              handleSocialLogin('twitter');
-            }}
-          >
-            <TwitterIcon className="text-twitter" />
-          </IconButton>
+          <SocialLoginButton
+            label={twitterLabel}
+            icon={<TwitterIcon className="text-twitter" />}
+            onClick={() => handleSocialLogin('twitter')}
+          />
         ) : null}
       </div>
       <DialogTrigger
@@ -152,5 +147,43 @@ function RequestPasswordDialog() {
         </Button>
       </DialogFooter>
     </Dialog>
+  );
+}
+
+interface SocialLoginButtonProps {
+  onClick: () => void;
+  label: MessageDescriptor;
+  icon: ReactElement;
+}
+function SocialLoginButton({onClick, label, icon}: SocialLoginButtonProps) {
+  const {trans} = useTrans();
+  const {
+    social: {compact_buttons},
+  } = useSettings();
+
+  if (compact_buttons) {
+    return (
+      <IconButton
+        variant="outline"
+        radius="rounded"
+        aria-label={trans(label)}
+        onClick={onClick}
+      >
+        {icon}
+      </IconButton>
+    );
+  }
+
+  return (
+    <Button
+      variant="outline"
+      startIcon={icon}
+      onClick={onClick}
+      className="w-full min-h-42"
+    >
+      <span className="min-w-160 text-start">
+        <Trans {...label} />
+      </span>
+    </Button>
   );
 }

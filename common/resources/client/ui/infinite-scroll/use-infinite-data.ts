@@ -1,20 +1,27 @@
-import {useInfiniteQuery, UseInfiniteQueryResult} from '@tanstack/react-query';
+import {
+  hashQueryKey,
+  useInfiniteQuery,
+  UseInfiniteQueryResult,
+} from '@tanstack/react-query';
 import {apiClient} from '@common/http/query-client';
 import {BackendResponse} from '@common/http/backend-response/backend-response';
 import {
   hasNextPage,
   PaginationResponse,
 } from '@common/http/backend-response/pagination-response';
-import {useMemo, useState} from 'react';
+import {useMemo, useRef, useState} from 'react';
 import {SortDescriptor} from '@common/ui/tables/types/sort-descriptor';
 import {GetDatatableDataParams} from '@common/datatable/requests/paginated-resources';
 import {QueryKey} from '@tanstack/query-core/src/types';
 
-export type UseInfiniteDataResult<T> = UseInfiniteQueryResult<
-  PaginationResponse<T>
-> & {
+export type UseInfiniteDataResult<
+  T,
+  E extends object = object
+> = UseInfiniteQueryResult<PaginationResponse<T> & E> & {
   items: T[];
   totalItems: number | null;
+  // initial load is done and no results were returned from backend
+  noResults: boolean;
   sortDescriptor: SortDescriptor;
   setSortDescriptor: (sortDescriptor: SortDescriptor) => void;
   searchQuery: string;
@@ -48,7 +55,7 @@ interface Response<T> extends BackendResponse {
 export interface UseInfiniteDataProps<T> {
   initialPage?: PaginationResponse<T> | null;
   queryKey: QueryKey;
-  queryParams?: Record<string, string | number>;
+  queryParams?: Record<string, string | number | null>;
   endpoint: string;
   defaultOrderBy?: SortDescriptor['orderBy'];
   defaultOrderDir?: SortDescriptor['orderDir'];
@@ -58,9 +65,9 @@ export interface UseInfiniteDataProps<T> {
   paginate?: 'simple' | 'lengthAware' | 'cursor';
   transformResponse?: (response: Response<T>) => Response<T>;
 }
-export function useInfiniteData<T>(
+export function useInfiniteData<T, E extends object = {}>(
   props: UseInfiniteDataProps<T>
-): UseInfiniteDataResult<T> {
+): UseInfiniteDataResult<T, E> {
   const {
     initialPage,
     endpoint,
@@ -77,13 +84,16 @@ export function useInfiniteData<T>(
     orderDir: defaultOrderDir,
   });
 
+  const queryKey = buildQueryKey(props, sortDescriptor, searchQuery);
+  const initialQueryKey = useRef(hashQueryKey(queryKey)).current;
+
   const query = useInfiniteQuery({
     keepPreviousData: willSortOrFilter,
-    queryKey: buildQueryKey(props, sortDescriptor, searchQuery),
+    queryKey,
     queryFn: ({pageParam}) => {
       const params: GetDatatableDataParams = {
         ...queryParams,
-        perPage: initialPage?.per_page,
+        perPage: initialPage?.per_page || queryParams?.perPage,
         query: searchQuery,
         paginate,
         ...sortDescriptor,
@@ -105,13 +115,9 @@ export function useInfiniteData<T>(
       return lastResponse.pagination.current_page + 1;
     },
     initialData: () => {
-      if (
-        !initialPage ||
-        // if sorting or search changed, remove initial data, so query is reset
-        sortDescriptor.orderBy !== defaultOrderBy ||
-        sortDescriptor.orderDir !== defaultOrderDir ||
-        !!searchQuery
-      ) {
+      // initial data will be for initial query key only, remove
+      // initial data if query key changes, so query is reset
+      if (!initialPage || hashQueryKey(queryKey) !== initialQueryKey) {
         return undefined;
       }
 
@@ -136,11 +142,12 @@ export function useInfiniteData<T>(
     ...query,
     items,
     totalItems,
+    noResults: query.data?.pages?.[0].pagination.data.length === 0,
     sortDescriptor,
     setSortDescriptor,
     searchQuery,
     setSearchQuery,
-  } as UseInfiniteDataResult<T>;
+  } as UseInfiniteDataResult<T, E>;
 }
 
 function fetchData<T>(

@@ -7,12 +7,12 @@ class LocalizationPolicy
 {
     use HandlesAuthorization;
 
-    public function index(User $user)
+    public function index(?User $user)
     {
         return $user->hasPermission('localizations.view');
     }
 
-    public function show(User $user)
+    public function show(?User $user)
     {
         return $user->hasPermission('localizations.view');
     }

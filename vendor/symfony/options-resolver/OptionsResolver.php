@@ -537,7 +537,7 @@ class OptionsResolver implements Options
         }
 
         if ($forcePrepend) {
-            $this->normalizers[$option] ??= [];
+            $this->normalizers[$option] = $this->normalizers[$option] ?? [];
             array_unshift($this->normalizers[$option], $normalizer);
         } else {
             $this->normalizers[$option][] = $normalizer;
@@ -1134,7 +1134,7 @@ class OptionsResolver implements Options
 
     private function verifyTypes(string $type, mixed $value, array &$invalidTypes, int $level = 0): bool
     {
-        if (\is_array($value) && str_ends_with($type, '[]')) {
+        if (\is_array($value) && '[]' === substr($type, -2)) {
             $type = substr($type, 0, -2);
             $valid = true;
 
@@ -1222,7 +1222,7 @@ class OptionsResolver implements Options
     private function formatValue(mixed $value): string
     {
         if (\is_object($value)) {
-            return $value::class;
+            return \get_class($value);
         }
 
         if (\is_array($value)) {

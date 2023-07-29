@@ -22,7 +22,7 @@ class UserLibraryTracksController extends BaseController
         $this->authorize('show', $user);
 
         $query = (new LibraryTracksQuery([
-            'orderBy' => request()->get('orderBy', 'likes_created_at'),
+            'orderBy' => request()->get('orderBy', 'likes.created_at'),
             'orderDir' => request()->get('orderDir', 'desc'),
         ]))->get($user->id);
         $paginator = new Paginator($query, request()->all());

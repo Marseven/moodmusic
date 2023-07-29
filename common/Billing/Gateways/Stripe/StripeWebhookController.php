@@ -20,7 +20,7 @@ class StripeWebhookController extends Controller
 {
     public function __construct(
         protected Stripe $stripe,
-        protected Subscription $subscription
+        protected Subscription $subscription,
     ) {
     }
 
@@ -81,7 +81,7 @@ class StripeWebhookController extends Controller
     }
 
     protected function handleInvoicePaid(
-        array $payload
+        array $payload,
     ): Response|Application|ResponseFactory {
         $stripeInvoice = $payload['data']['object'];
         $stripeSubscriptionId = $stripeInvoice['subscription'];
@@ -96,13 +96,15 @@ class StripeWebhookController extends Controller
                 'subscription_id' => $subscription->id,
                 'paid' => true,
             ]);
+        } else {
+            return response('Wait for subscription to be created', 503);
         }
 
         return response('Webhook Handled', 200);
     }
 
     protected function handleCustomerUpdated(
-        array $payload
+        array $payload,
     ): Response|Application|ResponseFactory {
         $stripeCustomer = $payload['data']['object'];
         $user = User::where('stripe_id', $stripeCustomer['id'])->firstOrFail();
@@ -120,7 +122,7 @@ class StripeWebhookController extends Controller
     }
 
     protected function handleSubscriptionUpdated(
-        array $payload
+        array $payload,
     ): Response|Application|ResponseFactory {
         $stripeSubscription = $payload['data']['object'];
         $newStripePrice = $stripeSubscription['items']['data'][0]['price'];
@@ -137,35 +139,33 @@ class StripeWebhookController extends Controller
         $subscription = Subscription::where(
             'gateway_id',
             $stripeSubscription['id'],
-        )->first();
+        )->firstOrFail();
 
-        if ($subscription) {
-            // sync local subscription details with stripe
-            $subscription
-                ->fill([
-                    'renews_at' => Carbon::createFromTimestamp(
-                        $stripeSubscription['current_period_end'],
-                    ),
-                    'product_id' => $newProduct->id,
-                    'price_id' => $newPrice->id,
-                ])
-                ->save();
+        // sync local subscription details with stripe
+        $subscription
+            ->fill([
+                'renews_at' => Carbon::createFromTimestamp(
+                    $stripeSubscription['current_period_end'],
+                ),
+                'product_id' => $newProduct->id,
+                'price_id' => $newPrice->id,
+            ])
+            ->save();
 
-            // mark local subscription as cancelled if renew failed on stripe
-            if (
-                $stripeSubscription['status'] === 'cancelled' ||
-                $stripeSubscription['status'] === 'unpaid' ||
-                $stripeSubscription['cancel_at_period_end']
-            ) {
-                $subscription->markAsCancelled();
-            }
+        // mark local subscription as cancelled if renew failed on stripe
+        if (
+            $stripeSubscription['status'] === 'cancelled' ||
+            $stripeSubscription['status'] === 'unpaid' ||
+            $stripeSubscription['cancel_at_period_end']
+        ) {
+            $subscription->markAsCancelled();
         }
 
         return response('Webhook Handled', 200);
     }
 
     protected function handleSubscriptionCreated(
-        array $payload
+        array $payload,
     ): Response|Application|ResponseFactory {
         $stripeSubscription = $payload['data']['object'];
 
@@ -177,7 +177,7 @@ class StripeWebhookController extends Controller
     }
 
     protected function markSubscriptionAsCancelled(
-        string $stripeSubscriptionId
+        string $stripeSubscriptionId,
     ): Response|Application|ResponseFactory {
         $subscription = Subscription::where(
             'gateway_id',
@@ -192,7 +192,7 @@ class StripeWebhookController extends Controller
     }
 
     protected function deleteSubscription(
-        string $stripeSubscriptionId
+        string $stripeSubscriptionId,
     ): Response|Application|ResponseFactory {
         $subscription = Subscription::where(
             'gateway_id',

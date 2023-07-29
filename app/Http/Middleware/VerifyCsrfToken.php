@@ -11,13 +11,5 @@ class VerifyCsrfToken extends BaseVerifyCsrfToken
      *
      * @var array
      */
-    protected $except = [
-        'secure/auth/login',
-        'secure/auth/register',
-        'secure/auth/logout',
-        'secure/auth/password/email',
-        'secure/update/run',
-        'secure/track/plays/*/log',
-        'secure/player/tracks'
-    ];
+    protected $except = [];
 }

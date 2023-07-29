@@ -11,7 +11,8 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 
-class Artist extends Model {
+class Artist extends Model
+{
     use OrdersByPopularity, Searchable, HasFactory;
 
     const MODEL_TYPE = 'artist';
@@ -20,7 +21,6 @@ class Artist extends Model {
         'id' => 'integer',
         'spotify_popularity' => 'integer',
         'fully_scraped' => 'boolean',
-        'auto_update' => 'boolean',
         'verified' => 'boolean',
     ];
     protected $appends = ['model_type'];
@@ -28,14 +28,9 @@ class Artist extends Model {
     protected $hidden = [
         'pivot',
         'spotify_followers',
-        'image_large',
         'fully_scraped',
-        'bio_legacy',
         'updated_at',
         'created_at',
-        'wiki_image_large',
-        'wiki_image_small',
-        'auto_update',
         'spotify_id',
         'spotify_popularity',
         'views',
@@ -43,7 +38,7 @@ class Artist extends Model {
 
     public function albums(): BelongsToMany
     {
-    	return $this->belongsToMany(Album::class, 'artist_album');
+        return $this->belongsToMany(Album::class, 'artist_album');
     }
 
     public function topTracks()
@@ -51,9 +46,12 @@ class Artist extends Model {
         return $this->belongsToMany(Track::class)
             ->withCount('plays')
             ->orderByPopularity('desc')
-            ->with(['album', 'artists' => function(BelongsToMany $builder) {
-                return $builder->select('artists.name', 'artists.id');
-            }])
+            ->with([
+                'album',
+                'artists' => function (BelongsToMany $builder) {
+                    return $builder->select('artists.name', 'artists.id');
+                },
+            ])
             ->limit(20);
     }
 
@@ -62,22 +60,33 @@ class Artist extends Model {
         return $this->belongsToMany(Track::class)
             ->withCount('plays')
             ->orderByPopularity('desc')
-            ->with(['album', 'artists' => function(BelongsToMany $builder) {
-                return $builder->select('artists.name', 'artists.id');
-            }]);
+            ->with([
+                'album',
+                'artists' => function (BelongsToMany $builder) {
+                    return $builder->select('artists.name', 'artists.id');
+                },
+            ]);
     }
 
     public function similar()
     {
-        return $this->belongsToMany(Artist::class, 'similar_artists', 'artist_id', 'similar_id')
+        return $this->belongsToMany(
+            Artist::class,
+            'similar_artists',
+            'artist_id',
+            'similar_id',
+        )
             ->select(['artists.id', 'name', 'image_small'])
             ->orderByPopularity('desc');
     }
 
     public function genres(): MorphToMany
     {
-        return $this->morphToMany(Genre::class, 'genreable')
-            ->select('genres.name', 'genres.id');
+        return $this->morphToMany(Genre::class, 'genreable')->select(
+            'genres.name',
+            'genres.id',
+            'genres.display_name',
+        );
     }
 
     public function profile(): HasOne
@@ -95,9 +104,13 @@ class Artist extends Model {
         return $this->morphMany(ProfileLink::class, 'linkeable');
     }
 
-    public function followers() {
-        return $this->morphToMany(User::class, 'likeable', 'likes')
-            ->withTimestamps();
+    public function followers()
+    {
+        return $this->morphToMany(
+            User::class,
+            'likeable',
+            'likes',
+        )->withTimestamps();
     }
 
     public function likes(): BelongsToMany
@@ -130,26 +143,31 @@ class Artist extends Model {
 
     public static function filterableFields(): array
     {
-        return [
-            'id',
-            'spotify_id',
-        ];
+        return ['id', 'spotify_id'];
     }
 
     public function needsUpdating(): bool
     {
-        if ( ! $this->exists) return false;
+        if (!$this->exists || !$this->spotify_id) {
+            return false;
+        }
         $settings = app(Settings::class);
-        if ($settings->get('artist_provider', 'local') === 'local') return false;
-        if ( ! $this->auto_update) return false;
-        if ( ! $this->fully_scraped) return true;
+        if ($settings->get('artist_provider') !== 'spotify') {
+            return false;
+        }
+        if (!$this->fully_scraped) {
+            return true;
+        }
 
         $updateInterval = (int) $settings->get('automation.artist_interval', 7);
 
         // 0 means that artist should never be updated from 3rd party sites
-        if ($updateInterval === 0) return false;
+        if ($updateInterval === 0) {
+            return false;
+        }
 
-        return !$this->updated_at || $this->updated_at->addDays($updateInterval) <= Carbon::now();
+        return !$this->updated_at ||
+            $this->updated_at->addDays($updateInterval) <= Carbon::now();
     }
 
     public static function getModelTypeAttribute(): string

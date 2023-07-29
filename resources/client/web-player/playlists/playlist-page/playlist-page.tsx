@@ -10,7 +10,6 @@ import {message} from '@common/i18n/message';
 import {SearchIcon} from '@common/icons/material/Search';
 import {VirtualTableBody} from '@app/web-player/playlists/virtual-table-body';
 import {PlaylistPageHeader} from '@app/web-player/playlists/playlist-page/playlist-page-header';
-import {PlaylistTrackContextDialog} from '@app/web-player/playlists/playlist-page/playlist-track-context-dialog';
 import {Playlist} from '@app/web-player/playlists/playlist';
 import {queueGroupId} from '@app/web-player/queue-group-id';
 import {PlaylistTableRow} from '@app/web-player/playlists/playlist-page/playlist-table-row';
@@ -52,7 +51,7 @@ function PageContent({
   const {trans} = useTrans();
   const query = useInfiniteData({
     initialPage: initialTracks,
-    queryKey: ['playlists', playlist.id],
+    queryKey: ['tracks', 'playlist', playlist.id],
     endpoint: `playlists/${playlist.id}/tracks`,
     defaultOrderBy: 'position',
     defaultOrderDir: 'asc',
@@ -92,7 +91,6 @@ function PageContent({
         sortDescriptor={sortDescriptor}
         onSortChange={setSortDescriptor}
         renderRowAs={PlaylistTableRow}
-        contextDialog={<PlaylistTrackContextDialog playlist={playlist} />}
         tableBody={<VirtualTableBody query={query} totalItems={totalItems} />}
       />
       {!items.length && !isInitialLoading && (

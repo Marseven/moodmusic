@@ -1,13 +1,13 @@
 import clsx from 'clsx';
 import React, {
-  ComponentPropsWithoutRef,
+  ComponentPropsWithRef,
   JSXElementConstructor,
   ReactNode,
 } from 'react';
 import {CheckIcon} from '../../icons/material/Check';
 import {To} from 'react-router-dom';
 
-export interface ListItemBaseProps extends ComponentPropsWithoutRef<'div'> {
+export interface ListItemBaseProps extends ComponentPropsWithRef<'div'> {
   startIcon?: ReactNode;
   endIcon?: ReactNode;
   endSection?: ReactNode;
@@ -21,6 +21,7 @@ export interface ListItemBaseProps extends ComponentPropsWithoutRef<'div'> {
   showCheckmark?: boolean;
   elementType?: 'a' | JSXElementConstructor<any> | 'div';
   to?: To;
+  href?: string;
 }
 
 export const ListItemBase = React.forwardRef<HTMLDivElement, ListItemBaseProps>(
@@ -49,10 +50,17 @@ export const ListItemBase = React.forwardRef<HTMLDivElement, ListItemBaseProps>(
       );
     }
 
+    // if (!endIcon && !endSection && showCheckmark) {
+    //   endIcon = (
+    //     <CheckIcon size="sm" className={clsx('text-primary', 'invisible')} />
+    //   );
+    // }
+
     const iconClassName = clsx(
       'icon-sm rounded overflow-hidden flex-shrink-0',
       !isDisabled && 'text-muted'
     );
+    const endSectionClassName = clsx(!isDisabled && 'text-muted');
 
     const Element = elementType;
 
@@ -83,7 +91,7 @@ export const ListItemBase = React.forwardRef<HTMLDivElement, ListItemBaseProps>(
           )}
         </div>
         {(endIcon || endSection) && (
-          <div className={endIcon ? iconClassName : 'text-muted'}>
+          <div className={endIcon ? iconClassName : endSectionClassName}>
             {endIcon || endSection}
           </div>
         )}
@@ -92,20 +100,15 @@ export const ListItemBase = React.forwardRef<HTMLDivElement, ListItemBaseProps>(
   }
 );
 
-interface Props {
-  isSelected?: boolean;
-  isDisabled?: boolean;
-  isActive?: boolean;
-  className?: string;
-  showCheckmark?: boolean;
-}
 function itemClassName({
   className,
   isSelected,
   isActive,
   isDisabled,
   showCheckmark,
-}: Props): string {
+  endIcon,
+  endSection,
+}: ListItemBaseProps): string {
   let state: string = '';
   if (isDisabled) {
     state = 'text-disabled pointer-events-none';
@@ -121,10 +124,23 @@ function itemClassName({
     state = 'hover:bg-hover';
   }
 
+  let padding;
+
+  if (showCheckmark) {
+    if (endIcon || endSection) {
+      padding = 'pl-8 pr-8';
+    } else {
+      padding = 'pl-8 pr-24';
+    }
+  } else {
+    padding = 'px-20';
+  }
+
   return clsx(
     'w-full select-none outline-none cursor-pointer',
-    'py-8 text-sm truncate flex items-center gap-10 text-main',
-    showCheckmark ? 'px-8' : 'px-20',
+    'py-8 text-sm truncate flex items-center gap-10',
+    !isDisabled && 'text-main',
+    padding,
     state,
     className
   );

@@ -8,7 +8,7 @@ import {Link} from 'react-router-dom';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {AvatarPlaceholderIcon} from '@common/auth/ui/account-settings/avatar/avatar-placeholder-icon';
 
-type Size = 'xs' | 'sm' | 'md' | 'lg';
+type Size = 'xs' | 'sm' | 'md' | 'lg' | 'xl';
 
 export interface AvatarProps extends ComponentPropsWithoutRef<any> {
   className?: string;
@@ -57,7 +57,7 @@ export const Avatar = forwardRef<HTMLImageElement, AvatarProps>(
       ...domProps,
       className: clsx(
         className,
-        'relative block overflow-hidden select-none',
+        'relative block overflow-hidden select-none flex-shrink-0',
         getSizeClassName(size),
         circle ? 'rounded-full' : 'rounded'
       ),
@@ -83,6 +83,8 @@ function getSizeClassName(size: Size) {
       return 'w-32 h-32';
     case 'lg':
       return 'w-40 h-40';
+    case 'xl':
+      return 'w-60 h-60';
     // allow overriding with custom classNames
     default:
       return size;

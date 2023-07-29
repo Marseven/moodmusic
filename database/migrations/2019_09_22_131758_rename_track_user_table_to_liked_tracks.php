@@ -1,9 +1,9 @@
 <?php
 
 use App\Track;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class RenameTrackUserTableToLikedTracks extends Migration
 {
@@ -23,8 +23,16 @@ class RenameTrackUserTableToLikedTracks extends Migration
         });
 
         Schema::table('likes', function (Blueprint $table) {
+
+
             $table->string('likeable_type', 20)->default(addslashes(Track::class))->after('likeable_id');
-            $table->dropIndex('track_user_track_id_user_id_unique');
+
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $indexesFound = $sm->listTableIndexes('likes');
+            if (array_key_exists('track_user_track_id_user_id_unique', $indexesFound)) {
+                $table->dropIndex('track_user_track_id_user_id_unique');
+            }
+
             $table->unique(['likeable_id', 'likeable_type', 'user_id']);
         });
     }

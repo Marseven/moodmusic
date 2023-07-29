@@ -11,6 +11,7 @@ return [
     ['name' => 'social.google.enable', 'value' => true],
     ['name' => 'social.twitter.enable', 'value' => true],
     ['name' => 'social.facebook.enable', 'value' => true],
+    ['name' => 'social.compact_buttons', 'value' => true],
 
     // real time
     ['name' => 'realtime.enable', 'value' => false],
@@ -66,9 +67,6 @@ return [
             'discover',
         ]),
     ],
-
-    // custom domains
-    ['name' => 'custom_domains.default_host', 'value' => config('app.url')],
 
     // uploading
     ['name' => 'uploads.chunk', 'value' => true],

@@ -1,6 +1,6 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {startOfMonth, toCalendarDate} from '@internationalized/date';
-import {useIsMobileMediaQuery} from '../../../../../utils/hooks/is-mobile-media-query';
+import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {CalendarMonth} from './calendar-month';
 import {DatePickerState} from '../date-picker/use-date-picker-state';
 import {DateRangePickerState} from '../date-range-picker/use-date-range-picker-state';
@@ -17,7 +17,7 @@ export function Calendar({state, visibleMonths = 1}: CalendarProps) {
   }
 
   return (
-    <>
+    <Fragment>
       {[...new Array(visibleMonths).keys()].map(index => {
         const startDate = toCalendarDate(
           startOfMonth(state.calendarDates[index])
@@ -34,6 +34,6 @@ export function Calendar({state, visibleMonths = 1}: CalendarProps) {
           />
         );
       })}
-    </>
+    </Fragment>
   );
 }

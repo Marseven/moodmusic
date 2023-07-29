@@ -6,7 +6,7 @@ export function useIsMediaPlaying(
 ): boolean {
   return usePlayerStore(s => {
     return (
-      s.status === 'playing' &&
+      s.isPlaying &&
       s.cuedMedia?.id === mediaId &&
       (!groupId || groupId === s.cuedMedia.groupId)
     );

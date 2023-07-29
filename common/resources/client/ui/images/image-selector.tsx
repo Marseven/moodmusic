@@ -45,7 +45,6 @@ interface ImageSelectorProps {
   disabled?: boolean;
   value?: string;
   onChange?: (newValue: string) => void;
-  highlightSelector?: string;
   defaultValue?: string;
   diskPrefix: string;
   showRemoveButton?: boolean;

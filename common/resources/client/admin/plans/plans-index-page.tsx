@@ -26,6 +26,7 @@ const columnConfig: ColumnConfig<Product>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    visibleInMode: 'all',
     header: () => <Trans message="Name" />,
     body: product => {
       const price = product.prices[0];
@@ -46,23 +47,24 @@ const columnConfig: ColumnConfig<Product>[] = [
   {
     key: 'created_at',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Created" />,
     body: product => <FormattedDate date={product.created_at} />,
-    align: 'end',
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Last updated" />,
     body: product => <FormattedDate date={product.updated_at} />,
-    width: 'w-1',
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
+    visibleInMode: 'all',
     hideHeader: true,
     align: 'end',
-    width: 'w-1',
+    maxWidth: 'max-w-84',
     body: product => {
       return (
         <Fragment>

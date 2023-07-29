@@ -1,7 +1,6 @@
 <?php namespace App;
 
 use App\Traits\OrdersByPopularity;
-use Carbon\Carbon;
 use Common\Comments\Comment;
 use Common\Search\Searchable;
 use Common\Settings\Settings;
@@ -28,7 +27,6 @@ class Album extends Model
         'id' => 'integer',
         'fully_scraped' => 'boolean',
         'spotify_popularity' => 'integer',
-        'auto_update' => 'boolean',
         'owner_id' => 'integer',
     ];
 
@@ -38,12 +36,9 @@ class Album extends Model
         'fully_scraped',
         'temp_id',
         'artist_id',
-        'auto_update',
         'views',
-        'local_only',
         'spotify_id',
         'description',
-        'artist_type',
         'updated_at',
     ];
     protected $appends = ['model_type'];
@@ -135,10 +130,10 @@ class Album extends Model
 
     public function needsUpdating(): bool
     {
-        if (!$this->exists || !$this->spotify_id || !$this->auto_update) {
+        if (!$this->exists || !$this->spotify_id) {
             return false;
         }
-        if (app(Settings::class)->get('album_provider', 'local') === 'local') {
+        if (app(Settings::class)->get('album_provider') !== 'spotify') {
             return false;
         }
 
@@ -150,11 +145,6 @@ class Album extends Model
         }
 
         return false;
-    }
-
-    public function getCreatedAtAttribute(?string $date): ?string
-    {
-        return $date ? Carbon::parse($date)->diffForHumans() : null;
     }
 
     public function addPopularityToTracks()
@@ -197,6 +187,7 @@ class Album extends Model
             'name' => $this->name,
             'spotify_id' => $this->spotify_id,
             'artists' => $this->artists->pluck('name'),
+            'tags' => $this->tags->pluck('display_name'),
         ];
     }
 

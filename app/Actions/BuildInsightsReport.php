@@ -170,10 +170,15 @@ class BuildInsightsReport
 
         $data = array_map(function ($item) use ($artists) {
             $artist = $artists->firstWhere('id', $item['label']);
+            if ( ! $artist) {
+                return null;
+            }
             $item['model'] = $artist;
             $item['label'] = $artist->name;
             return $item;
         }, $data);
+
+        $data = array_values(array_filter($data));
 
         return [
             'datasets' => [

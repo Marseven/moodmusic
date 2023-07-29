@@ -1,5 +1,5 @@
 import {MediaItem} from '@common/player/media-item';
-import {PlayerState} from '@common/player/player-state';
+import {PlayerState} from '@common/player/state/player-state';
 
 export function playerQueue(state: () => PlayerState) {
   const getPointer = (): number => {

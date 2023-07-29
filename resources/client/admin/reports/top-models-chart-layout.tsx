@@ -62,12 +62,12 @@ export function TopModelsChartLayout({data, isLoading, ...layoutProps}: Props) {
           </div>
         </div>
       ))}
-      {!isLoading && !dataItems.length && (
+      {!isLoading && !dataItems.length ? (
         <div className="flex items-center gap-8 text-muted">
           <InfoIcon size="sm" />
           <Trans message="No plays in selected timeframe." />
         </div>
-      )}
+      ) : null}
     </ChartLayout>
   );
 }

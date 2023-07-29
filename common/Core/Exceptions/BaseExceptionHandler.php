@@ -49,6 +49,7 @@ class BaseExceptionHandler extends Handler
         if (
             $previous &&
             method_exists($previous, 'response') &&
+            $previous->response() &&
             property_exists($previous->response(), 'action')
         ) {
             $array['action'] = $e->getPrevious()->response()->action;

@@ -9,7 +9,6 @@ use App\Services\Providers\Spotify\SpotifyPlaylist;
 use App\Services\Providers\Spotify\SpotifyTopTracks;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -46,7 +45,8 @@ class UpdateChannelContent
             $channel->$relation()->syncWithoutDetaching($pivots->toArray());
         });
 
-        Cache::forget("channels.$channel->id");
+        // clear channel cache, it's based on updated_at timestamp
+        $channel->touch();
     }
 
     private function getContent(

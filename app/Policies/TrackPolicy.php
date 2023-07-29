@@ -10,13 +10,13 @@ use Illuminate\Database\Eloquent\Builder;
 
 class TrackPolicy extends BasePolicy
 {
-    public function index(User $user)
+    public function index(?User $user)
     {
         return $this->hasPermission($user, 'tracks.view') ||
             $this->hasPermission($user, 'music.view');
     }
 
-    public function show(User $user, Track $track)
+    public function show(?User $user, Track $track)
     {
         if ($track->owner_id === $user->id) {
             return true;
@@ -113,7 +113,7 @@ class TrackPolicy extends BasePolicy
         }
     }
 
-    public function download(User $user, Track $track)
+    public function download(?User $user, Track $track)
     {
         return app(Settings::class)->get('player.enable_download') &&
             $this->hasPermission($user, 'music.download');

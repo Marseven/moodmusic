@@ -8,11 +8,12 @@ import {Form} from '../../ui/forms/form';
 import {Localization} from '../../i18n/localization';
 import {FormTextField} from '../../ui/forms/input-field/text-field/text-field';
 import {useValueLists} from '../../http/value-lists';
-import {Option} from '../../ui/forms/select/select';
+import {FormSelect, Option} from '../../ui/forms/select/select';
 import {DialogFooter} from '../../ui/overlays/dialog/dialog-footer';
 import {Button} from '../../ui/buttons/button';
 import {useUpdateLocalization} from './update-localization';
-import {FormComboBox} from '../../ui/forms/combobox/form-combobox';
+import {message} from '@common/i18n/message';
+import {useTrans} from '@common/i18n/use-trans';
 
 interface UpdateLocalizationDialogProps {
   localization: Localization;
@@ -20,6 +21,7 @@ interface UpdateLocalizationDialogProps {
 export function UpdateLocalizationDialog({
   localization,
 }: UpdateLocalizationDialogProps) {
+  const {trans} = useTrans();
   const {formId, close} = useDialogContext();
   const form = useForm<Partial<Localization>>({
     defaultValues: {
@@ -53,21 +55,20 @@ export function UpdateLocalizationDialog({
             className="mb-30"
             required
           />
-          <FormComboBox
+          <FormSelect
             required
             name="language"
             label={<Trans message="Language" />}
             selectionMode="single"
-            useOptionLabelAsInputValue
+            showSearchField
+            searchPlaceholder={trans(message('Search languages'))}
           >
-            {languages.map(language => {
-              return (
-                <Option value={language.code} key={language.code}>
-                  {language.name}
-                </Option>
-              );
-            })}
-          </FormComboBox>
+            {languages.map(language => (
+              <Option value={language.code} key={language.code}>
+                {language.name}
+              </Option>
+            ))}
+          </FormSelect>
         </Form>
       </DialogBody>
       <DialogFooter>

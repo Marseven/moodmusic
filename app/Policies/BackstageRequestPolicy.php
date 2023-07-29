@@ -2,33 +2,36 @@
 
 namespace App\Policies;
 
-use Common\Auth\BaseUser;
 use App\BackstageRequest;
+use App\User;
 use Common\Core\Policies\BasePolicy;
 
 class BackstageRequestPolicy extends BasePolicy
 {
-    public function index(BaseUser $user, $userId = null)
+    public function index(User $user, $userId = null)
     {
-        return $user->hasPermission('backstageRequests.view') || $user->id === (int) $userId;
+        return $this->hasPermission($user, 'backstageRequests.view') ||
+            $user->id === (int) $userId;
     }
 
-    public function show(BaseUser $user, BackstageRequest $backstageRequest)
+    public function show(User $user, BackstageRequest $backstageRequest)
     {
-        return $user->hasPermission('backstageRequests.view') || $backstageRequest->user_id === $user->id;
+        return $this->hasPermission($user, 'backstageRequests.view') ||
+            $backstageRequest->user_id === $user->id;
     }
 
-    public function store(BaseUser $user)
+    public function store(User $user)
     {
-        return !!$user->id;
+        return $this->hasPermission($user, 'backstageRequests.create');
     }
 
-    public function update(BaseUser $user, BackstageRequest $backstageRequest)
+    public function update(User $user, BackstageRequest $backstageRequest)
     {
-        return $user->hasPermission('backstageRequests.update') || $backstageRequest->user_id === $user->id;
+        return $user->hasPermission('backstageRequests.update') ||
+            $backstageRequest->user_id === $user->id;
     }
 
-    public function destroy(BaseUser $user, $backstageRequestIds)
+    public function destroy(User $user, $backstageRequestIds)
     {
         if ($user->hasPermission('backstageRequests.delete')) {
             return true;
@@ -41,7 +44,7 @@ class BackstageRequestPolicy extends BasePolicy
         }
     }
 
-    public function handle(BaseUser $user)
+    public function handle(User $user)
     {
         return $user->hasPermission('backstageRequests.handle');
     }

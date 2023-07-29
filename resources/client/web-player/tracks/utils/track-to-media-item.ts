@@ -2,29 +2,32 @@ import {Track} from '@app/web-player/tracks/track';
 import {MediaItem} from '@common/player/media-item';
 import {getTrackImageSrc} from '@app/web-player/tracks/track-image/track-image';
 import {Album} from '@app/web-player/albums/album';
+import {guessPlayerProvider} from '@common/player/utils/guess-player-provider';
 
 export function trackToMediaItem(
   track: Track,
-  queueGroupId?: string
+  queueGroupId?: string | number
 ): MediaItem<Track> {
-  if (track.url) {
+  const provider: MediaItem['provider'] = track.src
+    ? guessPlayerProvider(track.src)
+    : 'youtube';
+
+  if (!track.src || provider === 'youtube') {
     return {
       id: track.id,
-      src: track.url,
-      provider: 'htmlVideo',
+      provider: 'youtube',
       meta: track,
-      image: getTrackImageSrc(track),
-      duration: track.duration ? Math.round(track.duration / 1000) : undefined,
+      src: track.src ? track.src : 'resolve',
       groupId: queueGroupId,
     };
   }
 
   return {
     id: track.id,
-    provider: 'youtube',
+    src: track.src,
+    provider,
     meta: track,
-    src: track.youtube_id ? track.youtube_id : 'resolve',
-    duration: track.duration ? Math.round(track.duration / 1000) : undefined,
+    poster: getTrackImageSrc(track),
     groupId: queueGroupId,
   };
 }

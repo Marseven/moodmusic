@@ -20,12 +20,20 @@ import {DataTableExportCsvButton} from '../../datatable/csv-export/data-table-ex
 import {ChipList} from '../../ui/forms/input-field/chip-field/chip-list';
 import {Chip} from '../../ui/forms/input-field/chip-field/chip';
 import {useSettings} from '../../core/settings/use-settings';
+import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
+import {BanUserDialog} from '@common/admin/users/ban-user-dialog';
+import {PersonOffIcon} from '@common/icons/material/PersonOff';
+import {Tooltip} from '@common/ui/tooltip/tooltip';
+import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
+import {useUnbanUser} from '@common/admin/users/requests/use-unban-user';
 
 const columnConfig: ColumnConfig<User>[] = [
   {
     key: 'name',
     allowsSorting: true,
     sortingKey: 'email',
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     header: () => <Trans message="User" />,
     body: user => (
       <NameWithAvatar
@@ -38,6 +46,7 @@ const columnConfig: ColumnConfig<User>[] = [
   {
     key: 'subscribed',
     header: () => <Trans message="Subscribed" />,
+    width: 'w-96',
     body: user =>
       user.subscriptions?.length ? (
         <CheckIcon className="icon-md text-positive" />
@@ -57,7 +66,7 @@ const columnConfig: ColumnConfig<User>[] = [
               target="_blank"
               to={`/admin/roles/${role.id}/edit`}
             >
-              {role.name}
+              <Trans message={role.name} />
             </Link>
           </Chip>
         ))}
@@ -79,23 +88,44 @@ const columnConfig: ColumnConfig<User>[] = [
   {
     key: 'createdAt',
     allowsSorting: true,
+    width: 'w-96',
     header: () => <Trans message="Created at" />,
-    body: user => <FormattedDate date={user.created_at} />,
+    body: user => (
+      <time>
+        <FormattedDate date={user.created_at} />
+      </time>
+    ),
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
+    width: 'w-84 flex-shrink-0',
     hideHeader: true,
     align: 'end',
-    body: user => {
-      return (
+    visibleInMode: 'all',
+    body: user => (
+      <div className="text-muted">
         <Link to={`${user.id}/edit`}>
-          <IconButton size="md" className="text-muted">
-            <EditIcon />
-          </IconButton>
+          <Tooltip label={<Trans message="Edit user" />}>
+            <IconButton size="md">
+              <EditIcon />
+            </IconButton>
+          </Tooltip>
         </Link>
-      );
-    },
+        {user.banned_at ? (
+          <UnbanButton user={user} />
+        ) : (
+          <DialogTrigger type="modal">
+            <Tooltip label={<Trans message="Suspend user" />}>
+              <IconButton size="md">
+                <PersonOffIcon />
+              </IconButton>
+            </Tooltip>
+            <BanUserDialog user={user} />
+          </DialogTrigger>
+        )}
+      </div>
+    ),
   },
 ];
 
@@ -114,7 +144,7 @@ export function UserIndex() {
         filters={UserIndexFilters}
         columns={filteredColumns}
         actions={<Actions />}
-        queryParams={{with: 'subscriptions'}}
+        queryParams={{with: 'subscriptions,bans'}}
         selectedActions={<DeleteSelectedItemsAction />}
         emptyStateMessage={
           <DataTableEmptyStateMessage
@@ -136,5 +166,38 @@ function Actions() {
         <Trans message="Add new user" />
       </DataTableAddItemButton>
     </Fragment>
+  );
+}
+
+interface UnbanButtonProps {
+  user: User;
+}
+function UnbanButton({user}: UnbanButtonProps) {
+  const unban = useUnbanUser(user.id);
+  return (
+    <DialogTrigger
+      type="modal"
+      onClose={confirmed => {
+        if (confirmed) {
+          unban.mutate();
+        }
+      }}
+    >
+      <Tooltip label={<Trans message="Remove suspension" />}>
+        <IconButton size="md" color="danger">
+          <PersonOffIcon />
+        </IconButton>
+      </Tooltip>
+      <ConfirmationDialog
+        isDanger
+        title={
+          <Trans message="Suspend “:name“" values={{name: user.display_name}} />
+        }
+        body={
+          <Trans message="Are you sure you want to remove suspension from this user?" />
+        }
+        confirm={<Trans message="Unsuspend" />}
+      />
+    </DialogTrigger>
   );
 }

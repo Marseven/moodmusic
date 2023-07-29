@@ -15,7 +15,7 @@ class UserController extends BaseController
         protected User $user,
         protected UserRepository $userRepository,
         protected Request $request,
-        protected Settings $settings
+        protected Settings $settings,
     ) {
         $this->middleware('auth', ['except' => ['show']]);
     }
@@ -39,9 +39,17 @@ class UserController extends BaseController
         if ($this->settings->get('envato.enable')) {
             $relations[] = 'purchase_codes';
         }
-
+        
         if (Auth::id() === $user->id) {
             $relations[] = 'tokens';
+            $user->makeVisible([
+              'two_factor_confirmed_at',
+              'two_factor_recovery_codes',
+            ]);
+            if ($user->two_factor_confirmed_at) {
+                $user->two_factor_recovery_codes = $user->recoveryCodes();
+                $user->syncOriginal();
+            }
         }
 
         $user->load($relations);
@@ -81,13 +89,17 @@ class UserController extends BaseController
         foreach ($users as $user) {
             if (!$shouldDeleteCurrentUser && $user->id === Auth::id()) {
                 return $this->error(
-                    "Could not delete currently logged in user: {$user->email}",
+                    __('Could not delete currently logged in user: :email', [
+                        'email' => $user->email,
+                    ]),
                 );
             }
 
-            if ($user->is_admin) {
+            if ($user->hasPermission('admin')) {
                 return $this->error(
-                    "Could not delete admin user: {$user->email}",
+                    __('Could not delete admin user: :email', [
+                        'email' => $user->email,
+                    ]),
                 );
             }
         }

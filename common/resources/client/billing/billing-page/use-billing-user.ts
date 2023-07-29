@@ -1,4 +1,5 @@
-import {invalidateUseUserQuery, useUser} from '../../auth/ui/use-user';
+import {useUser} from '../../auth/ui/use-user';
+import {queryClient} from '@common/http/query-client';
 
 export function useBillingUser() {
   const query = useUser('me', {
@@ -11,5 +12,5 @@ export function useBillingUser() {
 }
 
 export function invalidateBillingUserQuery() {
-  invalidateUseUserQuery('me');
+  queryClient.invalidateQueries(['users']);
 }

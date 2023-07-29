@@ -2,6 +2,8 @@ import {useContext, useMemo} from 'react';
 import {PlayerStoreContext} from '@common/player/player-context';
 import {MediaItem} from '@common/player/media-item';
 
+export type PlayerActions = ReturnType<typeof usePlayerActions>;
+
 export function usePlayerActions() {
   const store = useContext(PlayerStoreContext);
 
@@ -12,6 +14,7 @@ export function usePlayerActions() {
       mediaItems: MediaItem[],
       queuePointer?: number
     ) => {
+      s.stop();
       await s.overrideQueue(mediaItems, queuePointer);
       return s.play();
     };
@@ -22,6 +25,7 @@ export function usePlayerActions() {
       playPrevious: s.playPrevious,
       pause: s.pause,
       subscribe: s.subscribe,
+      emit: s.emit,
       getCurrentTime: s.getCurrentTime,
       seek: s.seek,
       toggleRepeatMode: s.toggleRepeatMode,
@@ -29,13 +33,22 @@ export function usePlayerActions() {
       getState: store.getState,
       setVolume: s.setVolume,
       setMuted: s.setMuted,
-      overrideQueue: s.overrideQueue,
       appendToQueue: s.appendToQueue,
       removeFromQueue: s.removeFromQueue,
       enterFullscreen: s.enterFullscreen,
       exitFullscreen: s.exitFullscreen,
+      toggleFullscreen: s.toggleFullscreen,
+      enterPip: s.enterPip,
+      exitPip: s.exitPip,
+      setTextTrackVisibility: s.setTextTrackVisibility,
+      setCurrentTextTrack: s.setCurrentTextTrack,
+      setIsSeeking: s.setIsSeeking,
+      setControlsVisible: s.setControlsVisible,
       cue: s.cue,
       overrideQueueAndPlay,
+      overrideQueue: s.overrideQueue,
+      setPlaybackRate: s.setPlaybackRate,
+      setPlaybackQuality: s.setPlaybackQuality,
     };
   }, [store]);
 }

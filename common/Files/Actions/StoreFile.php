@@ -8,6 +8,7 @@ use Illuminate\Http\File;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File as FileFacade;
+use Illuminate\Support\Str;
 use League\Flysystem\Local\LocalFilesystemAdapter;
 use Storage;
 use Symfony\Component\Mime\MimeTypes;
@@ -34,8 +35,12 @@ class StoreFile
         $this->payload = $payload;
 
         if (
+            // prevent uploading .htaccess files
             $payload->filename === '.htaccess' ||
-            ($payload->public && $this->isPhpFile($payload, $fileOptions))
+            // dont store php files in public disk
+            ($payload->public && $this->isPhpFile($payload, $fileOptions)) ||
+            // prevent path traversal in user specified folder
+            ($payload->diskPrefix && Str::contains($payload->diskPrefix, '..'))
         ) {
             abort(403);
         }
@@ -46,7 +51,7 @@ class StoreFile
             return $this->storeStringContents($fileOptions['contents']);
         } elseif (isset($fileOptions['path'])) {
             // if source and destination is local (and not temp dir) move file
-            // instead of copying or using streams as this will be a lot faster
+            // instead of copying or using streams, this will be a lot faster
             if (
                 Arr::get($fileOptions, 'moveFile') === true &&
                 $this->disk->getAdapter() instanceof LocalFilesystemAdapter

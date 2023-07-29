@@ -1,7 +1,6 @@
 <?php
 
 return [
-
     /*
       |--------------------------------------------------------------------------
       | Default Filesystem Disk
@@ -49,12 +48,22 @@ return [
 
         'uploads' => [
             'driver' => 'dynamic-uploads',
+            'local_root' => env(
+                'PRIVATE_UPLOADS_LOCAL_ROOT',
+                storage_path('app/uploads'),
+            ),
+            'remote_root' => env('PRIVATE_UPLOADS_REMOTE_ROOT', 'uploads'),
         ],
 
         'public' => [
             'driver' => 'dynamic-public',
             'url' => 'storage',
             'visibility' => 'public',
+            'local_root' => env(
+                'PUBLIC_UPLOADS_LOCAL_ROOT',
+                public_path('storage'),
+            ),
+            'remote_root' => env('PUBLIC_UPLOADS_REMOTE_ROOT', 'storage'),
         ],
     ],
 
@@ -72,5 +81,4 @@ return [
     'links' => [
         public_path('storage') => storage_path('app/public'),
     ],
-
 ];

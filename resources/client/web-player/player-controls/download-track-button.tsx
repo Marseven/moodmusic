@@ -5,6 +5,8 @@ import {trackIsLocallyUploaded} from '@app/web-player/tracks/utils/track-is-loca
 import {DownloadIcon} from '@common/icons/material/Download';
 import {downloadFileFromUrl} from '@common/uploads/utils/download-file-from-url';
 import {useAuth} from '@common/auth/use-auth';
+import {Tooltip} from '@common/ui/tooltip/tooltip';
+import {Trans} from '@common/i18n/trans';
 
 export function DownloadTrackButton() {
   const {player, base_url} = useSettings();
@@ -21,12 +23,14 @@ export function DownloadTrackButton() {
   }
 
   return (
-    <IconButton
-      onClick={() => {
-        downloadFileFromUrl(`${base_url}/api/v1/tracks/${track.id}/download`);
-      }}
-    >
-      <DownloadIcon />
-    </IconButton>
+    <Tooltip label={<Trans message="Download" />}>
+      <IconButton
+        onClick={() => {
+          downloadFileFromUrl(`${base_url}/api/v1/tracks/${track.id}/download`);
+        }}
+      >
+        <DownloadIcon />
+      </IconButton>
+    </Tooltip>
   );
 }

@@ -1,8 +1,8 @@
 import {BackendFilter, FilterControlType} from '../backend-filter';
 import {ComponentPropsWithRef, forwardRef, ReactNode} from 'react';
-import {Button} from '../../../ui/buttons/button';
-import {KeyboardArrowDownIcon} from '../../../icons/material/KeyboardArrowDown';
-import {Trans} from '../../../i18n/trans';
+import {Button} from '@common/ui/buttons/button';
+import {KeyboardArrowDownIcon} from '@common/icons/material/KeyboardArrowDown';
+import {Trans} from '@common/i18n/trans';
 import clsx from 'clsx';
 
 interface TriggerButtonProps
@@ -53,7 +53,7 @@ export const ActiveFilterButton = forwardRef<
   HTMLButtonElement,
   InactiveFilterButtonProps
 >(({filter, children, ...domProps}, ref) => {
-  const isBoolean = filter.type === FilterControlType.BooleanToggle;
+  const isBoolean = filter.control.type === FilterControlType.BooleanToggle;
   return (
     <Button
       variant="outline"

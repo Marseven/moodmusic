@@ -1,7 +1,6 @@
 <?php namespace Common\Core;
 
 use App\User;
-use Common\Auth\Roles\Role;
 use Common\Core\Prerender\HandlesSeo;
 use Illuminate\Auth\Access\Response as AuthResponse;
 use Illuminate\Contracts\Auth\Access\Gate;
@@ -13,7 +12,6 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\Http\Middleware\EnsureFrontendRequestsAreStateful;
 
 class BaseController extends Controller
 {
@@ -39,7 +37,7 @@ class BaseController extends Controller
             $guest = new User();
             // make sure ID is not NULL to avoid false positives in authorization
             $guest->forceFill(['id' => -1]);
-            $guest->setRelation('roles', Role::where('guests', 1)->get());
+            $guest->setRelation('roles', app('guestRole'));
             return $this->authorizeForUser($guest, $ability, $arguments);
         }
     }
@@ -56,8 +54,7 @@ class BaseController extends Controller
 
         // only generate seo tags if request is coming from frontend and not from API
         if (
-            (EnsureFrontendRequestsAreStateful::fromFrontend(request()) ||
-                defined('SHOULD_PRERENDER')) &&
+            (requestIsFromFrontend() || defined('SHOULD_PRERENDER')) &&
             ($response = $this->handleSeo($data, $options))
         ) {
             return $response;
@@ -76,7 +73,7 @@ class BaseController extends Controller
      * Return error response with specified messages.
      */
     public function error(
-        string $message = '',
+        ?string $message = '',
         array $errors = [],
         int $status = 422,
         $data = [],

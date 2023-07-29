@@ -18,6 +18,7 @@ export function ImportArtistDialog() {
   const form = useForm<ImportArtistPayload>({
     defaultValues: {
       importAlbums: true,
+      importSimilarArtists: true,
     },
   });
   const {formId, close} = useDialogContext();

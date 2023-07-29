@@ -9,7 +9,7 @@ class FileEntryUser extends BaseUser
 {
     protected $table = 'users';
 
-    protected $billingEnabled = false;
+    protected bool $billingEnabled = false;
 
     public function getMorphClass()
     {

@@ -66,7 +66,7 @@ class Product extends Model
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'feature_list' => $this->feature_list,
+            'feature_list' => implode(', ', $this->feature_list),
             'created_at' => $this->created_at->timestamp ?? '_null',
             'updated_at' => $this->updated_at->timestamp ?? '_null',
         ];

@@ -15,16 +15,26 @@ class LocalAndSpotifySearch extends SpotifySearch
     {
         $spotifyResults = parent::search($q, $limit, $modelTypes);
 
-        // spotify provider will only search artist, album and track and will use
         //  local provider for the rest of types, so there's no need to double search
-        $localModelTypes = array_intersect($modelTypes, [Artist::MODEL_TYPE, Album::MODEL_TYPE, Track::MODEL_TYPE]);
-        if ( ! empty($localModelTypes)) {
-            $localResults = app(LocalSearch::class)->search($q, $limit, $localModelTypes);
+        $localModelTypes = array_intersect($modelTypes, [
+            Artist::MODEL_TYPE,
+            Album::MODEL_TYPE,
+            Track::MODEL_TYPE,
+        ]);
+        if (!empty($localModelTypes)) {
+            $localResults = app(LocalSearch::class)->search(
+                $q,
+                $limit,
+                $localModelTypes,
+            );
         }
 
         foreach ($spotifyResults as $type => $results) {
             if (isset($localResults[$type])) {
-                $spotifyResults[$type] = $results->merge($localResults[$type])->unique('id')->take($limit);
+                $spotifyResults[$type] = $results
+                    ->merge($localResults[$type])
+                    ->unique('id')
+                    ->take($limit);
             }
         }
 

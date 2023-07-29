@@ -14,7 +14,8 @@ class LoadChannelMenuItems
                     'label' => $channel->name,
                     'action' => $channel->slug,
                     'type' => 'route',
-                    'model_id' => $channel->id
+                    'model_id' => $channel->id,
+                    'id' => $channel->id,
                 ];
             });
     }

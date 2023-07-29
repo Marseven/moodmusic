@@ -5,7 +5,7 @@ import {
 import {mainSearchModels} from '@app/web-player/search/search-autocomplete';
 import {Link, useParams} from 'react-router-dom';
 import {PageStatus} from '@common/http/page-status';
-import React, {Fragment, ReactNode, useMemo, useState} from 'react';
+import React, {Fragment, ReactNode, useEffect, useMemo, useState} from 'react';
 import {Tabs} from '@common/ui/tabs/tabs';
 import {TabList} from '@common/ui/tabs/tab-list';
 import {Tab} from '@common/ui/tabs/tab';
@@ -66,6 +66,7 @@ function MobileSearchBar() {
       }}
       autoFocus
       className="w-full"
+      size="lg"
       placeholder={trans(message('Search...'))}
     />
   );
@@ -117,7 +118,15 @@ function SearchResults({results}: SearchResultsProps) {
   }, [results]);
 
   const tabIndex = tabNames.indexOf(tabName as any);
+
   const [selectedTab, setSelectedTab] = useState(tabIndex > -1 ? tabIndex : 0);
+
+  // change tab when url changes
+  useEffect(() => {
+    if (tabIndex !== selectedTab) {
+      setSelectedTab(tabIndex);
+    }
+  }, [tabIndex, selectedTab]);
 
   const tabLink = (tabName?: string) => {
     let base = `/search/${searchQuery}`;
@@ -154,61 +163,61 @@ function SearchResults({results}: SearchResultsProps) {
         <Tab elementType={Link} to={tabLink()}>
           <Trans message="Top results" />
         </Tab>
-        {results.tracks?.length && (
+        {results.tracks?.length ? (
           <Tab elementType={Link} to={tabLink('tracks')}>
             <Trans message="Tracks" />
           </Tab>
-        )}
-        {results.artists?.length && (
+        ) : null}
+        {results.artists?.length ? (
           <Tab elementType={Link} to={tabLink('artists')}>
             <Trans message="Artists" />
           </Tab>
-        )}
-        {results.albums?.length && (
+        ) : null}
+        {results.albums?.length ? (
           <Tab elementType={Link} to={tabLink('albums')}>
             <Trans message="Albums" />
           </Tab>
-        )}
-        {results.playlists?.length && (
+        ) : null}
+        {results.playlists?.length ? (
           <Tab elementType={Link} to={tabLink('playlists')}>
             <Trans message="Playlists" />
           </Tab>
-        )}
-        {results.users?.length && (
+        ) : null}
+        {results.users?.length ? (
           <Tab elementType={Link} to={tabLink('users')}>
             <Trans message="Profiles" />
           </Tab>
-        )}
+        ) : null}
       </TabList>
       <TabPanels className="pt-8">
         <TabPanel>
           <TopResultsPanel results={results} />
         </TabPanel>
-        {results.tracks?.length && (
+        {results.tracks?.length ? (
           <TabPanel>
             <TrackResults tracks={results.tracks} />
           </TabPanel>
-        )}
-        {results.artists?.length && (
+        ) : null}
+        {results.artists?.length ? (
           <TabPanel>
             <ArtistResults artists={results.artists} />
           </TabPanel>
-        )}
-        {results.albums?.length && (
+        ) : null}
+        {results.albums?.length ? (
           <TabPanel>
             <AlbumResults albums={results.albums} />
           </TabPanel>
-        )}
-        {results.playlists?.length && (
+        ) : null}
+        {results.playlists?.length ? (
           <TabPanel>
             <PlaylistResults playlists={results.playlists} />
           </TabPanel>
-        )}
-        {results.users?.length && (
+        ) : null}
+        {results.users?.length ? (
           <TabPanel>
             <ProfileResults users={results.users} />
           </TabPanel>
-        )}
+        ) : null}
       </TabPanels>
     </Tabs>
   );
@@ -317,7 +326,7 @@ interface ProfileResultsProps {
 function ProfileResults({users, showMore}: ProfileResultsProps) {
   return (
     <div className="py-24">
-      <PanelTitle to={showMore ? 'profiles' : undefined}>
+      <PanelTitle to={showMore ? 'users' : undefined}>
         <Trans message="Profiles" />
       </PanelTitle>
       <ContentGrid>

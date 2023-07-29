@@ -77,7 +77,6 @@ export const AppAppearanceConfig: IAppearanceConfig = {
           'sidebar-secondary',
           'mobile-bottom',
           'landing-page-navbar',
-          'landing-page-footer',
         ],
         availableRoutes: [
           '/upload',

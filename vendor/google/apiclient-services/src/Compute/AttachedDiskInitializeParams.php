@@ -57,6 +57,14 @@ class AttachedDiskInitializeParams extends \Google\Collection
    */
   public $provisionedIops;
   /**
+   * @var string
+   */
+  public $provisionedThroughput;
+  /**
+   * @var string[]
+   */
+  public $replicaZones;
+  /**
    * @var string[]
    */
   public $resourceManagerTags;
@@ -202,6 +210,34 @@ class AttachedDiskInitializeParams extends \Google\Collection
   public function getProvisionedIops()
   {
     return $this->provisionedIops;
+  }
+  /**
+   * @param string
+   */
+  public function setProvisionedThroughput($provisionedThroughput)
+  {
+    $this->provisionedThroughput = $provisionedThroughput;
+  }
+  /**
+   * @return string
+   */
+  public function getProvisionedThroughput()
+  {
+    return $this->provisionedThroughput;
+  }
+  /**
+   * @param string[]
+   */
+  public function setReplicaZones($replicaZones)
+  {
+    $this->replicaZones = $replicaZones;
+  }
+  /**
+   * @return string[]
+   */
+  public function getReplicaZones()
+  {
+    return $this->replicaZones;
   }
   /**
    * @param string[]

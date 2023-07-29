@@ -10,17 +10,17 @@ export function useArtistPermissions(artist: Artist) {
       canDelete: false,
     };
     if (user?.id) {
-      const managesAlbum = !!user.artists?.find(a => artist.id);
+      const managesArtist = !!user.artists?.find(a => a.id === artist.id);
 
       permissions.canEdit =
         hasPermission('artists.update') ||
         hasPermission('music.update') ||
-        managesAlbum;
+        managesArtist;
 
       permissions.canDelete =
         hasPermission('artists.delete') ||
         hasPermission('music.delete') ||
-        managesAlbum;
+        managesArtist;
     }
     return permissions;
   }, [user, artist, hasPermission]);

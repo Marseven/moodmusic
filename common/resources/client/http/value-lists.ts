@@ -62,10 +62,11 @@ export function useValueLists(
   params?: Record<string, string | number | undefined>
 ) {
   return useQuery(
-    ['ValueLists', names, params],
+    ['value-lists', names, params],
     () => fetchValueLists(names, params),
     {
       staleTime: Infinity,
+      keepPreviousData: true,
       initialData: () => {
         // check if we have already fetched value lists for all specified names previously,
         // if so, return cached response for this query, as there's no need to fetch it again
@@ -99,6 +100,6 @@ function fetchValueLists(
   params?: Record<string, string | number | undefined>
 ): Promise<FetchValueListsResponse> {
   return apiClient
-    .get(`value-lists/${names}`, params)
+    .get(`value-lists/${names}`, {params})
     .then(response => response.data);
 }

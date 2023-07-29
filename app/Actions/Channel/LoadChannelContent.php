@@ -81,7 +81,10 @@ class LoadChannelContent
                         $builder,
                     );
                 case User::MODEL_TYPE:
-                    $datasource = new Datasource(User::withCount('followers'), $params);
+                    $datasource = new Datasource(
+                        User::withCount('followers'),
+                        $params,
+                    );
                     return $datasource->paginate();
             }
         }
@@ -136,43 +139,36 @@ class LoadChannelContent
 
     private function getQueryBuilderFor(
         string $modelType,
-        Channel $channel = null,
+        Channel $channel,
     ): Builder {
         switch ($modelType) {
             case Album::MODEL_TYPE:
-                return ($channel
-                    ? $channel->albums()
-                    : app(Album::class)
-                )->with('artists');
+                return $channel->albums()->with('artists');
             case Artist::MODEL_TYPE:
-                return ($channel
-                    ? $channel->artists()
-                    : app(Artist::class)
-                )->select(['name', 'artists.id', 'image_small']);
+                return $channel
+                    ->artists()
+                    ->select(['name', 'artists.id', 'image_small']);
             case User::MODEL_TYPE:
-                return ($channel
-                    ? $channel->users()
-                    : app(User::class)
-                )->select([
-                    'users.id',
-                    'email',
-                    'first_name',
-                    'last_name',
-                    'username',
-                    'avatar',
-                ]);
+                return $channel
+                    ->users()
+                    ->select([
+                        'users.id',
+                        'email',
+                        'first_name',
+                        'last_name',
+                        'username',
+                        'avatar',
+                    ]);
             case Genre::MODEL_TYPE:
-                return $channel ? $channel->genres() : app(Genre::class);
+                return $channel->genres();
             case Playlist::MODEL_TYPE:
-                return ($channel
-                    ? $channel->playlists()
-                    : app(Playlist::class)
-                )->with('editors');
+                return $channel->playlists()->with('editors');
             case Channel::MODEL_TYPE:
-                return $channel ? $channel->channels() : app(Channel::class);
+                return $channel->channels();
             // default to showing tracks, instead of crashing
             default:
-                return ($channel ? $channel->tracks() : app(Track::class))
+                return $channel
+                    ->tracks()
                     ->with('album.artists', 'artists', 'genres')
                     ->withCount('plays');
         }
@@ -198,7 +194,7 @@ class LoadChannelContent
                     ->firstOrFail();
             $channel->setAttribute('genre', $genre);
 
-            if (! $genre->display_name) {
+            if (!$genre->display_name) {
                 $genre->display_name = ucwords($genre->name);
             }
 

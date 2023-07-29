@@ -19,7 +19,7 @@ import {usePlaylistPermissions} from '@app/web-player/playlists/hooks/use-playli
 import {PlaylistImage} from '@app/web-player/playlists/playlist-image';
 import React, {Fragment, useCallback} from 'react';
 import {useIsFollowingPlaylist} from '@app/web-player/playlists/hooks/use-is-following-playlist';
-import {openGlobalDialog} from '@app/web-player/state/global-dialog-store';
+import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import {UpdatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/update-playlist-dialog';
 import {useUpdatePlaylist} from '@app/web-player/playlists/requests/use-update-playlist';
 import {CheckIcon} from '@common/icons/material/Check';
@@ -29,6 +29,7 @@ import {useFollowPlaylist} from '@app/web-player/playlists/requests/use-follow-p
 import {useUnfollowPlaylist} from '@app/web-player/playlists/requests/use-unfollow-playlist';
 import {AddToQueueButton} from '@app/web-player/context-dialog/add-to-queue-menu-button';
 import {PlaylistOwnerName} from '@app/web-player/playlists/playlist-grid-item';
+import {ShareMediaButton} from '@app/web-player/context-dialog/share-media-button';
 
 interface PlaylistContextDialogProps {
   playlist: Playlist;
@@ -64,14 +65,12 @@ export function PlaylistContextDialog({playlist}: PlaylistContextDialogProps) {
       >
         <Trans message="Copy playlist link" />
       </ContextMenuButton>
-      <ContextMenuButton>
-        <Trans message="Share" />
-      </ContextMenuButton>
+      {playlist.public && <ShareMediaButton item={playlist} />}
       {canEdit && (
         <ContextMenuButton
           onClick={() => {
             closeMenu();
-            openGlobalDialog(UpdatePlaylistDialog, {playlist});
+            openDialog(UpdatePlaylistDialog, {playlist});
           }}
         >
           <Trans message="Edit" />
@@ -189,7 +188,7 @@ function DeleteButton({playlist}: FollowButtonsProps) {
       disabled={deletePlaylist.isLoading}
       onClick={() => {
         closeMenu();
-        openGlobalDialog(ConfirmationDialog, {
+        openDialog(ConfirmationDialog, {
           isDanger: true,
           title: <Trans message="Delete playlist" />,
           body: (

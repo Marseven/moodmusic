@@ -90,7 +90,11 @@ function RequestDetails({request}: RequestDetailsProps) {
         />
         <Detail
           name={<Trans message="Requested role" />}
-          value={request.data.role}
+          value={
+            request.data.role ? (
+              <Trans message={request.data.role} />
+            ) : undefined
+          }
         />
         <Detail
           name={<Trans message="First name" />}

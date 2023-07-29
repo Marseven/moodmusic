@@ -72,13 +72,13 @@ export function PlaylistTableRow({
         triggerOnContextMenu
         placement="bottom-start"
       >
-        <tr
+        <div
           className={className}
           ref={domRef}
           {...mergeProps(sortableProps, domProps)}
         >
           {children}
-        </tr>
+        </div>
         <PlaylistTrackContextDialog playlist={data!.playlist} />
       </DialogTrigger>
       {!item.isPlaceholder && <RowDragPreview track={item} ref={previewRef} />}
@@ -99,13 +99,18 @@ const RowDragPreview = React.forwardRef<
     selectedRows.length > 1 ? (
       <Trans message=":count tracks" values={{count: selectedRows.length}} />
     ) : (
-      `${track.name} - ${track.artists?.[0].name}`
+      `${track.name} - ${track.artists?.[0]?.name}`
     );
 
   return (
     <DragPreview ref={ref}>
       {() => (
-        <div className="p-8 rounded shadow bg-chip text-base">{content}</div>
+        <div
+          className="p-8 rounded shadow bg-chip text-base"
+          role="presentation"
+        >
+          {content}
+        </div>
       )}
     </DragPreview>
   );

@@ -197,7 +197,9 @@ class Subscription extends Model
     {
         if (!$this->onGracePeriod()) {
             throw new LogicException(
-                'Unable to resume subscription that is not within grace period.',
+                __(
+                    'Unable to resume subscription that is not within grace period.',
+                ),
             );
         }
 

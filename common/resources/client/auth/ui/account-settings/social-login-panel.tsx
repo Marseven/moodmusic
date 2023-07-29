@@ -11,15 +11,19 @@ import {User} from '../../user';
 import {AccountSettingsPanel} from './account-settings-panel';
 import {Trans} from '@common/i18n/trans';
 import {message} from '@common/i18n/message';
-import {invalidateUseUserQuery} from '../use-user';
 import {useSettings} from '@common/core/settings/use-settings';
+import {queryClient} from '@common/http/query-client';
+import {AccountSettingsId} from '@common/auth/ui/account-settings/account-settings-sidenav';
 
 interface Props {
   user: User;
 }
 export function SocialLoginPanel({user}: Props) {
   return (
-    <AccountSettingsPanel title={<Trans message="Manage social login" />}>
+    <AccountSettingsPanel
+      id={AccountSettingsId.SocialLogin}
+      title={<Trans message="Manage social login" />}
+    >
       <SocialLoginPanelRow
         icon={<EnvatoIcon viewBox="0 0 50 50" className="bg-envato" />}
         service="envato"
@@ -100,7 +104,7 @@ function SocialLoginPanelRow({
               {service},
               {
                 onSuccess: () => {
-                  invalidateUseUserQuery('me');
+                  queryClient.invalidateQueries(['users']);
                   toast(
                     message('Disabled :service account', {values: {service}})
                   );
@@ -110,7 +114,7 @@ function SocialLoginPanelRow({
           } else {
             const e = await connectSocial(service);
             if (e?.status === 'SUCCESS') {
-              invalidateUseUserQuery('me');
+              queryClient.invalidateQueries(['users']);
               toast(message('Enabled :service account', {values: {service}}));
             }
           }

@@ -38,7 +38,7 @@ import {UpdateTrackPayload} from '@app/admin/tracks-datatable-page/requests/use-
 export function AlbumTracksForm() {
   const form = useFormContext<CreateAlbumPayload>();
   const {watch, setValue, getValues} = form;
-  const {fields, remove, append, move} = useFieldArray({
+  const {fields, remove, prepend, move} = useFieldArray({
     name: 'tracks',
   });
 
@@ -57,7 +57,15 @@ export function AlbumTracksForm() {
   };
 
   const {openFilePicker} = useTrackUploader({
-    onUploadStart: data => append(data),
+    onUploadStart: data =>
+      prepend(
+        // newly uploaded track should inherit album artists, genres and tags
+        mergeTrackFormValues(data, {
+          artists: form.getValues('artists'),
+          genres: form.getValues('genres'),
+          tags: form.getValues('tags'),
+        })
+      ),
     onMetadataChange: (file, newData) => {
       hydrateAlbumForm(form, newData);
       updateTrack(file.id, newData);
@@ -86,7 +94,7 @@ export function AlbumTracksForm() {
           type="modal"
           onClose={newTrack => {
             if (newTrack) {
-              append(newTrack);
+              prepend(newTrack);
             }
           }}
         >

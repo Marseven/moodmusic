@@ -1,8 +1,8 @@
 import {User} from '@common/auth/user';
 import {NormalizedModel} from '@common/datatable/filters/normalized-model';
+import {VotableModel} from '@common/votes/votable-model';
 
-export interface Comment {
-  id: number;
+export interface Comment extends VotableModel {
   content: string;
   user_id: number;
   user?: User;

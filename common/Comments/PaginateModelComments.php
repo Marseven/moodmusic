@@ -2,8 +2,8 @@
 
 namespace Common\Comments;
 
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class PaginateModelComments
 {
@@ -13,20 +13,25 @@ class PaginateModelComments
             ->comments()
             ->rootOnly()
             ->with([
-                'user' => fn(BelongsTo $builder) => $builder->compact(),
+                'user' => fn($builder) => $builder->compact(),
             ])
             ->paginate(request('perPage') ?? 25);
 
         $comments = app(LoadChildComments::class)->execute(
             $commentable,
-            collect($pagination->items()),
+            Collection::make($pagination->items()),
         );
+
+        $comments->load([
+            'votes' => fn($builder) => $builder->withCurrentUserVotes(),
+        ]);
 
         $comments->transform(function (Comment $comment) {
             if ($comment->deleted) {
                 $comment->content = null;
-                $comment->setRelation('user', null);
             }
+            $comment->current_vote = $comment->votes->first()?->vote_type;
+            $comment->unsetRelation('votes');
             return $comment;
         });
 

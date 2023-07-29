@@ -12,10 +12,9 @@ class TrackPlaysController extends BaseController
 {
     public function index($userId)
     {
-        $this->middleware('auth');
-
         $orderBy = request()->get('orderBy');
         $orderDir = request()->get('orderDir');
+
         // prevent ambiguous column db error
         if ($orderBy === 'created_at') {
             $orderBy = 'track_plays.created_at';

@@ -39,10 +39,10 @@ export function ImageZoomDialog(props: Props) {
           <CloseIcon />
         </IconButton>
         <div className="relative p-40 flex items-center justify-center w-full h-full">
-          {images?.length && (
+          {images?.length ? (
             <IconButton
               size="lg"
-              color="paper"
+              color="white"
               variant="flat"
               className="absolute my-auto top-0 bottom-0 left-20"
               radius="rounded"
@@ -53,16 +53,16 @@ export function ImageZoomDialog(props: Props) {
             >
               <KeyboardArrowLeftIcon />
             </IconButton>
-          )}
+          ) : null}
           <img
             src={src}
             alt=""
             className="max-h-full w-auto shadow object-contain"
           />
-          {images?.length && (
+          {images?.length ? (
             <IconButton
               size="lg"
-              color="paper"
+              color="white"
               variant="flat"
               className="absolute my-auto top-0 bottom-0 right-20"
               radius="rounded"
@@ -73,7 +73,7 @@ export function ImageZoomDialog(props: Props) {
             >
               <KeyboardArrowRightIcon />
             </IconButton>
-          )}
+          ) : null}
         </div>
       </DialogBody>
     </Dialog>

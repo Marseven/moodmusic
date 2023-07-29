@@ -1,4 +1,4 @@
-import create from 'zustand';
+import {create} from 'zustand';
 import {immer} from 'zustand/middleware/immer';
 import {enableMapSet} from 'immer';
 import {WritableDraft} from 'immer/dist/types/types-external';

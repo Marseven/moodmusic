@@ -43,22 +43,21 @@ class DynamicStorageDiskProvider extends ServiceProvider
         $config['driver'] = $driverName;
 
         // set root based on drive type and name
-        if ($driverName === 'local') {
-            $config['root'] =
-                $type === 'public'
-                    ? public_path('storage')
-                    : storage_path('app/uploads');
-        } else {
-            $config['root'] = $type === 'public' ? 'storage' : 'uploads';
-        }
+        $config['root'] =
+            $driverName === 'local'
+                ? $config['local_root']
+                : $config['remote_root'];
 
         // unset "storage" url from remote drives as "$disk->url()" will generate "storage/file_entry.jpg" url
-        if ($driverName !== 'local' && Arr::get($config, 'url') === 'storage') {
+        if (
+            $driverName !== 'local' &&
+            Arr::get($config, 'url') === $config['remote_root']
+        ) {
             unset($config['url']);
         }
 
         if (isset($config['port'])) {
-          $config['port'] = (int) $config['port'];
+            $config['port'] = (int) $config['port'];
         }
 
         $dynamicConfigKey = "{$type}_{$driverName}";

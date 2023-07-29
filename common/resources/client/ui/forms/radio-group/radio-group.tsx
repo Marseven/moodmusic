@@ -59,6 +59,7 @@ export const RadioGroup = forwardRef<HTMLFieldSetElement, RadioGroupProps>(
         <div
           className={clsx(
             'flex',
+            label ? 'mt-6' : 'mt-0',
             orientation === 'vertical' ? 'flex-col gap-10' : 'flex-row gap-16'
           )}
         >

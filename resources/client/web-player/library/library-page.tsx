@@ -18,16 +18,16 @@ import {useAuthClickCapture} from '@app/web-player/use-auth-click-capture';
 import {useUserPlaylists} from '@app/web-player/library/requests/use-user-playlists';
 import {PlaylistImage} from '@app/web-player/playlists/playlist-image';
 import {InfiniteScrollSentinel} from '@common/ui/infinite-scroll/infinite-scroll-sentinel';
-import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {AdHost} from '@common/admin/ads/ad-host';
+import {useIsTabletMediaQuery} from '@common/utils/hooks/is-tablet-media-query';
 
 export function LibraryPage() {
   const navigate = useNavigate();
   const authHandler = useAuthClickCapture();
   const query = useUserPlaylists('me');
-  const isMobile = useIsMobileMediaQuery();
+  const isSmallScreen = useIsTabletMediaQuery();
 
-  if (!isMobile) {
+  if (!isSmallScreen) {
     return <Navigate to="/library/songs" replace />;
   }
 

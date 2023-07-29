@@ -95,7 +95,7 @@ function PaypalSection() {
       >
         <Trans message="PayPal gateway" />
       </FormSwitch>
-      {paypalIsEnabled && (
+      {paypalIsEnabled ? (
         <SettingsErrorGroup name="paypal_group">
           {isInvalid => (
             <Fragment>
@@ -134,7 +134,7 @@ function PaypalSection() {
             </Fragment>
           )}
         </SettingsErrorGroup>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -143,7 +143,7 @@ function StripeSection() {
   const {watch} = useFormContext<AdminSettings>();
   const stripeEnabled = watch('client.billing.stripe.enable');
   return (
-    <>
+    <Fragment>
       <FormSwitch
         name="client.billing.stripe.enable"
         description={
@@ -158,7 +158,7 @@ function StripeSection() {
       >
         <Trans message="Stripe gateway" />
       </FormSwitch>
-      {stripeEnabled && (
+      {stripeEnabled ? (
         <SettingsErrorGroup name="stripe_group" separatorBottom={false}>
           {isInvalid => (
             <Fragment>
@@ -179,14 +179,13 @@ function StripeSection() {
               <FormTextField
                 name="server.stripe_webhook_secret"
                 label={<Trans message="Stripe webhook signing secret" />}
-                required
                 className="mb-20"
                 invalid={isInvalid}
               />
             </Fragment>
           )}
         </SettingsErrorGroup>
-      )}
-    </>
+      ) : null}
+    </Fragment>
   );
 }

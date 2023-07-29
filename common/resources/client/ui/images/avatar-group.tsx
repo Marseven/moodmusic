@@ -13,6 +13,8 @@ export function AvatarGroup(props: AvatarGroupProps) {
     props.children
   ) as ReactElement<AvatarProps>[];
 
+  if (!children.length) return null;
+
   const firstLink = children[0].props.link;
   const label = children[0].props.label;
 

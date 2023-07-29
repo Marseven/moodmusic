@@ -2,7 +2,7 @@ import {Track} from '@app/web-player/tracks/track';
 import {Table, TableProps} from '@common/ui/tables/table';
 import {ColumnConfig} from '@common/datatable/column-config';
 import {Trans} from '@common/i18n/trans';
-import React, {ReactElement, useMemo} from 'react';
+import React, {useMemo} from 'react';
 import {AlbumLink} from '@app/web-player/albums/album-link';
 import {ScheduleIcon} from '@common/icons/material/Schedule';
 import {FormattedDuration} from '@common/i18n/formatted-duration';
@@ -22,15 +22,13 @@ import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {TrackOptionsColumn} from '@app/web-player/tracks/track-table/track-options-column';
 import {TableDataItem} from '@common/ui/tables/types/table-data-item';
-import {TrackContextDialogProps} from '@app/web-player/tracks/context-dialog/track-context-dialog';
 
 const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'index',
     header: () => <span>#</span>,
-    width: 'w-1',
-    padding: 'pl-16 pr-22',
     align: 'center',
+    width: 'w-24 flex-shrink-0',
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <Skeleton size="w-20 h-20" variant="rect" />;
@@ -47,8 +45,8 @@ const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'name',
     allowsSorting: true,
-    padding: 'pr-16',
-    width: 'max-sm:w-5/6 max-sm:max-w-1',
+    width: 'flex-3 min-w-224',
+    visibleInMode: 'all',
     header: () => <Trans message="Title" />,
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -60,6 +58,7 @@ const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'artist',
     header: () => <Trans message="Artist" />,
+    width: 'flex-2',
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <Skeleton className="leading-3 max-w-4/5" />;
@@ -70,6 +69,7 @@ const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'album_name',
     allowsSorting: true,
+    width: 'flex-2',
     header: () => <Trans message="Album" />,
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -82,7 +82,7 @@ const columnConfig: ColumnConfig<Track>[] = [
     key: 'added_at',
     sortingKey: 'likes.created_at',
     allowsSorting: true,
-    width: 'w-1',
+    maxWidth: 'max-w-112',
     header: () => <Trans message="Date added" />,
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -93,11 +93,11 @@ const columnConfig: ColumnConfig<Track>[] = [
   },
   {
     key: 'options',
-    width: 'w-1',
-    padding: 'px-4',
     align: 'end',
+    width: 'w-36 md:w-84',
     header: () => <Trans message="Options" />,
     hideHeader: true,
+    visibleInMode: 'all',
     body: (track, row) => {
       if (row.isPlaceholder) {
         return (
@@ -112,8 +112,9 @@ const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'duration',
     allowsSorting: true,
-    width: 'w-1',
     className: 'text-muted',
+    maxWidth: 'max-w-48',
+    align: 'end',
     header: () => <ScheduleIcon />,
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -125,8 +126,8 @@ const columnConfig: ColumnConfig<Track>[] = [
   {
     key: 'popularity',
     allowsSorting: true,
-    width: 'w-90',
     className: 'text-muted',
+    maxWidth: 'max-w-54',
     header: () => <TrendingUpIcon />,
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -136,7 +137,7 @@ const columnConfig: ColumnConfig<Track>[] = [
         <div className="h-6 w-full relative bg-chip">
           <div
             style={{width: `${track.popularity || 50}%`}}
-            className="h-full w-0 absolute top-0 left-0 bg-black/30"
+            className="h-full w-0 absolute top-0 left-0 bg-black/30 dark:bg-white/30"
           />
         </div>
       );
@@ -152,8 +153,7 @@ export interface TrackTableProps {
   hidePopularity?: boolean;
   hideAddedAtColumn?: boolean;
   hideHeaderRow?: boolean;
-  queueGroupId?: string;
-  contextDialog?: ReactElement<TrackContextDialogProps>;
+  queueGroupId?: string | number;
   renderRowAs?: TableProps<Track>['renderRowAs'];
   sortDescriptor?: TableProps<Track>['sortDescriptor'];
   onSortChange?: TableProps<Track>['onSortChange'];
@@ -170,7 +170,6 @@ export function TrackTable({
   hidePopularity = true,
   hideAddedAtColumn = true,
   queueGroupId,
-  contextDialog,
   renderRowAs,
   ...tableProps
 }: TrackTableProps) {
@@ -179,13 +178,6 @@ export function TrackTable({
   hideHeaderRow = hideHeaderRow || !!isMobile;
 
   const filteredColumns = useMemo(() => {
-    // on mobile show only name and options
-    if (isMobile) {
-      return columnConfig.filter(col => {
-        return col.key === 'name' || col.key === 'options';
-      });
-    }
-    // on desktop show all props, except for explicitly hidden ones
     return columnConfig.filter(col => {
       if (col.key === 'artist' && hideArtist) {
         return false;
@@ -201,7 +193,7 @@ export function TrackTable({
       }
       return true;
     });
-  }, [isMobile, hideArtist, hideAlbum, hidePopularity, hideAddedAtColumn]);
+  }, [hideArtist, hideAlbum, hidePopularity, hideAddedAtColumn]);
 
   const meta: TrackTableMeta = useMemo(() => {
     return {queueGroupId: queueGroupId, hideTrackImage};
@@ -212,7 +204,6 @@ export function TrackTable({
       closeOnInteractOutside
       hideHeaderRow={hideHeaderRow}
       selectionStyle="highlight"
-      enableSelection={!isMobile}
       selectRowOnContextMenu
       renderRowAs={renderRowAs || TrackTableRowWithContextMenu}
       columns={filteredColumns}
@@ -235,7 +226,7 @@ function TrackTableRowWithContextMenu({
   children,
   ...domProps
 }: RowElementProps<Track>) {
-  const row = <tr {...domProps}>{children}</tr>;
+  const row = <div {...domProps}>{children}</div>;
   if (item.isPlaceholder) {
     return row;
   }

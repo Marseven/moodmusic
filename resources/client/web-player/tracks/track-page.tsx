@@ -25,7 +25,7 @@ import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
 import {AlbumImage} from '@app/web-player/albums/album-image/album-image';
 import {useSettings} from '@common/core/settings/use-settings';
 import {FormattedNumber} from '@common/i18n/formatted-number';
-import {TruncatedDescription} from '@app/web-player/tracks/truncated-description';
+import {TruncatedDescription} from '@common/ui/truncated-description';
 import {Waveform} from '@app/web-player/tracks/waveform/waveform';
 import {CommentBarContextProvider} from '@app/web-player/tracks/waveform/comment-bar-context';
 import {CommentBarNewCommentForm} from '@app/web-player/tracks/waveform/comment-bar-new-comment-form';
@@ -40,11 +40,13 @@ import {FocusScope} from '@react-aria/focus';
 import {trackIsLocallyUploaded} from '@app/web-player/tracks/utils/track-is-locally-uploaded';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {AdHost} from '@common/admin/ads/ad-host';
+import {useCommentPermissions} from '@app/web-player/tracks/hooks/use-comment-permissions';
 
 export function TrackPage() {
+  const {canView: showComments, canCreate: allowCommenting} =
+    useCommentPermissions();
   const query = useTrack({autoUpdate: true});
   const {canEdit} = useTrackPermissions([query.data?.track]);
-  const {player} = useSettings();
 
   if (query.data) {
     return (
@@ -53,7 +55,7 @@ export function TrackPage() {
           <PageMetaTags query={query} />
           <AdHost slot="general_top" className="mb-44" />
           <TrackPageHeader track={query.data.track} />
-          {player?.track_comments ? (
+          {allowCommenting ? (
             <CommentBarNewCommentForm
               className="mb-16"
               commentable={query.data.track}
@@ -75,7 +77,7 @@ export function TrackPage() {
           description={query.data.track.description}
           className="text-sm mt-24"
         />
-        {player?.track_comments ? (
+        {showComments ? (
           <CommentList
             className="mt-34"
             commentable={query.data.track}
@@ -125,7 +127,7 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
         hideAlbum
         hidePopularity={false}
       />
-      {!album.tracks?.length && (
+      {!album.tracks?.length ? (
         <IllustratedMessage
           className="mt-34"
           title={<Trans message="Nothing to display" />}
@@ -133,7 +135,7 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
             <Trans message="This album does not have any tracks yet" />
           }
         />
-      )}
+      ) : null}
     </div>
   );
 }
@@ -198,7 +200,11 @@ function TrackPageHeader({track}: TrackPageHeaderProps) {
             <PlaybackToggleButton
               buttonType="text"
               track={track}
+              tracks={
+                track.album?.tracks?.length ? track.album.tracks : undefined
+              }
               className={actionButtonClassName({isFirst: true})}
+              queueId={queueGroupId(track.album || track)}
             />
           </TrackActionsBar>
         }

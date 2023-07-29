@@ -14,7 +14,7 @@ class Paypal implements CommonSubscriptionGatewayActions
     public function __construct(
         protected Settings $settings,
         protected PaypalPlans $plans,
-        protected PaypalSubscriptions $subscriptions
+        protected PaypalSubscriptions $subscriptions,
     ) {
     }
 
@@ -35,7 +35,7 @@ class Paypal implements CommonSubscriptionGatewayActions
 
     public function storeSubscriptionDetailsLocally(
         string $paypalSubscriptionId,
-        User $user
+        User $user,
     ): bool {
         $response = $this->paypal()->get(
             "billing/subscriptions/$paypalSubscriptionId",
@@ -61,7 +61,7 @@ class Paypal implements CommonSubscriptionGatewayActions
     public function changePlan(
         Subscription $subscription,
         Product $newProduct,
-        Price $newPrice
+        Price $newPrice,
     ): bool {
         return $this->subscriptions->changePlan(
             $subscription,
@@ -72,15 +72,20 @@ class Paypal implements CommonSubscriptionGatewayActions
 
     public function cancelSubscription(
         Subscription $subscription,
-        bool $atPeriodEnd = true
+        bool $atPeriodEnd = true,
     ): bool {
         return $this->subscriptions->cancel($subscription, $atPeriodEnd);
     }
 
     public function resumeSubscription(
         Subscription $subscription,
-        array $gatewayParams = []
+        array $gatewayParams = [],
     ): bool {
         return $this->subscriptions->resume($subscription, $gatewayParams);
+    }
+
+    public function findSubscription(Subscription $subscription): array
+    {
+        return $this->subscriptions->find($subscription);
     }
 }

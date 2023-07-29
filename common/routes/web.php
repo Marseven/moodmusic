@@ -1,6 +1,7 @@
 <?php
 
 use Common\Auth\Controllers\SocialAuthController;
+use Common\Auth\Controllers\TwoFactorQrCodeController;
 use Common\Billing\Invoices\InvoiceController;
 use Common\Core\Controllers\HomeController;
 use Common\Core\Controllers\UpdateController;
@@ -67,7 +68,6 @@ Route::group(['middleware' => 'web'], function () {
     });
 
     // CUSTOM DOMAINS
-
     Route::group(
         ['prefix' => 'secure', 'middleware' => 'customDomainsEnabled'],
         function () {
@@ -85,6 +85,10 @@ Route::group(['middleware' => 'web'], function () {
             ]);
         },
     );
+
+    // TWO FACTOR AUTH
+    Route::get('auth/user/two-factor/qr-code', [TwoFactorQrCodeController::class, 'show'])
+      ->middleware(['auth', 'password.confirm']);
 
     // Laravel Auth routes with names so route('login') and similar calls don't error out
     Route::get('login', [HomeController::class, 'show'])->name('login');

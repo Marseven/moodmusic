@@ -3,7 +3,7 @@ export const WAVE_HEIGHT = 45;
 const BAR_WIDTH = 3;
 const BAR_GAP: number = 0.5;
 
-export function generateWaveformData(file: File): Promise<number[][]> {
+export function generateWaveformData(file: File): Promise<number[][] | null> {
   const audioContext = new window.AudioContext();
   return new Promise((resolve, abort) => {
     const canvas = document.createElement('canvas');
@@ -23,10 +23,14 @@ export function generateWaveformData(file: File): Promise<number[][]> {
       if (!buffer) {
         abort();
       } else {
-        audioContext.decodeAudioData(buffer as ArrayBuffer, buffer => {
-          const waveData = extractBuffer(buffer, context);
-          resolve(waveData);
-        });
+        audioContext.decodeAudioData(
+          buffer as ArrayBuffer,
+          buffer => {
+            const waveData = extractBuffer(buffer, context);
+            resolve(waveData);
+          },
+          () => resolve(null)
+        );
       }
     };
     reader.readAsArrayBuffer(file);

@@ -184,7 +184,7 @@ export function Breadcrumb(props: BreadcrumbsProps) {
       sizeStyle: style,
       isClickable,
       isDisabled,
-      isLink: isNavigation,
+      isLink: isNavigation && child.key !== 'menu',
     });
   });
 

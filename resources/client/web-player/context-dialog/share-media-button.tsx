@@ -4,12 +4,13 @@ import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
 import {Track} from '@app/web-player/tracks/track';
 import {Artist} from '@app/web-player/artists/artist';
 import {Album} from '@app/web-player/albums/album';
-import {openGlobalDialog} from '@app/web-player/state/global-dialog-store';
+import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import React from 'react';
 import {ShareMediaDialog} from '@app/web-player/sharing/share-media-dialog';
+import {Playlist} from '@app/web-player/playlists/playlist';
 
 interface Props {
-  item: Track | Album | Artist;
+  item: Track | Album | Artist | Playlist;
 }
 export function ShareMediaButton({item}: Props) {
   const {close: closeMenu} = useDialogContext();
@@ -17,7 +18,7 @@ export function ShareMediaButton({item}: Props) {
     <ContextMenuButton
       onClick={() => {
         closeMenu();
-        openGlobalDialog(ShareMediaDialog, {
+        openDialog(ShareMediaDialog, {
           item,
         });
       }}

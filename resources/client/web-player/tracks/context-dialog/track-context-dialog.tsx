@@ -18,13 +18,15 @@ import {ToggleRepostMenuButton} from '@app/web-player/context-dialog/toggle-repo
 import {getRadioLink} from '@app/web-player/radio/get-radio-link';
 import {useShouldShowRadioButton} from '@app/web-player/tracks/context-dialog/use-should-show-radio-button';
 import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
-import {openGlobalDialog} from '@app/web-player/state/global-dialog-store';
+import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
 import {useDeleteTracks} from '@app/web-player/tracks/requests/use-delete-tracks';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
 import {getAlbumLink} from '@app/web-player/albums/album-link';
 import {ShareMediaButton} from '@app/web-player/context-dialog/share-media-button';
+import {useSettings} from '@common/core/settings/use-settings';
+import {LyricsDialog} from '@app/web-player/tracks/lyrics/lyrics-dialog';
 
 export interface TrackContextDialogProps {
   tracks: Track[];
@@ -40,6 +42,8 @@ export function TrackContextDialog({
   const firstTrack = tracks[0];
   const {canEdit, canDelete} = useTrackPermissions(tracks);
   const shouldShowRadio = useShouldShowRadioButton();
+  const {player} = useSettings();
+  const {close} = useDialogContext();
 
   const loadTracks = useCallback(() => {
     return Promise.resolve(tracks);
@@ -92,6 +96,16 @@ export function TrackContextDialog({
               </ContextMenuButton>
             </Fragment>
           )}
+          {!player?.hide_lyrics && tracks.length === 1 && (
+            <ContextMenuButton
+              onClick={() => {
+                close();
+                openDialog(LyricsDialog, {track: firstTrack});
+              }}
+            >
+              <Trans message="View lyrics" />
+            </ContextMenuButton>
+          )}
           {!isMobile && (
             <CopyLinkMenuButton
               link={getTrackLink(firstTrack, {absolute: true})}
@@ -121,7 +135,7 @@ export function TrackContextDialog({
           )}
         </Fragment>
       ) : null}
-      {canDelete && <DeleteButton tracks={tracks} />}
+      {canDelete && !isMobile && <DeleteButton tracks={tracks} />}
     </ContextDialogLayout>
   );
 }
@@ -140,7 +154,7 @@ function DeleteButton({tracks}: TrackContextDialogProps) {
       disabled={deleteTracks.isLoading}
       onClick={() => {
         closeMenu();
-        openGlobalDialog(ConfirmationDialog, {
+        openDialog(ConfirmationDialog, {
           isDanger: true,
           title: <Trans message="Delete tracks" />,
           body: (

@@ -1,6 +1,6 @@
 import {FieldValues, SubmitHandler, UseFormReturn} from 'react-hook-form';
 import clsx from 'clsx';
-import {ReactNode} from 'react';
+import React, {ReactNode} from 'react';
 import {useStickySentinel} from '../utils/hooks/sticky-sentinel';
 import {Form} from '../ui/forms/form';
 import {Button} from '../ui/buttons/button';
@@ -12,6 +12,8 @@ interface Props<T extends FieldValues> {
   title: ReactNode;
   isLoading: boolean;
   children: ReactNode;
+  actions?: ReactNode;
+  backButton?: ReactNode;
   disableSaveWhenNotDirty?: boolean;
   wrapInContainer?: boolean;
 }
@@ -20,19 +22,21 @@ export function CrupdateResourceLayout<T extends FieldValues>({
   form,
   title,
   children,
+  actions,
+  backButton,
   isLoading = false,
   disableSaveWhenNotDirty = false,
   wrapInContainer = true,
 }: Props<T>) {
   const {isSticky, sentinelRef} = useStickySentinel();
-  const isDirty = !disableSaveWhenNotDirty ? true : form.formState.isDirty;
+  const isDirty = !disableSaveWhenNotDirty
+    ? true
+    : Object.keys(form.formState.dirtyFields).length;
 
   return (
     <Form
       onSubmit={onSubmit}
-      onBeforeSubmit={() => {
-        form.clearErrors();
-      }}
+      onBeforeSubmit={() => form.clearErrors()}
       form={form}
     >
       <div ref={sentinelRef} />
@@ -44,15 +48,17 @@ export function CrupdateResourceLayout<T extends FieldValues>({
       >
         <div
           className={clsx(
-            'flex items-center md:items-start gap-24 md:gap-80 py-14',
+            'flex items-center md:items-start gap-24 py-14',
             wrapInContainer && 'container mx-auto px-24'
           )}
         >
-          <h1 className="text-xl md:text-3xl whitespace-nowrap overflow-hidden overflow-ellipsis">
+          {backButton}
+          <h1 className="text-xl md:text-3xl whitespace-nowrap overflow-hidden overflow-ellipsis md:mr-64">
             {title}
           </h1>
+          <div className="mr-auto"></div>
+          {actions}
           <Button
-            className="ml-auto"
             variant="flat"
             color="primary"
             type="submit"

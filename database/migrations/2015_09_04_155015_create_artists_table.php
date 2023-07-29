@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 
 class CreateArtistsTable extends Migration {
 
@@ -18,7 +18,6 @@ class CreateArtistsTable extends Migration {
 			$table->integer('spotify_followers')->nullable()->unsigned();
 			$table->tinyInteger('spotify_popularity')->nullable()->unsigned()->index();
 			$table->string('image_small')->nullable();
-			$table->string('image_large')->nullable();
 			$table->boolean('fully_scraped')->default(0);
 			$table->timestamp('updated_at')->nullable();
 

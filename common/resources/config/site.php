@@ -26,4 +26,5 @@ return [
     'scout_mysql_mode' => env('SCOUT_MYSQL_MODE', 'extended'),
     'uploads_disable_tus' => env('UPLOADS_DISABLE_TUS'),
     'uploads_tus_method' => env('UPLOADS_TUS_METHOD'),
+    'simulated_connection' => env('SIMULATED_CONNECTION', false),
 ];

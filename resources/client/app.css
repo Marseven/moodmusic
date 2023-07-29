@@ -5,10 +5,6 @@
 @tailwind components;
 @tailwind utilities;
 
-.player-container iframe, .player-container video {
-  @apply w-full h-full;
-}
-
 .player-overlay-bg {
   background-image: linear-gradient(theme('colors.background'), theme('colors.background-alt') 85%);
 }

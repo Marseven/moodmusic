@@ -50,7 +50,6 @@ class CrupdateTrack
         }
 
         if ($album) {
-            $inlineData['album_name'] = $album['name'];
             $inlineData['album_id'] = $album['id'];
         }
 
@@ -110,11 +109,11 @@ class CrupdateTrack
             $track->artists
                 ->first()
                 ->followers()
-                ->chunkById(1000, function ($followers) use ($album) {
+                ->chunkById(1000, function ($followers) use ($track) {
                     try {
                         Notification::send(
                             $followers,
-                            new ArtistUploadedMedia($album),
+                            new ArtistUploadedMedia($track),
                         );
                     } catch (Exception $e) {
                         //

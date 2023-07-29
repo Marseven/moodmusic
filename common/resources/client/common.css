@@ -3,6 +3,7 @@
 @import 'ui/layout/dashbboard-layout.css';
 @import 'text-editor/editor-styles.css';
 @import 'admin/ads/ad-host.css';
+@import 'player/player-styles.css';
 
 @layer base {
   html,
@@ -74,6 +75,10 @@
 
   .hidden-scrollbar::-webkit-scrollbar {
     display: none;
+  }
+
+  .stable-scrollbar {
+    scrollbar-gutter: stable;
   }
 
   .diagonal-lines {

@@ -14,7 +14,7 @@ export function GenreGridItem({genre}: GenreGridItemProps) {
     >
       <GenreImage genre={genre} className="shadow-md w-full aspect-square" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-xl font-semibold capitalize text-white whitespace-nowrap overflow-hidden overflow-ellipsis max-w-[86%] z-20">
-        {genre.name}
+        {genre.display_name || genre.name}
       </div>
     </Link>
   );

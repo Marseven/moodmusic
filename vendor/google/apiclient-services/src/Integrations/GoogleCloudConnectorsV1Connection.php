@@ -52,6 +52,8 @@ class GoogleCloudConnectorsV1Connection extends \Google\Collection
   public $labels;
   protected $lockConfigType = GoogleCloudConnectorsV1LockConfig::class;
   protected $lockConfigDataType = '';
+  protected $logConfigType = GoogleCloudConnectorsV1LogConfig::class;
+  protected $logConfigDataType = '';
   /**
    * @var string
    */
@@ -70,6 +72,10 @@ class GoogleCloudConnectorsV1Connection extends \Google\Collection
   protected $sslConfigDataType = '';
   protected $statusType = GoogleCloudConnectorsV1ConnectionStatus::class;
   protected $statusDataType = '';
+  /**
+   * @var string
+   */
+  public $subscriptionType;
   /**
    * @var bool
    */
@@ -220,6 +226,20 @@ class GoogleCloudConnectorsV1Connection extends \Google\Collection
     return $this->lockConfig;
   }
   /**
+   * @param GoogleCloudConnectorsV1LogConfig
+   */
+  public function setLogConfig(GoogleCloudConnectorsV1LogConfig $logConfig)
+  {
+    $this->logConfig = $logConfig;
+  }
+  /**
+   * @return GoogleCloudConnectorsV1LogConfig
+   */
+  public function getLogConfig()
+  {
+    return $this->logConfig;
+  }
+  /**
    * @param string
    */
   public function setName($name)
@@ -302,6 +322,20 @@ class GoogleCloudConnectorsV1Connection extends \Google\Collection
   public function getStatus()
   {
     return $this->status;
+  }
+  /**
+   * @param string
+   */
+  public function setSubscriptionType($subscriptionType)
+  {
+    $this->subscriptionType = $subscriptionType;
+  }
+  /**
+   * @return string
+   */
+  public function getSubscriptionType()
+  {
+    return $this->subscriptionType;
   }
   /**
    * @param bool

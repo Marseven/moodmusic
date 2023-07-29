@@ -30,7 +30,7 @@ export type CreateAlbumPayloadTrack = Omit<
 export interface CreateAlbumPayload
   extends Omit<Album, 'genres' | 'tags' | 'tracks' | 'artists'> {
   artists: NormalizedModel[];
-  genres?: NormalizedModel[];
+  genres?: NormalizedModel[] | string[];
   tags?: NormalizedModel[];
   tracks: CreateAlbumPayloadTrack[];
 }

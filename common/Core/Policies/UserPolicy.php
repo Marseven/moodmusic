@@ -1,29 +1,29 @@
 <?php namespace Common\Core\Policies;
 
-use Common\Auth\BaseUser;
+use App\User;
 
 class UserPolicy extends BasePolicy
 {
-    public function index(BaseUser $user)
+    public function index(?User $user)
     {
-        return $user->hasPermission('users.view');
+        return $this->hasPermission($user, 'users.view');
     }
 
-    public function show(BaseUser $current, BaseUser $requested)
+    public function show(?User $current, User $requested)
     {
-        return $current->hasPermission('users.view') ||
+        return $this->hasPermission($current, 'users.view') ||
             $current->id === $requested->id;
     }
 
-    public function store(BaseUser $user)
+    public function store(User $user)
     {
-        return $user->hasPermission('users.create');
+        return $this->hasPermission($user, 'users.create');
     }
 
-    public function update(BaseUser $current, BaseUser $toUpdate = null)
+    public function update(User $current, User $toUpdate = null)
     {
         // user has proper permissions
-        if ($current->hasPermission('users.update')) {
+        if ($this->hasPermission($current, 'users.update')) {
             return true;
         }
 
@@ -43,7 +43,7 @@ class UserPolicy extends BasePolicy
         return true;
     }
 
-    public function destroy(BaseUser $user, array $userIds)
+    public function destroy(User $user, array $userIds)
     {
         $deletingOwnAccount = collect($userIds)->every(function (
             int $userId
@@ -51,6 +51,6 @@ class UserPolicy extends BasePolicy
             return $userId === $user->id;
         });
 
-        return $deletingOwnAccount || $user->hasPermission('users.delete');
+        return $deletingOwnAccount || $this->hasPermission($user, 'users.delete');
     }
 }

@@ -19,7 +19,7 @@ export interface BackstageRequest {
   user: User;
   artist?: Artist;
   created_at: string;
-  status: string;
+  status: 'approved' | 'pending' | 'denied';
   data: {
     socialProfiles: {[key: string]: ExternalSocialProfile};
     first_name?: string;

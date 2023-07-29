@@ -20,7 +20,7 @@ import {ToggleInLibraryMenuButton} from '@app/web-player/context-dialog/toggle-i
 import {CopyLinkMenuButton} from '@app/web-player/context-dialog/copy-link-menu-button';
 import {useDeleteAlbum} from '@app/web-player/albums/requests/use-delete-album';
 import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
-import {openGlobalDialog} from '@app/web-player/state/global-dialog-store';
+import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
 import {ToggleRepostMenuButton} from '@app/web-player/context-dialog/toggle-repost-menu-button';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
@@ -95,7 +95,7 @@ function DeleteButton({album}: AlbumContextMenuProps) {
       disabled={deleteAlbum.isLoading}
       onClick={() => {
         closeMenu();
-        openGlobalDialog(ConfirmationDialog, {
+        openDialog(ConfirmationDialog, {
           isDanger: true,
           title: <Trans message="Delete album" />,
           body: <Trans message="Are you sure you want to delete this album?" />,

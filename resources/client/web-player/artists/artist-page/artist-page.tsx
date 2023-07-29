@@ -31,6 +31,7 @@ export function ArtistPage() {
     autoUpdate: true,
     loadAlbumTracks: isListView,
     albumsPerPage: isListView ? 5 : 25,
+    paginate: 'simple',
   };
   const query = useArtist(params);
 

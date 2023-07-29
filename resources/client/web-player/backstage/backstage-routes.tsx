@@ -28,32 +28,54 @@ const RouteConfig: RouteObject[] = [
   // Backstage request form
   {
     path: 'requests',
-    element: <BackstageTypeSelector />,
+    element: (
+      <AuthRoute permission="backstageRequests.create">
+        <BackstageTypeSelector />
+      </AuthRoute>
+    ),
   },
   {
     path: 'requests/verify-artist',
-    element: <BackstageRequestFormPage />,
+    element: (
+      <AuthRoute permission="backstageRequests.create">
+        <BackstageRequestFormPage />
+      </AuthRoute>
+    ),
   },
   {
     path: 'requests/become-artist',
-    element: <BackstageRequestFormPage />,
+    element: (
+      <AuthRoute permission="backstageRequests.create">
+        <BackstageRequestFormPage />
+      </AuthRoute>
+    ),
   },
   {
     path: 'requests/claim-artist',
-    element: <BackstageRequestFormPage />,
+    element: (
+      <AuthRoute permission="backstageRequests.create">
+        <BackstageRequestFormPage />
+      </AuthRoute>
+    ),
   },
   {
     path: 'requests/:requestId/request-submitted',
-    element: <BackstageRequestSubmittedPage />,
+    element: (
+      <AuthRoute permission="backstageRequests.create">
+        <BackstageRequestSubmittedPage />
+      </AuthRoute>
+    ),
   },
 
   // Tracks
   {
     path: 'tracks/new',
     element: (
-      <BackstageLayout>
-        <CreateTrackPage />
-      </BackstageLayout>
+      <AuthRoute permission="music.create">
+        <BackstageLayout>
+          <CreateTrackPage />
+        </BackstageLayout>
+      </AuthRoute>
     ),
   },
   {
@@ -73,9 +95,11 @@ const RouteConfig: RouteObject[] = [
   {
     path: 'albums/new',
     element: (
-      <BackstageLayout>
-        <CreateAlbumPage wrapInContainer={false} />
-      </BackstageLayout>
+      <AuthRoute permission="music.create">
+        <BackstageLayout>
+          <CreateAlbumPage wrapInContainer={false} />
+        </BackstageLayout>
+      </AuthRoute>
     ),
   },
   {

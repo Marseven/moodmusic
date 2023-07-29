@@ -58,7 +58,7 @@ class SettingsTableSeeder extends Seeder
     /**
      * Merge existing menus setting json with new one.
      */
-    private function mergeMenusSetting(array $defaultSettings)
+    private function mergeMenusSetting(array $defaultSettings): void
     {
         $existing =
             json_decode(

@@ -105,7 +105,6 @@ function ClaimForm({requestType}: ClaimFormProps) {
         </div>
         {requestType === 'claim-artist' && <BackstageRoleSelect />}
         <FormTextField
-          required
           name="company"
           label={<Trans message="Company (optional)" />}
           className="mb-24"

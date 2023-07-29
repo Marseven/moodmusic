@@ -6,9 +6,12 @@ import {CustomPageBody} from '@common/custom-page/custom-page-body';
 import {PageMetaTags} from '@common/http/page-meta-tags';
 import {PageStatus} from '@common/http/page-status';
 
-export function CustomPageLayout() {
+interface Props {
+  slug?: string;
+}
+export function CustomPageLayout({slug}: Props) {
   const {pageSlug} = useParams();
-  const query = useCustomPage(pageSlug!);
+  const query = useCustomPage(slug || pageSlug!);
 
   return (
     <div className="flex flex-col min-h-full bg">

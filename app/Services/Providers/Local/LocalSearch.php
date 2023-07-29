@@ -11,12 +11,13 @@ use App\Track;
 use App\User;
 use Illuminate\Support\Collection;
 
-class LocalSearch implements SearchInterface {
-
+class LocalSearch implements SearchInterface
+{
     protected string $query;
     protected int $limit;
 
-    public function search(string $q, int $limit, array $modelTypes): Collection {
+    public function search(string $q, int $limit, array $modelTypes): Collection
+    {
         $this->query = urldecode($q);
         $this->limit = $limit ?: 10;
 
@@ -25,19 +26,19 @@ class LocalSearch implements SearchInterface {
         foreach ($modelTypes as $modelType) {
             if ($modelType === Artist::MODEL_TYPE) {
                 $results['artists'] = $this->artists();
-            } else if ($modelType === Album::MODEL_TYPE) {
+            } elseif ($modelType === Album::MODEL_TYPE) {
                 $results['albums'] = $this->albums();
-            } else if ($modelType === Track::MODEL_TYPE) {
+            } elseif ($modelType === Track::MODEL_TYPE) {
                 $results['tracks'] = $this->tracks();
-            } else if ($modelType === Playlist::MODEL_TYPE) {
+            } elseif ($modelType === Playlist::MODEL_TYPE) {
                 $results['playlists'] = $this->playlists();
-            } else if ($modelType === Channel::MODEL_TYPE) {
+            } elseif ($modelType === Channel::MODEL_TYPE) {
                 $results['channels'] = $this->channels();
-            } else if ($modelType === Genre::MODEL_TYPE) {
+            } elseif ($modelType === Genre::MODEL_TYPE) {
                 $results['genres'] = $this->genres();
-            } else if ($modelType === Tag::MODEL_TYPE) {
+            } elseif ($modelType === Tag::MODEL_TYPE) {
                 $results['tags'] = $this->tags();
-            } else if ($modelType === User::MODEL_TYPE) {
+            } elseif ($modelType === User::MODEL_TYPE) {
                 $results['users'] = $this->users();
             }
         }
@@ -47,37 +48,64 @@ class LocalSearch implements SearchInterface {
 
     public function artists(): Collection
     {
-        return Artist::search($this->query)->take($this->limit)->get();
+        return Artist::search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->values();
     }
 
     public function albums(): Collection
     {
-        return Album::search($this->query)->take($this->limit)->get()->load('artists');
+        return Album::search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->load('artists')
+            ->values();
     }
 
     public function tracks(): Collection
     {
-        return Track::search($this->query)->take($this->limit)->get()->load(['album', 'artists']);
+        return Track::search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->load(['album', 'artists'])
+            ->values();
     }
 
     public function playlists(): Collection
     {
-        return Playlist::search($this->query)->take($this->limit)->get()->load(['editors']);
+        return Playlist::search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->load(['editors'])
+            ->values();
     }
 
     public function channels(): Collection
     {
-        return app(Channel::class)->search($this->query)->take($this->limit)->get();
+        return app(Channel::class)
+            ->search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->values();
     }
 
     public function genres(): Collection
     {
-        return app(Genre::class)->search($this->query)->take($this->limit)->get();
+        return app(Genre::class)
+            ->search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->values();
     }
 
     public function tags(): Collection
     {
-        return app(Tag::class)->search($this->query)->take($this->limit)->get();
+        return app(Tag::class)
+            ->search($this->query)
+            ->take($this->limit)
+            ->get()
+            ->values();
     }
 
     public function users(): Collection
@@ -86,6 +114,7 @@ class LocalSearch implements SearchInterface {
             ->search($this->query)
             ->take($this->limit)
             ->get()
-            ->loadCount('followers');
+            ->loadCount('followers')
+            ->values();
     }
 }

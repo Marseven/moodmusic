@@ -1,8 +1,8 @@
 <?php
 
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class UpdateGenreArtistTableToV2 extends Migration
 {
@@ -22,8 +22,16 @@ class UpdateGenreArtistTableToV2 extends Migration
             }
 
             $table->renameColumn('artist_id', 'genreable_id');
-            $table->string('genreable_type', 10)->index()->default('App\\\Artist');
-            $table->dropIndex('genre_artist_artist_id_genre_id_unique');
+            if ( ! Schema::hasColumn('genre_artist', 'genreable_type')) {
+                $table->string('genreable_type', 10)->index()->default('App\\\Artist');
+            }
+
+            $sm = Schema::getConnection()->getDoctrineSchemaManager();
+            $indexesFound = $sm->listTableIndexes('genre_artist');
+
+            if (array_key_exists('genre_artist_artist_id_genre_id_unique', $indexesFound)) {
+                $table->dropIndex('genre_artist_artist_id_genre_id_unique');
+            }
 
             $table->unique(['genreable_id', 'genreable_type', 'genre_id']);
         });

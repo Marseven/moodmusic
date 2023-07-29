@@ -117,6 +117,8 @@ export const DefaultAppearanceConfig: IAppearanceConfig = {
           'pricing-table-page',
           'contact-us-page',
           'notifications-page',
+          'footer',
+          'footer-secondary',
         ],
       } as MenuSectionConfig,
     },
@@ -131,11 +133,11 @@ export const DefaultAppearanceConfig: IAppearanceConfig = {
       ],
     },
     'seo-settings': {
-      label: message('Seo Settings'),
+      label: message('SEO Settings'),
       position: 5,
       buildBreadcrumb: () => [
         {
-          label: message('Seo'),
+          label: message('SEO'),
           location: `seo`,
         },
       ],

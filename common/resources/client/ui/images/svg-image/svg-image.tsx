@@ -8,15 +8,17 @@ type DangerousHtml = {__html: string} | undefined;
 interface Props {
   src: string;
   className?: string;
+  height?: string | false;
 }
-export const SvgImage = memo(({src, className}: Props) => {
+export const SvgImage = memo(({src, className, height = 'h-full'}: Props) => {
   const {data: svgString} = useSvgImageContent(src);
   // render container even if image is not loaded yet, so there's
   // no layout shift if height is provided via className
   return (
     <div
       className={clsx(
-        'inline-block bg-no-repeat h-full svg-image-container',
+        'inline-block bg-no-repeat svg-image-container',
+        height,
         className
       )}
       dangerouslySetInnerHTML={svgString}

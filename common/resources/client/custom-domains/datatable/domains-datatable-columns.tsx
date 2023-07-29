@@ -13,8 +13,8 @@ export const domainsDatatableColumns: ColumnConfig<CustomDomain>[] = [
     key: 'host',
     allowsSorting: true,
     header: () => <Trans message="Domain" />,
-    // prevent long urls from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     body: domain => (
       <div>
         <div className="flex items-center gap-6 whitespace-nowrap">
@@ -36,6 +36,7 @@ export const domainsDatatableColumns: ColumnConfig<CustomDomain>[] = [
     key: 'user_id',
     allowsSorting: true,
     header: () => <Trans message="Owner" />,
+    width: 'flex-2 min-w-140',
     body: domain => {
       if (!domain.user) return '';
       return (
@@ -64,6 +65,8 @@ export const domainsDatatableColumns: ColumnConfig<CustomDomain>[] = [
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
+    width: 'w-80 flex-shrink-0',
+    visibleInMode: 'all',
     align: 'end',
     body: domain => <DeleteDomainButton domain={domain} />,
   },

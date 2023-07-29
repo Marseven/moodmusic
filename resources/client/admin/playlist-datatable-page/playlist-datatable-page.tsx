@@ -31,6 +31,8 @@ const columnConfig: ColumnConfig<Playlist>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     header: () => <Trans message="Playlist" />,
     body: playlist => (
       <NameWithAvatar
@@ -38,11 +40,11 @@ const columnConfig: ColumnConfig<Playlist>[] = [
         label={<PlaylistLink playlist={playlist} />}
       />
     ),
-    width: 'col-w-2',
   },
   {
     key: 'owner',
     header: () => <Trans message="Owner" />,
+    width: 'flex-2',
     body: playlist =>
       playlist.owner ? (
         <NameWithAvatar
@@ -51,11 +53,11 @@ const columnConfig: ColumnConfig<Playlist>[] = [
           description={playlist.owner.email}
         />
       ) : null,
-    width: 'col-w-2',
   },
   {
     key: 'public',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Public" />,
     body: entry =>
       entry.public ? (
@@ -63,11 +65,11 @@ const columnConfig: ColumnConfig<Playlist>[] = [
       ) : (
         <CloseIcon className="icon-md text-danger" />
       ),
-    width: 'w-1',
   },
   {
     key: 'collaborative',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Collaborative" />,
     body: entry =>
       entry.collaborative ? (
@@ -75,18 +77,18 @@ const columnConfig: ColumnConfig<Playlist>[] = [
       ) : (
         <CloseIcon className="icon-md text-danger" />
       ),
-    width: 'w-1',
   },
   {
     key: 'views',
+    maxWidth: 'max-w-100',
     allowsSorting: true,
     header: () => <Trans message="Views" />,
     body: playlist => <FormattedNumber value={playlist.views} />,
-    width: 'w-1',
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: playlist => <FormattedDate date={playlist.updated_at} />,
   },
@@ -95,6 +97,8 @@ const columnConfig: ColumnConfig<Playlist>[] = [
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    width: 'w-42 flex-shrink-0',
+    visibleInMode: 'all',
     body: playlist => {
       return (
         <DialogTrigger

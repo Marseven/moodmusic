@@ -3,10 +3,12 @@
 use App\User;
 use Common\Search\Searchable;
 use Common\Tags\Tag;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Str;
 
 class CustomPage extends Model
 {
@@ -25,9 +27,11 @@ class CustomPage extends Model
 
     protected $appends = ['model_type'];
 
-    public function setSlugAttribute($value)
+    protected function slug(): Attribute
     {
-        $this->attributes['slug'] = slugify($value);
+        return Attribute::make(
+            set: fn (string $value) => slugify($value),
+        );
     }
 
     public function user(): BelongsTo
@@ -52,6 +56,17 @@ class CustomPage extends Model
             'updated_at' => $this->updated_at->timestamp ?? '_null',
             'user_id' => $this->user_id,
             'workspace_id' => $this->workspace_id ?? '_null',
+        ];
+    }
+
+    public function toNormalizedArray(): array
+    {
+        return [
+            'id' => $this->id,
+            'name' => $this->title,
+            'image' => $this->meta['image'] ?? null,
+            'description' => Str::limit($this->body, 100),
+            'model_type' => static::MODEL_TYPE,
         ];
     }
 

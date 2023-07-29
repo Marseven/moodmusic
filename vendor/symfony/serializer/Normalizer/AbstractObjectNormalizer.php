@@ -14,7 +14,6 @@ namespace Symfony\Component\Serializer\Normalizer;
 use Symfony\Component\PropertyAccess\Exception\InvalidArgumentException;
 use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 use Symfony\Component\PropertyAccess\Exception\UninitializedPropertyException;
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyInfo\PropertyTypeExtractorInterface;
 use Symfony\Component\PropertyInfo\Type;
 use Symfony\Component\Serializer\Encoder\CsvEncoder;
@@ -27,7 +26,6 @@ use Symfony\Component\Serializer\Exception\NotNormalizableValueException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadataInterface;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorFromClassMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorResolverInterface;
-use Symfony\Component\Serializer\Mapping\ClassMetadataInterface;
 use Symfony\Component\Serializer\Mapping\Factory\ClassMetadataFactoryInterface;
 use Symfony\Component\Serializer\NameConverter\NameConverterInterface;
 
@@ -136,13 +134,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     }
 
     /**
-     * @param array $context
+     * {@inheritdoc}
      */
-    public function supportsNormalization(mixed $data, string $format = null /* , array $context = [] */)
+    public function supportsNormalization(mixed $data, string $format = null)
     {
         return \is_object($data) && !$data instanceof \Traversable;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function normalize(mixed $object, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -158,9 +159,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
         $data = [];
         $stack = [];
         $attributes = $this->getAttributes($object, $format, $context);
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
-        $classMetadata = $this->classMetadataFactory?->getMetadataFor($class);
-        $attributesMetadata = $this->classMetadataFactory?->getMetadataFor($class)->getAttributesMetadata();
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
+        $attributesMetadata = $this->classMetadataFactory ? $this->classMetadataFactory->getMetadataFor($class)->getAttributesMetadata() : null;
         if (isset($context[self::MAX_DEPTH_HANDLER])) {
             $maxDepthHandler = $context[self::MAX_DEPTH_HANDLER];
             if (!\is_callable($maxDepthHandler)) {
@@ -198,15 +198,14 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
             $attributeValue = $this->applyCallbacks($attributeValue, $object, $attribute, $format, $attributeContext);
 
-            $stack[$attribute] = $attributeValue;
+            if (null !== $attributeValue && !\is_scalar($attributeValue)) {
+                $stack[$attribute] = $attributeValue;
+            }
+
+            $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $attributeContext);
         }
 
         foreach ($stack as $attribute => $attributeValue) {
-            if (null === $attributeValue || \is_scalar($attributeValue)) {
-                $data = $this->updateData($data, $attribute, $attributeValue, $class, $format, $context, $attributesMetadata, $classMetadata);
-                continue;
-            }
-
             if (!$this->serializer instanceof NormalizerInterface) {
                 throw new LogicException(sprintf('Cannot normalize attribute "%s" because the injected serializer is not a normalizer.', $attribute));
             }
@@ -214,17 +213,54 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             $attributeContext = $this->getAttributeNormalizationContext($object, $attribute, $context);
             $childContext = $this->createChildContext($attributeContext, $attribute, $format);
 
-            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext, $attributesMetadata, $classMetadata);
+            $data = $this->updateData($data, $attribute, $this->serializer->normalize($attributeValue, $format, $childContext), $class, $format, $attributeContext);
         }
 
-        $preserveEmptyObjects = $context[self::PRESERVE_EMPTY_OBJECTS] ?? $this->defaultContext[self::PRESERVE_EMPTY_OBJECTS] ?? false;
-        if ($preserveEmptyObjects && !\count($data)) {
+        if (isset($context[self::PRESERVE_EMPTY_OBJECTS]) && !\count($data)) {
             return new \ArrayObject();
         }
 
         return $data;
     }
 
+    /**
+     * Computes the normalization context merged with current one. Metadata always wins over global context, as more specific.
+     */
+    private function getAttributeNormalizationContext(object $object, string $attribute, array $context): array
+    {
+        if (null === $metadata = $this->getAttributeMetadata($object, $attribute)) {
+            return $context;
+        }
+
+        return array_merge($context, $metadata->getNormalizationContextForGroups($this->getGroups($context)));
+    }
+
+    /**
+     * Computes the denormalization context merged with current one. Metadata always wins over global context, as more specific.
+     */
+    private function getAttributeDenormalizationContext(string $class, string $attribute, array $context): array
+    {
+        $context['deserialization_path'] = ($context['deserialization_path'] ?? false) ? $context['deserialization_path'].'.'.$attribute : $attribute;
+
+        if (null === $metadata = $this->getAttributeMetadata($class, $attribute)) {
+            return $context;
+        }
+
+        return array_merge($context, $metadata->getDenormalizationContextForGroups($this->getGroups($context)));
+    }
+
+    private function getAttributeMetadata(object|string $objectOrClass, string $attribute): ?AttributeMetadataInterface
+    {
+        if (!$this->classMetadataFactory) {
+            return null;
+        }
+
+        return $this->classMetadataFactory->getMetadataFor($objectOrClass)->getAttributesMetadata()[$attribute] ?? null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     protected function instantiateObject(array &$data, string $class, array &$context, \ReflectionClass $reflectionClass, array|bool $allowedAttributes, string $format = null)
     {
         if ($this->classDiscriminatorResolver && $mapping = $this->classDiscriminatorResolver->getMappingForClass($class)) {
@@ -252,7 +288,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      */
     protected function getAttributes(object $object, ?string $format, array $context): array
     {
-        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
+        $class = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
         $key = $class.'-'.$context['cache_key'];
 
         if (isset($this->attributesCache[$key])) {
@@ -297,13 +333,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     abstract protected function getAttributeValue(object $object, string $attribute, string $format = null, array $context = []);
 
     /**
-     * @param array $context
+     * {@inheritdoc}
      */
-    public function supportsDenormalization(mixed $data, string $type, string $format = null /* , array $context = [] */)
+    public function supportsDenormalization(mixed $data, string $type, string $format = null)
     {
         return class_exists($type) || (interface_exists($type, false) && $this->classDiscriminatorResolver && null !== $this->classDiscriminatorResolver->getMappingForClass($type));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function denormalize(mixed $data, string $type, string $format = null, array $context = [])
     {
         if (!isset($context['cache_key'])) {
@@ -322,28 +361,11 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
 
         $reflectionClass = new \ReflectionClass($type);
         $object = $this->instantiateObject($normalizedData, $type, $context, $reflectionClass, $allowedAttributes, $format);
-        $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : $object::class;
-
-        $nestedAttributes = $this->getNestedAttributes($resolvedClass);
-        $nestedData = [];
-        $propertyAccessor = PropertyAccess::createPropertyAccessor();
-        foreach ($nestedAttributes as $property => $serializedPath) {
-            if (null === $value = $propertyAccessor->getValue($normalizedData, $serializedPath)) {
-                continue;
-            }
-            $nestedData[$property] = $value;
-            $normalizedData = $this->removeNestedValue($serializedPath->getElements(), $normalizedData);
-        }
-
-        $normalizedData = array_merge($normalizedData, $nestedData);
+        $resolvedClass = $this->objectClassResolver ? ($this->objectClassResolver)($object) : \get_class($object);
 
         foreach ($normalizedData as $attribute => $value) {
             if ($this->nameConverter) {
-                $notConverted = $attribute;
                 $attribute = $this->nameConverter->denormalize($attribute, $resolvedClass, $format, $context);
-                if (isset($nestedData[$notConverted]) && !isset($nestedData[$attribute])) {
-                    throw new LogicException(sprintf('Duplicate values for key "%s" found. One value is set via the SerializedPath annotation: "%s", the other one is set via the SerializedName annotation: "%s".', $notConverted, implode('->', $nestedAttributes[$notConverted]->getElements()), $attribute));
-                }
             }
 
             $attributeContext = $this->getAttributeDenormalizationContext($resolvedClass, $attribute, $context);
@@ -359,7 +381,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
             if ($attributeContext[self::DEEP_OBJECT_TO_POPULATE] ?? $this->defaultContext[self::DEEP_OBJECT_TO_POPULATE] ?? false) {
                 try {
                     $attributeContext[self::OBJECT_TO_POPULATE] = $this->getAttributeValue($object, $attribute, $format, $attributeContext);
-                } catch (NoSuchPropertyException) {
+                } catch (NoSuchPropertyException $e) {
                 }
             }
 
@@ -472,7 +494,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                             }
                             break;
                         case Type::BUILTIN_TYPE_INT:
-                            if (ctype_digit('-' === $data[0] ? substr($data, 1) : $data)) {
+                            if (ctype_digit($data) || '-' === $data[0] && ctype_digit(substr($data, 1))) {
                                 $data = (int) $data;
                             } else {
                                 throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be int ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_INT], $context['deserialization_path'] ?? null);
@@ -483,12 +505,16 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                                 return (float) $data;
                             }
 
-                            return match ($data) {
-                                'NaN' => \NAN,
-                                'INF' => \INF,
-                                '-INF' => -\INF,
-                                default => throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null),
-                            };
+                            switch ($data) {
+                                case 'NaN':
+                                    return \NAN;
+                                case 'INF':
+                                    return \INF;
+                                case '-INF':
+                                    return -\INF;
+                                default:
+                                    throw NotNormalizableValueException::createForUnexpectedDataType(sprintf('The type of the "%s" attribute for class "%s" must be float ("%s" given).', $attribute, $currentClass, $data), $data, [Type::BUILTIN_TYPE_FLOAT], $context['deserialization_path'] ?? null);
+                            }
                     }
                 }
 
@@ -549,7 +575,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                     return (float) $data;
                 }
 
-                if ((Type::BUILTIN_TYPE_FALSE === $builtinType && false === $data) || (Type::BUILTIN_TYPE_TRUE === $builtinType && true === $data)) {
+                if (Type::BUILTIN_TYPE_FALSE === $builtinType && false === $data) {
                     return $data;
                 }
 
@@ -644,19 +670,9 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     /**
      * Sets an attribute and apply the name converter if necessary.
      */
-    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context, ?array $attributesMetadata, ?ClassMetadataInterface $classMetadata): array
+    private function updateData(array $data, string $attribute, mixed $attributeValue, string $class, ?string $format, array $context): array
     {
         if (null === $attributeValue && ($context[self::SKIP_NULL_VALUES] ?? $this->defaultContext[self::SKIP_NULL_VALUES] ?? false)) {
-            return $data;
-        }
-
-        if (null !== $classMetadata && null !== $serializedPath = ($attributesMetadata[$attribute] ?? null)?->getSerializedPath()) {
-            $propertyAccessor = PropertyAccess::createPropertyAccessor();
-            if ($propertyAccessor->isReadable($data, $serializedPath) && null !== $propertyAccessor->getValue($data, $serializedPath)) {
-                throw new LogicException(sprintf('The element you are trying to set is already populated: "%s".', (string) $serializedPath));
-            }
-            $propertyAccessor->setValue($data, $serializedPath, $attributeValue);
-
             return $data;
         }
 
@@ -706,6 +722,8 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
      *
      * We must not mix up the attribute cache between parent and children.
      *
+     * {@inheritdoc}
+     *
      * @internal
      */
     protected function createChildContext(array $parentContext, string $attribute, ?string $format): array
@@ -735,7 +753,7 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
                 'context' => $context,
                 'ignored' => $context[self::IGNORED_ATTRIBUTES] ?? $this->defaultContext[self::IGNORED_ATTRIBUTES],
             ]));
-        } catch (\Exception) {
+        } catch (\Exception $e) {
             // The context cannot be serialized, skip the cache
             return false;
         }
@@ -749,48 +767,5 @@ abstract class AbstractObjectNormalizer extends AbstractNormalizer
     {
         return str_starts_with($e->getMessage(), 'Typed property')
             && str_ends_with($e->getMessage(), 'must not be accessed before initialization');
-    }
-
-    /**
-     * Returns all attributes with a SerializedPath annotation and the respective path.
-     */
-    private function getNestedAttributes(string $class): array
-    {
-        if (!$this->classMetadataFactory || !$this->classMetadataFactory->hasMetadataFor($class)) {
-            return [];
-        }
-
-        $properties = [];
-        $serializedPaths = [];
-        $classMetadata = $this->classMetadataFactory->getMetadataFor($class);
-        foreach ($classMetadata->getAttributesMetadata() as $name => $metadata) {
-            if (!$serializedPath = $metadata->getSerializedPath()) {
-                continue;
-            }
-            $serializedPath = $metadata->getSerializedPath();
-            $pathIdentifier = implode(',', $serializedPath->getElements());
-            if (isset($serializedPaths[$pathIdentifier])) {
-                throw new LogicException(sprintf('Duplicate serialized path: "%s" used for properties "%s" and "%s".', $pathIdentifier, $serializedPaths[$pathIdentifier], $name));
-            }
-            $serializedPaths[$pathIdentifier] = $name;
-            $properties[$name] = $serializedPath;
-        }
-
-        return $properties;
-    }
-
-    private function removeNestedValue(array $path, array $data): array
-    {
-        $element = array_shift($path);
-        if ([] === $path) {
-            unset($data[$element]);
-        } else {
-            $data[$element] = $this->removeNestedValue($path, $data[$element]);
-            if ([] === $data[$element]) {
-                unset($data[$element]);
-            }
-        }
-
-        return $data;
     }
 }

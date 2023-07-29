@@ -1,6 +1,6 @@
 import {DateRangeValue} from '../date-range-value';
-import {message} from '../../../../../../i18n/message';
-import {MessageDescriptor} from '../../../../../../i18n/message-descriptor';
+import {message} from '@common/i18n/message';
+import {MessageDescriptor} from '@common/i18n/message-descriptor';
 import {
   endOfWeek,
   endOfYear,
@@ -8,10 +8,10 @@ import {
   startOfWeek,
   startOfYear,
 } from '@internationalized/date';
-import {startOfDay} from '../../../../../../utils/date/start-of-day';
-import {endOfDay} from '../../../../../../utils/date/end-of-day';
-import {getBootstrapData} from '../../../../../../core/bootstrap-data/use-backend-bootstrap-data';
-import {getUserTimezone} from '../../../../../../i18n/get-user-timezone';
+import {startOfDay} from '@common/utils/date/start-of-day';
+import {endOfDay} from '@common/utils/date/end-of-day';
+import {getBootstrapData} from '@common/core/bootstrap-data/use-backend-bootstrap-data';
+import {getUserTimezone} from '@common/i18n/get-user-timezone';
 
 const Now = startOfDay(now(getUserTimezone()));
 const locale = getBootstrapData().i18n?.language || 'en';
@@ -53,11 +53,14 @@ export const DateRangePresets: DateRangePreset[] = [
   {
     key: 3,
     label: message('Last week'),
-    getRangeValue: () => ({
-      preset: 3,
-      start: startOfWeek(Now, locale).subtract({weeks: 1}),
-      end: endOfWeek(endOfDay(Now), locale).add({weeks: 1}),
-    }),
+    getRangeValue: () => {
+      const start = startOfWeek(Now, locale).subtract({days: 7});
+      return {
+        preset: 3,
+        start,
+        end: start.add({days: 6}),
+      };
+    },
   },
   {
     key: 4,

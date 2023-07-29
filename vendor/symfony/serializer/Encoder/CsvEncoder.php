@@ -56,6 +56,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         $this->defaultContext = array_merge($this->defaultContext, $defaultContext);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function encode(mixed $data, string $format, array $context = []): string
     {
         $handle = fopen('php://temp,', 'w+');
@@ -119,11 +122,17 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $value;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsEncoding(string $format): bool
     {
         return self::FORMAT === $format;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function decode(string $data, string $format, array $context = []): mixed
     {
         $handle = fopen('php://temp', 'r+');
@@ -154,7 +163,7 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
                     $headerCount = array_fill(0, $nbCols, 1);
                 } else {
                     foreach ($cols as $col) {
-                        $header = explode($keySeparator, $col ?? '');
+                        $header = explode($keySeparator, $col);
                         $headers[] = $header;
                         $headerCount[] = \count($header);
                     }
@@ -199,6 +208,9 @@ class CsvEncoder implements EncoderInterface, DecoderInterface
         return $result[0];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function supportsDecoding(string $format): bool
     {
         return self::FORMAT === $format;

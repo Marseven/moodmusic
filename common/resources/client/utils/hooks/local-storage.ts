@@ -1,14 +1,41 @@
-import {useState} from 'react';
+import {useEffect, useState} from 'react';
+
+interface StoreEvent {
+  detail: {
+    key: string;
+    newValue: any;
+  };
+}
 
 export function useLocalStorage<T>(key: string, initialValue: T | null = null) {
   const [storedValue, setStoredValue] = useState<T>(() => {
     return getFromLocalStorage<T>(key, initialValue);
   });
+
   const setValue = (value: T | ((val: T) => T)) => {
     const valueToStore = value instanceof Function ? value(storedValue) : value;
     setStoredValue(valueToStore);
     setInLocalStorage(key, valueToStore);
+    window.dispatchEvent(
+      new CustomEvent('storage', {
+        detail: {key, newValue: valueToStore},
+      })
+    );
   };
+
+  // update state value using custom storage event. This will re-render
+  // component even if local storage value was set from different hook instance
+  useEffect(() => {
+    const handleStorageChange = (event: StoreEvent) => {
+      if (event.detail.key === key) {
+        setStoredValue(event.detail.newValue);
+      }
+    };
+    window.addEventListener('storage', handleStorageChange as any);
+    return () =>
+      window.removeEventListener('storage', handleStorageChange as any);
+  }, [key]);
+
   return [storedValue, setValue] as const;
 }
 

@@ -1,47 +1,57 @@
 import {
   BackendFilter,
   FilterControlType,
+  FilterOperator,
 } from '../../datatable/filters/backend-filter';
-import {
-  CreatedAtFilter,
-  UpdatedAtFilter,
-} from '../../datatable/filters/timestamp-filters';
 import {message} from '../../i18n/message';
 import {USER_MODEL} from '../../auth/user';
 import {SiteConfigContextValue} from '@common/core/settings/site-config-context';
+import {
+  createdAtFilter,
+  updatedAtFilter,
+} from '@common/datatable/filters/timestamp-filters';
 
 export const CustomPageDatatableFilters = (
   config: SiteConfigContextValue
 ): BackendFilter[] => {
-  const dynamicFilters =
+  const dynamicFilters: BackendFilter[] =
     config.customPages.types.length > 1
       ? [
-          new BackendFilter({
-            type: FilterControlType.Select,
+          {
+            control: {
+              type: FilterControlType.Select,
+              defaultValue: 'default',
+              options: config.customPages.types.map(type => ({
+                value: type.type,
+                label: type.label,
+                key: type.type,
+              })),
+            },
+
             key: 'type',
             label: message('Type'),
             description: message('Type of the page'),
-            defaultValue: 'default',
-            options: config.customPages.types.map(type => {
-              return {value: type.type, label: type.label, key: type.type};
-            }),
-          }),
+            defaultOperator: FilterOperator.eq,
+          },
         ]
       : [];
 
   return [
-    new BackendFilter({
-      type: FilterControlType.SelectModel,
-      model: USER_MODEL,
+    {
       key: 'user_id',
       label: message('User'),
       description: message('User page was created by'),
-    }),
+      defaultOperator: FilterOperator.eq,
+      control: {
+        type: FilterControlType.SelectModel,
+        model: USER_MODEL,
+      },
+    },
     ...dynamicFilters,
-    new CreatedAtFilter({
+    createdAtFilter({
       description: message('Date page was created'),
     }),
-    new UpdatedAtFilter({
+    updatedAtFilter({
       description: message('Date page was last updated'),
     }),
   ];

@@ -45,17 +45,17 @@ import {RefreshIcon} from '@common/icons/material/Refresh';
 const columnConfig: ColumnConfig<NormalizedModel>[] = [
   {
     key: 'dragHandle',
+    width: 'w-42 flex-shrink-0',
     header: () => <Trans message="Drag handle" />,
     hideHeader: true,
     body: () => (
       <DragHandleIcon className="cursor-pointer text-muted hover:text" />
     ),
-    width: 'w-1',
   },
   {
     key: 'name',
     header: () => <Trans message="Content item" />,
-    padding: 'px-16',
+    visibleInMode: 'all',
     body: item => (
       <NameWithAvatar
         image={item.image}
@@ -74,6 +74,8 @@ const columnConfig: ColumnConfig<NormalizedModel>[] = [
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    width: 'w-42 flex-shrink-0',
+    visibleInMode: 'all',
     body: (item, {index}) => <RemoveItemColumn index={index} />,
   },
 ];

@@ -4,9 +4,7 @@ import {apiClient, queryClient} from '@common/http/query-client';
 import {Track} from '@app/web-player/tracks/track';
 import {showHttpErrorToast} from '@common/utils/http/show-http-error-toast';
 import {useParams} from 'react-router-dom';
-import {
-  moveMultipleItemsInArray
-} from '@common/utils/array/move-multiple-items-in-array';
+import {moveMultipleItemsInArray} from '@common/utils/array/move-multiple-items-in-array';
 
 interface Response extends BackendResponse {
   //
@@ -24,7 +22,7 @@ export function useReorderPlaylistTracks() {
     (payload: Payload) => reorderTracks(playlistId!, payload),
     {
       onSuccess: () => {
-        queryClient.invalidateQueries(['playlists', +playlistId!, 'tracks']);
+        queryClient.invalidateQueries(['tracks', 'playlist', +playlistId!]);
       },
       onError: err => showHttpErrorToast(err),
     }

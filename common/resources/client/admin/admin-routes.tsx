@@ -10,7 +10,6 @@ import {ThemeList} from './appearance/sections/themes/theme-list';
 import {SeoSection} from './appearance/sections/seo-section';
 import {CustomCodeSection} from './appearance/sections/code/custom-code-section';
 import {CustomPageDatablePage} from './custom-pages/custom-page-datable-page';
-import {PageEditorLayout} from './custom-pages/editor/page-editor-layout';
 import {SettingsLayout} from './settings/settings-layout';
 import {GeneralSettings} from './settings/pages/general-settings';
 import {ThemeEditor} from './appearance/sections/themes/theme-editor';
@@ -47,6 +46,8 @@ import {AuthRoute} from '../auth/guards/auth-route';
 import {NotFoundPage} from '../ui/not-found-page/not-found-page';
 import {AppAppearanceConfig} from '@app/admin/appearance/app-appearance-config';
 import {AppAdminRoutes} from '@app/admin/app-admin-routes';
+import {EditCustomPage} from '@common/admin/custom-pages/edit-custom-page';
+import {CreateCustomPage} from '@common/admin/custom-pages/create-custom-page';
 
 const ReportsPage = React.lazy(() => import('./analytics/admin-report-page'));
 
@@ -187,7 +188,7 @@ const AdminRouteConfig: RouteObject[] = [
         path: 'custom-pages/new',
         element: (
           <AuthRoute permission="custom_pages.update">
-            <PageEditorLayout />
+            <CreateCustomPage />
           </AuthRoute>
         ),
       },
@@ -195,7 +196,7 @@ const AdminRouteConfig: RouteObject[] = [
         path: 'custom-pages/:pageId/edit',
         element: (
           <AuthRoute permission="custom_pages.update">
-            <PageEditorLayout />
+            <EditCustomPage />
           </AuthRoute>
         ),
       },

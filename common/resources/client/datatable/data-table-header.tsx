@@ -7,9 +7,10 @@ import {AddFilterButton} from './filters/add-filter-button';
 import {MessageDescriptor} from '@common/i18n/message-descriptor';
 import {message} from '@common/i18n/message';
 
-interface PageHeaderProps {
+interface Props {
   actions?: ReactNode;
   filters?: BackendFilter[];
+  filtersLoading?: boolean;
   searchPlaceholder?: MessageDescriptor;
   searchValue?: string;
   onSearchChange: (value: string) => void;
@@ -17,10 +18,11 @@ interface PageHeaderProps {
 export function DataTableHeader({
   actions,
   filters,
+  filtersLoading,
   searchPlaceholder = message('Type to search...'),
   searchValue = '',
   onSearchChange,
-}: PageHeaderProps) {
+}: Props) {
   const {trans} = useTrans();
   return (
     <HeaderLayout>
@@ -35,7 +37,9 @@ export function DataTableHeader({
           onSearchChange(e.target.value);
         }}
       />
-      {filters && <AddFilterButton filters={filters} />}
+      {filters && (
+        <AddFilterButton filters={filters} disabled={filtersLoading} />
+      )}
       {actions}
     </HeaderLayout>
   );

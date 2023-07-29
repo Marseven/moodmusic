@@ -1,6 +1,9 @@
 <?php
 
 use Cocur\Slugify\Slugify;
+use Common\Comments\Comment;
+use Common\Core\Middleware\EnsureFrontendRequestsAreStateful;
+use Common\Settings\Settings;
 use Common\Tags\Tag;
 use Common\Workspaces\Workspace;
 use Illuminate\Support\Str;
@@ -44,7 +47,9 @@ if (!function_exists('modelTypeToNamespace')) {
         if ($modelType === 'workspace') {
             return Workspace::class;
         }
-
+        if ($modelType === 'comment') {
+            return Comment::class;
+        }
         if ($modelType === 'tag' && !class_exists('App\Tag')) {
             return Tag::class;
         }
@@ -90,5 +95,25 @@ if (!function_exists('getIp')) {
             }
         }
         return request()->ip();
+    }
+}
+
+if (!function_exists('requestIsFromFrontend')) {
+    function requestIsFromFrontend(): bool
+    {
+        return EnsureFrontendRequestsAreStateful::fromFrontend(request());
+    }
+}
+
+if (!function_exists('settings')) {
+    function settings()
+    {
+        $arguments = func_get_args();
+
+        if (empty($arguments)) {
+            return app(Settings::class);
+        }
+
+        return app(Settings::class)->get(...$arguments);
     }
 }

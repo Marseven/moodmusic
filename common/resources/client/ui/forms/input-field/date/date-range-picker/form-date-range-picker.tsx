@@ -45,12 +45,16 @@ export function FormDateRangePicker(props: FormDateRangePickerProps) {
 export function absoluteRangeToDateRange(props: FormDateRange | null) {
   const {start, end, preset} = props || {};
   const dateRange: Partial<DateRangeValue> = {preset};
-  if (start) {
-    dateRange.start =
-      typeof start === 'string' ? parseAbsoluteToLocal(start) : start;
-  }
-  if (end) {
-    dateRange.end = typeof end === 'string' ? parseAbsoluteToLocal(end) : end;
+  try {
+    if (start) {
+      dateRange.start =
+        typeof start === 'string' ? parseAbsoluteToLocal(start) : start;
+    }
+    if (end) {
+      dateRange.end = typeof end === 'string' ? parseAbsoluteToLocal(end) : end;
+    }
+  } catch (e) {
+    // ignore
   }
   return dateRange;
 }
@@ -59,7 +63,7 @@ export function dateRangeToAbsoluteRange({
   start,
   end,
   preset,
-}: Partial<DateRangeValue> = {}) {
+}: Partial<DateRangeValue> = {}): AbsoluteDateRange {
   const absoluteRange: AbsoluteDateRange = {
     preset,
   };

@@ -12,8 +12,6 @@
 namespace Symfony\Component\Serializer\Mapping\Loader;
 
 use Symfony\Component\Config\Util\XmlUtils;
-use Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException;
-use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\Serializer\Exception\MappingException;
 use Symfony\Component\Serializer\Mapping\AttributeMetadata;
 use Symfony\Component\Serializer\Mapping\ClassDiscriminatorMapping;
@@ -33,9 +31,16 @@ class XmlFileLoader extends FileLoader
      */
     private $classes;
 
+    /**
+     * {@inheritdoc}
+     */
     public function loadClassMetadata(ClassMetadataInterface $classMetadata): bool
     {
-        if (!$this->classes ??= $this->getClassesFromXml()) {
+        if (null === $this->classes) {
+            $this->classes = $this->getClassesFromXml();
+        }
+
+        if (!$this->classes) {
             return false;
         }
 
@@ -64,14 +69,6 @@ class XmlFileLoader extends FileLoader
 
                 if (isset($attribute['serialized-name'])) {
                     $attributeMetadata->setSerializedName((string) $attribute['serialized-name']);
-                }
-
-                if (isset($attribute['serialized-path'])) {
-                    try {
-                        $attributeMetadata->setSerializedPath(new PropertyPath((string) $attribute['serialized-path']));
-                    } catch (InvalidPropertyPathException) {
-                        throw new MappingException(sprintf('The "serialized-path" value must be a valid property path for the attribute "%s" of the class "%s".', $attributeName, $classMetadata->getName()));
-                    }
                 }
 
                 if (isset($attribute['ignore'])) {
@@ -124,7 +121,11 @@ class XmlFileLoader extends FileLoader
      */
     public function getMappedClasses(): array
     {
-        return array_keys($this->classes ??= $this->getClassesFromXml());
+        if (null === $this->classes) {
+            $this->classes = $this->getClassesFromXml();
+        }
+
+        return array_keys($this->classes);
     }
 
     /**

@@ -32,7 +32,7 @@ export function ChartLayout(props: ChartLayoutProps) {
         className
       )}
     >
-      <div className="text-xs p-14 flex-shrink-0 flex justify-between">
+      <div className="text-xs p-14 flex-shrink-0 flex justify-between items-center">
         <div className="font-semibold text-sm">{title}</div>
         {description && <div className="text-muted">{description}</div>}
       </div>

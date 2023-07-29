@@ -41,8 +41,7 @@ class LoadArtist
         foreach ($load as $relation) {
             if ($relation === 'similar') {
                 if (
-                    app(Settings::class)->get('artist_provider', 'local') ===
-                    'local'
+                    app(Settings::class)->get('artist_provider') !== 'spotify'
                 ) {
                     $similar = app(GetSimilarArtists::class)->execute($artist);
                     $artist->setRelation('similar', $similar);

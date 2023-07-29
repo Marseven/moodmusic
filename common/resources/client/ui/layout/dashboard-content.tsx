@@ -8,7 +8,7 @@ export function DashboardContent({children}: DashboardContentProps) {
   return cloneElement(children, {
     className: clsx(
       children.props.className,
-      'dashboard-grid-content overflow-y-auto'
+      'dashboard-grid-content overflow-y-auto stable-scrollbar'
     ),
   });
 }

@@ -172,7 +172,7 @@ function MenuItemsManager({fieldArray: {append, fields, move}}: ItemListProps) {
             }}
           />
         ))}
-        {!fields.length && (
+        {!fields.length ? (
           <IllustratedMessage
             size="xs"
             className="my-40"
@@ -182,7 +182,7 @@ function MenuItemsManager({fieldArray: {append, fields, move}}: ItemListProps) {
               <Trans message="Click “add“ button to start adding links, pages, routes and other items to this menu. " />
             }
           />
-        )}
+        ) : null}
       </div>
     </Fragment>
   );

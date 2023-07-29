@@ -27,7 +27,8 @@ class ImportLyrics
         // South of the Border (feat. Camila Cabello & Cardi B) => South of the Border
         $trackName = trim(explode('(feat.', $trackName)[0]);
 
-        $providers = [AzLyricsProvider::class, GoogleLyricsProvider::class];
+        //$providers = [AzLyricsProvider::class, GoogleLyricsProvider::class];
+        $providers = [GoogleLyricsProvider::class];
 
         $text = null;
         foreach ($providers as $provider) {

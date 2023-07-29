@@ -3,7 +3,7 @@
 use App\User;
 use Common\Auth\Permissions\Permission;
 use Common\Core\Values\ValueLists;
-use FileFinder;
+use Error;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Arr;
@@ -14,29 +14,13 @@ use Symfony\Component\Finder\Finder;
 
 class ExportTranslations extends Command
 {
-    /**
-     * @var string
-     */
     protected $signature = 'translations:export';
 
-    /**
-     * @var string
-     */
     protected $description = 'Export default laravel translations as flattened json file.';
 
-    /**
-     * @var Filesystem
-     */
-    private $fs;
-
-    /**
-     * @param Filesystem $fs
-     */
-    public function __construct(Filesystem $fs)
+    public function __construct(protected Filesystem $fs)
     {
         parent::__construct();
-
-        $this->fs = $fs;
     }
 
     public function handle(): void
@@ -153,7 +137,7 @@ class ExportTranslations extends Command
             foreach ((new $namespace())->messages() as $message) {
                 $messages[$message] = $message;
             }
-        } catch (\Error $e) {
+        } catch (Error $e) {
             //
         }
 
@@ -166,10 +150,21 @@ class ExportTranslations extends Command
         $lines = app(ValueLists::class)
             ->permissions()
             ->map(function (Permission $permission) {
+                $restrictionLines = $permission->restrictions
+                    ->map(function ($restriction) {
+                        return [
+                            ucfirst(str_replace('_', ' ', $restriction['name'])),
+                            $restriction['description'],
+                        ];
+                    })
+                    ->flatten()
+                    ->toArray();
+
                 return [
                     $permission['display_name'],
                     $permission['group'],
                     $permission['description'],
+                    ...$restrictionLines,
                 ];
             })
             ->flatten(1)

@@ -4,6 +4,7 @@ use App\User;
 use Common\Billing\Models\Price;
 use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
+use Stripe\Exception\InvalidRequestException;
 use Stripe\StripeClient;
 
 class StripeSubscriptions
@@ -58,9 +59,16 @@ class StripeSubscriptions
             return true;
         }
 
-        $stripeSubscription = $this->client->subscriptions->retrieve(
-            $subscription->gateway_id,
-        );
+        try {
+            $stripeSubscription = $this->client->subscriptions->retrieve(
+                $subscription->gateway_id,
+            );
+        } catch (InvalidRequestException $e) {
+            if ($e->getStripeCode() === 'resource_missing') {
+                return true;
+            }
+            throw($e);
+        }
 
         // cancel subscription at current period end and don't delete
         if ($atPeriodEnd) {
@@ -130,7 +138,7 @@ class StripeSubscriptions
         if ($user->stripe_id) {
             try {
                 $this->client->customers->retrieve($user->stripe_id);
-            } finally {
+            } catch (InvalidRequestException $e) {
                 $user->stripe_id = null;
             }
         }

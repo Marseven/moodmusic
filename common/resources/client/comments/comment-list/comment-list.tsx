@@ -10,16 +10,25 @@ import {FormattedNumber} from '@common/i18n/formatted-number';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
 import {CommentListItem} from '@common/comments/comment-list/comment-list-item';
 import {Skeleton} from '@common/ui/skeleton/skeleton';
+import {ReactNode} from 'react';
+import {AccountRequiredCard} from '@common/comments/comment-list/account-required-card';
+import {message} from '@common/i18n/message';
+
+const accountRequiredMessage = message(
+  'Please <l>login</l> or <r>create account</r> to comment'
+);
 
 interface CommentListProps {
   commentable: Commentable;
   canDeleteAllComments?: boolean;
   className?: string;
+  children?: ReactNode;
 }
 export function CommentList({
   className,
   commentable,
   canDeleteAllComments = false,
+  children,
 }: CommentListProps) {
   const {items, totalItems, ...query} = useComments(commentable);
 
@@ -40,6 +49,8 @@ export function CommentList({
           />
         )}
       </div>
+      {children}
+      <AccountRequiredCard message={accountRequiredMessage} />
       <AnimatePresence initial={false} mode="wait">
         {query.isInitialLoading ? (
           <CommentSkeletons count={4} />
@@ -51,7 +62,7 @@ export function CommentList({
           />
         )}
       </AnimatePresence>
-      <InfiniteScrollSentinel query={query} />
+      <InfiniteScrollSentinel query={query} variant="loadMore" />
     </div>
   );
 }
@@ -94,21 +105,23 @@ function CommentListItems({
 interface CommentSkeletonsProps {
   count: number;
 }
-export function CommentSkeletons({count}: CommentSkeletonsProps) {
+function CommentSkeletons({count}: CommentSkeletonsProps) {
   return (
     <m.div key="loading-skeleton" {...opacityAnimation}>
       {[...new Array(count).keys()].map(index => (
         <div
           key={index}
-          className="flex items-start gap-10 py-10 min-h-70 group"
+          className="flex items-start gap-24 py-18 min-h-70 group"
         >
-          <Skeleton variant="avatar" />
-          <div className="flex-auto max-w-384">
-            <Skeleton className="leading-3 max-w-120" />
-            <Skeleton className="leading-3" />
-          </div>
-          <div className="w-64 ml-auto">
-            <Skeleton className="leading-3" />
+          <Skeleton variant="avatar" radius="rounded-full" size="w-60 h-60" />
+          <div className="text-sm flex-auto">
+            <Skeleton className="text-base max-w-184 mb-4" />
+            <Skeleton className="text-sm" />
+            <div className="flex items-center gap-8 mt-10">
+              <Skeleton className="text-sm max-w-70" />
+              <Skeleton className="text-sm max-w-40" />
+              <Skeleton className="text-sm max-w-60" />
+            </div>
           </div>
         </div>
       ))}

@@ -34,7 +34,8 @@ class YoutubeAudioSearch
         if ($this->settings->get('youtube.store_id') && count($results)) {
             app(Track::class)
                 ->where('id', $trackId)
-                ->update(['youtube_id' => $results[0]['id']]);
+                ->whereNull('src')
+                ->update(['src' => $results[0]['id']]);
         }
 
         return $results;

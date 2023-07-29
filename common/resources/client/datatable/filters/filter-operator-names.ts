@@ -13,4 +13,5 @@ export const FilterOperatorNames: {[op in FilterOperator]: MessageDescriptor} =
     has: message('Include'),
     doesntHave: message('Do not include'),
     between: message('Is between'),
+    hasAll: message('Include all'),
   };

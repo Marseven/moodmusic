@@ -245,7 +245,6 @@ function S3Form({isInvalid}: CredentialFormProps) {
         label={<Trans message="Amazon S3 region" />}
         pattern="[a-z1-9\-]+"
         placeholder="us-east-1"
-        required
       />
       <FormTextField
         invalid={isInvalid}

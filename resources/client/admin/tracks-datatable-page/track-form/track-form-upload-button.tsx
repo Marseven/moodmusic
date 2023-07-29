@@ -34,7 +34,7 @@ export function TrackFormUploadButton() {
         disabled={isUploading}
         onClick={() => openFilePicker()}
       >
-        {watch('url') ? (
+        {watch('src') ? (
           <Trans message="Replace file" />
         ) : (
           <Trans message="Upload file" />

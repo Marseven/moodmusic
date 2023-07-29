@@ -4,6 +4,7 @@ use Common\Billing\GatewayException;
 use Common\Billing\Models\Price;
 use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
+use Illuminate\Support\Carbon;
 
 class PaypalSubscriptions
 {
@@ -12,7 +13,7 @@ class PaypalSubscriptions
     public function changePlan(
         Subscription $subscription,
         Product $newProduct,
-        Price $newPrice
+        Price $newPrice,
     ): bool {
         $response = $this->paypal()->post(
             "billing/subscriptions/$subscription->gateway_id/revise",
@@ -30,7 +31,7 @@ class PaypalSubscriptions
 
     public function cancel(
         Subscription $subscription,
-        $atPeriodEnd = true
+        $atPeriodEnd = true,
     ): bool {
         if ($atPeriodEnd) {
             $response = $this->paypal()->post(
@@ -67,5 +68,24 @@ class PaypalSubscriptions
         }
 
         return true;
+    }
+
+    public function find(Subscription $subscription)
+    {
+        $response = $this->paypal()->get(
+            "billing/subscriptions/$subscription->gateway_id",
+        );
+
+        if (!$response->successful()) {
+            throw new GatewayException(
+                "Could not find paypal subscription: {$response->json()}",
+            );
+        }
+
+        return [
+            'renews_at' => Carbon::parse(
+                $response['billing_info']['next_billing_time'],
+            ),
+        ];
     }
 }

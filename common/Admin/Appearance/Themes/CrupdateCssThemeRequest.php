@@ -8,18 +8,7 @@ use Illuminate\Validation\Rule;
 
 class CrupdateCssThemeRequest extends BaseFormRequest
 {
-    /**
-     * @return bool
-     */
-    public function authorize()
-    {
-        return true;
-    }
-
-    /**
-     * @return array
-     */
-    public function rules()
+    public function rules(): array
     {
         $required = $this->getMethod() === 'POST' ? 'required' : '';
         $ignore = $this->getMethod() === 'PUT' ? $this->route('css_theme')->id : '';

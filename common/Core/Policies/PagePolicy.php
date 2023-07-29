@@ -5,12 +5,12 @@ use Common\Pages\CustomPage;
 
 class PagePolicy extends BasePolicy
 {
-    public function index(User $user, int $userId = null)
+    public function index(?User $user, int $userId = null)
     {
         return $user->hasPermission('custom_pages.view') || $user->id === $userId;
     }
 
-    public function show(User $user, CustomPage $customPage)
+    public function show(?User $user, CustomPage $customPage)
     {
         return $user->hasPermission('custom_pages.view') || $customPage->user_id === $user->id;
     }

@@ -1,8 +1,8 @@
 import clsx from 'clsx';
 import {BackendFilter} from '../backend-filter';
 import {useBackendFilterUrlParams} from '../backend-filter-url-params';
-import {IconButton} from '../../../ui/buttons/icon-button';
-import {CloseIcon} from '../../../icons/material/Close';
+import {IconButton} from '@common/ui/buttons/icon-button';
+import {CloseIcon} from '@common/icons/material/Close';
 import {FilterListControl} from './filter-list-control';
 import {FilterItemFormValue} from '../add-filter-dialog';
 
@@ -27,7 +27,9 @@ export function FilterList({
   return (
     <div className={clsx('flex items-center gap-6 overflow-x-auto', className)}>
       {decodedFilters.map((field, index) => {
-        const filter = filters.find(f => f.key === field.key)!;
+        const filter = filters.find(f => f.key === field.key);
+
+        if (!filter) return null;
 
         const handleValueChange = (payload: FilterItemFormValue) => {
           const newFilters = [...decodedFilters];

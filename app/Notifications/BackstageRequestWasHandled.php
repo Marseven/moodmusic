@@ -25,23 +25,18 @@ class BackstageRequestWasHandled extends Notification
 
     public function toMail($notifiable)
     {
+        $subject = $this->backstageRequest->status === 'approved'
+            ? __(':siteName backstage request was approved', ['siteName' => config('app.name')])
+            : __(':siteName backstage request was denied', ['siteName' => config('app.name')]);
+
         $message = (new MailMessage())
             ->greeting(
                 __('Hi :name,', [
                     'name' => $this->backstageRequest->user->display_name,
                 ]),
             )
-            ->subject(
-                __(':sitename backstage request :status', [
-                    'sitename' => config('app.name'),
-                    'status' => $this->backstageRequest->status,
-                ]),
-            )
-            ->line(
-                __('Your backstage request was :status.', [
-                    'status' => $this->backstageRequest->status,
-                ]),
-            );
+            ->subject($subject)
+            ->line($this->getStatusMessage());
 
         if ($this->notes) {
             $message->line($this->notes);
@@ -53,7 +48,7 @@ class BackstageRequestWasHandled extends Notification
         );
     }
 
-    public function toArray($notifiable)
+    public function toArray(): array
     {
         return [
             'mainAction' => [
@@ -62,9 +57,7 @@ class BackstageRequestWasHandled extends Notification
             ],
             'lines' => [
                 [
-                    'content' => __('Your backstage request was :status.', [
-                        'status' => $this->backstageRequest->status,
-                    ]),
+                    'content' => $this->getStatusMessage(),
                     'type' => 'primary',
                 ],
             ],
@@ -76,5 +69,13 @@ class BackstageRequestWasHandled extends Notification
         return $this->backstageRequest->artist
             ? app(UrlGenerator::class)->artist($this->backstageRequest->artist)
             : app(UrlGenerator::class)->home();
+    }
+
+    private function getStatusMessage(): string
+    {
+       return match ($this->backstageRequest->status) {
+            'approved' => __('Your backstage request was approved.'),
+            'denied' => __('Your backstage request was denied.'),
+        };
     }
 }

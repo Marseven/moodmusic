@@ -28,7 +28,7 @@ import {WaveformWithComments} from '@app/web-player/tracks/track-list/track-list
 import {TrackActionsBar} from '@app/web-player/tracks/track-actions-bar';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 
-interface TrackListItemProps {
+interface Props {
   album: Album;
   reposter?: User;
   className?: string;
@@ -46,7 +46,7 @@ export const AlbumListItem = memo(
     hideActions,
     linksInNewTab,
     maxHeight,
-  }: TrackListItemProps) => {
+  }: Props) => {
     const queueId = queueGroupId(album);
     const {player} = useSettings();
     const isMobile = useIsMobileMediaQuery();
@@ -121,14 +121,14 @@ export const AlbumListItem = memo(
               </div>
               <div className="ml-auto text-sm">
                 <FormattedRelativeTime date={album.created_at} />
-                {album.genres?.length && (
+                {album.genres?.length ? (
                   <Chip className="mt-6 w-max" size="xs">
                     <GenreLink
                       genre={album.genres[0]}
                       target={linksInNewTab ? '_blank' : undefined}
                     />
                   </Chip>
-                )}
+                ) : null}
               </div>
             </div>
             <div className="my-20">

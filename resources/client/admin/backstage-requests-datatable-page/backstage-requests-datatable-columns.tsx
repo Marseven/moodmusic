@@ -16,12 +16,15 @@ export const BackstageRequestsDatatableColumns: ColumnConfig<BackstageRequest>[]
     {
       key: 'type',
       allowsSorting: true,
+      minWidth: 'min-w-100',
       header: () => <Trans message="Type" />,
       body: request => <BackstageRequestType type={request.type} />,
     },
     {
       key: 'status',
       allowsSorting: true,
+      visibleInMode: 'all',
+      minWidth: 'min-w-100',
       header: () => <Trans message="Status" />,
       body: request => (
         <div className="flex items-center gap-8">
@@ -42,6 +45,8 @@ export const BackstageRequestsDatatableColumns: ColumnConfig<BackstageRequest>[]
     {
       key: 'user',
       allowsSorting: true,
+      visibleInMode: 'all',
+      width: 'flex-3',
       header: () => <Trans message="User" />,
       body: request =>
         request.user ? (
@@ -55,6 +60,7 @@ export const BackstageRequestsDatatableColumns: ColumnConfig<BackstageRequest>[]
     {
       key: 'artist',
       allowsSorting: true,
+      width: 'flex-3',
       header: () => <Trans message="Artist" />,
       body: request => {
         if (!request.artist) return request.artist_name;
@@ -73,6 +79,7 @@ export const BackstageRequestsDatatableColumns: ColumnConfig<BackstageRequest>[]
     {
       key: 'created_at',
       allowsSorting: true,
+      width: 'w-100',
       header: () => <Trans message="Requested at" />,
       body: request =>
         request.created_at ? <FormattedDate date={request.created_at} /> : '',
@@ -82,6 +89,8 @@ export const BackstageRequestsDatatableColumns: ColumnConfig<BackstageRequest>[]
       header: () => <Trans message="Actions" />,
       hideHeader: true,
       align: 'end',
+      visibleInMode: 'all',
+      width: 'w-60 flex-shrink-0',
       body: request => (
         <Button
           elementType={Link}

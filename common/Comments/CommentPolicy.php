@@ -2,17 +2,23 @@
 
 namespace Common\Comments;
 
+use App\User;
 use Common\Auth\BaseUser;
 use Common\Core\Policies\BasePolicy;
 
 class CommentPolicy extends BasePolicy
 {
-    public function index(BaseUser $user, $userId = null)
+    public function vote(User $user)
+    {
+        return $user->hasPermission('comments.create');
+    }
+
+    public function index(?BaseUser $user, $userId = null)
     {
         return $user->hasPermission('comments.view') || $user->id === (int) $userId;
     }
 
-    public function show(BaseUser $user, Comment $comment)
+    public function show(?BaseUser $user, Comment $comment)
     {
         return $user->hasPermission('comments.view') || $comment->user_id === $user->id;
     }

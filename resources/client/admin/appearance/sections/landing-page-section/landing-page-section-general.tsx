@@ -73,7 +73,6 @@ function HeaderSection() {
         name="settings.homepage.appearance.headerImage"
         className="mb-30"
         label={<Trans message="Header image" />}
-        highlightSelector={'[data-testid="headerImage"]'}
         defaultValue={defaultImage}
         diskPrefix="homepage"
       />
@@ -133,7 +132,6 @@ function FooterSection() {
         name="settings.homepage.appearance.footerImage"
         className="mb-30"
         label={<Trans message="Footer background image" />}
-        highlightSelector={'[data-testid="footerImage"]'}
         defaultValue={defaultImage}
         diskPrefix="homepage"
       />
@@ -164,7 +162,7 @@ function PricingSection() {
           );
         }}
       />
-      <FormSwitch className="mb-24" name="settings.links.homepage_pricing">
+      <FormSwitch className="mb-24" name="settings.homepage.pricing">
         <Trans message="Show pricing table" />
       </FormSwitch>
     </div>

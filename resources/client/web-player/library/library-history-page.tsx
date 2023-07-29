@@ -24,24 +24,16 @@ export function LibraryHistoryPage() {
 
   const query = useInfiniteData<Track>({
     queryKey: libraryHistoryQueryKey,
-    endpoint: `track/plays/${user!.id}`,
+    endpoint: `tracks/plays/${user!.id}`,
     defaultOrderBy: 'track_plays.created_at',
     defaultOrderDir: 'desc',
     paginate: 'simple',
-    willSortOrFilter: true,
+    willSortOrFilter: false,
   });
-  const {
-    isInitialLoading,
-    sortDescriptor,
-    setSortDescriptor,
-    searchQuery,
-    setSearchQuery,
-    items,
-    isError,
-  } = query;
+  const {isInitialLoading, searchQuery, setSearchQuery, items, isError} = query;
 
   const {trans} = useTrans();
-  const queueId = queueGroupId(user!, 'playHistory', sortDescriptor);
+  const queueId = queueGroupId(user!, 'playHistory');
 
   if (isError) {
     return <PageErrorMessage />;
@@ -72,10 +64,9 @@ export function LibraryHistoryPage() {
         />
       </div>
       <TrackTable
+        enableSorting={false}
         queueGroupId={queueId}
         tracks={isInitialLoading ? getPlaceholderItems() : items}
-        sortDescriptor={sortDescriptor}
-        onSortChange={setSortDescriptor}
         hideAddedAtColumn={false}
         tableBody={<VirtualTableBody query={query} />}
       />

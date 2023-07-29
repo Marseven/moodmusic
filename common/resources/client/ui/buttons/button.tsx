@@ -6,6 +6,7 @@ import {IconSize} from '../../icons/svg-icon';
 
 export interface ButtonProps extends ButtonBaseProps {
   size?: ButtonSize;
+  sizeClassName?: string;
   equalWidth?: boolean;
   startIcon?: ReactElement | null | false;
   endIcon?: ReactElement | null | false;
@@ -17,6 +18,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       startIcon,
       endIcon,
       size = 'sm',
+      sizeClassName,
       className,
       equalWidth = false,
       radius = 'rounded',
@@ -27,7 +29,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ) => {
     const mergedClassName = clsx(
       'font-semibold',
-      getButtonSizeStyle(size, {equalWidth, variant}),
+      sizeClassName || getButtonSizeStyle(size, {equalWidth, variant}),
       className
     );
     return (

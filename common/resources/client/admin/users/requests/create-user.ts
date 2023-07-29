@@ -23,7 +23,7 @@ export function useCreateUser(form: UseFormReturn<CreateUserPayload>) {
   return useMutation((props: CreateUserPayload) => createUser(props), {
     onSuccess: () => {
       toast(message('User created'));
-      queryClient.invalidateQueries([DatatableDataQueryKey('users')]);
+      queryClient.invalidateQueries(DatatableDataQueryKey('users'));
       navigate('/admin/users');
     },
     onError: r => onFormQueryError(r, form),

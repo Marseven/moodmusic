@@ -2,6 +2,7 @@
 
 use App\User;
 use Common\Admin\Appearance\Themes\CssTheme;
+use Common\Auth\Jobs\LogActiveSessionJob;
 use Common\Auth\Roles\Role;
 use Common\Billing\Gateways\Stripe\FormatsMoney;
 use Common\Core\AppUrl;
@@ -65,10 +66,7 @@ class BaseBootstrapData implements BootstrapData
         $this->data['settings']['version'] = config('common.site.version');
         $this->data['default_meta_tags'] = $this->getDefaultMetaTags();
         $this->data['user'] = $this->getCurrentUser();
-        $this->data['guest_role'] = $this->role
-            ->where('guests', true)
-            ->with('permissions')
-            ->first();
+        $this->data['guest_role'] = app('guestRole')->load('permissions');
         $this->data['i18n'] =
             $this->localizationsRepository->getByNameOrCode(
                 app()->getLocale(),
@@ -93,6 +91,8 @@ class BaseBootstrapData implements BootstrapData
         $this->data['show_cookie_notice'] =
             !$alreadyAccepted && $this->isCookieLawCountry();
 
+        $this->logActiveSession();
+
         return $this;
     }
 
@@ -104,6 +104,8 @@ class BaseBootstrapData implements BootstrapData
             ->get();
 
         $selectedTheme = null;
+
+        // first, get theme from cookie or url param, if theme change by user is enabled
         if ($this->settings->get('themes.user_change')) {
             if ($themeFromUrl = $this->request->get('beThemeId')) {
                 $selectedTheme = $themes->find($themeFromUrl);
@@ -112,10 +114,17 @@ class BaseBootstrapData implements BootstrapData
                     Arr::get($_COOKIE, 'be-active-theme'),
                 );
             }
-        } elseif ($defaultId = $this->settings->get('themes.default_id')) {
+        }
+
+        // if no theme was selected, get default theme specified by admin
+        if (
+            !$selectedTheme &&
+            ($defaultId = $this->settings->get('themes.default_id'))
+        ) {
             $selectedTheme = $themes->find($defaultId);
         }
 
+        // finally, fallback to default light theme
         if (!$selectedTheme) {
             $selectedTheme = $themes->where('default_light', true)->first();
         }
@@ -167,5 +176,18 @@ class BaseBootstrapData implements BootstrapData
         // prettier-ignore
         return in_array($isoCode, ['AT', 'BE', 'BG', 'BR', 'CY', 'CZ', 'DE', 'DK', 'EE', 'EL', 'ES', 'FI', 'FR', 'GB', 'HR', 'HU', 'IE', 'IT','LT', 'LU', 'LV', 'MT', 'NL', 'NO', 'PL', 'PT', 'RO', 'SE', 'SI', 'SK',
         ]);
+    }
+
+    protected function logActiveSession()
+    {
+        if ($this->data['user']) {
+            LogActiveSessionJob::dispatch([
+                'user_id' => $this->data['user']->id,
+                'ip_address' => getIp(),
+                'user_agent' => $this->request->userAgent(),
+                'session_id' => session()->getId(),
+                'token' => $this->data['user']->currentAccessToken()?->token,
+            ]);
+        }
     }
 }

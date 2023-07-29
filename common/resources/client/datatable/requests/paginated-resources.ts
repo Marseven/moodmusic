@@ -8,7 +8,7 @@ export interface GetDatatableDataParams {
   filters?: string | null;
   query?: string;
   with?: string;
-  perPage?: number;
+  perPage?: number | string | null;
   page?: number;
   [key: string]: string | number | boolean | undefined | null;
 }

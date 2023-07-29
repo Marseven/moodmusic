@@ -1,7 +1,7 @@
 import {useForm} from 'react-hook-form';
 import {useParams} from 'react-router-dom';
 import React, {useEffect} from 'react';
-import {invalidateUseUserQuery, useUser} from '../../auth/ui/use-user';
+import {useUser} from '../../auth/ui/use-user';
 import {UpdateUserPayload, useUpdateUser} from './requests/update-user';
 import {Button} from '../../ui/buttons/button';
 import {useResendVerificationEmail} from '../../auth/requests/use-resend-verification-email';
@@ -15,6 +15,7 @@ import {useSettings} from '../../core/settings/use-settings';
 import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
 import {FormImageSelector} from '@common/ui/images/image-selector';
+import {queryClient} from '@common/http/query-client';
 
 export function UpdateUserPage() {
   const form = useForm<UpdateUserPayload>();
@@ -77,7 +78,7 @@ export function UpdateUserPage() {
         <AvatarSection
           user={data!.user}
           onChange={() => {
-            invalidateUseUserQuery(userId!);
+            queryClient.invalidateQueries(['users']);
           }}
         />
       }

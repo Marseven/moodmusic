@@ -69,7 +69,7 @@ class MailgunApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface) {
+        } catch (DecodingExceptionInterface $e) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Mailgun server.', $response, 0, $e);
@@ -123,7 +123,7 @@ class MailgunApiTransport extends AbstractApiTransport
             }
 
             if ($header instanceof TagHeader) {
-                $payload[] = ['o:tag' => $header->getValue()];
+                $payload['o:tag'] = $header->getValue();
 
                 continue;
             }
@@ -160,6 +160,7 @@ class MailgunApiTransport extends AbstractApiTransport
                     $new = basename($filename);
                     $html = str_replace('cid:'.$filename, 'cid:'.$new, $html);
                     $p = new \ReflectionProperty($attachment, 'filename');
+                    $p->setAccessible(true);
                     $p->setValue($attachment, $new);
                 }
                 $inlines[] = $attachment;

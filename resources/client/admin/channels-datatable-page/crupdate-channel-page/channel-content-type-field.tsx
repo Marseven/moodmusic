@@ -19,6 +19,7 @@ export function ChannelContentTypeField() {
         } else {
           setValue('config.autoUpdateMethod', 'spotifyTopTracks');
           setValue('config.contentModel', TRACK_MODEL);
+          setValue('config.connectToGenreViaUrl', false);
         }
         if (newValue === 'listAll') {
           setValue('config.contentModel', ARTIST_MODEL);

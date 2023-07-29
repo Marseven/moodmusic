@@ -80,8 +80,15 @@ export function hydrateAlbumForm(
   if (!form.getValues('image') && data.image) {
     form.setValue('image', data.image);
   }
-  if (!form.getValues('release_date') && data.release_date) {
+  if (data.release_date) {
     form.setValue('release_date', data.release_date);
+  }
+  if (data.genres?.length) {
+    form.setValue(
+      'genres',
+      // @ts-ignore
+      mergeArraysWithoutDuplicates(form.getValues('genres'), data.genres)
+    );
   }
   if (!form.getValues('name') && data.album_name) {
     form.setValue('name', data.album_name);

@@ -18,10 +18,10 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
     key: 'name',
     allowsSorting: true,
     header: () => <Trans message="Album" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-3',
+    visibleInMode: 'all',
     body: album => (
-      <div className="flex items-center gap-12 w-max">
+      <div className="flex items-center gap-12">
         <AlbumImage
           album={album}
           className="flex-shrink-0"
@@ -35,12 +35,11 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
     key: 'artist',
     allowsSorting: false,
     header: () => <Trans message="Artist" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-2',
     body: album => {
       if (!album.artists?.[0]) return null;
       return (
-        <div className="flex items-center gap-12 w-max">
+        <div className="flex items-center gap-12">
           <SmallArtistImage
             artist={album.artists[0]}
             className="flex-shrink-0 rounded"
@@ -54,6 +53,7 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
   {
     key: 'release_date',
     allowsSorting: true,
+    minWidth: 'min-w-100',
     header: () => <Trans message="Release date" />,
     body: album =>
       album.release_date ? <FormattedDate date={album.release_date} /> : null,
@@ -61,6 +61,7 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
   {
     key: 'track_count',
     allowsSorting: false,
+    minWidth: 'min-w-70',
     header: () => <Trans message="Track count" />,
     body: album =>
       album.tracks_count ? (
@@ -71,12 +72,14 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
     key: 'plays',
     allowsSorting: true,
     header: () => <Trans message="Plays" />,
+    minWidth: 'min-w-70',
     body: album =>
       album.plays ? <FormattedNumber value={album.plays} /> : null,
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: album =>
       album.updated_at ? <FormattedDate date={album.updated_at} /> : '',
@@ -85,7 +88,9 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
+    visibleInMode: 'all',
     align: 'end',
+    width: 'w-84 flex-shrink-0',
     body: album => (
       <div className="text-muted">
         <IconButton size="md" elementType={Link} to={`${album.id}/insights`}>

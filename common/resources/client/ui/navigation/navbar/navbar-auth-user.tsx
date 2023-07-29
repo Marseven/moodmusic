@@ -37,7 +37,9 @@ export function NavbarAuthUser({items = []}: NavbarAuthUserProps) {
         src={user.avatar}
         alt=""
       />
-      <span className="block text-sm mr-2">{user.display_name}</span>
+      <span className="block text-sm mr-2 max-w-124 overflow-x-hidden overflow-ellipsis">
+        {user.display_name}
+      </span>
       <ArrowDropDownIcon className="block icon-sm" />
     </ButtonBase>
   );

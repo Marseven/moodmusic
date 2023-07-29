@@ -42,12 +42,12 @@ function calcHighestUpsellPercentage(products?: Product[]) {
     const monthlyAmount = monthly.amount * 12;
     const yearlyAmount = yearly.amount;
 
-    const amountDecrease = Math.round(
-      ((monthlyAmount - yearlyAmount) / yearlyAmount) * 100
+    const savingsPercentage = Math.round(
+      ((monthlyAmount - yearlyAmount) / monthlyAmount) * 100
     );
 
-    if (amountDecrease > 0 && amountDecrease <= 200) {
-      return amountDecrease;
+    if (savingsPercentage > 0 && savingsPercentage <= 200) {
+      return savingsPercentage;
     }
 
     return 0;

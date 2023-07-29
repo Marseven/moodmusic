@@ -1,15 +1,21 @@
-import {Navbar} from '../../../ui/navigation/navbar/navbar';
+import {Navbar} from '@common/ui/navigation/navbar/navbar';
 import {useUser} from '../use-user';
-import {ProgressCircle} from '../../../ui/progress/progress-circle';
+import {ProgressCircle} from '@common/ui/progress/progress-circle';
 import {SocialLoginPanel} from './social-login-panel';
 import {BasicInfoPanel} from './basic-info-panel/basic-info-panel';
 import {ChangePasswordPanel} from './change-password-panel/change-password-panel';
 import {LocalizationPanel} from './localization-panel';
 import {AccessTokenPanel} from './access-token-panel/access-token-panel';
 import {DangerZonePanel} from './danger-zone-panel/danger-zone-panel';
-import {Trans} from '../../../i18n/trans';
-import {StaticPageTitle} from '../../../seo/static-page-title';
-import {Fragment} from 'react';
+import {Trans} from '@common/i18n/trans';
+import {StaticPageTitle} from '@common/seo/static-page-title';
+import {AccountSettingsPanel} from '@common/auth/ui/account-settings/account-settings-panel';
+import {TwoFactorStepper} from '@common/auth/ui/two-factor/stepper/two-factor-auth-stepper';
+import {
+  AccountSettingsId,
+  AccountSettingsSidenav,
+} from '@common/auth/ui/account-settings/account-settings-sidenav';
+import {SessionsPanel} from '@common/auth/ui/account-settings/sessions-panel/sessions-panel';
 
 export function AccountSettingsPage() {
   const {data, isLoading} = useUser('me', {
@@ -36,14 +42,26 @@ export function AccountSettingsPage() {
               isIndeterminate
             />
           ) : (
-            <Fragment>
-              <BasicInfoPanel user={data.user} />
-              <SocialLoginPanel user={data.user} />
-              <ChangePasswordPanel />
-              <LocalizationPanel user={data.user} />
-              <AccessTokenPanel user={data.user} />
-              <DangerZonePanel />
-            </Fragment>
+            <div className="flex items-start gap-24">
+              <AccountSettingsSidenav />
+              <main className="flex-auto">
+                <BasicInfoPanel user={data.user} />
+                <SocialLoginPanel user={data.user} />
+                <ChangePasswordPanel />
+                <AccountSettingsPanel
+                  id={AccountSettingsId.TwoFactor}
+                  title={<Trans message="Two factor authentication" />}
+                >
+                  <div className="max-w-580">
+                    <TwoFactorStepper user={data.user} />
+                  </div>
+                </AccountSettingsPanel>
+                <SessionsPanel user={data.user} />
+                <LocalizationPanel user={data.user} />
+                <AccessTokenPanel user={data.user} />
+                <DangerZonePanel />
+              </main>
+            </div>
           )}
         </div>
       </div>

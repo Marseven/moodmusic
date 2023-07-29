@@ -40,9 +40,9 @@ export function Footer({className, padding}: Props) {
 
 function Menus() {
   const settings = useSettings();
-  const primaryMenu = settings.menus.find(m => m.positions.includes('footer'));
+  const primaryMenu = settings.menus.find(m => m.positions?.includes('footer'));
   const secondaryMenu = settings.menus.find(m =>
-    m.positions.includes('footer-secondary')
+    m.positions?.includes('footer-secondary')
   );
 
   if (!primaryMenu && !secondaryMenu) return null;
@@ -60,8 +60,9 @@ function Menus() {
 }
 
 function ThemeSwitcher() {
+  const {themes} = useSettings();
   const {selectedTheme, selectTheme} = useThemeSelector();
-  if (!selectedTheme) return null;
+  if (!selectedTheme || !themes?.user_change) return null;
 
   return (
     <Button

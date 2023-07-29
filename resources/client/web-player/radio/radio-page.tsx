@@ -109,23 +109,24 @@ function Image({seed}: SeedImageProps) {
         <SmallArtistImage
           artist={seed}
           size="w-240 h-240"
-          className="rounded mx-auto"
+          wrapperClassName="mx-auto"
+          className="rounded"
         />
       );
     case 'genre':
       return (
         <GenreImage
           genre={seed}
-          size="w-240 h-240 mx-auto"
-          className="rounded"
+          size="w-240 h-240"
+          className="rounded mx-auto"
         />
       );
     default:
       return (
         <TrackImage
           track={seed}
-          size="w-240 h-240 mx-auto"
-          className="rounded"
+          size="w-240 h-240"
+          className="rounded mx-auto"
         />
       );
   }

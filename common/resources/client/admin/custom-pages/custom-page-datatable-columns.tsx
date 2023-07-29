@@ -13,6 +13,8 @@ export const CustomPageDatatableColumns: ColumnConfig<CustomPage>[] = [
   {
     key: 'slug',
     allowsSorting: true,
+    width: 'flex-2 min-w-200',
+    visibleInMode: 'all',
     header: () => <Trans message="Slug" />,
     body: page => (
       <Link target="_blank" to={`/pages/${page.slug}`} className={LinkStyle}>
@@ -23,6 +25,7 @@ export const CustomPageDatatableColumns: ColumnConfig<CustomPage>[] = [
   {
     key: 'user_id',
     allowsSorting: true,
+    width: 'flex-2 min-w-140',
     header: () => <Trans message="Owner" />,
     body: page =>
       page.user && (
@@ -35,23 +38,24 @@ export const CustomPageDatatableColumns: ColumnConfig<CustomPage>[] = [
   },
   {
     key: 'type',
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Type" />,
     body: page => <Trans message={page.type} />,
-    width: 'w-1',
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: page => <FormattedDate date={page.updated_at} />,
-    width: 'w-1',
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
-    width: 'w-1',
+    width: 'w-84 flex-shrink-0',
+    visibleInMode: 'all',
     body: page => (
       <IconButton
         size="md"

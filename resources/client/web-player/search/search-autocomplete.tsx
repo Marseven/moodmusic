@@ -40,6 +40,11 @@ import {useListboxContext} from '@common/ui/forms/listbox/listbox-context';
 import {AnimatePresence, m} from 'framer-motion';
 import {opacityAnimation} from '@common/ui/animation/opacity-animation';
 import {useParams} from 'react-router-dom';
+import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
+import {ArtistContextDialog} from '@app/web-player/artists/artist-context-dialog';
+import {AlbumContextDialog} from '@app/web-player/albums/album-context-dialog';
+import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
+import {PlaylistContextDialog} from '@app/web-player/playlists/playlist-context-dialog';
 
 export const mainSearchModels = [
   ARTIST_MODEL,
@@ -123,7 +128,12 @@ export function SearchAutocomplete({className}: SearchAutocompleteProps) {
                       description={<Trans message="Artist" />}
                       textLabel={result.name}
                     >
-                      <ArtistLink artist={result} />
+                      <DialogTrigger type="popover" triggerOnContextMenu>
+                        <div>
+                          <ArtistLink artist={result} />
+                        </div>
+                        <ArtistContextDialog artist={result} />
+                      </DialogTrigger>
                     </Item>
                   );
                 case ALBUM_MODEL:
@@ -142,7 +152,12 @@ export function SearchAutocomplete({className}: SearchAutocompleteProps) {
                       description={<ArtistLinks artists={result.artists} />}
                       textLabel={result.name}
                     >
-                      <AlbumLink album={result} />
+                      <DialogTrigger type="popover" triggerOnContextMenu>
+                        <div>
+                          <AlbumLink album={result} />
+                        </div>
+                        <AlbumContextDialog album={result} />
+                      </DialogTrigger>
                     </Item>
                   );
                 case TRACK_MODEL:
@@ -161,7 +176,12 @@ export function SearchAutocomplete({className}: SearchAutocompleteProps) {
                       description={<ArtistLinks artists={result.artists} />}
                       textLabel={result.name}
                     >
-                      <TrackLink track={result} />
+                      <DialogTrigger type="popover" triggerOnContextMenu>
+                        <div>
+                          <TrackLink track={result} />
+                        </div>
+                        <TrackContextDialog tracks={[result]} />
+                      </DialogTrigger>
                     </Item>
                   );
                 case USER_MODEL:
@@ -204,7 +224,12 @@ export function SearchAutocomplete({className}: SearchAutocompleteProps) {
                       description={<PlaylistOwnerName playlist={result} />}
                       textLabel={result.name}
                     >
-                      <PlaylistLink playlist={result} />
+                      <DialogTrigger type="popover" triggerOnContextMenu>
+                        <div>
+                          <PlaylistLink playlist={result} />
+                        </div>
+                        <PlaylistContextDialog playlist={result} />
+                      </DialogTrigger>
                     </Item>
                   );
               }
@@ -237,7 +262,7 @@ function PlayableImage({
 
   const queueId = queueGroupId(model);
   const isPlaying = usePlayerStore(
-    s => s.status === 'playing' && s.originalQueue[0]?.groupId === queueId
+    s => s.isPlaying && s.originalQueue[0]?.groupId === queueId
   );
 
   return (

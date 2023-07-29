@@ -12,7 +12,10 @@ class LoginResponse implements LoginResponseContract
 {
     public function toResponse($request): JsonResponse
     {
-        if (app(Settings::class)->get('single_device_login')) {
+        if (
+            $request->get('password') &&
+            app(Settings::class)->get('single_device_login')
+        ) {
             Auth::logoutOtherDevices($request->get('password'));
         }
 

@@ -17,16 +17,22 @@ import {
   useDatatableData,
 } from './requests/paginated-resources';
 import {DataTableContext} from './page/data-table-context';
-import {AnimatePresence} from 'framer-motion';
+import {AnimatePresence, m} from 'framer-motion';
 import {ProgressBar} from '../ui/progress/progress-bar';
 import {Table, TableProps} from '../ui/tables/table';
 import {DataTablePaginationFooter} from './data-table-pagination-footer';
 import {DataTableHeader} from './data-table-header';
 import {FilterList} from './filters/filter-list/filter-list';
 import {SelectedStateDatatableHeader} from '@common/datatable/selected-state-datatable-header';
+import clsx from 'clsx';
+import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
+import {BackendFiltersUrlKey} from '@common/datatable/filters/backend-filters-url-key';
+import {opacityAnimation} from '@common/ui/animation/opacity-animation';
+import {FilterListSkeleton} from '@common/datatable/filters/filter-list/filter-list-skeleton';
 
 export interface DataTableProps<T extends TableDataItem> {
   filters?: BackendFilter[];
+  filtersLoading?: boolean;
   columns: ColumnConfig<T>[];
   searchPlaceholder?: MessageDescriptor;
   queryParams?: Record<string, string | number | undefined | null>;
@@ -35,13 +41,17 @@ export interface DataTableProps<T extends TableDataItem> {
   emptyStateMessage: ReactElement<{isFiltering: boolean}>;
   actions?: ReactNode;
   enableSelection?: boolean;
+  selectionStyle?: TableProps<T>['selectionStyle'];
   selectedActions?: ReactNode;
   onRowAction?: TableProps<T>['onAction'];
   tableDomProps?: ComponentProps<'table'>;
   children?: ReactNode;
+  collapseTableOnMobile?: boolean;
+  cellHeight?: string;
 }
 export function DataTable<T extends TableDataItem>({
   filters,
+  filtersLoading,
   columns,
   searchPlaceholder,
   queryParams,
@@ -52,8 +62,12 @@ export function DataTable<T extends TableDataItem>({
   tableDomProps,
   onRowAction,
   enableSelection = true,
+  selectionStyle = 'checkbox',
   children,
+  cellHeight,
+  collapseTableOnMobile = true,
 }: DataTableProps<T>) {
+  const isMobile = useIsMobileMediaQuery();
   const {trans} = useTrans();
   const {encodedFilters} = useBackendFilterUrlParams(filters);
   const [params, setParams] = useState<GetDatatableDataParams>({perPage: 15});
@@ -63,7 +77,7 @@ export function DataTable<T extends TableDataItem>({
     {
       ...params,
       ...queryParams,
-      filters: encodedFilters,
+      [BackendFiltersUrlKey]: encodedFilters,
     },
     {
       onSuccess: () => {
@@ -102,13 +116,33 @@ export function DataTable<T extends TableDataItem>({
             onSearchChange={query => setParams({...params, query})}
             actions={actions}
             filters={filters}
+            filtersLoading={filtersLoading}
             key="default"
           />
         )}
       </AnimatePresence>
-      {filters && <FilterList className="mb-14" filters={filters} />}
-      <div className="relative border rounded">
-        {query.isLoading && (
+
+      {filters && (
+        <div className="mb-14">
+          <AnimatePresence initial={false} mode="wait">
+            {filtersLoading && encodedFilters ? (
+              <FilterListSkeleton />
+            ) : (
+              <m.div key="filter-list" {...opacityAnimation}>
+                <FilterList filters={filters} />
+              </m.div>
+            )}
+          </AnimatePresence>
+        </div>
+      )}
+
+      <div
+        className={clsx(
+          'relative rounded',
+          (!isMobile || !collapseTableOnMobile) && 'border'
+        )}
+      >
+        {query.isFetching && (
           <ProgressBar
             isIndeterminate
             className="absolute top-0 left-0 w-full z-10"
@@ -128,8 +162,11 @@ export function DataTable<T extends TableDataItem>({
             }}
             selectedRows={selectedRows}
             enableSelection={enableSelection}
+            selectionStyle={selectionStyle}
             onSelectionChange={setSelectedRows}
             onAction={onRowAction}
+            collapseOnMobile={collapseTableOnMobile}
+            cellHeight={cellHeight}
           />
         </div>
 

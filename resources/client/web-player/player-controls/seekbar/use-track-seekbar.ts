@@ -1,76 +1,67 @@
 import {Track} from '@app/web-player/tracks/track';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
-import {useEffect} from 'react';
+import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {
   tracksToMediaItems,
   trackToMediaItem,
 } from '@app/web-player/tracks/utils/track-to-media-item';
-import {useBaseSeekbar} from '@app/web-player/player-controls/seekbar/use-base-seekbar';
+import {flushSync} from 'react-dom';
+import {useEffect, useState} from 'react';
 
 export function useTrackSeekbar(track: Track, queue?: Track[]) {
-  const duration = usePlayerStore(s => {
-    // either use exact duration from provider if this track is cued, or use duration from track props
-    return s.cuedMedia?.id === track.id && s.mediaDuration
-      ? s.mediaDuration
+  const player = usePlayerActions();
+  const cuedMedia = usePlayerStore(s => s.cuedMedia);
+
+  // either use exact duration from provider if this track is cued, or use duration from track props
+  const playerDuration = usePlayerStore(s => s.mediaDuration);
+  const duration =
+    cuedMedia?.id === track.id && playerDuration
+      ? playerDuration
       : (track.duration || 0) / 1000;
-  });
 
-  const {player, startTimer, stopTimer, listeners, time, setTime} =
-    useBaseSeekbar();
+  const [currentTime, setCurrentTime] = useState(
+    track.id === player.getState().cuedMedia?.id ? player.getCurrentTime() : 0
+  );
 
-  // when this track is cued, listen to playback events and sync seekbar,
-  // when a different track is cued, unsubscribe and reset seekbar
   useEffect(() => {
-    let unsubscribeFromPlayback: (() => void) | undefined;
-
-    // subscribe on initial load, if this track is already cued
-    if (player.getState().cuedMedia?.id === track.id) {
-      unsubscribeFromPlayback = player.subscribe(listeners);
-      // if we render seekbar when player is already playing, need to start the timer here
-      if (player.getState().status === 'playing') {
-        startTimer();
-      }
-    }
-
-    const unsubscribeFromCuedTrack = player.subscribe({
-      onCued: media => {
-        if (media?.id === track.id) {
-          unsubscribeFromPlayback = player.subscribe(listeners);
-        } else {
-          unsubscribeFromPlayback?.();
-          stopTimer();
-          setTime(0);
-        }
+    return player.subscribe({
+      progress: ({currentTime}) => {
+        setCurrentTime(
+          track.id === player.getState().cuedMedia?.id ? currentTime : 0
+        );
       },
     });
-
-    return () => {
-      unsubscribeFromCuedTrack?.();
-      unsubscribeFromPlayback?.();
-    };
-  }, [player, track, listeners, setTime, stopTimer, startTimer]);
+  }, [player, track]);
 
   return {
     duration,
     minValue: 0,
     maxValue: duration,
-    value: time,
+    value: currentTime,
     onPointerDown: () => {
-      stopTimer();
+      player.setIsSeeking(true);
       player.pause();
-      player.cue(trackToMediaItem(track));
+
+      // flush so provider src is changed immediately. Without this seeking
+      // will not work when clicking on a different track the first time
+      if (player.getState().cuedMedia?.id !== track.id) {
+        flushSync(() => {
+          if (queue?.length) {
+            const pointer = queue?.findIndex(t => t.id === track.id);
+            player.overrideQueue(tracksToMediaItems(queue), pointer);
+          } else {
+            player.cue(trackToMediaItem(track));
+          }
+        });
+      }
     },
     onChange: (value: number) => {
-      setTime(value);
+      player.getState().emit('progress', {currentTime: value});
       player.seek(value);
     },
     onChangeEnd: () => {
-      if (queue?.length) {
-        const pointer = queue?.findIndex(t => t.id === track.id);
-        player.overrideQueueAndPlay(tracksToMediaItems(queue), pointer);
-      } else {
-        player.play(track ? trackToMediaItem(track) : undefined);
-      }
+      player.setIsSeeking(false);
+      player.play();
     },
   };
 }

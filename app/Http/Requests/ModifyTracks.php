@@ -30,7 +30,6 @@ class ModifyTracks extends BaseFormRequest
         return [
             'name' => $name,
             'number'             => 'int',
-            'album_name'         => 'string|min:1|max:255|nullable',
             'duration'           => 'required|integer|min:1',
             'spotify_popularity' => 'min:1|max:100|nullable',
             'album_id'           => 'nullable|integer|min:1|exists:albums,id',

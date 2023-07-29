@@ -62,6 +62,10 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
   public $intentNameAuisScore;
   public $intentNameAuisScoreExp;
   /**
+   * @var float
+   */
+  public $intentNamePauis;
+  /**
    * @var bool
    */
   public $isFeasible;
@@ -81,6 +85,10 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
    * @var bool
    */
   public $isPodcastIntent;
+  /**
+   * @var bool
+   */
+  public $isVideoIntent;
   /**
    * @var int
    */
@@ -110,6 +118,10 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
    * @var int
    */
   public $parsingScoreMse8BucketId;
+  /**
+   * @var string
+   */
+  public $phase;
   public $pq2tVsAssistantIbstCosine;
   public $pq2tVsIbstCosine;
   /**
@@ -124,6 +136,10 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
    * @var string
    */
   public $searchDispatch;
+  /**
+   * @var string
+   */
+  public $subIntentType;
   /**
    * @var float
    */
@@ -306,6 +322,20 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
     return $this->intentNameAuisScoreExp;
   }
   /**
+   * @param float
+   */
+  public function setIntentNamePauis($intentNamePauis)
+  {
+    $this->intentNamePauis = $intentNamePauis;
+  }
+  /**
+   * @return float
+   */
+  public function getIntentNamePauis()
+  {
+    return $this->intentNamePauis;
+  }
+  /**
    * @param bool
    */
   public function setIsFeasible($isFeasible)
@@ -374,6 +404,20 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
   public function getIsPodcastIntent()
   {
     return $this->isPodcastIntent;
+  }
+  /**
+   * @param bool
+   */
+  public function setIsVideoIntent($isVideoIntent)
+  {
+    $this->isVideoIntent = $isVideoIntent;
+  }
+  /**
+   * @return bool
+   */
+  public function getIsVideoIntent()
+  {
+    return $this->isVideoIntent;
   }
   /**
    * @param int
@@ -515,6 +559,20 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
   {
     return $this->parsingScoreMse8BucketId;
   }
+  /**
+   * @param string
+   */
+  public function setPhase($phase)
+  {
+    $this->phase = $phase;
+  }
+  /**
+   * @return string
+   */
+  public function getPhase()
+  {
+    return $this->phase;
+  }
   public function setPq2tVsAssistantIbstCosine($pq2tVsAssistantIbstCosine)
   {
     $this->pq2tVsAssistantIbstCosine = $pq2tVsAssistantIbstCosine;
@@ -572,6 +630,20 @@ class AssistantPrefulfillmentRankerPrefulfillmentSignals extends \Google\Model
   public function getSearchDispatch()
   {
     return $this->searchDispatch;
+  }
+  /**
+   * @param string
+   */
+  public function setSubIntentType($subIntentType)
+  {
+    $this->subIntentType = $subIntentType;
+  }
+  /**
+   * @return string
+   */
+  public function getSubIntentType()
+  {
+    return $this->subIntentType;
   }
   /**
    * @param float

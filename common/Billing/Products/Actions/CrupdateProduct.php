@@ -38,7 +38,6 @@ class CrupdateProduct
         $product = $product->fill($newData);
         $product->save();
 
-
         if ($permissions = Arr::get($data, 'permissions')) {
             $this->syncPermissions($product, $permissions);
         }
@@ -47,7 +46,12 @@ class CrupdateProduct
 
         // delete old prices
         $originalProduct?->prices->each(function (Price $price) use ($prices) {
-            if (!Arr::first($prices, fn($p) => $p['id'] === $price->id)) {
+            if (
+                !Arr::first(
+                    $prices,
+                    fn($p) => isset($p['id']) && $p['id'] === $price->id,
+                )
+            ) {
                 $price->delete();
             }
         });

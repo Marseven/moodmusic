@@ -15,8 +15,9 @@ import {LinkStyle} from '../../../../ui/buttons/external-link';
 import {useAuth} from '../../../use-auth';
 import {Trans} from '../../../../i18n/trans';
 import secureFilesSvg from './secure-files.svg';
-import {invalidateUseUserQuery} from '../../use-user';
 import {useSettings} from '../../../../core/settings/use-settings';
+import {queryClient} from '@common/http/query-client';
+import {AccountSettingsId} from '@common/auth/ui/account-settings/account-settings-sidenav';
 
 interface Props {
   user: User;
@@ -28,6 +29,7 @@ export function AccessTokenPanel({user}: Props) {
   if (!api?.integrated || !hasPermission('api.access')) return null;
   return (
     <AccountSettingsPanel
+      id={AccountSettingsId.Developers}
       title={<Trans message="API access tokens" />}
       titleSuffix={
         <Link className={LinkStyle} to="/api-docs" target="_blank">
@@ -112,7 +114,7 @@ function DeleteTokenButton({token}: DeleteTokenButtonProps) {
           deleteToken.mutate(
             {id: token.id},
             {
-              onSuccess: () => invalidateUseUserQuery('me'),
+              onSuccess: () => queryClient.invalidateQueries(['users']),
             }
           );
         }

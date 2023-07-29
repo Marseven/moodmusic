@@ -30,6 +30,7 @@ return [
         'region' => env('STORAGE_S3_REGION'),
         'bucket' => env('STORAGE_S3_BUCKET'),
         'endpoint' => env('STORAGE_S3_ENDPOINT'),
+        'use_path_style_endpoint' => env('STORAGE_S3_USE_PATH_STYLE_ENDPOINT', false),
     ],
 
     'digitalocean_s3' => [
@@ -75,6 +76,7 @@ return [
         'client_id' => env('GOOGLE_ID'),
         'client_secret' => env('GOOGLE_SECRET'),
         'redirect' => env('APP_URL') . '/secure/auth/social/google/callback',
+        'analytics_property_id' => env('ANALYTICS_PROPERTY_ID'),
     ],
 
     'twitter' => [

@@ -12,21 +12,30 @@ const loaderUrl = 'https://www.gstatic.com/charts/loader.js';
 interface UseGoogleGeoChartProps {
   placeholderRef: RefObject<HTMLDivElement>;
   data: LocationDatasetItem[];
+  onCountrySelected?: (countryCode: string) => void;
+  country?: string;
 }
 export function useGoogleGeoChart({
   placeholderRef,
   data,
+  country,
+  onCountrySelected,
 }: UseGoogleGeoChartProps) {
   const {trans} = useTrans();
   const {analytics} = useSettings();
   const apiKey = analytics?.gchart_api_key;
   const {selectedTheme} = useThemeSelector();
   const geoChartRef = useRef<google.visualization.GeoChart>();
+  // only allow selecting countries, not cities
+  const regionInteractivity = !!onCountrySelected && !country;
   const drawGoogleChart = useCallback(() => {
     if (typeof google === 'undefined') return;
 
     const seedData = data.map(location => [location.label, location.value]);
-    seedData.unshift([trans(message('Country')), trans(message('Clicks'))]);
+    seedData.unshift([
+      country ? trans(message('City')) : trans(message('Country')),
+      trans(message('Clicks')),
+    ]);
 
     const backgroundColor = `${themeValueToHex(
       selectedTheme.colors['--be-paper']
@@ -34,9 +43,14 @@ export function useGoogleGeoChart({
     const chartColor = `${themeValueToHex(
       selectedTheme.colors['--be-primary']
     )}`;
+
     const options: google.visualization.GeoChartOptions = {
       colorAxis: {colors: [chartColor]},
       backgroundColor,
+      region: country ? country.toUpperCase() : undefined,
+      resolution: country ? 'provinces' : 'countries',
+      displayMode: country ? 'markers' : 'regions',
+      enableRegionInteractivity: regionInteractivity,
     };
 
     if (
@@ -52,7 +66,14 @@ export function useGoogleGeoChart({
       google.visualization.arrayToDataTable(seedData),
       options
     );
-  }, [selectedTheme, data, placeholderRef]);
+  }, [
+    selectedTheme,
+    data,
+    placeholderRef,
+    trans,
+    country,
+    regionInteractivity,
+  ]);
 
   const initGoogleGeoChart = useCallback(() => {
     if (lazyLoader.alreadyLoading(loaderUrl)) return;
@@ -61,12 +82,21 @@ export function useGoogleGeoChart({
         packages: ['geochart'],
         // See: https://developers.google.com/chart/interactive/docs/basic_load_libs#load-settings
         mapsApiKey: apiKey,
-      });
-      google.charts.setOnLoadCallback(() => {
-        drawGoogleChart();
+        callback: () => {
+          drawGoogleChart();
+          if (geoChartRef.current && onCountrySelected) {
+            google.visualization.events.addListener(
+              geoChartRef.current,
+              'regionClick',
+              (a: {region: string}) => {
+                onCountrySelected?.(a.region);
+              }
+            );
+          }
+        },
       });
     });
-  }, [apiKey, drawGoogleChart]);
+  }, [apiKey, drawGoogleChart, onCountrySelected]);
 
   // on component load: load chart library then draw, otherwise just draw
   useEffect(() => {

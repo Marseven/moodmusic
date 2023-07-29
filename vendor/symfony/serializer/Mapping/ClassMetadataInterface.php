@@ -53,5 +53,5 @@ interface ClassMetadataInterface
 
     public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping;
 
-    public function setClassDiscriminatorMapping(?ClassDiscriminatorMapping $mapping);
+    public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null);
 }

@@ -1,8 +1,8 @@
 import {useContext, useMemo} from 'react';
-import {cellStyle} from './table-style';
 import {TableContext} from './table-context';
 import {TableDataItem} from './types/table-data-item';
 import {RowContext} from '@common/datatable/column-config';
+import {useTableCellStyle} from '@common/ui/tables/style/use-table-cell-style';
 
 interface TableCellProps {
   rowIsHovered: boolean;
@@ -18,9 +18,7 @@ export function TableCell({
   item,
   id,
 }: TableCellProps) {
-  const {enableSelection, columns} = useContext(TableContext);
-  const isFirst = enableSelection ? false : index === 0;
-  const isLast = index === columns.length - 1;
+  const {columns} = useContext(TableContext);
   const column = columns[index];
 
   const rowContext: RowContext = useMemo(() => {
@@ -31,14 +29,22 @@ export function TableCell({
     };
   }, [rowIndex, rowIsHovered, item.isPlaceholder]);
 
+  const style = useTableCellStyle({
+    index: index,
+    isHeader: false,
+  });
+
   return (
-    <td
-      id={id}
+    <div
       tabIndex={-1}
-      data-testid={`col-${column.key}`}
-      className={cellStyle({isFirst, isLast, column})}
+      role="gridcell"
+      aria-colindex={index + 1}
+      id={id}
+      className={style}
     >
-      {column.body(item, rowContext)}
-    </td>
+      <div className="overflow-x-hidden overflow-ellipsis min-w-0 w-full">
+        {column.body(item, rowContext)}
+      </div>
+    </div>
   );
 }

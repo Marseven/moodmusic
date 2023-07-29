@@ -71,7 +71,6 @@ class ArtistController extends BaseController
         $artists = Artist::whereIn('id', $artistIds)->get();
         $imagePaths = $artists
             ->pluck('image_small')
-            ->concat($artists->pluck('image_large'))
             ->filter();
         app(DeleteEntries::class)->execute([
             'paths' => $imagePaths->toArray(),

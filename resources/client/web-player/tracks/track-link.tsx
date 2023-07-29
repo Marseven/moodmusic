@@ -17,7 +17,10 @@ export function TrackLink({track, className, ...linkProps}: TrackLinkProps) {
   return (
     <Link
       {...linkProps}
-      className={clsx('hover:underline', className)}
+      className={clsx(
+        'hover:underline overflow-x-hidden overflow-ellipsis',
+        className
+      )}
       to={finalUri}
     >
       {track.name}

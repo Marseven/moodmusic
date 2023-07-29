@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {Fragment} from 'react';
 import {DataTablePage} from '../../datatable/page/data-table-page';
 import {IconButton} from '../../ui/buttons/icon-button';
 import {FormattedDate} from '../../i18n/formatted-date';
@@ -23,17 +23,22 @@ const columnConfig: ColumnConfig<FileEntry>[] = [
   {
     key: 'name',
     allowsSorting: true,
+    visibleInMode: 'all',
+    width: 'flex-3 min-w-200',
     header: () => <Trans message="Name" />,
     body: entry => (
-      <div>
-        <div>{entry.name}</div>
-        <div className="text-muted text-xs">{entry.file_name}</div>
-      </div>
+      <Fragment>
+        <div className="overflow-x-hidden overflow-ellipsis">{entry.name}</div>
+        <div className="text-muted text-xs overflow-x-hidden overflow-ellipsis">
+          {entry.file_name}
+        </div>
+      </Fragment>
     ),
   },
   {
     key: 'owner_id',
     allowsSorting: true,
+    width: 'flex-3 min-w-200',
     header: () => <Trans message="Uploader" />,
     body: entry => {
       const user = entry.users?.[0] as User;
@@ -49,6 +54,7 @@ const columnConfig: ColumnConfig<FileEntry>[] = [
   },
   {
     key: 'type',
+    width: 'w-100 flex-shrink-0',
     allowsSorting: true,
     header: () => <Trans message="Type" />,
     body: entry => (
@@ -61,7 +67,7 @@ const columnConfig: ColumnConfig<FileEntry>[] = [
   {
     key: 'public',
     allowsSorting: true,
-    width: 'w-1',
+    width: 'w-60 flex-shrink-0',
     header: () => <Trans message="Public" />,
     body: entry =>
       entry.public ? (
@@ -73,23 +79,24 @@ const columnConfig: ColumnConfig<FileEntry>[] = [
   {
     key: 'file_size',
     allowsSorting: true,
-    width: 'w-1',
+    maxWidth: 'max-w-100',
     header: () => <Trans message="File size" />,
     body: entry => <FormattedBytes bytes={entry.file_size} />,
   },
   {
     key: 'updated_at',
     allowsSorting: true,
-    width: 'w-1',
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: entry => <FormattedDate date={entry.updated_at} />,
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
-    width: 'w-1',
     hideHeader: true,
     align: 'end',
+    width: 'w-42 flex-shrink-0',
+    visibleInMode: 'all',
     body: entry => {
       return (
         <DialogTrigger type="modal">

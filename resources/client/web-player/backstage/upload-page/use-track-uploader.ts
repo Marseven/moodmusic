@@ -81,9 +81,9 @@ export function useTrackUploader(options: Options) {
           {
             onSuccess: formValues => {
               updateUpload(file.id, {isExtractingMetadata: false});
-              const newValues = {
+              const newValues: ExtractedTrackMetadata = {
                 ...formValues,
-                url: entry.url,
+                src: entry.url,
               };
               optionsRef.current.onMetadataChange(file, newValues);
             },
@@ -133,7 +133,9 @@ export function useTrackUploader(options: Options) {
       for (const file of files) {
         updateUpload(file.id, {isGeneratingWave: true});
         const waveData = await generateWaveformData(file.native);
-        optionsRef.current.onMetadataChange(file, {waveData});
+        if (waveData) {
+          optionsRef.current.onMetadataChange(file, {waveData});
+        }
         updateUpload(file.id, {isGeneratingWave: false});
       }
     },

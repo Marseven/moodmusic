@@ -13,12 +13,24 @@ import {useNormalizedModel} from '@common/users/queries/use-normalized-model';
 import {ARTIST_MODEL} from '@app/web-player/artists/artist';
 import {useCurrentDateTime} from '@common/i18n/use-current-date-time';
 import {getAlbumLink} from '@app/web-player/albums/album-link';
-import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
+import {
+  FileUploadProvider,
+  useFileUploadStore,
+} from '@common/uploads/uploader/file-upload-provider';
 
 interface Props {
   wrapInContainer?: boolean;
 }
 export function CreateAlbumPage({wrapInContainer}: Props) {
+  return (
+    <FileUploadProvider>
+      <PageContent wrapInContainer={wrapInContainer} />
+    </FileUploadProvider>
+  );
+}
+
+function PageContent({wrapInContainer}: Props) {
+  const uploadIsInProgress = !!useFileUploadStore(s => s.activeUploadsCount);
   const now = useCurrentDateTime();
   const navigate = useNavigate();
   const {pathname} = useLocation();
@@ -59,13 +71,11 @@ export function CreateAlbumPage({wrapInContainer}: Props) {
         });
       }}
       title={<Trans message="Add new album" />}
-      isLoading={createAlbum.isLoading}
+      isLoading={createAlbum.isLoading || uploadIsInProgress}
       disableSaveWhenNotDirty
       wrapInContainer={wrapInContainer}
     >
-      <FileUploadProvider>
-        <AlbumForm showExternalIdFields />
-      </FileUploadProvider>
+      <AlbumForm showExternalIdFields />
     </CrupdateResourceLayout>
   );
 }

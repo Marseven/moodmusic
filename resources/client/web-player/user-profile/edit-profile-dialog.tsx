@@ -16,12 +16,16 @@ import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field'
 import {FormImageSelector} from '@common/ui/images/image-selector';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
 import {ProfileLinksForm} from '@app/admin/artist-datatable-page/artist-form/profile-links-form';
+import {Option} from '@common/ui/forms/combobox/combobox';
+import {FormComboBox} from '@common/ui/forms/combobox/form-combobox';
+import {useValueLists} from '@common/http/value-lists';
 
 interface Props {
   user: User;
 }
 export function EditProfileDialog({user}: Props) {
   const {close, formId} = useDialogContext();
+  const {data} = useValueLists(['countries']);
   const form = useForm<UpdateProfilePayload>({
     defaultValues: {
       user: {
@@ -53,13 +57,14 @@ export function EditProfileDialog({user}: Props) {
           }
         >
           <FileUploadProvider>
-            <div className="flex items-start gap-30">
+            <div className="md:flex items-start gap-30">
               <FormImageSelector
                 label={<Trans message="Avatar" />}
                 name="user.avatar"
                 diskPrefix="avatars"
                 variant="square"
                 previewSize="w-200 h-200"
+                className="max-md:mb-20"
               />
               <div className="flex-auto">
                 <FormTextField
@@ -71,25 +76,32 @@ export function EditProfileDialog({user}: Props) {
                   <FormTextField
                     name="user.first_name"
                     label={<Trans message="First name" />}
-                    className="flex-auto mb-24"
+                    className="flex-1 mb-24"
                   />
                   <FormTextField
                     name="user.last_name"
                     label={<Trans message="Last name" />}
-                    className="flex-auto mb-24"
+                    className="flex-1 mb-24"
                   />
                 </div>
                 <div className="flex items-center gap-24">
                   <FormTextField
                     name="profile.city"
                     label={<Trans message="City" />}
-                    className="flex-auto mb-24"
+                    className="flex-1 mb-24"
                   />
-                  <FormTextField
+                  <FormComboBox
+                    className="flex-1 mb-24"
+                    selectionMode="single"
                     name="profile.country"
                     label={<Trans message="Country" />}
-                    className="flex-auto mb-24"
-                  />
+                  >
+                    {data?.countries?.map(country => (
+                      <Option key={country.code} value={country.name}>
+                        {country.name}
+                      </Option>
+                    ))}
+                  </FormComboBox>
                 </div>
                 <FormTextField
                   name="profile.description"

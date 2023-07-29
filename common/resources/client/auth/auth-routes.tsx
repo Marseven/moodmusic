@@ -2,11 +2,11 @@ import {RegisterPage} from './ui/register-page';
 import {AuthRoute} from './guards/auth-route';
 import {AccountSettingsPage} from './ui/account-settings/account-settings-page';
 import {GuestRoute} from './guards/guest-route';
-import {LoginPage} from './ui/login-page';
 import {ForgotPasswordPage} from './ui/forgot-password-page';
 import {ResetPasswordPage} from './ui/reset-password-page';
 import React, {Fragment} from 'react';
 import {Route} from 'react-router-dom';
+import {LoginPageWrapper} from '@common/auth/ui/login-page-wrapper';
 
 export const AuthRoutes = (
   <Fragment>
@@ -23,7 +23,7 @@ export const AuthRoutes = (
       path="login"
       element={
         <GuestRoute>
-          <LoginPage />
+          <LoginPageWrapper />
         </GuestRoute>
       }
     />
@@ -39,7 +39,7 @@ export const AuthRoutes = (
       path="/workspace/join/login"
       element={
         <GuestRoute>
-          <LoginPage />
+          <LoginPageWrapper />
         </GuestRoute>
       }
     />

@@ -7,6 +7,7 @@ import type {TableDataItem} from './types/table-data-item';
 export type TableSelectionStyle = 'checkbox' | 'highlight';
 
 export interface TableContextValue<T extends TableDataItem = TableDataItem> {
+  isCollapsedMode: boolean;
   selectedRows: (string | number)[];
   onSelectionChange: (keys: (string | number)[]) => void;
   sortDescriptor?: SortDescriptor;
@@ -19,7 +20,11 @@ export interface TableContextValue<T extends TableDataItem = TableDataItem> {
   columns: ColumnConfig<T>[];
   toggleRow: (item: T) => void;
   selectRow: (item: T | null, merge?: boolean) => void;
+  hideBorder: boolean;
+  hideHeaderRow: boolean;
+  collapseOnMobile: boolean;
   onAction: TableProps<T>['onAction'];
   selectRowOnContextMenu: TableProps<T>['selectRowOnContextMenu'];
+  cellHeight: string | undefined;
 }
 export const TableContext = createContext<TableContextValue>(null!);

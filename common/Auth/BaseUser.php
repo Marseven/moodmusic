@@ -4,6 +4,7 @@ use App\User;
 use Common\Auth\Permissions\Permission;
 use Common\Auth\Permissions\Traits\HasPermissionsRelation;
 use Common\Auth\Roles\Role;
+use Common\Auth\Traits\Bannable;
 use Common\Auth\Traits\HasAvatarAttribute;
 use Common\Auth\Traits\HasDisplayNameAttribute;
 use Common\Billing\Billable;
@@ -21,11 +22,13 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Str;
+use Laravel\Fortify\TwoFactorAuthenticatable;
 
 abstract class BaseUser extends Authenticatable implements
     HasLocalePreference,
@@ -34,6 +37,7 @@ abstract class BaseUser extends Authenticatable implements
     use Searchable,
         Notifiable,
         Billable,
+        TwoFactorAuthenticatable,
         SetsAvailableSpaceAttribute,
         HasPermissionsRelation,
         HasAvatarAttribute,
@@ -48,6 +52,9 @@ abstract class BaseUser extends Authenticatable implements
         'remember_token',
         'pivot',
         'legacy_permissions',
+        'two_factor_secret',
+        'two_factor_recovery_codes',
+        'two_factor_confirmed_at',
     ];
     protected $casts = [
         'id' => 'integer',
@@ -56,7 +63,7 @@ abstract class BaseUser extends Authenticatable implements
         'unread_notifications_count' => 'integer',
     ];
     protected $appends = ['display_name', 'has_password', 'model_type'];
-    protected $billingEnabled = true;
+    protected bool $billingEnabled = true;
     protected $gravatarSize;
 
     public function preferredLocale()
@@ -67,10 +74,11 @@ abstract class BaseUser extends Authenticatable implements
     public function __construct(array $attributes = [])
     {
         parent::__construct($attributes);
-        $this->billingEnabled = app(Settings::class)->get('billing.enable');
+        $this->billingEnabled =
+            app(Settings::class)->get('billing.enable') || false;
     }
 
-    public function toArray(bool $showAll = false)
+    public function toArray(bool $showAll = false): array
     {
         if (
             (!$showAll && !Auth::id()) ||
@@ -102,29 +110,20 @@ abstract class BaseUser extends Authenticatable implements
         return parent::toArray();
     }
 
-    /**
-     * @return BelongsToMany
-     */
-    public function roles()
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_role');
     }
 
-    /**
-     * @return string
-     */
-    public function routeNotificationForSlack()
+    public function routeNotificationForSlack(): string
     {
         return config('services.slack.webhook_url');
     }
 
-    /**
-     * @param Builder $query
-     * @param string $notifId
-     * @return Builder
-     */
-    public function scopeWhereNeedsNotificationFor(Builder $query, $notifId)
-    {
+    public function scopeWhereNeedsNotificationFor(
+        Builder $query,
+        string $notifId,
+    ) {
         return $query->whereHas('notificationSubscriptions', function (
             Builder $builder,
         ) use ($notifId) {
@@ -166,12 +165,34 @@ abstract class BaseUser extends Authenticatable implements
             ->orderBy('file_entry_models.created_at', 'asc');
     }
 
-    /**
-     * Social profiles this users account is connected to.
-     */
+    public function followedUsers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'follower_id',
+            'followed_id',
+        )->compact();
+    }
+
+    public function followers(): BelongsToMany
+    {
+        return $this->belongsToMany(
+            User::class,
+            'follows',
+            'followed_id',
+            'follower_id',
+        )->compact();
+    }
+
     public function social_profiles(): HasMany
     {
         return $this->hasMany(SocialProfile::class);
+    }
+
+    public function bans(): MorphMany
+    {
+        return $this->morphMany(Ban::class, 'bannable');
     }
 
     /**
@@ -246,8 +267,7 @@ abstract class BaseUser extends Authenticatable implements
                     Permission $permission,
                 ) {
                     return $carry->mergeRestrictions($permission);
-                },
-                $group[0]);
+                }, $group[0]);
             });
 
         $this->setRelation('permissions', $permissions->values());
@@ -268,14 +288,6 @@ abstract class BaseUser extends Authenticatable implements
         } else {
             return Product::where('free', true)->first();
         }
-    }
-
-    public function getRestrictionValue(
-        string $permissionName,
-        string $restriction,
-    ): int|bool|null {
-        $permission = $this->getPermission($permissionName);
-        return $permission?->getRestrictionValue($restriction);
     }
 
     public function scopeCompact(Builder $query): Builder
@@ -316,6 +328,17 @@ abstract class BaseUser extends Authenticatable implements
         $newToken = $this->createToken($tokenName);
         $this->withAccessToken($newToken->accessToken);
         return $newToken->plainTextToken;
+    }
+
+    public function isBanned(): bool
+    {
+        if (!$this->getAttributeValue('banned_at')) {
+            return false;
+        }
+
+        $bannedUntil = $this->bans->first()->expired_at;
+
+        return !$bannedUntil || $bannedUntil->isFuture();
     }
 
     public function resolveRouteBinding($value, $field = null): ?self

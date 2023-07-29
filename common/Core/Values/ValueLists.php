@@ -227,7 +227,7 @@ class ValueLists
             ->select(['name', 'id'])
             ->get();
     }
-    
+
     private function loadAppValueFile(string $name, array $params): ?array
     {
         $fileName = Str::kebab($name);

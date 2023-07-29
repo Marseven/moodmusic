@@ -17,14 +17,17 @@ import {
 } from '../../core/settings/site-config-context';
 import {useSettings} from '../../core/settings/use-settings';
 
-export function LoginPage() {
+interface Props {
+  onTwoFactorChallenge: () => void;
+}
+export function LoginPage({onTwoFactorChallenge}: Props) {
   const [searchParams] = useSearchParams();
   const {pathname} = useLocation();
 
   const isWorkspaceLogin = pathname.includes('workspace');
   const searchParamsEmail = searchParams.get('email') || undefined;
 
-  const {branding, registration, site} = useSettings();
+  const {branding, registration, site, social} = useSettings();
   const siteConfig = useContext(SiteConfigContext);
 
   const demoDefaults =
@@ -66,7 +69,13 @@ export function LoginPage() {
       <Form
         form={form}
         onSubmit={payload => {
-          login.mutate(payload);
+          login.mutate(payload, {
+            onSuccess: response => {
+              if (response.two_factor) {
+                onTwoFactorChallenge();
+              }
+            },
+          });
         }}
       >
         <FormTextField
@@ -105,7 +114,15 @@ export function LoginPage() {
           <Trans message="Continue" />
         </Button>
       </Form>
-      <SocialAuthSection dividerMessage={<Trans message="Or sign in with" />} />
+      <SocialAuthSection
+        dividerMessage={
+          social.compact_buttons ? (
+            <Trans message="Or sign in with" />
+          ) : (
+            <Trans message="OR" />
+          )
+        }
+      />
     </AuthLayout>
   );
 }

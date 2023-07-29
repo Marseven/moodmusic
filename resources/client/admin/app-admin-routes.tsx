@@ -130,7 +130,7 @@ export const AppAdminRoutes: RouteObject[] = [
     path: 'lyrics',
     element: <LyricsDatatablePage />,
   },
-  // Lyrics
+  // Comments
   {
     path: 'comments',
     element: <CommentsDatatablePage />,

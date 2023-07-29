@@ -27,7 +27,7 @@ export interface ButtonBaseProps
   relative?: RelativeRoutingType;
   href?: string;
   target?: '_blank';
-  rel?: 'noreferrer';
+  rel?: string;
   replace?: boolean;
   end?: boolean;
   elementType?: 'button' | 'a' | JSXElementConstructor<any>;

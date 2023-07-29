@@ -14,8 +14,6 @@ tags:
   - name: Tags
   - name: Genres
   - name: Users
-  - name: Uploads
-    description: Upload files to SITE_NAME
   - name: Auth
     description: Authenticate requests to the API
   - name: Files and Folders
@@ -478,7 +476,7 @@ Search results include hits from all the specified types.'
           description: 'Comma separated list of additional data to fetch for this artist. Supported values: similar, genres, albums, topTracks.'
           schema:
             type: string
-            example: albums, genres
+            example: albums,genres
             default: null
       responses:
         '200':
@@ -696,7 +694,7 @@ Search results include hits from all the specified types.'
           description: 'Comma separated list of additional data to fetch for this album. Supported values: tags, genres, artists, tracks.'
           schema:
             type: string
-            example: artists, genres, tags
+            example: artists,genres,tags
             default: null
       responses:
         '200':
@@ -745,7 +743,7 @@ Search results include hits from all the specified types.'
           description: 'Comma separated list of additional data to fetch for this track. Supported values: tags, genres, artists, album.'
           schema:
             type: string
-            example: album, genres, tags
+            example: album,genres,tags
             default: null
       responses:
         '200':

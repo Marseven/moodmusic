@@ -79,7 +79,7 @@ function Logo() {
       aria-label={trans({message: 'Go to homepage'})}
     >
       <img
-        className="block w-auto h-56 max-w-[188px]"
+        className="block w-auto h-56 max-w-[188px] object-contain"
         src={logoUrl}
         alt={trans({message: 'Site logo'})}
       />

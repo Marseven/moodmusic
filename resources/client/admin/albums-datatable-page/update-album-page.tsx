@@ -10,7 +10,12 @@ import {
 } from '@app/admin/albums-datatable-page/requests/use-update-album';
 import {AlbumForm} from '@app/admin/albums-datatable-page/album-form/album-form';
 import {PageStatus} from '@common/http/page-status';
-import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
+import {
+  FileUploadProvider,
+  useFileUploadStore,
+} from '@common/uploads/uploader/file-upload-provider';
+import {Navigate} from 'react-router-dom';
+import {useAlbumPermissions} from '@app/web-player/albums/use-album-permissions';
 
 interface Props {
   wrapInContainer?: boolean;
@@ -23,7 +28,12 @@ export function UpdateAlbumPage({wrapInContainer}: Props) {
 
   if (query.data) {
     return (
-      <PageContent album={query.data.album} wrapInContainer={wrapInContainer} />
+      <FileUploadProvider>
+        <PageContent
+          album={query.data.album}
+          wrapInContainer={wrapInContainer}
+        />
+      </FileUploadProvider>
     );
   }
 
@@ -35,12 +45,26 @@ interface PageContentProps {
   wrapInContainer?: boolean;
 }
 function PageContent({album, wrapInContainer}: PageContentProps) {
+  const {canEdit} = useAlbumPermissions(album);
+  const uploadIsInProgress = !!useFileUploadStore(s => s.activeUploadsCount);
   const form = useForm<UpdateAlbumPayload>({
     defaultValues: {
-      ...album,
+      image: album.image,
+      name: album.name,
+      release_date: album.release_date,
+      artists: album.artists,
+      genres: album.genres,
+      tags: album.tags,
+      description: album.description,
+      spotify_id: album.spotify_id,
+      tracks: album.tracks,
     },
   });
-  const updateAlbum = useUpdateAlbum(form);
+  const updateAlbum = useUpdateAlbum(form, album.id);
+
+  if (!canEdit) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <CrupdateResourceLayout
@@ -49,13 +73,11 @@ function PageContent({album, wrapInContainer}: PageContentProps) {
         updateAlbum.mutate(values);
       }}
       title={<Trans message="Edit “:name“ album" values={{name: album.name}} />}
-      isLoading={updateAlbum.isLoading}
+      isLoading={updateAlbum.isLoading || uploadIsInProgress}
       disableSaveWhenNotDirty
       wrapInContainer={wrapInContainer}
     >
-      <FileUploadProvider>
-        <AlbumForm showExternalIdFields />
-      </FileUploadProvider>
+      <AlbumForm showExternalIdFields />
     </CrupdateResourceLayout>
   );
 }

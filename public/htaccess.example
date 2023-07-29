@@ -1,4 +1,4 @@
-<FilesMatch "(?i)\.(php|php3?|phtml)$">
+<FilesMatch "(?i)\.(php[0-9]?|phtml)$">
     Require all denied
 </FilesMatch>
 <FilesMatch "index.php">

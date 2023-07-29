@@ -22,6 +22,8 @@ const columnConfig: ColumnConfig<Localization>[] = [
     key: 'name',
     allowsSorting: true,
     sortingKey: 'name',
+    visibleInMode: 'all',
+    width: 'flex-3 min-w-200',
     header: () => <Trans message="Name" />,
     body: locale => locale.name,
   },
@@ -31,21 +33,21 @@ const columnConfig: ColumnConfig<Localization>[] = [
     sortingKey: 'language',
     header: () => <Trans message="Language code" />,
     body: locale => locale.language,
-    width: 'w-1',
   },
   {
     key: 'updatedAt',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: locale => <FormattedDate date={locale.updated_at} />,
-    width: 'w-1',
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
-    width: 'w-1',
+    width: 'w-84 flex-shrink-0',
+    visibleInMode: 'all',
     body: locale => {
       return (
         <div className="text-muted">

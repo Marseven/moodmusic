@@ -45,7 +45,7 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         '::/128',
     ];
 
-    private HttpClientInterface $client;
+    private $client;
     private string|array|null $subnets;
 
     /**
@@ -62,6 +62,9 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         $this->subnets = $subnets;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $onProgress = $options['on_progress'] ?? null;
@@ -87,11 +90,17 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         return $this->client->request($method, $url, $options);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         return $this->client->stream($responses, $timeout);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setLogger(LoggerInterface $logger): void
     {
         if ($this->client instanceof LoggerAwareInterface) {
@@ -99,6 +108,9 @@ final class NoPrivateNetworkHttpClient implements HttpClientInterface, LoggerAwa
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function withOptions(array $options): static
     {
         $clone = clone $this;

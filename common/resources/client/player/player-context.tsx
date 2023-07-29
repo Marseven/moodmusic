@@ -1,10 +1,9 @@
 import {createContext, ReactNode, useState} from 'react';
-import {StoreApi} from 'zustand';
-import {createPlayerStore} from '@common/player/player-store';
-import {PlayerStoreOptions} from '@common/player/player-store-options';
-import {PlayerState} from '@common/player/player-state';
+import {createPlayerStore} from '@common/player/state/player-store';
+import {PlayerStoreOptions} from '@common/player/state/player-store-options';
+import type {PlayerStoreApi} from '@common/player/state/player-state';
 
-export const PlayerStoreContext = createContext<StoreApi<PlayerState>>(null!);
+export const PlayerStoreContext = createContext<PlayerStoreApi>(null!);
 
 interface PlayerContextProps {
   children: ReactNode;
@@ -18,7 +17,7 @@ export function PlayerContext({children, id, options}: PlayerContextProps) {
   });
 
   return (
-    <PlayerStoreContext.Provider value={store as StoreApi<PlayerState>}>
+    <PlayerStoreContext.Provider value={store}>
       {children}
     </PlayerStoreContext.Provider>
   );

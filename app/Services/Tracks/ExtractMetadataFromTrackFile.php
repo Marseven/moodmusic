@@ -110,7 +110,6 @@ class ExtractMetadataFromTrackFile
                         'release_date' => Carbon::now(),
                         'image' => $normalizedMetadata['image']['url'] ?? null,
                         'fully_scraped' => true,
-                        'auto_update' => false,
                         'owner_id' => Auth::id(),
                     ]);
                 }
@@ -121,7 +120,7 @@ class ExtractMetadataFromTrackFile
         if (isset($normalizedMetadata['date'])) {
             $normalizedMetadata['release_date'] = Carbon::parse(
                 $normalizedMetadata['date'],
-            )->toDateString();
+            )->toISOString();
             unset($normalizedMetadata['date']);
         }
 

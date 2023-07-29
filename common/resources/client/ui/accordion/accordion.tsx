@@ -21,10 +21,18 @@ type Props = {
   defaultExpandedValues?: Key[];
   onExpandedChange?: (key: Key[]) => void;
   className?: string;
+  isLazy?: boolean;
 };
 export const Accordion = React.forwardRef<HTMLDivElement, Props>(
   (
-    {variant = 'default', mode = 'single', children, className, ...other},
+    {
+      variant = 'default',
+      mode = 'single',
+      children,
+      className,
+      isLazy,
+      ...other
+    },
     ref
   ) => {
     const [expandedValues, setExpandedValues] = useControlledState(
@@ -50,6 +58,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, Props>(
                 variant,
                 expandedValues,
                 setExpandedValues,
+                isLazy,
               });
             })}
           </FocusScope>
@@ -66,6 +75,7 @@ interface AccordionItemProps {
   description?: ReactNode;
   value?: Key;
   bodyClassName?: string;
+  labelClassName?: string;
   chevronPosition?: 'left' | 'right';
   startIcon?: ReactElement;
   endAppend?: ReactElement;
@@ -77,12 +87,14 @@ interface ClonedItemProps extends AccordionItemProps {
   setExpandedValues: (keys: Key[]) => void;
   mode: 'single' | 'multiple';
   value: Key;
+  isLazy?: boolean;
 }
 export function AccordionItem({
   children,
   label,
   disabled,
   bodyClassName,
+  labelClassName,
   startIcon,
   description,
   endAppend,
@@ -90,10 +102,14 @@ export function AccordionItem({
   dataTestId,
   ...other
 }: AccordionItemProps) {
-  const {expandedValues, setExpandedValues, variant, value, mode} =
+  const {expandedValues, setExpandedValues, variant, value, mode, isLazy} =
     other as ClonedItemProps;
   const ref = useRef<HTMLButtonElement>(null);
   const isExpanded = !disabled && expandedValues.includes(value);
+  const wasExpandedOnce = useRef(false);
+  if (isExpanded) {
+    wasExpandedOnce.current = true;
+  }
   const focusManager = useFocusManager();
   const id = useId();
   const buttonId = `${id}-button`;
@@ -171,7 +187,9 @@ export function AccordionItem({
         className={clsx(
           'flex items-center text-sm justify-between w-full',
           disabled && 'pointer-events-none',
-          isExpanded && variant !== 'minimal' && 'border-b',
+          isExpanded && variant !== 'minimal'
+            ? 'border-b'
+            : 'border-b border-b-transparent',
           variant === 'outline'
             ? isExpanded
               ? 'rounded-t'
@@ -193,7 +211,7 @@ export function AccordionItem({
               toggle();
             }
           }}
-          className="flex items-center text-left gap-10 flex-auto pl-14 pr-10 py-10 hover:bg-hover outline-none focus-visible:bg-primary/focus"
+          className="flex items-center text-left gap-10 flex-auto py-10 outline-none pl-14 pr-10 hover:bg-hover focus-visible:bg-primary/focus"
         >
           {chevronPosition === 'left' && chevron}
           {startIcon &&
@@ -205,7 +223,9 @@ export function AccordionItem({
               ),
             })}
           <div className="flex-auto overflow-hidden overflow-ellipsis">
-            <div data-testid="accordion-label">{label}</div>
+            <div className={labelClassName} data-testid="accordion-label">
+              {label}
+            </div>
             {description && (
               <div className="text-muted text-xs">{description}</div>
             )}
@@ -226,7 +246,9 @@ export function AccordionItem({
         initial={false}
         animate={isExpanded ? 'open' : 'closed'}
       >
-        <div className={clsx('p-16', bodyClassName)}>{children}</div>
+        <div className={clsx('p-16', bodyClassName)}>
+          {!isLazy || wasExpandedOnce ? children : null}
+        </div>
       </m.div>
     </div>
   );

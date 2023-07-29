@@ -107,9 +107,12 @@ class ImportRecordsIntoScout
             $model = new $model();
             $indexName = $model->searchableAs();
             $algolia->initIndex($indexName)->setSettings([
-                'attributesForFaceting' => array_map(function ($field) {
-                    return "filterOnly($field)";
-                }, $filterableFields),
+                'attributesForFaceting' => array_values(
+                    array_map(
+                        fn($field) => "filterOnly($field)",
+                        $filterableFields,
+                    ),
+                ),
             ]);
         }
     }

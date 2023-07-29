@@ -23,11 +23,12 @@ const columnConfig: ColumnConfig<
   {
     key: 'name',
     allowsSorting: true,
+    visibleInMode: 'all',
+    width: 'flex-3 min-w-200',
     header: () => <Trans message="Genre" />,
     body: genre => (
       <NameWithAvatar image={genre.image} label={<GenreLink genre={genre} />} />
     ),
-    width: 'col-w-2',
   },
   {
     key: 'display_name',
@@ -40,11 +41,11 @@ const columnConfig: ColumnConfig<
     allowsSorting: true,
     header: () => <Trans message="Number of artists" />,
     body: genre => genre.artists_count,
-    width: 'col-w-2',
   },
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: genre => <FormattedDate date={genre.updated_at} />,
   },
@@ -53,6 +54,8 @@ const columnConfig: ColumnConfig<
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    visibleInMode: 'all',
+    width: 'w-42 flex-shrink-0',
     body: genre => {
       return (
         <DialogTrigger type="modal">

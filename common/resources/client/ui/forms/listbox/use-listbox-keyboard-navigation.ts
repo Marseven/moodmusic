@@ -1,11 +1,13 @@
-import React from 'react';
+import React, {KeyboardEvent} from 'react';
 import {UseListboxReturn} from './types';
 
 export function useListboxKeyboardNavigation({
-  state: {isOpen, setIsOpen, selectedIndex, activeIndex},
+  state: {isOpen, setIsOpen, selectedIndex, activeIndex, setInputValue},
   loopFocus,
   collection,
   focusItem,
+  handleItemSelection,
+  allowCustomValue,
 }: UseListboxReturn) {
   const handleTriggerKeyDown = (e: React.KeyboardEvent): true | void => {
     // ignore if dropdown is open or if event bubbled up from portal
@@ -80,5 +82,39 @@ export function useListboxKeyboardNavigation({
     }
   };
 
-  return {handleTriggerKeyDown, handleListboxKeyboardNavigation};
+  const handleListboxSearchFieldKeydown = (
+    e: KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === 'Enter' && activeIndex != null && collection.size) {
+      // prevent form submit when selecting item in combobox via "enter"
+      e.preventDefault();
+      const [value, obj] = [...collection.entries()][activeIndex];
+      if (value) {
+        handleItemSelection(value);
+        // "onSelected" will not be called for dropdown items, because keydown
+        // event will never be triggered for them in "virtualFocus" mode
+        obj.element.props.onSelected?.();
+      }
+      return;
+    }
+
+    // on escape, clear input and close dropdown
+    if (e.key === 'Escape' && isOpen) {
+      setIsOpen(false);
+      if (!allowCustomValue) {
+        setInputValue('');
+      }
+    }
+
+    const handled = handleTriggerKeyDown(e);
+    if (!handled) {
+      handleListboxKeyboardNavigation(e);
+    }
+  };
+
+  return {
+    handleTriggerKeyDown,
+    handleListboxKeyboardNavigation,
+    handleListboxSearchFieldKeydown,
+  };
 }

@@ -29,11 +29,10 @@ const Columns: ColumnConfig<Album>[] = [
     key: 'name',
     allowsSorting: true,
     header: () => <Trans message="Name" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
-    padding: 'pl-8 pr-16',
+    visibleInMode: 'all',
+    width: 'flex-3',
     body: album => (
-      <div className="flex items-center gap-12 w-max">
+      <div className="flex items-center gap-12">
         <AlbumImage
           album={album}
           className="flex-shrink-0"
@@ -69,9 +68,10 @@ const Columns: ColumnConfig<Album>[] = [
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
+    width: 'w-84 flex-shrink-0',
+    visibleInMode: 'all',
     hideHeader: true,
     align: 'end',
-    padding: 'pl-16',
     body: album => <RowActions album={album} />,
   },
 ];

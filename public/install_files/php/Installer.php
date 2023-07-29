@@ -212,20 +212,6 @@ class Installer
 
     protected function onValidateAndInsertDatabaseCredentials()
     {
-        if (!strlen($this->post('db_host'))) {
-            throw new InstallerException(
-                'Please specify a database host.',
-                'db_host',
-            );
-        }
-
-        if (!strlen($this->post('db_database'))) {
-            throw new InstallerException(
-                'Please specify the database name.',
-                'db_database',
-            );
-        }
-
         $config = [
             'db_host' => null,
             'db_database' => null,
@@ -237,45 +223,6 @@ class Installer
         array_walk($config, function (&$value, $key) {
             $value = $value ?: $this->post($key);
         });
-
-        $dsn =
-            'mysql:host=' .
-            $config['db_host'] .
-            ';dbname=' .
-            $config['db_database'];
-        if ($config['port']) {
-            $dsn .= ';port=' . $config['port'];
-        }
-
-        try {
-            $db = new PDO(
-                $dsn,
-                $config['db_username'],
-                $config['db_password'],
-                [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION],
-            );
-        } catch (PDOException $ex) {
-            throw new Exception('Connection failed: ' . $ex->getMessage());
-        }
-
-        /*
-         * Check the database is empty
-         */
-        $fetch = $db->query('show tables', PDO::FETCH_NUM);
-
-        $tables = 0;
-        while ($result = $fetch->fetch()) {
-            $tables++;
-        }
-
-        if ($tables > 0) {
-            throw new Exception(
-                sprintf(
-                    'Database "%s" is not empty. Please empty the database or specify another database.',
-                    $this->e($config['db_database']),
-                ),
-            );
-        }
 
         $this->insertDBCredentials($config);
     }
@@ -557,7 +504,7 @@ class Installer
 
         try {
             file_put_contents($this->logFile, $message, FILE_APPEND);
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             //
         }
     }

@@ -1,13 +1,14 @@
 import {useFormContext} from 'react-hook-form';
-import {SettingsPanel} from '../settings-panel';
-import {FormSwitch} from '../../../ui/forms/toggle/switch';
-import {AdminSettings} from '../admin-settings';
-import {FormTextField} from '../../../ui/forms/input-field/text-field/text-field';
-import {SettingsErrorGroup} from '../settings-error-group';
-import {Trans} from '../../../i18n/trans';
+import {SettingsPanel} from '@common/admin/settings/settings-panel';
+import {FormSwitch} from '@common/ui/forms/toggle/switch';
+import {AdminSettings} from '@common/admin/settings/admin-settings';
+import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
+import {SettingsErrorGroup} from '@common/admin/settings/settings-error-group';
+import {Trans} from '@common/i18n/trans';
 import {Fragment} from 'react';
 import {Link} from 'react-router-dom';
-import {useSettings} from '../../../core/settings/use-settings';
+import {useSettings} from '@common/core/settings/use-settings';
+import {SettingsSeparator} from '@common/admin/settings/settings-separator';
 
 export function AuthenticationSettings() {
   return (
@@ -19,7 +20,7 @@ export function AuthenticationSettings() {
     >
       <EmailConfirmationSection />
       <FormSwitch
-        className="mb-30"
+        className="mb-24"
         name="client.registration.disable"
         description={
           <Trans message="All registration related functionality (including social login) will be disabled." />
@@ -28,6 +29,7 @@ export function AuthenticationSettings() {
         <Trans message="Disable registration" />
       </FormSwitch>
       <FormSwitch
+        className="mb-24"
         name="client.single_device_login"
         description={
           <Trans message="Only allow one device to be logged into user account at the same time." />
@@ -35,10 +37,29 @@ export function AuthenticationSettings() {
       >
         <Trans message="Single device login" />
       </FormSwitch>
+      <FormSwitch
+        name="client.social.compact_buttons"
+        description={
+          <Trans message="Use compact design for social login buttons." />
+        }
+      >
+        <Trans message="Compact buttons" />
+      </FormSwitch>
       <EnvatoSection />
       <GoogleSection />
       <FacebookSection />
       <TwitterSection />
+      <SettingsSeparator />
+      <FormTextField
+        inputElementType="textarea"
+        rows={3}
+        className="mt-24"
+        name="client.auth.domain_blacklist"
+        label={<Trans message="Domain blacklist" />}
+        description={
+          <Trans message="Comma separated list of domains. Users will not be able to register or login using any email adress from specified domains." />
+        }
+      />
     </SettingsPanel>
   );
 }

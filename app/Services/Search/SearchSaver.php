@@ -161,7 +161,6 @@ class SearchSaver {
                 'spotify_popularity' => Arr::get($artist, 'spotify_popularity') ?: null,
                 'spotify_followers' => Arr::get($artist, 'spotify_followers') ?: null,
                 'image_small' => Arr::get($artist, 'image_small') ?: null,
-                'image_large' => Arr::get($artist, 'image_large') ?: null,
             ];
         });
 

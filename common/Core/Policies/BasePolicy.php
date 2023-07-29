@@ -3,7 +3,6 @@
 namespace Common\Core\Policies;
 
 use App\User;
-use Common\Auth\Roles\Role;
 use Common\Core\Exceptions\AccessResponseWithAction;
 use Common\Settings\Settings;
 use Illuminate\Auth\Access\HandlesAuthorization;
@@ -43,10 +42,8 @@ abstract class BasePolicy
         ] = $this->parseNamespace($namespace);
 
         // user can't create resource at all
-        $response = $this->hasPermission($user, $permission);
-
-        if ($response->denied()) {
-            return $response;
+        if (!$this->hasPermission($user, $permission)) {
+            return Response::deny();
         }
 
         // user is admin, can ignore count restriction
@@ -72,18 +69,10 @@ abstract class BasePolicy
         return Response::allow();
     }
 
-    protected function hasPermission(?User $user, string $permission): Response
+    protected function hasPermission(?User $user, string $permission): bool
     {
-        if ($user?->hasPermission($permission)) {
-            return Response::allow();
-        } elseif (
-            Role::where('guests', true)
-                ->first()
-                ?->hasPermission($permission)
-        ) {
-            return Response::allow();
-        }
-        return Response::deny();
+        $model = $user ?: app('guestRole');
+        return $model?->hasPermission($permission) ?? false;
     }
 
     protected function parseNamespace(

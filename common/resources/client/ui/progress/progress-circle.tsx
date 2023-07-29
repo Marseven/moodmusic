@@ -1,6 +1,5 @@
 import React, {ComponentPropsWithoutRef, CSSProperties} from 'react';
 import clsx from 'clsx';
-import {InputSize} from '../forms/input-field/input-size';
 import {clamp} from '../../utils/number/clamp';
 import {useNumberFormatter} from '../../i18n/use-number-formatter';
 
@@ -8,9 +7,12 @@ export interface ProgressCircleProps extends ComponentPropsWithoutRef<'div'> {
   value?: number;
   minValue?: number;
   maxValue?: number;
-  size?: 'sm' | 'md' | 'lg';
+  size?: 'sm' | 'md' | 'lg' | string;
   isIndeterminate?: boolean;
   className?: string;
+  position?: string;
+  trackColor?: string;
+  fillColor?: string;
 }
 export const ProgressCircle = React.forwardRef<
   HTMLDivElement,
@@ -23,11 +25,14 @@ export const ProgressCircle = React.forwardRef<
     size = 'md',
     isIndeterminate = false,
     className,
+    position = 'relative',
+    trackColor,
+    fillColor = 'border-primary',
     ...domProps
   } = props;
 
   value = clamp(value, minValue, maxValue);
-  const circleStyle = getCircleStyle(size);
+  const circleSize = getCircleStyle(size);
 
   const percentage = (value - minValue) / (maxValue - minValue);
   const formatter = useNumberFormatter({style: 'percent'});
@@ -63,15 +68,14 @@ export const ProgressCircle = React.forwardRef<
       role="progressbar"
       ref={ref}
       className={clsx(
-        'relative progress-circle',
-        circleStyle.size,
+        'progress-circle',
+        position,
+        circleSize,
         isIndeterminate && 'indeterminate',
         className
       )}
     >
-      <div
-        className={`track ${circleStyle.size} border-4 ${circleStyle.radius}`}
-      />
+      <div className={clsx(circleSize, trackColor, 'border-4 rounded-full')} />
       <div
         className={clsx(
           'fills absolute w-full h-full top-0 left-0',
@@ -79,18 +83,20 @@ export const ProgressCircle = React.forwardRef<
         )}
       >
         <FillMask
-          sizeStyle={circleStyle}
+          circleSize={circleSize}
           subMaskStyle={subMask1Style}
+          isIndeterminate={isIndeterminate}
+          className="rotate-180"
+          fillColor={fillColor}
           subMaskClassName={clsx(
             isIndeterminate && 'progress-circle-fill-submask-1-animate'
           )}
-          isIndeterminate={isIndeterminate}
-          className="rotate-180"
         />
         <FillMask
-          sizeStyle={circleStyle}
+          circleSize={circleSize}
           subMaskStyle={subMask2Style}
           isIndeterminate={isIndeterminate}
+          fillColor={fillColor}
           subMaskClassName={clsx(
             isIndeterminate && 'progress-circle-fill-submask-2-animate'
           )}
@@ -102,17 +108,19 @@ export const ProgressCircle = React.forwardRef<
 
 interface FillMaskProps {
   className?: string;
-  sizeStyle: SizeStyle;
+  circleSize?: string;
   subMaskStyle: CSSProperties;
   subMaskClassName: string;
   isIndeterminate?: boolean;
+  fillColor?: string;
 }
 function FillMask({
   subMaskStyle,
   subMaskClassName,
   className,
-  sizeStyle,
+  circleSize,
   isIndeterminate,
+  fillColor,
 }: FillMaskProps) {
   return (
     <div
@@ -129,25 +137,21 @@ function FillMask({
         )}
         style={subMaskStyle}
       >
-        <div
-          className={`${sizeStyle.size} border-4 border-primary ${sizeStyle.radius}`}
-        />
+        <div className={clsx(circleSize, fillColor, 'rounded-full border-4')} />
       </div>
     </div>
   );
 }
 
-interface SizeStyle {
-  size: string;
-  radius: string;
-}
-function getCircleStyle(size: InputSize): SizeStyle {
+function getCircleStyle(size: ProgressCircleProps['size']) {
   switch (size) {
     case 'sm':
-      return {size: 'w-24 h-24', radius: 'rounded-[16px]'};
+      return 'w-24 h-24';
+    case 'md':
+      return 'w-32 h-32';
     case 'lg':
-      return {size: 'w-42 h-42', radius: 'rounded-[64px]'};
+      return 'w-42 h-42';
     default:
-      return {size: 'w-32 h-32', radius: 'rounded-[32px]'};
+      return size;
   }
 }

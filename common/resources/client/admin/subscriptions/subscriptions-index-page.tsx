@@ -32,6 +32,8 @@ const columnConfig: ColumnConfig<Subscription>[] = [
   {
     key: 'usr_id',
     allowsSorting: true,
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     header: () => <Trans message="Customer" />,
     body: subscriptions => (
       <NameWithAvatar
@@ -43,8 +45,8 @@ const columnConfig: ColumnConfig<Subscription>[] = [
   },
   {
     key: 'status',
+    width: 'w-100 flex-shrink-0',
     header: () => <Trans message="Status" />,
-    width: 'w-1',
     body: subscription => {
       if (subscription.valid) {
         return (
@@ -65,7 +67,6 @@ const columnConfig: ColumnConfig<Subscription>[] = [
     allowsSorting: true,
     header: () => <Trans message="Plan" />,
     body: subscription => subscription.product?.name,
-    width: 'w-1',
   },
   {
     key: 'gateway',
@@ -80,31 +81,29 @@ const columnConfig: ColumnConfig<Subscription>[] = [
     allowsSorting: true,
     header: () => <Trans message="Renews at" />,
     body: subscription => <FormattedDate date={subscription.renews_at} />,
-    width: 'w-1',
   },
   {
     key: 'ends_at',
     allowsSorting: true,
     header: () => <Trans message="Ends at" />,
     body: subscription => <FormattedDate date={subscription.ends_at} />,
-    width: 'w-1',
   },
   {
     key: 'created_at',
     allowsSorting: true,
     header: () => <Trans message="Created at" />,
     body: subscription => <FormattedDate date={subscription.created_at} />,
-    width: 'w-1',
   },
   {
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    visibleInMode: 'all',
+    width: 'w-128 flex-shrink-0',
     body: subscription => {
       return <SubscriptionActions subscription={subscription} />;
     },
-    width: 'w-1',
   },
 ];
 

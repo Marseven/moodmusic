@@ -1,9 +1,9 @@
 <?php namespace App\Services\Providers\Spotify;
 
 use App;
-use Log;
 use App\Services\HttpClient;
 use GuzzleHttp\Exception\ClientException;
+use Log;
 
 class SpotifyHttpClient extends HttpClient {
 
@@ -21,9 +21,6 @@ class SpotifyHttpClient extends HttpClient {
      */
 	static $baseUrl = 'https://api.spotify.com/v1';
 
-    /**
-     * @param array $params
-     */
 	public function __construct($params = [])
     {
 		parent::__construct(array_merge(['exceptions' => true]));

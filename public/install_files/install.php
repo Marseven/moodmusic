@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <base href="install_files/">
-    
+
     <!-- Meta -->
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, minimal-ui">
@@ -151,6 +151,11 @@
                             <div class="input-container">
                                 <label for="db_password">Database Password</label>
                                 <input id="db_password" type="text" v-model="databaseForm.db_password">
+                            </div>
+
+                            <div class="input-container">
+                                <label for="prefix">Database Port</label>
+                                <input id="prefix" type="text" v-model="databaseForm.db_port" placeholder="Optional">
                             </div>
 
                             <div class="input-container">

@@ -17,7 +17,7 @@ export function EmailVerificationPage() {
   const logoSrc = isDarkMode ? logo_light : logo_dark;
 
   return (
-    <div className="flex flex-col items-center p-24 bg-alt w-full h-full">
+    <div className="flex flex-col items-center p-24 bg-alt w-full min-h-full">
       {logoSrc && (
         <img
           src={logoSrc}

@@ -3,6 +3,7 @@ import clsx from 'clsx';
 import {UseSliderReturn} from './use-slider';
 import {useGlobalListeners, useObjectRef} from '@react-aria/utils';
 import {createEventHandler} from '@common/utils/dom/create-event-handler';
+import {BaseSliderProps} from '@common/ui/forms/slider/base-slider';
 
 interface SliderThumb {
   index: number;
@@ -11,7 +12,9 @@ interface SliderThumb {
   ariaLabel?: string;
   inputRef?: Ref<HTMLInputElement>;
   onBlur?: React.FocusEventHandler;
+  fillColor?: BaseSliderProps['fillColor'];
 }
+
 export function SliderThumb({
   index,
   slider,
@@ -19,6 +22,7 @@ export function SliderThumb({
   ariaLabel,
   inputRef,
   onBlur,
+  fillColor = 'primary',
 }: SliderThumb) {
   const inputObjRef = useObjectRef(inputRef);
   const {addGlobalListener, removeGlobalListener} = useGlobalListeners();
@@ -43,6 +47,8 @@ export function SliderThumb({
     showThumbOnHoverOnly,
     thumbSize = 'w-18 h-18',
   } = slider;
+
+  const isDragging = isThumbDragging(index);
   const value = values[index];
 
   // Immediately register editability with the state
@@ -77,8 +83,11 @@ export function SliderThumb({
     'outline-none rounded-full top-1/2 -translate-y-1/2 -translate-x-1/2 absolute inset-0 transition-button duration-200',
     thumbSize,
     !isDisabled && 'shadow-md',
-    thumbColor({isDisabled, isDragging: isThumbDragging(index)}),
-    showThumbOnHoverOnly && !isPointerOver ? 'invisible' : 'visible'
+    thumbColor({fillColor, isDisabled, isDragging: isDragging}),
+    // show thumb on hover and while dragging, otherwise "blur" event will fire on thumb and dragging will stop
+    (showThumbOnHoverOnly && isDragging) || isPointerOver
+      ? 'visible'
+      : 'invisible'
   );
 
   return (
@@ -140,11 +149,22 @@ export function SliderThumb({
 interface SliderThumbColorProps {
   isDisabled?: boolean;
   isDragging: boolean;
+  fillColor?: BaseSliderProps['fillColor'];
 }
-function thumbColor({isDisabled, isDragging}: SliderThumbColorProps): string {
+
+function thumbColor({
+  isDisabled,
+  isDragging,
+  fillColor,
+}: SliderThumbColorProps): string {
   if (isDisabled) {
     return 'bg-slider-disabled cursor-default';
   }
+
+  if (fillColor && fillColor !== 'primary') {
+    return fillColor;
+  }
+
   return clsx(
     'hover:bg-primary-dark',
     isDragging ? 'bg-primary-dark' : 'bg-primary'

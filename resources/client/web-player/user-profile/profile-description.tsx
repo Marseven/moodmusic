@@ -26,7 +26,7 @@ export function ProfileDescription({profile, links, shortDescription}: Props) {
           {(profile.city || profile.country) && (
             <div className="p-10 rounded bg-alt/80 dark:bg text-secondary w-max">
               {profile.city}
-              {profile.country && ','} {profile.country}
+              {profile.city && ','} {profile.country}
             </div>
           )}
           <ProfileLinks links={links} />

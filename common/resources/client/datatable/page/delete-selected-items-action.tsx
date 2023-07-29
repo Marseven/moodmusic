@@ -5,42 +5,40 @@ import {DialogTrigger} from '../../ui/overlays/dialog/dialog-trigger';
 import React from 'react';
 import {useDeleteSelectedRows} from '../requests/delete-selected-rows';
 import {useDataTable} from './data-table-context';
+import {useDialogContext} from '@common/ui/overlays/dialog/dialog-context';
 
 export function DeleteSelectedItemsAction() {
-  const deleteSelectedRows = useDeleteSelectedRows();
-  const {selectedRows} = useDataTable();
-
   return (
-    <DialogTrigger
-      type="modal"
-      onClose={isConfirmed => {
-        if (isConfirmed) {
-          deleteSelectedRows.mutate();
-        }
-      }}
-    >
-      <Button
-        variant="flat"
-        color="danger"
-        className="ml-auto"
-        disabled={deleteSelectedRows.isLoading}
-        data-testid="delete-rows-button"
-      >
+    <DialogTrigger type="modal">
+      <Button variant="flat" color="danger" className="ml-auto">
         <Trans message="Delete" />
       </Button>
-      <ConfirmationDialog
-        title={
-          <Trans
-            message="Delete [one 1 item|other :count items]?"
-            values={{count: selectedRows.length}}
-          />
-        }
-        body={
-          <Trans message="This will permanently remove the items and cannot be undone." />
-        }
-        confirm={<Trans message="Delete" />}
-        isDanger
-      />
+      <DeleteItemsDialog />
     </DialogTrigger>
+  );
+}
+
+function DeleteItemsDialog() {
+  const deleteSelectedRows = useDeleteSelectedRows();
+  const {selectedRows} = useDataTable();
+  const {close} = useDialogContext();
+  return (
+    <ConfirmationDialog
+      isLoading={deleteSelectedRows.isLoading}
+      title={
+        <Trans
+          message="Delete [one 1 item|other :count items]?"
+          values={{count: selectedRows.length}}
+        />
+      }
+      body={
+        <Trans message="This will permanently remove the items and cannot be undone." />
+      }
+      confirm={<Trans message="Delete" />}
+      isDanger
+      onConfirm={() => {
+        deleteSelectedRows.mutate(undefined, {onSuccess: () => close()});
+      }}
+    />
   );
 }

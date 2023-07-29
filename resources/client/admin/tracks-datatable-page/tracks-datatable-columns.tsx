@@ -23,10 +23,10 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
     key: 'name',
     allowsSorting: true,
     header: () => <Trans message="Track" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     body: track => (
-      <div className="flex items-center gap-12 w-max">
+      <div className="flex items-center gap-12">
         <TrackImage
           track={track}
           className="flex-shrink-0"
@@ -40,12 +40,11 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
     key: 'artist',
     allowsSorting: false,
     header: () => <Trans message="Artist" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-2',
     body: track => {
       if (!track.artists?.[0]) return null;
       return (
-        <div className="flex items-center gap-12 w-max">
+        <div className="flex items-center gap-12">
           <SmallArtistImage
             artist={track.artists[0]}
             className="flex-shrink-0 rounded"
@@ -58,6 +57,7 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
   },
   {
     key: 'duration',
+    minWidth: 'min-w-76',
     allowsSorting: true,
     header: () => <Trans message="Duration" />,
     body: track =>
@@ -66,6 +66,7 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
   {
     key: 'plays',
     allowsSorting: true,
+    minWidth: 'min-w-70',
     header: () => <Trans message="Plays" />,
     body: track =>
       track.plays ? <FormattedNumber value={track.plays} /> : null,
@@ -73,6 +74,7 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: track =>
       track.updated_at ? <FormattedDate date={track.updated_at} /> : '',
@@ -82,6 +84,8 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    visibleInMode: 'all',
+    width: 'w-128 flex-shrink-0',
     body: track => (
       <div className="text-muted">
         <IconButton size="md" elementType={Link} to={`${track.id}/insights`}>

@@ -35,7 +35,7 @@ class StripePlans
 
         // create any local product prices on stripe, that don't exist there already
         $product->prices->each(function (Price $price) use ($product) {
-            // todo: check if stripe actually exist on stripe (when switching from test to live will not work otherwise)
+            // todo: check if price actually exist on stripe (when switching from test to live will not work otherwise)
             if (!$price->stripe_id) {
                 $this->createPrice($product, $price);
             }

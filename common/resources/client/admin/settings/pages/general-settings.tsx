@@ -96,13 +96,13 @@ function HomepageSection() {
           </Option>
         ))}
         {data?.menuItemCategories?.map(category => (
-          <Option key={category.name} value={category.name.toLowerCase()}>
+          <Option key={category.type} value={category.type}>
             {category.name}
           </Option>
         ))}
       </FormSelect>
       {data?.menuItemCategories?.map(category => {
-        return selectedType === category.name.toLowerCase() ? (
+        return selectedType === category.type ? (
           <FormSelect
             className="mt-24"
             name="client.homepage.value"

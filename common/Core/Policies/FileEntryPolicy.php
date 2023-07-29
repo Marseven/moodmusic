@@ -13,9 +13,9 @@ use Laravel\Sanctum\PersonalAccessToken;
 class FileEntryPolicy extends BasePolicy
 {
     public function index(
-        User $user,
+        ?User $user,
         array $entryIds = null,
-        int $userId = null
+        int $userId = null,
     ): bool {
         if ($entryIds) {
             return $this->userCan($user, 'files.view', $entryIds);
@@ -48,7 +48,7 @@ class FileEntryPolicy extends BasePolicy
         $token = $this->getAccessTokenFromRequest();
         if ($token) {
             $previewTokenMatches = collect($entries)->every(function (
-                $entry
+                $entry,
             ) use ($token) {
                 return $entry['preview_token'] === $token;
             });
@@ -116,7 +116,7 @@ class FileEntryPolicy extends BasePolicy
 
         return $entries->every(function (FileEntry $entry) use (
             $permission,
-            $currentUser
+            $currentUser,
         ) {
             $user = $entry->users->find($currentUser->id);
             return $this->userOwnsEntryOrWasGrantedPermission(
@@ -133,7 +133,7 @@ class FileEntryPolicy extends BasePolicy
      */
     public function userOwnsEntryOrWasGrantedPermission(
         $user,
-        string $permission
+        string $permission,
     ) {
         return $user &&
             ($user['owns_entry'] ||
@@ -144,7 +144,7 @@ class FileEntryPolicy extends BasePolicy
     }
 
     protected function findEntries(
-        FileEntry|array|Collection $entries
+        FileEntry|array|Collection $entries,
     ): Collection {
         if ($entries instanceof FileEntry) {
             return $entries->newCollection([$entries]);
@@ -162,6 +162,7 @@ class FileEntryPolicy extends BasePolicy
         switch ($fullPermission) {
             case 'files.view':
                 return 'view';
+            case 'files.create':
             case 'files.update':
                 return 'edit';
             case 'files.delete':

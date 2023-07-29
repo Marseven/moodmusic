@@ -24,7 +24,7 @@ export function AlbumLink({album, artist, className, target}: AlbumLinkProps) {
     <Link
       target={target}
       className={clsx(
-        'hover:underline outline-none focus-visible:underline',
+        'hover:underline outline-none focus-visible:underline overflow-x-hidden overflow-ellipsis',
         className
       )}
       to={uri}
@@ -36,12 +36,13 @@ export function AlbumLink({album, artist, className, target}: AlbumLinkProps) {
 
 export function getAlbumLink(
   album: Album,
-  {artist, absolute}: {artist?: Artist; absolute?: boolean} = {}
+  options: {artist?: Artist; absolute?: boolean} = {}
 ) {
+  const artist = options.artist || album.artists?.[0];
   const artistName = slugifyString(artist?.name || 'Various Artists');
   const albumName = slugifyString(album.name);
   let link = `/album/${album.id}/${artistName}/${albumName}`;
-  if (absolute) {
+  if (options.absolute) {
     link = `${getBootstrapData().settings.base_url}${link}`;
   }
   return link;

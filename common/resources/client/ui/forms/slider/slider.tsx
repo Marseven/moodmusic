@@ -30,6 +30,7 @@ export function Slider({inputRef, onBlur, ...props}: SliderProps) {
   return (
     <BaseSlider {...baseProps} slider={slider}>
       <SliderThumb
+        fillColor={props.fillColor}
         index={0}
         slider={slider}
         inputRef={inputRef}
@@ -42,6 +43,7 @@ export function Slider({inputRef, onBlur, ...props}: SliderProps) {
 export interface FormSliderProps extends SliderProps {
   name: string;
 }
+
 export function FormSlider({name, ...props}: FormSliderProps) {
   const {
     field: {onChange, onBlur, value = '', ref},

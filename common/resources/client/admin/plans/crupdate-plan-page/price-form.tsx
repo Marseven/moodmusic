@@ -4,18 +4,20 @@ import React, {Fragment, useMemo, useState} from 'react';
 import {useValueLists} from '@common/http/value-lists';
 import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {Trans} from '@common/i18n/trans';
-import {FormComboBox} from '@common/ui/forms/combobox/form-combobox';
 import {Item} from '@common/ui/forms/listbox/item';
 import {FormSelect, Select} from '@common/ui/forms/select/select';
 import {Price} from '@common/billing/price';
 import {BillingPeriodPresets} from '@common/admin/plans/crupdate-plan-page/billing-period-presets';
 import {Button} from '@common/ui/buttons/button';
+import {message} from '@common/i18n/message';
+import {useTrans} from '@common/i18n/use-trans';
 
 interface PriceFormProps {
   index: number;
   onRemovePrice: () => void;
 }
 export function PriceForm({index, onRemovePrice}: PriceFormProps) {
+  const {trans} = useTrans();
   const query = useValueLists(['currencies']);
   const currencies = useMemo(() => {
     return query.data?.currencies ? Object.values(query.data.currencies) : [];
@@ -58,12 +60,14 @@ export function PriceForm({index, onRemovePrice}: PriceFormProps) {
         name={`prices.${index}.amount`}
         className="mb-20"
       />
-      <FormComboBox
+      <FormSelect
         required
         disabled={!allowPriceChanges}
         label={<Trans message="Currency" />}
         name={`prices.${index}.currency`}
         items={currencies}
+        showSearchField
+        searchPlaceholder={trans(message('Search currencies'))}
         selectionMode="single"
         className="mb-20"
       >
@@ -73,7 +77,7 @@ export function PriceForm({index, onRemovePrice}: PriceFormProps) {
             key={item.code}
           >{`${item.code}: ${item.name}`}</Item>
         )}
-      </FormComboBox>
+      </FormSelect>
       <BillingPeriodSelect
         disabled={!allowPriceChanges}
         index={index}

@@ -11,6 +11,7 @@ import {useUploadAvatar} from '../avatar/upload-avatar';
 import {useRemoveAvatar} from '../avatar/remove-avatar';
 import {FormImageSelector} from '@common/ui/images/image-selector';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
+import {AccountSettingsId} from '@common/auth/ui/account-settings/account-settings-sidenav';
 
 interface Props {
   user: User;
@@ -30,6 +31,7 @@ export function BasicInfoPanel({user}: Props) {
 
   return (
     <AccountSettingsPanel
+      id={AccountSettingsId.AccountDetails}
       title={<Trans message="Update name and profile image" />}
       actions={
         <Button

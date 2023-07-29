@@ -56,7 +56,7 @@ export function FilterListControlDialog({
       <DialogHeader>
         <Trans {...filter.label} />
       </DialogHeader>
-      <DialogBody padding="px-14 pt-14 pb-4">
+      <DialogBody padding="px-14 pt-14 pb-4 max-h-288">
         <Form
           form={form}
           id={formId}

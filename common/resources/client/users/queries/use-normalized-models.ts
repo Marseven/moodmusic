@@ -13,6 +13,7 @@ interface Response extends BackendResponse {
 interface Params {
   query?: string;
   perPage?: number;
+  with?: string;
 }
 
 export function useNormalizedModels(

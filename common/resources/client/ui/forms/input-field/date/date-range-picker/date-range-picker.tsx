@@ -69,7 +69,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
           segmentProps={openOnClick}
           value={value.start}
           onChange={newValue => {
-            onChange({...value, start: newValue});
+            onChange({start: newValue, end: value.end});
           }}
         />
         <ArrowRightAltIcon
@@ -82,7 +82,7 @@ export function DateRangePicker(props: DateRangePickerProps) {
           segmentProps={openOnClick}
           value={value.end}
           onChange={newValue => {
-            onChange({...value, end: newValue});
+            onChange({start: value.start, end: newValue});
           }}
         />
       </DatePickerField>

@@ -35,6 +35,8 @@ export function useListbox<T>(
     showEmptyMessage,
     maxItems,
     isAsync,
+    allowCustomValue,
+    clearSelectionOnInputClear,
   } = props;
   const selectionMode = props.selectionMode || 'none';
   const id = useId();
@@ -93,7 +95,7 @@ export function useListbox<T>(
     // don't shift floating menu on the sides of combobox, otherwise input might get obscured
     shiftCrossAxis: !virtualFocus,
   });
-  const {refs, floating, strategy, x, y} = floatingProps;
+  const {refs, strategy, x, y} = floatingProps;
 
   // handle selection state for syncing with active index in keyboard navigation
   const selectedOption =
@@ -154,19 +156,26 @@ export function useListbox<T>(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       setInputValue(e.target.value);
 
-      // if listbox is async, filtering will happen on backend
-      if (!isAsync) {
-        setActiveCollection(e.target.value.trim() ? 'filtered' : 'all');
-      }
+      setActiveCollection(e.target.value.trim() ? 'filtered' : 'all');
 
       if (e.target.value) {
         setIsOpen(true);
-      } else {
+      } else if (clearSelectionOnInputClear) {
         // deselect currently selected option if user fully clears the input
         selectValues('');
       }
+
+      focusItem('increment', 0);
     },
-    [setInputValue, setIsOpen, setActiveCollection, selectValues, isAsync]
+    [
+      setInputValue,
+      setIsOpen,
+      setActiveCollection,
+      selectValues,
+      isAsync,
+      clearSelectionOnInputClear,
+      focusItem,
+    ]
   );
 
   const handleItemSelection = (value: PrimitiveValue) => {
@@ -188,6 +197,7 @@ export function useListbox<T>(
         reference.blur();
       }
     }
+    setActiveCollection('all');
     setIsOpen(false);
     onItemSelected?.(value);
     // make sure "onItemSelected" callback has a chance to use activeIndex value, before clearing it
@@ -206,14 +216,16 @@ export function useListbox<T>(
     floatingMaxHeight,
     showCheckmark,
     collection,
+    collections,
     virtualFocus,
     focusItem,
     showEmptyMessage,
+    allowCustomValue,
 
     // floating ui
     refs,
     reference: floatingProps.reference,
-    floating,
+    floating: refs.setFloating,
     positionStyle: {
       position: strategy,
       top: y ?? '',

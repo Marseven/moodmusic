@@ -51,8 +51,9 @@ function fileMatchesTypes(file: UploadedFile, types: string[]): boolean {
         }
 
         // otherwise this is likely an extension
-        if (type.replace('.', '') && file.extension) {
-          return file.extension.toLowerCase() === type.toLowerCase();
+        const extension = type.replace('.', '').toLowerCase();
+        if (extension && file.extension) {
+          return file.extension.toLowerCase() === extension;
         }
         return false;
       })

@@ -1,5 +1,5 @@
-import {BackendFilter} from '../backend-filter';
+import {BackendFilter, FilterControl} from '../backend-filter';
 
-export interface FilterPanelProps {
-  filter: BackendFilter;
+export interface FilterPanelProps<T = FilterControl> {
+  filter: BackendFilter<T>;
 }

@@ -16,8 +16,8 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
     key: 'name',
     allowsSorting: true,
     header: () => <Trans message="Artist" />,
-    // prevent long names from overflowing the table
-    width: 'w-5/6 max-w-200',
+    width: 'flex-3',
+    visibleInMode: 'all',
     body: artist => (
       <div className="flex items-center gap-12 w-max">
         <SmallArtistImage
@@ -55,6 +55,7 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
   {
     key: 'updated_at',
     allowsSorting: true,
+    maxWidth: 'max-w-100',
     header: () => <Trans message="Last updated" />,
     body: artist =>
       artist.updated_at ? <FormattedDate date={artist.updated_at} /> : '',
@@ -63,7 +64,9 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
     key: 'actions',
     header: () => <Trans message="Actions" />,
     hideHeader: true,
+    visibleInMode: 'all',
     align: 'end',
+    width: 'w-84 flex-shrink-0',
     body: artist => (
       <div className="text-muted">
         <IconButton size="md" elementType={Link} to={`${artist.id}/insights`}>

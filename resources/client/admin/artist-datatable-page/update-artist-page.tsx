@@ -12,6 +12,8 @@ import {
   useUpdateArtist,
 } from '@app/admin/artist-datatable-page/requests/use-update-artist';
 import {CrupdateArtistForm} from '@app/admin/artist-datatable-page/artist-form/crupdate-artist-form';
+import {useArtistPermissions} from '@app/web-player/artists/use-artist-permissions';
+import {Navigate} from 'react-router-dom';
 
 interface Props {
   wrapInContainer?: boolean;
@@ -47,6 +49,7 @@ function PageContent({
   wrapInContainer,
   showExternalFields,
 }: PageContentProps) {
+  const {canEdit} = useArtistPermissions(response.artist);
   const form = useForm<UpdateArtistPayload>({
     defaultValues: {
       id: response.artist.id,
@@ -61,6 +64,10 @@ function PageContent({
     },
   });
   const updateArtist = useUpdateArtist(form);
+
+  if (!canEdit) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <CrupdateResourceLayout

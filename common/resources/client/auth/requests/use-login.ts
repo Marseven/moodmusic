@@ -6,10 +6,17 @@ import {useNavigate} from '../../utils/hooks/use-navigate';
 import {apiClient} from '../../http/query-client';
 import {useAuth} from '../use-auth';
 import {useBootstrapData} from '../../core/bootstrap-data/bootstrap-data-context';
+import {useCallback} from 'react';
 
-interface Response extends BackendResponse {
+interface LoginResponse extends BackendResponse {
   bootstrapData: string;
+  two_factor: false;
 }
+interface TwoFactorResponse {
+  two_factor: true;
+}
+
+type Response = LoginResponse | TwoFactorResponse;
 
 export interface LoginPayload {
   email: string;
@@ -19,16 +26,29 @@ export interface LoginPayload {
 }
 
 export function useLogin(form: UseFormReturn<LoginPayload>) {
-  const navigate = useNavigate();
-  const {getRedirectUri} = useAuth();
-  const {setBootstrapData} = useBootstrapData();
+  const handleSuccess = useHandleLoginSuccess();
   return useMutation(login, {
     onSuccess: response => {
-      setBootstrapData(response.bootstrapData);
-      navigate(getRedirectUri(), {replace: true});
+      if (!response.two_factor) {
+        handleSuccess(response);
+      }
     },
     onError: r => onFormQueryError(r, form),
   });
+}
+
+export function useHandleLoginSuccess() {
+  const navigate = useNavigate();
+  const {getRedirectUri} = useAuth();
+  const {setBootstrapData} = useBootstrapData();
+
+  return useCallback(
+    (response: LoginResponse) => {
+      setBootstrapData(response.bootstrapData);
+      navigate(getRedirectUri(), {replace: true});
+    },
+    [navigate, setBootstrapData, getRedirectUri]
+  );
 }
 
 function login(payload: LoginPayload): Promise<Response> {

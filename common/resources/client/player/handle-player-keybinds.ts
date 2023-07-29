@@ -1,4 +1,4 @@
-import {PlayerState} from '@common/player/player-state';
+import {PlayerState} from '@common/player/state/player-state';
 import {isCtrlOrShiftPressed} from '@common/utils/keybinds/is-ctrl-or-shift-pressed';
 
 export function handlePlayerKeybinds(
@@ -12,9 +12,9 @@ export function handlePlayerKeybinds(
   )
     return;
 
-  if (e.key === ' ') {
+  if (e.key === ' ' || e.key === 'k') {
     e.preventDefault();
-    if (state().status === 'playing') {
+    if (state().isPlaying) {
       state().pause();
     } else {
       state().play();

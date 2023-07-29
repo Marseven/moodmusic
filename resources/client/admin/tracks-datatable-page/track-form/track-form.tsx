@@ -88,24 +88,23 @@ export function TrackForm({
           className="mb-24"
         />
         <DurationField />
-        {showExternalIdFields && <TrackUrlField />}
-        {showExternalIdFields && <YoutubeIdField />}
+        {showExternalIdFields && <SourceField />}
         {showExternalIdFields && <SpotifyIdField />}
       </div>
     </div>
   );
 }
 
-function TrackUrlField() {
+function SourceField() {
   return (
     <FormTextField
-      name="url"
-      label={<Trans message="Audio or video URL" />}
+      name="src"
+      label={<Trans message="Playback source" />}
       className="mb-24"
       minLength={1}
       maxLength={230}
       description={
-        <Trans message="Remote or local url to music or video file for this track. It will always play instead of youtube video." />
+        <Trans message="Supports audio, video, hls/dash stream and youtube video url. If left empty, best matching youtube video will be found automatically." />
       }
     />
   );
@@ -123,24 +122,6 @@ function SpotifyIdField() {
       className="mb-24"
       minLength={22}
       maxLength={22}
-    />
-  );
-}
-
-function YoutubeIdField() {
-  return (
-    <FormTextField
-      name="youtube_id"
-      label={<Trans message="Youtube video ID" />}
-      className="mb-24"
-      minLength={8}
-      maxLength={20}
-      description={
-        <Trans
-          message="ID only. https://www.youtube.com/embed?v=<b>EPyh41zPg4Z</b>"
-          values={{b: parts => <strong>{parts}</strong>}}
-        />
-      }
     />
   );
 }

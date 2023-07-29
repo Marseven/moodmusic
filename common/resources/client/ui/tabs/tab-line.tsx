@@ -20,6 +20,8 @@ export function TabLine() {
   useLayoutEffect(() => {
     if (selectedTab != null && tabsRef.current) {
       const el = tabsRef.current[selectedTab];
+      if (!el) return;
+
       setStyle(prevState => {
         return {
           width: `${el.offsetWidth}px`,

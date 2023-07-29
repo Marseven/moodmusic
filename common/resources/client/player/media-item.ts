@@ -1,15 +1,35 @@
+import {MediaStreamType} from '@common/player/state/player-state';
+
 interface BaseMediaItem<T = any> {
   id: string | number;
   groupId?: string | number;
-  provider: 'youtube' | 'htmlAudio' | 'htmlVideo';
-  meta: T;
-  // in seconds. Will be set by provider, but that might have a delay depending on provider.
-  duration?: number;
+  provider: 'youtube' | 'htmlAudio' | 'htmlVideo' | 'hls' | 'dash';
+  meta?: T;
+  initialTime?: number;
+  poster?: string;
+  captions?: {
+    id: string | number;
+    label: string;
+    src: string;
+    language?: string;
+  }[];
 }
 
 export interface YoutubeMediaItem<T = any> extends BaseMediaItem<T> {
   provider: 'youtube';
-  src?: 'resolve' | string;
+  src: 'resolve' | string;
+}
+
+export interface HlsMediaItem<T = any> extends BaseMediaItem<T> {
+  provider: 'hls';
+  src: string;
+  streamType?: MediaStreamType;
+}
+
+export interface DashMediaItem<T = any> extends BaseMediaItem<T> {
+  provider: 'dash';
+  src: string;
+  streamType?: MediaStreamType;
 }
 
 export interface HtmlAudioMediaItem<T = any> extends BaseMediaItem<T> {
@@ -19,11 +39,12 @@ export interface HtmlAudioMediaItem<T = any> extends BaseMediaItem<T> {
 
 export interface HtmlVideoMediaItem<T = any> extends BaseMediaItem<T> {
   provider: 'htmlVideo';
-  image?: string;
   src: string;
 }
 
 export type MediaItem<T = any> =
   | YoutubeMediaItem<T>
   | HtmlAudioMediaItem<T>
-  | HtmlVideoMediaItem<T>;
+  | HtmlVideoMediaItem<T>
+  | HlsMediaItem<T>
+  | DashMediaItem<T>;

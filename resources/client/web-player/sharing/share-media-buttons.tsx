@@ -7,6 +7,8 @@ import {FacebookIcon} from '@common/icons/social/facebook';
 import {TwitterIcon} from '@common/icons/social/twitter';
 import {TumblrIcon} from '@common/icons/social/tumblr';
 import {ShareIcon} from '@common/icons/material/Share';
+import {toast} from '@common/ui/toast/toast';
+import {message} from '@common/i18n/message';
 
 interface ShareButtonsProps {
   link: string;
@@ -51,10 +53,16 @@ export function ShareMediaButtons({
         <IconButton
           size={size}
           onClick={() => {
-            navigator.share({
-              title: name,
-              url: link,
-            });
+            try {
+              navigator.share({
+                title: name,
+                url: link,
+              });
+            } catch (e) {
+              if ((e as DOMException).name !== 'AbortError') {
+                toast(message('Could not share link'));
+              }
+            }
           }}
           className="text-muted"
         >

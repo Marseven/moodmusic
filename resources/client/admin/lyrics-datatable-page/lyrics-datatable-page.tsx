@@ -23,9 +23,11 @@ const columnConfig: ColumnConfig<Lyric>[] = [
     key: 'track_id',
     allowsSorting: true,
     header: () => <Trans message="Track" />,
+    width: 'flex-3 min-w-200',
+    visibleInMode: 'all',
     body: lyric =>
       lyric.track ? (
-        <div className="flex items-center gap-12 w-max">
+        <div className="flex items-center gap-12">
           <TrackImage
             track={lyric.track}
             className="flex-shrink-0 rounded"
@@ -37,6 +39,7 @@ const columnConfig: ColumnConfig<Lyric>[] = [
   },
   {
     key: 'album',
+    width: 'flex-2',
     header: () => <Trans message="Album" />,
     body: lyric =>
       lyric.track?.album ? <AlbumLink album={lyric.track.album} /> : null,
@@ -44,6 +47,7 @@ const columnConfig: ColumnConfig<Lyric>[] = [
   {
     key: 'updated_at',
     allowsSorting: true,
+    width: 'w-100',
     header: () => <Trans message="Last updated" />,
     body: lyric => <FormattedDate date={lyric.updated_at} />,
   },
@@ -52,6 +56,8 @@ const columnConfig: ColumnConfig<Lyric>[] = [
     header: () => <Trans message="Actions" />,
     hideHeader: true,
     align: 'end',
+    visibleInMode: 'all',
+    width: 'w-42 flex-shrink-0',
     body: lyric => {
       return (
         <DialogTrigger type="modal">

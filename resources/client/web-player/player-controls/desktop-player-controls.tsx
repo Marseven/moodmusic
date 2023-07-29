@@ -4,15 +4,7 @@ import {ReactNode, useContext} from 'react';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
 import {PlaybackControls} from '@app/web-player/player-controls/playback-controls';
-import {Slider} from '@common/ui/forms/slider/slider';
-import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {useTrans} from '@common/i18n/use-trans';
-import {message} from '@common/i18n/message';
-import {VolumeUpIcon} from '@common/icons/material/VolumeUp';
-import {VolumeOffIcon} from '@common/icons/material/VolumeOff';
-import {VolumeDownIcon} from '@common/icons/material/VolumeDown';
-import {QueueMusicIcon} from '@common/icons/material/QueueMusic';
 import {LikeIconButton} from '@app/web-player/library/like-icon-button';
 import {DashboardLayoutContext} from '@common/ui/layout/dashboard-layout-context';
 import {
@@ -24,6 +16,15 @@ import {KeyboardArrowUpIcon} from '@common/icons/material/KeyboardArrowUp';
 import {LyricsButton} from '@app/web-player/player-controls/lyrics-button';
 import {DownloadTrackButton} from '@app/web-player/player-controls/download-track-button';
 import {useSettings} from '@common/core/settings/use-settings';
+import {getTrackLink, TrackLink} from '@app/web-player/tracks/track-link';
+import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
+import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
+import {Link} from 'react-router-dom';
+import {ArtistContextDialog} from '@app/web-player/artists/artist-context-dialog';
+import {MediaQueueListIcon} from '@common/icons/media/media-queue-list';
+import {VolumeControls} from '@common/player/ui/controls/volume-controls';
+import {Tooltip} from '@common/ui/tooltip/tooltip';
+import {Trans} from '@common/i18n/trans';
 
 export function DesktopPlayerControls() {
   const mediaIsCued = usePlayerStore(s => s.cuedMedia != null);
@@ -45,12 +46,34 @@ function QueuedTrack() {
   if (track) {
     content = (
       <div className="flex items-center gap-14">
-        <TrackImage className="rounded w-56 h-56 object-cover" track={track} />
-        <div>
-          <div className="text-sm">{track.name}</div>
-          <div className="text-xs text-muted">
-            <ArtistLinks artists={track.artists} />
-          </div>
+        <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+          <Link to={getTrackLink(track)} className="flex-shrink-0">
+            <TrackImage
+              className="rounded w-56 h-56 object-cover"
+              track={track}
+            />
+          </Link>
+          <TrackContextDialog tracks={[track]} />
+        </DialogTrigger>
+        <div className="min-w-0 overflow-hidden overflow-ellipsis">
+          <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+            <TrackLink
+              track={track}
+              className="text-sm whitespace-nowrap min-w-0 max-w-full"
+            />
+            <TrackContextDialog tracks={[track]} />
+          </DialogTrigger>
+          {track.artists?.length ? (
+            <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+              <div className="text-xs text-muted">
+                <ArtistLinks
+                  artists={track.artists}
+                  className="whitespace-nowrap"
+                />
+              </div>
+              <ArtistContextDialog artist={track.artists[0]} />
+            </DialogTrigger>
+          ) : null}
         </div>
         <LikeIconButton likeable={track} />
       </div>
@@ -70,17 +93,19 @@ function SecondaryControls() {
     <div className="flex items-center justify-end min-w-180 w-[30%]">
       <LyricsButton />
       <DownloadTrackButton />
-      <IconButton
-        className="flex-shrink-0"
-        onClick={() => {
-          setRightSidenavStatus(
-            rightSidenavStatus === 'closed' ? 'open' : 'closed'
-          );
-        }}
-      >
-        <QueueMusicIcon />
-      </IconButton>
-      <VolumeControls />
+      <Tooltip label={<Trans message="Queue" />}>
+        <IconButton
+          className="flex-shrink-0"
+          onClick={() => {
+            setRightSidenavStatus(
+              rightSidenavStatus === 'closed' ? 'open' : 'closed'
+            );
+          }}
+        >
+          <MediaQueueListIcon />
+        </IconButton>
+      </Tooltip>
+      <VolumeControls trackColor="neutral" />
       <OverlayButton />
     </div>
   );
@@ -88,7 +113,7 @@ function SecondaryControls() {
 
 function OverlayButton() {
   const isActive = usePlayerOverlayStore(s => s.isMaximized);
-  const isUninitialized = usePlayerStore(s => s.status === 'uninitialized');
+  const playerReady = usePlayerStore(s => s.providerReady);
   const {player} = useSettings();
 
   if (player?.hide_video_button) {
@@ -96,78 +121,21 @@ function OverlayButton() {
   }
 
   return (
-    <IconButton
-      className="flex-shrink-0 ml-26"
-      color="chip"
-      variant="flat"
-      radius="rounded"
-      size="xs"
-      iconSize="sm"
-      disabled={isUninitialized}
-      onClick={() => {
-        playerOverlayState.toggle();
-      }}
-    >
-      {isActive ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
-    </IconButton>
-  );
-}
-
-function VolumeControls() {
-  const volume = usePlayerStore(s => s.volume);
-  const player = usePlayerActions();
-  const isUninitialized = usePlayerStore(s => s.status === 'uninitialized');
-
-  return (
-    <div className="flex w-min items-center gap-4">
-      <ToggleMuteButton />
-      <Slider
-        isDisabled={isUninitialized}
-        showThumbOnHoverOnly
-        thumbSize="w-14 h-14"
-        trackColor="neutral"
-        minValue={0}
-        maxValue={100}
-        className="flex-auto"
-        width="w-96"
-        value={volume}
-        onChange={value => {
-          player.setVolume(value);
-        }}
-      />
-    </div>
-  );
-}
-
-function ToggleMuteButton() {
-  const {trans} = useTrans();
-  const isMuted = usePlayerStore(s => s.muted);
-  const volume = usePlayerStore(s => s.volume);
-  const player = usePlayerActions();
-  const isUninitialized = usePlayerStore(s => s.status === 'uninitialized');
-
-  if (isMuted) {
-    return (
+    <Tooltip label={<Trans message="Expand" />}>
       <IconButton
-        disabled={isUninitialized}
-        size="sm"
-        iconSize="md"
-        aria-label={trans(message('Unmute'))}
-        onClick={() => player.setMuted(false)}
+        className="flex-shrink-0 ml-26"
+        color="chip"
+        variant="flat"
+        radius="rounded"
+        size="xs"
+        iconSize="sm"
+        disabled={!playerReady}
+        onClick={() => {
+          playerOverlayState.toggle();
+        }}
       >
-        <VolumeOffIcon />
+        {isActive ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
       </IconButton>
-    );
-  }
-  return (
-    <IconButton
-      disabled={isUninitialized}
-      size="sm"
-      iconSize="md"
-      aria-label={trans(message('Mute'))}
-      onClick={() => player.setMuted(true)}
-    >
-      {volume < 40 ? <VolumeDownIcon /> : <VolumeUpIcon />}
-    </IconButton>
+    </Tooltip>
   );
 }

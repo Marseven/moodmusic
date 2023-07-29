@@ -197,7 +197,7 @@ class TNTSearchEngine extends Engine
     public function map(Builder $builder, $results, $model)
     {
         if (empty($results['ids'])) {
-            return Collection::make();
+            return $model->newCollection([]);
         }
 
         $keys = collect($results['ids'])->values()->all();
@@ -218,11 +218,11 @@ class TNTSearchEngine extends Engine
         }
 
         // sort models by tnt search result set
-        return $model->newCollection($results['ids'])->map(function ($hit) use ($models) {
+        return $model->newCollection(collect($results['ids'])->map(function ($hit) use ($models, $results) {
             if (isset($models[$hit])) {
-                return $models[$hit];
+                return $models[$hit]->setAttribute('__tntSearchScore__', $results['docScores'][$hit]);
             }
-        })->filter()->values();
+        })->filter()->all());
     }
 
     /**

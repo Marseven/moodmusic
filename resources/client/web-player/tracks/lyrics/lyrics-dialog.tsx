@@ -10,7 +10,7 @@ import {AnimatePresence, m} from 'framer-motion';
 import {opacityAnimation} from '@common/ui/animation/opacity-animation';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {MicIcon} from '@common/icons/material/Mic';
+import {MediaMicrophoneIcon} from '@common/icons/media/media-microphone';
 
 interface Props {
   track: Track;
@@ -23,7 +23,7 @@ export function LyricsDialog({track}: Props) {
   if (data?.lyric?.text) {
     content = (
       <m.div
-        className="text-lg"
+        className="text-lg w-full"
         key="lyrics"
         {...opacityAnimation}
         dangerouslySetInnerHTML={{__html: data?.lyric?.text || ''}}
@@ -34,7 +34,7 @@ export function LyricsDialog({track}: Props) {
   } else {
     content = (
       <IllustratedMessage
-        image={<MicIcon size="xl" />}
+        image={<MediaMicrophoneIcon size="xl" />}
         imageHeight="h-auto"
         title={<Trans message="We do not have lyrics for this song yet" />}
         description={<Trans message="Please try again later" />}
@@ -63,8 +63,8 @@ export function LyricsDialog({track}: Props) {
             </div>
           </div>
         </div>
-        <div className="flex-auto md:flex-[0.6_1_0%] overflow-y-auto w-max text-center pl-14 pr-14 md:pl-0 md:pr-40 pb-40">
-          <div className="flex items-center justify-center min-h-full">
+        <div className="flex-auto md:flex-[0.6_1_0%] stable-scrollbar overflow-y-auto text-center pl-14 pr-14 md:pl-0 md:pr-40 pb-40">
+          <div className="flex items-center justify-center min-h-full w-full max-w-580 mx-auto">
             <AnimatePresence>{content}</AnimatePresence>
           </div>
         </div>
@@ -75,8 +75,8 @@ export function LyricsDialog({track}: Props) {
 
 function LyricSkeleton() {
   return (
-    <m.div key="skeleton" {...opacityAnimation} className="w-full max-w-720">
-      {[...new Array(16).keys()].map(key => (
+    <m.div key="skeleton" {...opacityAnimation} className="w-full">
+      {[...new Array(8).keys()].map(key => (
         <Skeleton key={key} variant="text" className="mb-20" />
       ))}
     </m.div>

@@ -24,7 +24,14 @@ export const MixedImage = memo(({src, className, ...domProps}: Props) => {
   }
 
   if (type === 'svg') {
-    return <SvgImage {...domProps} className={className} src={src as string} />;
+    return (
+      <SvgImage
+        {...domProps}
+        className={className}
+        src={src as string}
+        height={false}
+      />
+    );
   }
 
   if (type === 'image') {

@@ -7,22 +7,10 @@ use Illuminate\Database\Seeder;
 
 class LocalizationsTableSeeder extends Seeder
 {
-    /**
-     * @var LocalizationsRepository
-     */
-    private $repository;
-
-    /**
-     * @param LocalizationsRepository $repository
-     */
-    public function __construct(LocalizationsRepository $repository)
+    public function __construct(protected LocalizationsRepository $repository)
     {
-        $this->repository = $repository;
     }
 
-    /**
-     * @return void
-     */
     public function run()
     {
         $localizations = Localization::all();
@@ -39,10 +27,8 @@ class LocalizationsTableSeeder extends Seeder
 
     /**
      * Merge existing localization translation lines with default ones.
-     *
-     * @param Collection $localizations
      */
-    private function mergeExistingTranslationLines($localizations)
+    private function mergeExistingTranslationLines(Collection $localizations)
     {
         $defaultLines = $this->repository->getDefaultTranslationLines();
 

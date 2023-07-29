@@ -4,6 +4,7 @@ import React, {
   ComponentPropsWithoutRef,
   JSXElementConstructor,
   ReactElement,
+  ReactNode,
   RefObject,
   useEffect,
   useMemo,
@@ -24,13 +25,17 @@ interface Props extends ComponentPropsWithoutRef<'div'> {
   listbox: UseListboxReturn;
   mobileOverlay?: JSXElementConstructor<OverlayProps>;
   children?: ReactElement;
+  searchField?: ReactNode;
   isLoading?: boolean;
+  onClose?: () => void;
 }
 export function Listbox({
   listbox,
   children: trigger,
   isLoading,
   mobileOverlay = Tray,
+  searchField,
+  onClose,
   ...domProps
 }: Props) {
   const isMobile = useIsMobileDevice();
@@ -48,7 +53,7 @@ export function Listbox({
   const Overlay = isMobile ? mobileOverlay : Popover;
 
   const className = clsx(
-    'py-4 text-base sm:text-sm outline-none bg-paper shadow-xl border max-h-inherit overflow-y-auto',
+    'py-4 text-base sm:text-sm outline-none bg-paper shadow-xl border max-h-inherit',
 
     // tray will apply its own rounding and max width
     Overlay === Popover && 'rounded',
@@ -94,19 +99,22 @@ export function Listbox({
                 restoreFocus
                 isOpen={isOpen}
                 onClose={() => {
+                  onClose?.();
                   setIsOpen(false);
                 }}
                 isDismissable
                 style={positionStyle}
                 ref={floating}
               >
-                <FocusContainer
-                  isLoading={isLoading}
-                  className={className}
-                  {...domProps}
+                <div
+                  className={clsx(className, 'flex flex-col')}
+                  role="presentation"
                 >
-                  {children}
-                </FocusContainer>
+                  {searchField}
+                  <FocusContainer isLoading={isLoading} {...domProps}>
+                    {children}
+                  </FocusContainer>
+                </div>
               </Overlay>
             )}
           </AnimatePresence>,
@@ -131,7 +139,7 @@ function FocusContainer({
     listboxId,
     virtualFocus,
     focusItem,
-    state: {activeIndex, setActiveIndex},
+    state: {activeIndex, setActiveIndex, selectedIndex},
   } = useListboxContext();
   const autoFocusRef = useRef(true);
   const domRef = useRef<HTMLDivElement>(null);
@@ -145,27 +153,28 @@ function FocusContainer({
   // on trigger keyDown and focus won't be applied to items
   useEffect(() => {
     if (autoFocusRef.current) {
+      const indexToFocus = activeIndex ?? selectedIndex;
       // if no activeIndex, focus menu itself
-      if (activeIndex == null && !virtualFocus) {
+      if (indexToFocus == null && !virtualFocus) {
         requestAnimationFrame(() => {
           domRef.current?.focus({preventScroll: true});
         });
-      } else if (activeIndex != null) {
+      } else if (indexToFocus != null) {
         // wait until next frame, otherwise auto scroll might not work
         requestAnimationFrame(() => {
-          focusItem('increment', activeIndex);
+          focusItem('increment', indexToFocus);
         });
       }
     }
     autoFocusRef.current = false;
-  }, [activeIndex, focusItem, virtualFocus]);
+  }, [activeIndex, selectedIndex, focusItem, virtualFocus]);
 
   return (
     <div
-      tabIndex={-1}
+      tabIndex={virtualFocus ? undefined : -1}
       role={role}
       id={listboxId}
-      className={className}
+      className="overflow-y-auto flex-auto"
       ref={domRef}
       {...domProps}
     >

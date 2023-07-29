@@ -45,7 +45,10 @@ export function AddMenuItemDialog({
             <AddRoute items={routeItems} />
           </AccordionItem>
           {categories.map(category => (
-            <AccordionItem key={category.name} label={category.name}>
+            <AccordionItem
+              key={category.name}
+              label={<Trans message={category.name} />}
+            >
               <AddRoute items={category.items} />
             </AccordionItem>
           ))}
@@ -100,24 +103,27 @@ interface AddRouteProps {
 }
 function AddRoute({items}: AddRouteProps) {
   const {close} = useDialogContext();
+
   return (
     <List>
-      {items.map(item => (
-        <ListItem
-          key={item.id}
-          startIcon={<AddIcon size="sm" />}
-          onSelected={() => {
-            if (item.label) {
-              const last = item.label.split('/').pop();
-              item.label = last ? ucFirst(last) : item.label;
-              item.id = nanoid(6);
-            }
-            close(item);
-          }}
-        >
-          {item.label}
-        </ListItem>
-      ))}
+      {items.map(item => {
+        return (
+          <ListItem
+            key={item.id}
+            startIcon={<AddIcon size="sm" />}
+            onSelected={() => {
+              if (item.label) {
+                const last = item.label.split('/').pop();
+                item.label = last ? ucFirst(last) : item.label;
+                item.id = nanoid(6);
+              }
+              close(item);
+            }}
+          >
+            {item.label}
+          </ListItem>
+        );
+      })}
     </List>
   );
 }

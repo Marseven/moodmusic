@@ -1,25 +1,24 @@
-import {PlayerStoreOptions} from '@common/player/player-store-options';
 import {getBootstrapData} from '@common/core/bootstrap-data/use-backend-bootstrap-data';
 import {findYoutubeVideosForTrack} from '@app/web-player/tracks/requests/find-youtube-videos-for-track';
-import {YoutubeProvider} from '@common/player/providers/youtube-provider';
 import {MediaItem, YoutubeMediaItem} from '@common/player/media-item';
 import {apiClient} from '@common/http/query-client';
 import {Track} from '@app/web-player/tracks/track';
 import {playerOverlayState} from '@app/web-player/state/player-overlay-store';
 import {loadMediaItemTracks} from '@app/web-player/requests/load-media-item-tracks';
 import {tracksToMediaItems} from '@app/web-player/tracks/utils/track-to-media-item';
+import {PlayerStoreOptions} from '@common/player/state/player-store-options';
+import {
+  YouTubePlayerState,
+  YoutubeProviderError,
+  YoutubeProviderInternalApi,
+} from '@common/player/providers/youtube/youtube-types';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
-import OnErrorEvent = YT.OnErrorEvent;
 
 // used to track play history for logging plays on backend (prevents logging play twice, unless track is fully played)
 const trackPlays = new Set<number>();
 
-// on mobile, YouTube embed playback needs to be started via user gesture the first
-// time on YouTube embed itself, starting it with custom play button will not work
-let playbackStartedViaGesture = false;
-
-// this is needed in order to stop YouTube embed from playing trying to
+// this is needed in order to stop YouTube embed from trying to
 // cue a video that will error out while valid video is already playing
 const failedVideoId = ' ';
 
@@ -27,8 +26,10 @@ const failedVideoId = ' ';
 const failedVideoIds = new Set<string>();
 let tracksSkippedDueToError = 0;
 
-async function resolveSrc(media: YoutubeMediaItem) {
-  const results = await findYoutubeVideosForTrack(media.meta);
+async function resolveSrc(
+  media: YoutubeMediaItem<Track>
+): Promise<YoutubeMediaItem> {
+  const results = await findYoutubeVideosForTrack(media.meta!);
   // Find first video ID that did not error out yet
   const match = results?.find(r => !failedVideoIds.has(`${r.id}`))?.id;
   return {
@@ -40,10 +41,11 @@ async function resolveSrc(media: YoutubeMediaItem) {
 function setMediaSessionMetadata(media: MediaItem<Track>) {
   if ('mediaSession' in navigator) {
     const track = media.meta;
+    if (!track) return;
     const image = track.image || track.album?.image;
     navigator.mediaSession.metadata = new MediaMetadata({
       title: track.name,
-      artist: track.artists?.[0].name,
+      artist: track.artists?.[0]?.name,
       album: track.album?.name,
       artwork: image
         ? [
@@ -59,35 +61,29 @@ function setMediaSessionMetadata(media: MediaItem<Track>) {
 }
 
 export const playerStoreOptions: Partial<PlayerStoreOptions> = {
+  persistQueueInLocalStorage: true,
   defaultVolume: getBootstrapData().settings.player?.default_volume,
   setMediaSessionMetadata,
   youtube: {
     srcResolver: resolveSrc,
-    suggestedQuality: getBootstrapData().settings.youtube?.suggested_quality,
-    onStateChange: e => {
-      if (e.data === YT.PlayerState.PLAYING) {
+    onStateChange: state => {
+      if (state === YouTubePlayerState.Playing) {
         tracksSkippedDueToError = 0;
       }
     },
   },
   onBeforePlay: () => {
     const player = getBootstrapData().settings.player;
-
-    // prevent playback if user does not have permission to play music
-    const hasPermission = userHasPlayPermission();
-    if (!hasPermission) {
-      toast.danger(message('Your current plan does not allow music playback.'));
-      return {preventPlayback: true};
-    }
-
+    // on mobile, YouTube embed playback needs to be started via user gesture
+    // on YouTube embed itself, starting it with custom play button will not work
     if (
-      !playbackStartedViaGesture &&
       player?.mobile?.auto_open_overlay &&
       // check if mobile
       window.matchMedia('(max-width: 768px)').matches
     ) {
-      playerOverlayState.toggle();
-      playbackStartedViaGesture = true;
+      playerOverlayState.open();
+      // wait for overlay animation to complete
+      return new Promise<void>(resolve => setTimeout(() => resolve(), 151));
     }
   },
   loadMoreMediaItems: async media => {
@@ -101,11 +97,11 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
   },
   listeners: {
     // change document title to currently cued track name
-    onCued: (media?: MediaItem<Track>) => {
-      if (!media) return;
+    cued: ({state: {cuedMedia}}) => {
+      if (!cuedMedia) return;
       const site_name = getBootstrapData().settings.branding.site_name;
-      let title = `${media.meta.name}`;
-      const artistName = media.meta.artists?.[0].name;
+      let title = `${cuedMedia.meta.name}`;
+      const artistName = cuedMedia.meta.artists?.[0].name;
 
       if (artistName) {
         title = `${title} - ${artistName} - ${site_name}`;
@@ -115,38 +111,53 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
 
       document.title = title;
     },
-    onPlay: (media?: MediaItem<Track>) => {
-      if (media && !trackPlays.has(media.meta.id)) {
-        trackPlays.add(media.meta.id);
-        apiClient.post(`track/plays/${media.meta.id}/log`, {
-          queueId: media.groupId,
+    play: ({state: {cuedMedia, pause}}) => {
+      // prevent playback if user does not have permission to play music
+      const hasPermission = userHasPlayPermission();
+      if (!hasPermission) {
+        toast.danger(
+          message('Your current plan does not allow music playback.')
+        );
+        pause();
+        return;
+      }
+      // log track play
+      if (cuedMedia && !trackPlays.has(cuedMedia.meta.id)) {
+        trackPlays.add(cuedMedia.meta.id);
+        apiClient.post(`tracks/plays/${cuedMedia.meta.id}/log`, {
+          queueId: cuedMedia.groupId,
         });
       }
     },
-    onPlaybackEnd: media => {
+    playbackEnd: ({state: {cuedMedia}}) => {
       // clear track play
-      if (media) {
-        trackPlays.delete(media.meta.id);
+      if (cuedMedia) {
+        trackPlays.delete(cuedMedia.meta.id);
       }
     },
-    onError: async (e, state) => {
-      if (state?.provider?.name === 'youtube') {
-        const provider = state.provider as YoutubeProvider;
+    error: async ({
+      sourceEvent,
+      state: {cuedMedia, providerApi, providerName, emit},
+    }) => {
+      const e = sourceEvent as YoutubeProviderError;
+      if (providerName === 'youtube' && providerApi) {
+        //const provider = state.provider as YoutubeProvider;
         logYoutubeError(e);
 
-        const videoId = provider.getYoutubeId();
-        if (videoId) {
-          failedVideoIds.add(`${videoId}`);
+        if (e.videoId) {
+          failedVideoIds.add(`${e.videoId}`);
         }
 
-        const media = provider.cuedMedia
-          ? await resolveSrc(provider.cuedMedia)
+        const media = cuedMedia
+          ? await resolveSrc(cuedMedia as YoutubeMediaItem)
           : null;
 
         // try to play alternative videos we fetched
         if (media?.src && media?.src !== failedVideoId) {
-          await provider.cueYoutubeVideo(media as Required<YoutubeMediaItem>);
-          provider.youtube?.playVideo();
+          await (
+            providerApi.internalProviderApi as YoutubeProviderInternalApi
+          ).loadVideoById(media.src);
+          providerApi.play();
 
           // there are no more alternative videos to try, we can error out
         } else {
@@ -156,7 +167,7 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
           // a video for this one. If we can't play 3 tracks in a row
           // we can assume there's an issue with YouTube API and bail
           if (tracksSkippedDueToError <= 2) {
-            provider.listeners.onPlaybackEnd?.();
+            emit('playbackEnd');
           }
         }
       } else {
@@ -169,12 +180,12 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
   },
 };
 
-function logYoutubeError(e?: OnErrorEvent) {
-  const videoUrl = e?.target?.getVideoUrl();
-  if (!e || !videoUrl || videoUrl.endsWith('%20')) return; // %20 = failedVideoId
+function logYoutubeError(e: YoutubeProviderError) {
+  const code = e?.code;
+  if (!e || !e.videoId) return;
   apiClient.post('youtube/log-client-error', {
-    code: e.data,
-    videoUrl: e.target.getVideoUrl(),
+    code,
+    videoUrl: e.videoId,
   });
 }
 

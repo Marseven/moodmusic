@@ -14,7 +14,6 @@ import {useFormContext} from 'react-hook-form';
 import {MenuItemConfig} from '../../core/settings/settings';
 import {FormSelect, Option} from '../../ui/forms/select/select';
 import {useAvailableRoutes} from '../appearance/sections/menus/hooks/available-routes';
-import {FormComboBox} from '../../ui/forms/combobox/form-combobox';
 import {ButtonBaseProps} from '../../ui/buttons/button-base';
 import {createSvgIconFromTree, IconTree} from '../../icons/create-svg-icon';
 import {DialogTrigger} from '../../ui/overlays/dialog/dialog-trigger';
@@ -144,32 +143,40 @@ function DestinationSelector({prefixName}: NameProps) {
         />
       )}
       {currentType === 'route' && (
-        <FormComboBox
+        <FormSelect
           className="mb-20"
           required
           items={routeItems}
           name={prefixName('action')}
-          openMenuOnFocus
           label={<Trans message="Page" />}
+          searchPlaceholder={trans(message('Search pages'))}
+          showSearchField
+          selectionMode="single"
         >
           {item => (
             <Item value={item.id} key={item.id}>
               {item.label}
             </Item>
           )}
-        </FormComboBox>
+        </FormSelect>
       )}
       {selectedCategory && (
-        <FormComboBox
+        <FormSelect
           className="mb-20"
           required
           items={selectedCategory.items}
           name={prefixName('action')}
-          openMenuOnFocus
-          label={selectedCategory.name}
+          showSearchField
+          searchPlaceholder={trans(message('Search...'))}
+          selectionMode="single"
+          label={<Trans message={selectedCategory.name} />}
         >
-          {item => <Item value={item.action!}>{item.label}</Item>}
-        </FormComboBox>
+          {item => (
+            <Item value={item.action}>
+              <Trans message={item.label} />
+            </Item>
+          )}
+        </FormSelect>
       )}
     </Fragment>
   );
@@ -193,7 +200,7 @@ function RoleSelector({prefixName}: NameProps) {
     >
       {role => (
         <Item value={role.id} key={role.id} capitalizeFirst>
-          {role.name}
+          <Trans message={role.name} />
         </Item>
       )}
     </FormChipField>
@@ -223,9 +230,9 @@ function PermissionSelector({prefixName}: NameProps) {
             <Item
               key={permission.name}
               value={permission.name}
-              description={permission.description}
+              description={<Trans message={permission.description} />}
             >
-              {permission.display_name || permission.name}
+              <Trans message={permission.display_name || permission.name} />
             </Item>
           ))}
         </Section>

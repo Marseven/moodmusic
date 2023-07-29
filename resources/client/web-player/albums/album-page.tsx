@@ -28,14 +28,15 @@ import {FocusScope} from '@react-aria/focus';
 import {ChipList} from '@common/ui/forms/input-field/chip-field/chip-list';
 import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {Link} from 'react-router-dom';
-import {TruncatedDescription} from '@app/web-player/tracks/truncated-description';
-import {useSettings} from '@common/core/settings/use-settings';
+import {TruncatedDescription} from '@common/ui/truncated-description';
 import {CommentBarContextProvider} from '@app/web-player/tracks/waveform/comment-bar-context';
 import {CommentBarNewCommentForm} from '@app/web-player/tracks/waveform/comment-bar-new-comment-form';
 import {AdHost} from '@common/admin/ads/ad-host';
+import {useCommentPermissions} from '@app/web-player/tracks/hooks/use-comment-permissions';
 
 export function AlbumPage() {
-  const {player} = useSettings();
+  const {canView: showComments, canCreate: allowCommenting} =
+    useCommentPermissions();
   const query = useAlbum({
     autoUpdate: true,
     defaultRelations: true,
@@ -49,7 +50,7 @@ export function AlbumPage() {
           <PageMetaTags query={query} />
           <AdHost slot="general_top" className="mb-44" />
           <AlbumPageHeader album={query.data.album} />
-          {player?.track_comments ? (
+          {allowCommenting ? (
             <CommentBarNewCommentForm
               className="mb-16"
               commentable={query.data.album}
@@ -73,11 +74,13 @@ export function AlbumPage() {
         />
         <AdHost slot="album_above" className="mt-34" />
         <AlbumTrackTable album={query.data.album} />
-        <CommentList
-          className="mt-34"
-          commentable={query.data.album}
-          canDeleteAllComments={canEdit}
-        />
+        {showComments && (
+          <CommentList
+            className="mt-34"
+            commentable={query.data.album}
+            canDeleteAllComments={canEdit}
+          />
+        )}
         <AdHost slot="general_bottom" className="mt-44" />
       </Fragment>
     );
@@ -105,7 +108,7 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
         hideAlbum
         hidePopularity={false}
       />
-      {!album.tracks?.length && (
+      {!album.tracks?.length ? (
         <IllustratedMessage
           className="mt-34"
           title={<Trans message="Nothing to display" />}
@@ -113,7 +116,7 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
             <Trans message="This album does not have any tracks yet" />
           }
         />
-      )}
+      ) : null}
     </div>
   );
 }

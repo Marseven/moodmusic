@@ -12,7 +12,7 @@ export interface BaseFieldProps {
   labelPosition?: 'top' | 'side';
   labelDisplay?: string;
   size?: InputSize;
-  inputRadius?: 'rounded-full' | 'rounded';
+  inputRadius?: 'rounded-full' | 'rounded' | 'rounded-none';
   inputBorder?: string;
   inputShadow?: string;
   invalid?: boolean;

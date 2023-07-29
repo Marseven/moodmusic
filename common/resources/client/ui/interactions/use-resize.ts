@@ -5,7 +5,7 @@ import {
   InteractableRect,
 } from './interactable-event';
 import {usePointerEvents, UsePointerEventsProps} from './use-pointer-events';
-import {setActiveInteraction} from './active-interaction';
+import {activeInteraction, setActiveInteraction} from './active-interaction';
 import {calcNewSizeFromAspectRatio} from './utils/calc-new-size-from-aspect-ratio';
 import {restrictResizableWithinBoundary} from './utils/restrict-resizable-within-boundary';
 import {domRectToObj} from './utils/dom-rect-to-obj';
@@ -58,7 +58,7 @@ export function useResize({
     onMoveStart: (e, resizable) => {
       const target = e.target as HTMLElement;
 
-      if (!target.dataset.resizeHandle) {
+      if (!target.dataset.resizeHandle || activeInteraction) {
         return false;
       }
 

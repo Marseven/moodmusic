@@ -70,13 +70,13 @@ export function OutgoingMailGroup() {
             <Option value="sendmail">SendMail</Option>
             <Option value="log">Log (Email will be saved to error log)</Option>
           </FormSelect>
-          {credentialForms.length && (
+          {credentialForms.length ? (
             <div className="mt-30">
               {credentialForms.map((CredentialsForm, index) => (
                 <CredentialsForm key={index} isInvalid={isInvalid} />
               ))}
             </div>
-          )}
+          ) : null}
         </Fragment>
       )}
     </SettingsErrorGroup>

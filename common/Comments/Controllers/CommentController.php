@@ -24,8 +24,20 @@ class CommentController extends BaseController
         $userId = $this->request->get('userId');
         $this->authorize('index', [Comment::class, $userId]);
 
+        $builder =  $this->comment->with(['user']);
+
+        // will need to specify this outside of filters on edit title comments page
+        if (request('commentable_id') && request('commentable_type')) {
+            $builder->where([
+                'commentable_id' => request('commentable_id'),
+                'commentable_type' => modelTypeToNamespace(
+                    request('commentable_type'),
+                ),
+            ]);
+        }
+
         $dataSource = new Datasource(
-            $this->comment->with(['user']),
+            $builder,
             $this->request->all(),
         );
 

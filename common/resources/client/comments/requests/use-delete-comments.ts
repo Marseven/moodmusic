@@ -1,9 +1,9 @@
 import {useMutation} from '@tanstack/react-query';
-import {apiClient} from '../../http/query-client';
-import {BackendResponse} from '../../http/backend-response/backend-response';
-import {toast} from '../../ui/toast/toast';
-import {message} from '../../i18n/message';
-import {showHttpErrorToast} from '../../utils/http/show-http-error-toast';
+import {apiClient} from '@common/http/query-client';
+import {BackendResponse} from '@common/http/backend-response/backend-response';
+import {toast} from '@common/ui/toast/toast';
+import {message} from '@common/i18n/message';
+import {showHttpErrorToast} from '@common/utils/http/show-http-error-toast';
 
 interface Response extends BackendResponse {
   //
@@ -17,7 +17,7 @@ export function useDeleteComments() {
   return useMutation((payload: Payload) => deleteComments(payload), {
     onSuccess: (response, payload) => {
       toast(
-        message('Deleted [one 1 comment|other :count comments]', {
+        message('[one Comment deleted|other Deleted :count comments]', {
           values: {count: payload.commentIds.length},
         })
       );

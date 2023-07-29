@@ -12,6 +12,8 @@
 namespace Symfony\Component\Serializer\Mapping;
 
 /**
+ * {@inheritdoc}
+ *
  * @author Kévin Dunglas <dunglas@gmail.com>
  */
 class ClassMetadata implements ClassMetadataInterface
@@ -55,21 +57,33 @@ class ClassMetadata implements ClassMetadataInterface
         $this->classDiscriminatorMapping = $classDiscriminatorMapping;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getName(): string
     {
         return $this->name;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function addAttributeMetadata(AttributeMetadataInterface $attributeMetadata)
     {
         $this->attributesMetadata[$attributeMetadata->getName()] = $attributeMetadata;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAttributesMetadata(): array
     {
         return $this->attributesMetadata;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function merge(ClassMetadataInterface $classMetadata)
     {
         foreach ($classMetadata->getAttributesMetadata() as $attributeMetadata) {
@@ -81,6 +95,9 @@ class ClassMetadata implements ClassMetadataInterface
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getReflectionClass(): \ReflectionClass
     {
         if (!$this->reflClass) {
@@ -90,16 +107,19 @@ class ClassMetadata implements ClassMetadataInterface
         return $this->reflClass;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getClassDiscriminatorMapping(): ?ClassDiscriminatorMapping
     {
         return $this->classDiscriminatorMapping;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setClassDiscriminatorMapping(ClassDiscriminatorMapping $mapping = null)
     {
-        if (1 > \func_num_args()) {
-            trigger_deprecation('symfony/serializer', '6.2', 'Calling "%s()" without any arguments is deprecated, pass null explicitly instead.', __METHOD__);
-        }
         $this->classDiscriminatorMapping = $mapping;
     }
 

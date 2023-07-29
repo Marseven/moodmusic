@@ -26,8 +26,8 @@ use Symfony\Contracts\Service\ResetInterface;
  */
 final class TraceableHttpClient implements HttpClientInterface, ResetInterface, LoggerAwareInterface
 {
-    private HttpClientInterface $client;
-    private ?Stopwatch $stopwatch;
+    private $client;
+    private $stopwatch;
     private \ArrayObject $tracedRequests;
 
     public function __construct(HttpClientInterface $client, Stopwatch $stopwatch = null)
@@ -37,6 +37,9 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests = new \ArrayObject();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function request(string $method, string $url, array $options = []): ResponseInterface
     {
         $content = null;
@@ -63,9 +66,12 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
             }
         };
 
-        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content, $this->stopwatch?->start("$method $url", 'http_client'));
+        return new TraceableResponse($this->client, $this->client->request($method, $url, $options), $content, null === $this->stopwatch ? null : $this->stopwatch->start("$method $url", 'http_client'));
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function stream(ResponseInterface|iterable $responses, float $timeout = null): ResponseStreamInterface
     {
         if ($responses instanceof TraceableResponse) {
@@ -89,6 +95,9 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         $this->tracedRequests->exchangeArray([]);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setLogger(LoggerInterface $logger): void
     {
         if ($this->client instanceof LoggerAwareInterface) {
@@ -96,6 +105,9 @@ final class TraceableHttpClient implements HttpClientInterface, ResetInterface, 
         }
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function withOptions(array $options): static
     {
         $clone = clone $this;

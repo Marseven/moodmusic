@@ -33,12 +33,12 @@ export function NotFoundPage() {
             </div>
           </div>
           <div className="dark:opacity-5">
-            <img src={imgUrl2} alt="" />
+            <img src={imgUrl2 as any} alt="" />
           </div>
         </div>
       </div>
       <div className="dark:opacity-80">
-        <img src={imgUrl1} alt="" />
+        <img src={imgUrl1 as any} alt="" />
       </div>
     </div>
   );

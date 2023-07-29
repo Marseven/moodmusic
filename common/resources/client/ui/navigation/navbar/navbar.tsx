@@ -24,7 +24,7 @@ import {
 } from '@common/ui/navigation/navbar/navbar-auth-user';
 import {NavbarAuthButtons} from '@common/ui/navigation/navbar/navbar-auth-buttons';
 
-type NavbarColor = 'primary' | 'bg' | 'bg-alt' | 'transparent';
+type NavbarColor = 'primary' | 'bg' | 'bg-alt' | 'transparent' | string;
 
 export interface NavbarProps {
   hideLogo?: boolean;
@@ -42,22 +42,23 @@ export interface NavbarProps {
   menuPosition?: string;
   authMenuItems?: NavbarAuthUserProps['items'];
 }
-export function Navbar({
-  hideLogo,
-  toggleButton,
-  children,
-  className,
-  border,
-  size = 'md',
-  color = 'primary',
-  darkModeColor = 'bg-alt',
-  textColor,
-  rightChildren,
-  menuPosition,
-  logoColor,
-  primaryButtonColor,
-  authMenuItems,
-}: NavbarProps) {
+export function Navbar(props: NavbarProps) {
+  let {
+    hideLogo,
+    toggleButton,
+    children,
+    className,
+    border,
+    size = 'md',
+    color = 'primary',
+    textColor,
+    darkModeColor = 'bg-alt',
+    rightChildren,
+    menuPosition,
+    logoColor,
+    primaryButtonColor,
+    authMenuItems,
+  } = props;
   const isMobile = useIsMobileMediaQuery();
   const isDarkMode = useIsDarkMode();
   const {notifications} = useSettings();
@@ -74,12 +75,7 @@ export function Navbar({
       className={clsx(
         'flex items-center gap-10 py-8',
         isMobile ? 'pl-14 pr-8' : 'px-20',
-        color === 'primary' &&
-          `bg-primary ${textColor || 'text-on-primary'} border-b-primary`,
-        color === 'bg' && `bg ${textColor || 'text-main'} border-b`,
-        color === 'bg-alt' && `bg-alt ${textColor || 'text-main'} border-b`,
-        color === 'transparent' &&
-          `bg-transparent ${textColor || 'text-white'}`,
+        getColorStyle(color, textColor),
         size === 'md' && 'h-64 py-8',
         size === 'sm' && 'h-54 py-4',
         size === 'xs' && 'h-48 py-4',
@@ -194,7 +190,7 @@ function Logo({color, isMobile, logoColor}: LogoProps) {
   if (
     isDarkMode ||
     !branding.logo_dark ||
-    (logoColor !== 'dark' && (color === 'primary' || color === 'transparent'))
+    (logoColor !== 'dark' && color !== 'bg' && color !== 'bg-alt')
   ) {
     desktopLogo = branding.logo_light;
     mobileLogo = branding.logo_light_mobile;
@@ -225,4 +221,19 @@ function Logo({color, isMobile, logoColor}: LogoProps) {
       />
     </Link>
   );
+}
+
+function getColorStyle(color: string, textColor?: string): string {
+  switch (color) {
+    case 'primary':
+      return `bg-primary ${textColor || 'text-on-primary'} border-b-primary`;
+    case 'bg':
+      return `bg ${textColor || 'text-main'} border-b`;
+    case 'bg-alt':
+      return `bg-alt ${textColor || 'text-main'} border-b`;
+    case 'transparent':
+      return `bg-transparent ${textColor || 'text-white'}`;
+    default:
+      return `${color} ${textColor}`;
+  }
 }

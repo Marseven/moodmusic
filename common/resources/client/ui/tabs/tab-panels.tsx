@@ -21,14 +21,17 @@ export interface TabPanelsProps {
 export function TabPanels({children, className}: TabPanelsProps) {
   const {selectedTab, isLazy} = useContext(TabContext);
 
-  const panelArray = Children.toArray(children);
+  // filter out falsy values, in case of conditional rendering
+  const panelArray = Children.toArray(children).filter(p => !!p);
 
   let rendered: ReactNode;
   if (isLazy) {
-    rendered = cloneElement<TabPanelProps>(
-      panelArray[selectedTab] as ReactElement,
-      {index: selectedTab}
-    );
+    const el = panelArray[selectedTab] as ReactElement;
+    rendered = isValidElement(el)
+      ? cloneElement<TabPanelProps>(panelArray[selectedTab] as ReactElement, {
+          index: selectedTab,
+        })
+      : null;
   } else {
     rendered = panelArray.map((panel, index) => {
       if (isValidElement<TabPanelsProps>(panel)) {
