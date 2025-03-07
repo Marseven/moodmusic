@@ -10,7 +10,8 @@ class SyncProductOnEnabledGateways
 {
     public function __construct(
         protected Stripe $stripe,
-        protected Paypal $paypal
+        protected Paypal $paypal,
+        protected Ebilling $ebilling
     ) {
     }
 
@@ -23,6 +24,9 @@ class SyncProductOnEnabledGateways
         }
         if ($this->paypal->isEnabled()) {
             $this->paypal->syncPlan($product);
+        }
+        if ($this->ebilling->isEnabled()) {
+            $this->ebilling->syncPlan($product);
         }
     }
 }

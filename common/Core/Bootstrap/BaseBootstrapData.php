@@ -47,6 +47,7 @@ class BaseBootstrapData implements BootstrapData
             $this->data['themes']['all'],
             fn($theme) => $theme['id'] === (int) $themeId,
         );
+       
         if (!$theme) {
             $theme = $this->data['themes']['all'][0];
         }

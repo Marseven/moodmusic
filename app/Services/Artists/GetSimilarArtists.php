@@ -22,7 +22,7 @@ class GetSimilarArtists
 
     private function getByGenres(Collection $genreIds, $artistId, $params): Collection
     {
-        return Artist::select(DB::raw('artists.*, COUNT(*) AS tag_count'))
+        return Artist::select(DB::raw('mm_artists.*, COUNT(*) AS tag_count'))
             ->join('genreables', 'genreable_id', '=', 'artists.id')
             ->whereIn('genreables.genre_id', $genreIds)
             ->where('genreables.genreable_type', Artist::class)

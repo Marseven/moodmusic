@@ -45,7 +45,8 @@ export function SubscriptionSettings() {
             </FormSwitch>
             <SettingsSeparator />
             <PaypalSection />
-            <StripeSection />
+            
+            <EbillingSection />
             <SettingsSeparator />
             <JsonChipField
               name="client.billing.accepted_cards"
@@ -187,5 +188,63 @@ function StripeSection() {
         </SettingsErrorGroup>
       ) : null}
     </Fragment>
+  );
+}
+
+function EbillingSection() {
+  const {watch} = useFormContext<AdminSettings>();
+  const ebillingIsEnabled = watch('client.billing.ebilling.enable');
+  console.log('Ebilling enabled:', ebillingIsEnabled); // Debug log
+
+  return (
+    <div className="mb-30">
+      <FormSwitch
+        name="client.billing.ebilling.enable"
+        description={
+          <div>
+            <Trans message="Enable ebilling payment gateway integration." />
+            <LearnMoreLink
+              className="mt-6"
+              link="https://support.vebto.com/help-center/articles/147/configuring-paypal"
+            />
+          </div>
+        }
+      >
+        <Trans message="ebilling gateway" />
+      </FormSwitch>
+      {ebillingIsEnabled ? (
+        <SettingsErrorGroup name="ebilling_group">
+          {isInvalid => (
+            <Fragment>
+              <FormTextField
+                name="server.ebilling_client_id"
+                label={<Trans message="Ebilling Client ID" />}
+                required
+                invalid={isInvalid}
+                className="mb-20"
+              />
+              <FormTextField
+                name="server.ebilling_secret"
+                label={<Trans message="Ebilling Secret" />}
+                required
+                invalid={isInvalid}
+                className="mb-20"
+              />
+              <FormSwitch
+                name="client.billing.ebilling_test_mode"
+                invalid={isInvalid}
+                description={
+                  <div>
+                    <Trans message="Allows testing ebilling payments with sandbox accounts." />
+                  </div>
+                }
+              >
+                <Trans message="Ebilling test mode" />
+              </FormSwitch>
+            </Fragment>
+          )}
+        </SettingsErrorGroup>
+      ) : null}
+    </div>
   );
 }

@@ -60,6 +60,13 @@ return [
         'product_id' => env('PAYPAL_PRODUCT_ID'),
         'product_name' => env('PAYPAL_PRODUCT_NAME'),
     ],
+    
+    'ebilling' => [
+        'username' => env('EBILLING_USERNAME'),
+        'sharedkey' => env('EBILLING_SHAREDKEY'),
+        'server_url' => env('EBILLING_SERVER_URL'),
+        'post_url' => env('EBILLING_POST_URL'),
+    ],
 
     'stripe' => [
         'model' => App\User::class,
