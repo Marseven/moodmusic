@@ -40,7 +40,7 @@ final class Statement implements StatementInterface
     /** @var array<int, mixed> */
     private array $parameters = [];
 
-    /** @psalm-var array<int, int> */
+    /** @var array<int, int> */
     private array $parameterTypes = [];
 
     /**
@@ -74,7 +74,7 @@ final class Statement implements StatementInterface
         );
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritDoc} */
     public function bindValue($param, $value, $type = ParameterType::STRING): bool
     {
         if (! isset($this->parameterMap[$param])) {
@@ -87,7 +87,7 @@ final class Statement implements StatementInterface
         return true;
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritDoc} */
     public function bindParam($param, &$variable, $type = ParameterType::STRING, $length = null): bool
     {
         Deprecation::trigger(
@@ -124,7 +124,7 @@ final class Statement implements StatementInterface
         return true;
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritDoc} */
     public function execute($params = null): Result
     {
         if ($params !== null) {

@@ -17,12 +17,41 @@
 
 namespace Google\Service\Playdeveloperreporting;
 
-class GooglePlayDeveloperReportingV1beta1ErrorIssue extends \Google\Model
+class GooglePlayDeveloperReportingV1beta1ErrorIssue extends \Google\Collection
 {
+  protected $collection_key = 'sampleErrorReports';
+  protected $annotationsType = GooglePlayDeveloperReportingV1beta1IssueAnnotation::class;
+  protected $annotationsDataType = 'array';
   /**
    * @var string
    */
   public $cause;
+  /**
+   * @var string
+   */
+  public $distinctUsers;
+  protected $distinctUsersPercentType = GoogleTypeDecimal::class;
+  protected $distinctUsersPercentDataType = '';
+  /**
+   * @var string
+   */
+  public $errorReportCount;
+  protected $firstAppVersionType = GooglePlayDeveloperReportingV1beta1AppVersion::class;
+  protected $firstAppVersionDataType = '';
+  protected $firstOsVersionType = GooglePlayDeveloperReportingV1beta1OsVersion::class;
+  protected $firstOsVersionDataType = '';
+  /**
+   * @var string
+   */
+  public $issueUri;
+  protected $lastAppVersionType = GooglePlayDeveloperReportingV1beta1AppVersion::class;
+  protected $lastAppVersionDataType = '';
+  /**
+   * @var string
+   */
+  public $lastErrorReportTime;
+  protected $lastOsVersionType = GooglePlayDeveloperReportingV1beta1OsVersion::class;
+  protected $lastOsVersionDataType = '';
   /**
    * @var string
    */
@@ -32,10 +61,28 @@ class GooglePlayDeveloperReportingV1beta1ErrorIssue extends \Google\Model
    */
   public $name;
   /**
+   * @var string[]
+   */
+  public $sampleErrorReports;
+  /**
    * @var string
    */
   public $type;
 
+  /**
+   * @param GooglePlayDeveloperReportingV1beta1IssueAnnotation[]
+   */
+  public function setAnnotations($annotations)
+  {
+    $this->annotations = $annotations;
+  }
+  /**
+   * @return GooglePlayDeveloperReportingV1beta1IssueAnnotation[]
+   */
+  public function getAnnotations()
+  {
+    return $this->annotations;
+  }
   /**
    * @param string
    */
@@ -49,6 +96,132 @@ class GooglePlayDeveloperReportingV1beta1ErrorIssue extends \Google\Model
   public function getCause()
   {
     return $this->cause;
+  }
+  /**
+   * @param string
+   */
+  public function setDistinctUsers($distinctUsers)
+  {
+    $this->distinctUsers = $distinctUsers;
+  }
+  /**
+   * @return string
+   */
+  public function getDistinctUsers()
+  {
+    return $this->distinctUsers;
+  }
+  /**
+   * @param GoogleTypeDecimal
+   */
+  public function setDistinctUsersPercent(GoogleTypeDecimal $distinctUsersPercent)
+  {
+    $this->distinctUsersPercent = $distinctUsersPercent;
+  }
+  /**
+   * @return GoogleTypeDecimal
+   */
+  public function getDistinctUsersPercent()
+  {
+    return $this->distinctUsersPercent;
+  }
+  /**
+   * @param string
+   */
+  public function setErrorReportCount($errorReportCount)
+  {
+    $this->errorReportCount = $errorReportCount;
+  }
+  /**
+   * @return string
+   */
+  public function getErrorReportCount()
+  {
+    return $this->errorReportCount;
+  }
+  /**
+   * @param GooglePlayDeveloperReportingV1beta1AppVersion
+   */
+  public function setFirstAppVersion(GooglePlayDeveloperReportingV1beta1AppVersion $firstAppVersion)
+  {
+    $this->firstAppVersion = $firstAppVersion;
+  }
+  /**
+   * @return GooglePlayDeveloperReportingV1beta1AppVersion
+   */
+  public function getFirstAppVersion()
+  {
+    return $this->firstAppVersion;
+  }
+  /**
+   * @param GooglePlayDeveloperReportingV1beta1OsVersion
+   */
+  public function setFirstOsVersion(GooglePlayDeveloperReportingV1beta1OsVersion $firstOsVersion)
+  {
+    $this->firstOsVersion = $firstOsVersion;
+  }
+  /**
+   * @return GooglePlayDeveloperReportingV1beta1OsVersion
+   */
+  public function getFirstOsVersion()
+  {
+    return $this->firstOsVersion;
+  }
+  /**
+   * @param string
+   */
+  public function setIssueUri($issueUri)
+  {
+    $this->issueUri = $issueUri;
+  }
+  /**
+   * @return string
+   */
+  public function getIssueUri()
+  {
+    return $this->issueUri;
+  }
+  /**
+   * @param GooglePlayDeveloperReportingV1beta1AppVersion
+   */
+  public function setLastAppVersion(GooglePlayDeveloperReportingV1beta1AppVersion $lastAppVersion)
+  {
+    $this->lastAppVersion = $lastAppVersion;
+  }
+  /**
+   * @return GooglePlayDeveloperReportingV1beta1AppVersion
+   */
+  public function getLastAppVersion()
+  {
+    return $this->lastAppVersion;
+  }
+  /**
+   * @param string
+   */
+  public function setLastErrorReportTime($lastErrorReportTime)
+  {
+    $this->lastErrorReportTime = $lastErrorReportTime;
+  }
+  /**
+   * @return string
+   */
+  public function getLastErrorReportTime()
+  {
+    return $this->lastErrorReportTime;
+  }
+  /**
+   * @param GooglePlayDeveloperReportingV1beta1OsVersion
+   */
+  public function setLastOsVersion(GooglePlayDeveloperReportingV1beta1OsVersion $lastOsVersion)
+  {
+    $this->lastOsVersion = $lastOsVersion;
+  }
+  /**
+   * @return GooglePlayDeveloperReportingV1beta1OsVersion
+   */
+  public function getLastOsVersion()
+  {
+    return $this->lastOsVersion;
   }
   /**
    * @param string
@@ -77,6 +250,20 @@ class GooglePlayDeveloperReportingV1beta1ErrorIssue extends \Google\Model
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * @param string[]
+   */
+  public function setSampleErrorReports($sampleErrorReports)
+  {
+    $this->sampleErrorReports = $sampleErrorReports;
+  }
+  /**
+   * @return string[]
+   */
+  public function getSampleErrorReports()
+  {
+    return $this->sampleErrorReports;
   }
   /**
    * @param string

@@ -17,8 +17,9 @@
 
 namespace Google\Service\Document;
 
-class GoogleCloudDocumentaiV1Processor extends \Google\Model
+class GoogleCloudDocumentaiV1Processor extends \Google\Collection
 {
+  protected $collection_key = 'processorVersionAliases';
   /**
    * @var string
    */
@@ -43,6 +44,16 @@ class GoogleCloudDocumentaiV1Processor extends \Google\Model
    * @var string
    */
   public $processEndpoint;
+  protected $processorVersionAliasesType = GoogleCloudDocumentaiV1ProcessorVersionAlias::class;
+  protected $processorVersionAliasesDataType = 'array';
+  /**
+   * @var bool
+   */
+  public $satisfiesPzi;
+  /**
+   * @var bool
+   */
+  public $satisfiesPzs;
   /**
    * @var string
    */
@@ -135,6 +146,48 @@ class GoogleCloudDocumentaiV1Processor extends \Google\Model
   public function getProcessEndpoint()
   {
     return $this->processEndpoint;
+  }
+  /**
+   * @param GoogleCloudDocumentaiV1ProcessorVersionAlias[]
+   */
+  public function setProcessorVersionAliases($processorVersionAliases)
+  {
+    $this->processorVersionAliases = $processorVersionAliases;
+  }
+  /**
+   * @return GoogleCloudDocumentaiV1ProcessorVersionAlias[]
+   */
+  public function getProcessorVersionAliases()
+  {
+    return $this->processorVersionAliases;
+  }
+  /**
+   * @param bool
+   */
+  public function setSatisfiesPzi($satisfiesPzi)
+  {
+    $this->satisfiesPzi = $satisfiesPzi;
+  }
+  /**
+   * @return bool
+   */
+  public function getSatisfiesPzi()
+  {
+    return $this->satisfiesPzi;
+  }
+  /**
+   * @param bool
+   */
+  public function setSatisfiesPzs($satisfiesPzs)
+  {
+    $this->satisfiesPzs = $satisfiesPzs;
+  }
+  /**
+   * @return bool
+   */
+  public function getSatisfiesPzs()
+  {
+    return $this->satisfiesPzs;
   }
   /**
    * @param string

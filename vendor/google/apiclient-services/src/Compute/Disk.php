@@ -23,6 +23,10 @@ class Disk extends \Google\Collection
   /**
    * @var string
    */
+  public $accessMode;
+  /**
+   * @var string
+   */
   public $architecture;
   protected $asyncPrimaryDiskType = DiskAsyncReplication::class;
   protected $asyncPrimaryDiskDataType = '';
@@ -38,6 +42,10 @@ class Disk extends \Google\Collection
   public $description;
   protected $diskEncryptionKeyType = CustomerEncryptionKey::class;
   protected $diskEncryptionKeyDataType = '';
+  /**
+   * @var bool
+   */
+  public $enableConfidentialCompute;
   protected $guestOsFeaturesType = GuestOsFeature::class;
   protected $guestOsFeaturesDataType = 'array';
   /**
@@ -115,6 +123,10 @@ class Disk extends \Google\Collection
   /**
    * @var bool
    */
+  public $satisfiesPzi;
+  /**
+   * @var bool
+   */
   public $satisfiesPzs;
   /**
    * @var string
@@ -153,6 +165,14 @@ class Disk extends \Google\Collection
   /**
    * @var string
    */
+  public $sourceInstantSnapshot;
+  /**
+   * @var string
+   */
+  public $sourceInstantSnapshotId;
+  /**
+   * @var string
+   */
   public $sourceSnapshot;
   protected $sourceSnapshotEncryptionKeyType = CustomerEncryptionKey::class;
   protected $sourceSnapshotEncryptionKeyDataType = '';
@@ -171,6 +191,10 @@ class Disk extends \Google\Collection
   /**
    * @var string
    */
+  public $storagePool;
+  /**
+   * @var string
+   */
   public $type;
   /**
    * @var string[]
@@ -181,6 +205,20 @@ class Disk extends \Google\Collection
    */
   public $zone;
 
+  /**
+   * @param string
+   */
+  public function setAccessMode($accessMode)
+  {
+    $this->accessMode = $accessMode;
+  }
+  /**
+   * @return string
+   */
+  public function getAccessMode()
+  {
+    return $this->accessMode;
+  }
   /**
    * @param string
    */
@@ -264,6 +302,20 @@ class Disk extends \Google\Collection
   public function getDiskEncryptionKey()
   {
     return $this->diskEncryptionKey;
+  }
+  /**
+   * @param bool
+   */
+  public function setEnableConfidentialCompute($enableConfidentialCompute)
+  {
+    $this->enableConfidentialCompute = $enableConfidentialCompute;
+  }
+  /**
+   * @return bool
+   */
+  public function getEnableConfidentialCompute()
+  {
+    return $this->enableConfidentialCompute;
   }
   /**
    * @param GuestOsFeature[]
@@ -548,6 +600,20 @@ class Disk extends \Google\Collection
   /**
    * @param bool
    */
+  public function setSatisfiesPzi($satisfiesPzi)
+  {
+    $this->satisfiesPzi = $satisfiesPzi;
+  }
+  /**
+   * @return bool
+   */
+  public function getSatisfiesPzi()
+  {
+    return $this->satisfiesPzi;
+  }
+  /**
+   * @param bool
+   */
   public function setSatisfiesPzs($satisfiesPzs)
   {
     $this->satisfiesPzs = $satisfiesPzs;
@@ -688,6 +754,34 @@ class Disk extends \Google\Collection
   /**
    * @param string
    */
+  public function setSourceInstantSnapshot($sourceInstantSnapshot)
+  {
+    $this->sourceInstantSnapshot = $sourceInstantSnapshot;
+  }
+  /**
+   * @return string
+   */
+  public function getSourceInstantSnapshot()
+  {
+    return $this->sourceInstantSnapshot;
+  }
+  /**
+   * @param string
+   */
+  public function setSourceInstantSnapshotId($sourceInstantSnapshotId)
+  {
+    $this->sourceInstantSnapshotId = $sourceInstantSnapshotId;
+  }
+  /**
+   * @return string
+   */
+  public function getSourceInstantSnapshotId()
+  {
+    return $this->sourceInstantSnapshotId;
+  }
+  /**
+   * @param string
+   */
   public function setSourceSnapshot($sourceSnapshot)
   {
     $this->sourceSnapshot = $sourceSnapshot;
@@ -754,6 +848,20 @@ class Disk extends \Google\Collection
   public function getStatus()
   {
     return $this->status;
+  }
+  /**
+   * @param string
+   */
+  public function setStoragePool($storagePool)
+  {
+    $this->storagePool = $storagePool;
+  }
+  /**
+   * @return string
+   */
+  public function getStoragePool()
+  {
+    return $this->storagePool;
   }
   /**
    * @param string

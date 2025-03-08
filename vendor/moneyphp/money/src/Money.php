@@ -54,12 +54,11 @@ final class Money implements JsonSerializable
 
     /**
      * Internal value.
+     * Amount, expressed in the smallest currency units (eg cents).
      *
      * @psalm-var numeric-string
      */
     private string $amount;
-
-    private Currency $currency;
 
     /**
      * @var Calculator
@@ -73,10 +72,8 @@ final class Money implements JsonSerializable
      *
      * @throws InvalidArgumentException If amount is not integer(ish).
      */
-    public function __construct(int|string $amount, Currency $currency)
+    public function __construct(int|string $amount, private readonly Currency $currency)
     {
-        $this->currency = $currency;
-
         if (filter_var($amount, FILTER_VALIDATE_INT) === false) {
             $numberFromString = Number::fromString((string) $amount);
             if (! $numberFromString->isInteger()) {
@@ -168,7 +165,7 @@ final class Money implements JsonSerializable
     }
 
     /**
-     * Returns the value represented by this object.
+     * Returns the value represented by this object - amount, expressed in the smallest currency units (eg cents).
      *
      * @psalm-return numeric-string
      */
@@ -272,14 +269,20 @@ final class Money implements JsonSerializable
      * the remainder after dividing the value by
      * the given factor.
      */
-    public function mod(Money $divisor): Money
+    public function mod(Money|int|string $divisor): Money
     {
-        // Note: non-strict equality is intentional here, since `Currency` is `final` and reliable.
-        if ($this->currency != $divisor->currency) {
-            throw new InvalidArgumentException('Currencies must be identical');
+        if ($divisor instanceof self) {
+            // Note: non-strict equality is intentional here, since `Currency` is `final` and reliable.
+            if ($this->currency != $divisor->currency) {
+                throw new InvalidArgumentException('Currencies must be identical');
+            }
+
+            $divisor = $divisor->amount;
+        } else {
+            $divisor = (string) Number::fromNumber($divisor);
         }
 
-        return new self(self::$calculator::mod($this->amount, $divisor->amount), $this->currency);
+        return new self(self::$calculator::mod($this->amount, $divisor), $this->currency);
     }
 
     /**
@@ -393,7 +396,7 @@ final class Money implements JsonSerializable
     /**
      * Round to a specific unit.
      *
-     * @psalm-param positive-int|0  $unit
+     * @psalm-param non-negative-int  $unit
      * @psalm-param self::ROUND_* $roundingMode
      */
     public function roundToUnit(int $unit, int $roundingMode = self::ROUND_HALF_UP): self
@@ -458,7 +461,7 @@ final class Money implements JsonSerializable
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @psalm-return array{amount: string, currency: string}
      */

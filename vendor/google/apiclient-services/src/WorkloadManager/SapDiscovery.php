@@ -28,11 +28,21 @@ class SapDiscovery extends \Google\Model
   /**
    * @var string
    */
+  public $projectNumber;
+  /**
+   * @var string
+   */
   public $systemId;
   /**
    * @var string
    */
   public $updateTime;
+  /**
+   * @var bool
+   */
+  public $useDrReconciliation;
+  protected $workloadPropertiesType = SapDiscoveryWorkloadProperties::class;
+  protected $workloadPropertiesDataType = '';
 
   /**
    * @param SapDiscoveryComponent
@@ -79,6 +89,20 @@ class SapDiscovery extends \Google\Model
   /**
    * @param string
    */
+  public function setProjectNumber($projectNumber)
+  {
+    $this->projectNumber = $projectNumber;
+  }
+  /**
+   * @return string
+   */
+  public function getProjectNumber()
+  {
+    return $this->projectNumber;
+  }
+  /**
+   * @param string
+   */
   public function setSystemId($systemId)
   {
     $this->systemId = $systemId;
@@ -103,6 +127,34 @@ class SapDiscovery extends \Google\Model
   public function getUpdateTime()
   {
     return $this->updateTime;
+  }
+  /**
+   * @param bool
+   */
+  public function setUseDrReconciliation($useDrReconciliation)
+  {
+    $this->useDrReconciliation = $useDrReconciliation;
+  }
+  /**
+   * @return bool
+   */
+  public function getUseDrReconciliation()
+  {
+    return $this->useDrReconciliation;
+  }
+  /**
+   * @param SapDiscoveryWorkloadProperties
+   */
+  public function setWorkloadProperties(SapDiscoveryWorkloadProperties $workloadProperties)
+  {
+    $this->workloadProperties = $workloadProperties;
+  }
+  /**
+   * @return SapDiscoveryWorkloadProperties
+   */
+  public function getWorkloadProperties()
+  {
+    return $this->workloadProperties;
   }
 }
 

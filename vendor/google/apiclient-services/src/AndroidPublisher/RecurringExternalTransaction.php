@@ -29,6 +29,12 @@ class RecurringExternalTransaction extends \Google\Model
    * @var string
    */
   public $initialExternalTransactionId;
+  /**
+   * @var string
+   */
+  public $migratedTransactionProgram;
+  protected $otherRecurringProductType = OtherRecurringProduct::class;
+  protected $otherRecurringProductDataType = '';
 
   /**
    * @param ExternalSubscription
@@ -71,6 +77,34 @@ class RecurringExternalTransaction extends \Google\Model
   public function getInitialExternalTransactionId()
   {
     return $this->initialExternalTransactionId;
+  }
+  /**
+   * @param string
+   */
+  public function setMigratedTransactionProgram($migratedTransactionProgram)
+  {
+    $this->migratedTransactionProgram = $migratedTransactionProgram;
+  }
+  /**
+   * @return string
+   */
+  public function getMigratedTransactionProgram()
+  {
+    return $this->migratedTransactionProgram;
+  }
+  /**
+   * @param OtherRecurringProduct
+   */
+  public function setOtherRecurringProduct(OtherRecurringProduct $otherRecurringProduct)
+  {
+    $this->otherRecurringProduct = $otherRecurringProduct;
+  }
+  /**
+   * @return OtherRecurringProduct
+   */
+  public function getOtherRecurringProduct()
+  {
+    return $this->otherRecurringProduct;
   }
 }
 

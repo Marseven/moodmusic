@@ -23,6 +23,10 @@ class ResourceStatus extends \Google\Model
    * @var string
    */
   public $physicalHost;
+  protected $schedulingType = ResourceStatusScheduling::class;
+  protected $schedulingDataType = '';
+  protected $upcomingMaintenanceType = UpcomingMaintenance::class;
+  protected $upcomingMaintenanceDataType = '';
 
   /**
    * @param string
@@ -37,6 +41,34 @@ class ResourceStatus extends \Google\Model
   public function getPhysicalHost()
   {
     return $this->physicalHost;
+  }
+  /**
+   * @param ResourceStatusScheduling
+   */
+  public function setScheduling(ResourceStatusScheduling $scheduling)
+  {
+    $this->scheduling = $scheduling;
+  }
+  /**
+   * @return ResourceStatusScheduling
+   */
+  public function getScheduling()
+  {
+    return $this->scheduling;
+  }
+  /**
+   * @param UpcomingMaintenance
+   */
+  public function setUpcomingMaintenance(UpcomingMaintenance $upcomingMaintenance)
+  {
+    $this->upcomingMaintenance = $upcomingMaintenance;
+  }
+  /**
+   * @return UpcomingMaintenance
+   */
+  public function getUpcomingMaintenance()
+  {
+    return $this->upcomingMaintenance;
   }
 }
 

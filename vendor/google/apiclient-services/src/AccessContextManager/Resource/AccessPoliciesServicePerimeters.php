@@ -54,6 +54,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @param CommitServicePerimetersRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function commit($parent, CommitServicePerimetersRequest $postBody, $optParams = [])
   {
@@ -72,6 +73,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @param ServicePerimeter $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function create($parent, ServicePerimeter $postBody, $optParams = [])
   {
@@ -88,6 +90,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * Format: `accessPolicies/{policy_id}/servicePerimeters/{service_perimeter_id}`
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -103,6 +106,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * `accessPolicies/{policy_id}/servicePerimeters/{service_perimeters_id}`
    * @param array $optParams Optional parameters.
    * @return ServicePerimeter
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -123,6 +127,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @opt_param string pageToken Next page token for the next batch of Service
    * Perimeter instances. Defaults to the first page of results.
    * @return ListServicePerimetersResponse
+   * @throws \Google\Service\Exception
    */
   public function listAccessPoliciesServicePerimeters($parent, $optParams = [])
   {
@@ -136,7 +141,8 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * storage. If a service perimeter contains errors, an error response is
    * returned for the first error encountered. (servicePerimeters.patch)
    *
-   * @param string $name Resource name for the `ServicePerimeter`. Format:
+   * @param string $name Identifier. Resource name for the `ServicePerimeter`.
+   * Format:
    * `accessPolicies/{access_policy}/servicePerimeters/{service_perimeter}`. The
    * `service_perimeter` component must begin with a letter, followed by
    * alphanumeric characters or `_`. After you create a `ServicePerimeter`, you
@@ -147,6 +153,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @opt_param string updateMask Required. Mask to control which fields get
    * updated. Must be non-empty.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function patch($name, ServicePerimeter $postBody, $optParams = [])
   {
@@ -168,6 +175,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @param ReplaceServicePerimetersRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function replaceAll($parent, ReplaceServicePerimetersRequest $postBody, $optParams = [])
   {
@@ -188,6 +196,7 @@ class AccessPoliciesServicePerimeters extends \Google\Service\Resource
    * @param TestIamPermissionsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return TestIamPermissionsResponse
+   * @throws \Google\Service\Exception
    */
   public function testIamPermissions($resource, TestIamPermissionsRequest $postBody, $optParams = [])
   {

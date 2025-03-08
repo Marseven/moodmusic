@@ -23,6 +23,10 @@ class GoogleAdsSearchads360V0ResourcesCampaign extends \Google\Collection
   /**
    * @var string
    */
+  public $accessibleBiddingStrategy;
+  /**
+   * @var string
+   */
   public $adServingOptimizationStatus;
   /**
    * @var string
@@ -58,6 +62,10 @@ class GoogleAdsSearchads360V0ResourcesCampaign extends \Google\Collection
   public $creationTime;
   protected $dynamicSearchAdsSettingType = GoogleAdsSearchads360V0ResourcesCampaignDynamicSearchAdsSetting::class;
   protected $dynamicSearchAdsSettingDataType = '';
+  /**
+   * @var string[]
+   */
+  public $effectiveLabels;
   /**
    * @var string
    */
@@ -155,6 +163,20 @@ class GoogleAdsSearchads360V0ResourcesCampaign extends \Google\Collection
    */
   public $urlExpansionOptOut;
 
+  /**
+   * @param string
+   */
+  public function setAccessibleBiddingStrategy($accessibleBiddingStrategy)
+  {
+    $this->accessibleBiddingStrategy = $accessibleBiddingStrategy;
+  }
+  /**
+   * @return string
+   */
+  public function getAccessibleBiddingStrategy()
+  {
+    return $this->accessibleBiddingStrategy;
+  }
   /**
    * @param string
    */
@@ -294,6 +316,20 @@ class GoogleAdsSearchads360V0ResourcesCampaign extends \Google\Collection
   public function getDynamicSearchAdsSetting()
   {
     return $this->dynamicSearchAdsSetting;
+  }
+  /**
+   * @param string[]
+   */
+  public function setEffectiveLabels($effectiveLabels)
+  {
+    $this->effectiveLabels = $effectiveLabels;
+  }
+  /**
+   * @return string[]
+   */
+  public function getEffectiveLabels()
+  {
+    return $this->effectiveLabels;
   }
   /**
    * @param string

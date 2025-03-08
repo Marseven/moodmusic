@@ -17,8 +17,11 @@
 
 namespace Google\Service\Pubsub;
 
-class Topic extends \Google\Model
+class Topic extends \Google\Collection
 {
+  protected $collection_key = 'messageTransforms';
+  protected $ingestionDataSourceSettingsType = IngestionDataSourceSettings::class;
+  protected $ingestionDataSourceSettingsDataType = '';
   /**
    * @var string
    */
@@ -33,6 +36,8 @@ class Topic extends \Google\Model
   public $messageRetentionDuration;
   protected $messageStoragePolicyType = MessageStoragePolicy::class;
   protected $messageStoragePolicyDataType = '';
+  protected $messageTransformsType = MessageTransform::class;
+  protected $messageTransformsDataType = 'array';
   /**
    * @var string
    */
@@ -43,7 +48,25 @@ class Topic extends \Google\Model
   public $satisfiesPzs;
   protected $schemaSettingsType = SchemaSettings::class;
   protected $schemaSettingsDataType = '';
+  /**
+   * @var string
+   */
+  public $state;
 
+  /**
+   * @param IngestionDataSourceSettings
+   */
+  public function setIngestionDataSourceSettings(IngestionDataSourceSettings $ingestionDataSourceSettings)
+  {
+    $this->ingestionDataSourceSettings = $ingestionDataSourceSettings;
+  }
+  /**
+   * @return IngestionDataSourceSettings
+   */
+  public function getIngestionDataSourceSettings()
+  {
+    return $this->ingestionDataSourceSettings;
+  }
   /**
    * @param string
    */
@@ -101,6 +124,20 @@ class Topic extends \Google\Model
     return $this->messageStoragePolicy;
   }
   /**
+   * @param MessageTransform[]
+   */
+  public function setMessageTransforms($messageTransforms)
+  {
+    $this->messageTransforms = $messageTransforms;
+  }
+  /**
+   * @return MessageTransform[]
+   */
+  public function getMessageTransforms()
+  {
+    return $this->messageTransforms;
+  }
+  /**
    * @param string
    */
   public function setName($name)
@@ -141,6 +178,20 @@ class Topic extends \Google\Model
   public function getSchemaSettings()
   {
     return $this->schemaSettings;
+  }
+  /**
+   * @param string
+   */
+  public function setState($state)
+  {
+    $this->state = $state;
+  }
+  /**
+   * @return string
+   */
+  public function getState()
+  {
+    return $this->state;
   }
 }
 

@@ -41,6 +41,8 @@ class DataCatalog extends \Google\Service
 
   public $catalog;
   public $entries;
+  public $organizations_locations;
+  public $projects_locations;
   public $projects_locations_entryGroups;
   public $projects_locations_entryGroups_entries;
   public $projects_locations_entryGroups_entries_tags;
@@ -51,6 +53,7 @@ class DataCatalog extends \Google\Service
   public $projects_locations_tagTemplates_fields_enumValues;
   public $projects_locations_taxonomies;
   public $projects_locations_taxonomies_policyTags;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the DataCatalog service.
@@ -63,6 +66,7 @@ class DataCatalog extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://datacatalog.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://datacatalog.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -100,9 +104,87 @@ class DataCatalog extends \Google\Service
                   'location' => 'query',
                   'type' => 'string',
                 ],
+                'location' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'project' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
                 'sqlResource' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->organizations_locations = new DataCatalog\Resource\OrganizationsLocations(
+        $this,
+        $this->serviceName,
+        'locations',
+        [
+          'methods' => [
+            'retrieveConfig' => [
+              'path' => 'v1/{+name}:retrieveConfig',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'retrieveEffectiveConfig' => [
+              'path' => 'v1/{+name}:retrieveEffectiveConfig',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'setConfig' => [
+              'path' => 'v1/{+name}:setConfig',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_locations = new DataCatalog\Resource\ProjectsLocations(
+        $this,
+        $this->serviceName,
+        'locations',
+        [
+          'methods' => [
+            'retrieveEffectiveConfig' => [
+              'path' => 'v1/{+name}:retrieveEffectiveConfig',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'setConfig' => [
+              'path' => 'v1/{+name}:setConfig',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
                 ],
               ],
             ],

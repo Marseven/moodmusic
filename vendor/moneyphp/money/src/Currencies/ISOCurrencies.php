@@ -26,11 +26,11 @@ final class ISOCurrencies implements Currencies
      * @psalm-var non-empty-array<non-empty-string, array{
      *     alphabeticCode: non-empty-string,
      *     currency: non-empty-string,
-     *     minorUnit: positive-int|0,
+     *     minorUnit: non-negative-int,
      *     numericCode: positive-int
      * }>|null
      */
-    private static ?array $currencies = null;
+    private static array|null $currencies = null;
 
     public function contains(Currency $currency): bool
     {
@@ -81,7 +81,7 @@ final class ISOCurrencies implements Currencies
      * @psalm-return non-empty-array<non-empty-string, array{
      *     alphabeticCode: non-empty-string,
      *     currency: non-empty-string,
-     *     minorUnit: positive-int|0,
+     *     minorUnit: non-negative-int,
      *     numericCode: positive-int
      * }>
      */
@@ -98,18 +98,15 @@ final class ISOCurrencies implements Currencies
      * @psalm-return non-empty-array<non-empty-string, array{
      *     alphabeticCode: non-empty-string,
      *     currency: non-empty-string,
-     *     minorUnit: positive-int|0,
+     *     minorUnit: non-negative-int,
      *     numericCode: positive-int
      * }>
-     *
-     * @psalm-suppress MoreSpecificReturnType do not specify all keys and values
      */
     private function loadCurrencies(): array
     {
         $file = __DIR__ . '/../../resources/currency.php';
 
         if (is_file($file)) {
-            /** @psalm-suppress LessSpecificReturnStatement */
             return require $file;
         }
 

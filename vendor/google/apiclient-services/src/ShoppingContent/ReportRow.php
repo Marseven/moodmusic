@@ -23,6 +23,8 @@ class ReportRow extends \Google\Model
   protected $bestSellersDataType = '';
   protected $brandType = Brand::class;
   protected $brandDataType = '';
+  protected $competitiveVisibilityType = CompetitiveVisibility::class;
+  protected $competitiveVisibilityDataType = '';
   protected $metricsType = Metrics::class;
   protected $metricsDataType = '';
   protected $priceCompetitivenessType = PriceCompetitiveness::class;
@@ -35,6 +37,8 @@ class ReportRow extends \Google\Model
   protected $productViewDataType = '';
   protected $segmentsType = Segments::class;
   protected $segmentsDataType = '';
+  protected $topicTrendsType = TopicTrends::class;
+  protected $topicTrendsDataType = '';
 
   /**
    * @param BestSellers
@@ -63,6 +67,20 @@ class ReportRow extends \Google\Model
   public function getBrand()
   {
     return $this->brand;
+  }
+  /**
+   * @param CompetitiveVisibility
+   */
+  public function setCompetitiveVisibility(CompetitiveVisibility $competitiveVisibility)
+  {
+    $this->competitiveVisibility = $competitiveVisibility;
+  }
+  /**
+   * @return CompetitiveVisibility
+   */
+  public function getCompetitiveVisibility()
+  {
+    return $this->competitiveVisibility;
   }
   /**
    * @param Metrics
@@ -147,6 +165,20 @@ class ReportRow extends \Google\Model
   public function getSegments()
   {
     return $this->segments;
+  }
+  /**
+   * @param TopicTrends
+   */
+  public function setTopicTrends(TopicTrends $topicTrends)
+  {
+    $this->topicTrends = $topicTrends;
+  }
+  /**
+   * @return TopicTrends
+   */
+  public function getTopicTrends()
+  {
+    return $this->topicTrends;
   }
 }
 

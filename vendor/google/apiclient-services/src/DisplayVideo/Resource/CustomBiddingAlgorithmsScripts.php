@@ -32,7 +32,10 @@ class CustomBiddingAlgorithmsScripts extends \Google\Service\Resource
 {
   /**
    * Creates a new custom bidding script. Returns the newly created script if
-   * successful. (scripts.create)
+   * successful. *Warning*: Starting **April 1, 2025**, requests updating custom
+   * bidding algorithms that are assigned to line items will return an error.
+   * [Read more about this announced change](/display-
+   * video/api/deprecations#features.custom_bidding_floodlight). (scripts.create)
    *
    * @param string $customBiddingAlgorithmId Required. The ID of the custom
    * bidding algorithm that owns the script.
@@ -45,6 +48,7 @@ class CustomBiddingAlgorithmsScripts extends \Google\Service\Resource
    * bidding algorithm. Only this partner will have write access to this custom
    * bidding script.
    * @return CustomBiddingScript
+   * @throws \Google\Service\Exception
    */
   public function create($customBiddingAlgorithmId, CustomBiddingScript $postBody, $optParams = [])
   {
@@ -67,6 +71,7 @@ class CustomBiddingAlgorithmsScripts extends \Google\Service\Resource
    * bidding algorithm. Only this partner will have write access to this custom
    * bidding script.
    * @return CustomBiddingScript
+   * @throws \Google\Service\Exception
    */
   public function get($customBiddingAlgorithmId, $customBiddingScriptId, $optParams = [])
   {
@@ -100,6 +105,7 @@ class CustomBiddingAlgorithmsScripts extends \Google\Service\Resource
    * bidding algorithm. Only this partner will have write access to this custom
    * bidding script.
    * @return ListCustomBiddingScriptsResponse
+   * @throws \Google\Service\Exception
    */
   public function listCustomBiddingAlgorithmsScripts($customBiddingAlgorithmId, $optParams = [])
   {

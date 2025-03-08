@@ -35,9 +35,17 @@ class JobStatistics extends \Google\Collection
   /**
    * @var string
    */
+  public $edition;
+  /**
+   * @var string
+   */
   public $endTime;
   protected $extractType = JobStatistics4::class;
   protected $extractDataType = '';
+  /**
+   * @var string
+   */
+  public $finalExecutionDurationMs;
   protected $loadType = JobStatistics3::class;
   protected $loadDataType = '';
   /**
@@ -134,6 +142,20 @@ class JobStatistics extends \Google\Collection
   /**
    * @param string
    */
+  public function setEdition($edition)
+  {
+    $this->edition = $edition;
+  }
+  /**
+   * @return string
+   */
+  public function getEdition()
+  {
+    return $this->edition;
+  }
+  /**
+   * @param string
+   */
   public function setEndTime($endTime)
   {
     $this->endTime = $endTime;
@@ -158,6 +180,20 @@ class JobStatistics extends \Google\Collection
   public function getExtract()
   {
     return $this->extract;
+  }
+  /**
+   * @param string
+   */
+  public function setFinalExecutionDurationMs($finalExecutionDurationMs)
+  {
+    $this->finalExecutionDurationMs = $finalExecutionDurationMs;
+  }
+  /**
+   * @return string
+   */
+  public function getFinalExecutionDurationMs()
+  {
+    return $this->finalExecutionDurationMs;
   }
   /**
    * @param JobStatistics3

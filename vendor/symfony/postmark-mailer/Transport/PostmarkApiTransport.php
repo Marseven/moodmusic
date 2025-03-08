@@ -35,9 +35,9 @@ class PostmarkApiTransport extends AbstractApiTransport
 
     private string $key;
 
-    private $messageStream;
+    private ?string $messageStream = null;
 
-    public function __construct(string $key, HttpClientInterface $client = null, EventDispatcherInterface $dispatcher = null, LoggerInterface $logger = null)
+    public function __construct(string $key, ?HttpClientInterface $client = null, ?EventDispatcherInterface $dispatcher = null, ?LoggerInterface $logger = null)
     {
         $this->key = $key;
 
@@ -62,7 +62,7 @@ class PostmarkApiTransport extends AbstractApiTransport
         try {
             $statusCode = $response->getStatusCode();
             $result = $response->toArray(false);
-        } catch (DecodingExceptionInterface $e) {
+        } catch (DecodingExceptionInterface) {
             throw new HttpTransportException('Unable to send an email: '.$response->getContent(false).sprintf(' (code %d).', $statusCode), $response);
         } catch (TransportExceptionInterface $e) {
             throw new HttpTransportException('Could not reach the remote Postmark server.', $response, 0, $e);
@@ -147,7 +147,7 @@ class PostmarkApiTransport extends AbstractApiTransport
             ];
 
             if ('inline' === $disposition) {
-                $att['ContentID'] = 'cid:'.$filename;
+                $att['ContentID'] = 'cid:'.($attachment->hasContentId() ? $attachment->getContentId() : $filename);
             }
 
             $attachments[] = $att;

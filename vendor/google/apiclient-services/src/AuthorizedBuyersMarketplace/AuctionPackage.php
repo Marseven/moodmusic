@@ -19,7 +19,7 @@ namespace Google\Service\AuthorizedBuyersMarketplace;
 
 class AuctionPackage extends \Google\Collection
 {
-  protected $collection_key = 'subscribedClients';
+  protected $collection_key = 'subscribedMediaPlanners';
   /**
    * @var string
    */
@@ -31,11 +31,19 @@ class AuctionPackage extends \Google\Collection
   /**
    * @var string
    */
+  public $dealOwnerSeatId;
+  /**
+   * @var string
+   */
   public $description;
   /**
    * @var string
    */
   public $displayName;
+  /**
+   * @var string[]
+   */
+  public $eligibleSeatIds;
   /**
    * @var string
    */
@@ -43,7 +51,13 @@ class AuctionPackage extends \Google\Collection
   /**
    * @var string[]
    */
+  public $subscribedBuyers;
+  /**
+   * @var string[]
+   */
   public $subscribedClients;
+  protected $subscribedMediaPlannersType = MediaPlanner::class;
+  protected $subscribedMediaPlannersDataType = 'array';
   /**
    * @var string
    */
@@ -80,6 +94,20 @@ class AuctionPackage extends \Google\Collection
   /**
    * @param string
    */
+  public function setDealOwnerSeatId($dealOwnerSeatId)
+  {
+    $this->dealOwnerSeatId = $dealOwnerSeatId;
+  }
+  /**
+   * @return string
+   */
+  public function getDealOwnerSeatId()
+  {
+    return $this->dealOwnerSeatId;
+  }
+  /**
+   * @param string
+   */
   public function setDescription($description)
   {
     $this->description = $description;
@@ -106,6 +134,20 @@ class AuctionPackage extends \Google\Collection
     return $this->displayName;
   }
   /**
+   * @param string[]
+   */
+  public function setEligibleSeatIds($eligibleSeatIds)
+  {
+    $this->eligibleSeatIds = $eligibleSeatIds;
+  }
+  /**
+   * @return string[]
+   */
+  public function getEligibleSeatIds()
+  {
+    return $this->eligibleSeatIds;
+  }
+  /**
    * @param string
    */
   public function setName($name)
@@ -122,6 +164,20 @@ class AuctionPackage extends \Google\Collection
   /**
    * @param string[]
    */
+  public function setSubscribedBuyers($subscribedBuyers)
+  {
+    $this->subscribedBuyers = $subscribedBuyers;
+  }
+  /**
+   * @return string[]
+   */
+  public function getSubscribedBuyers()
+  {
+    return $this->subscribedBuyers;
+  }
+  /**
+   * @param string[]
+   */
   public function setSubscribedClients($subscribedClients)
   {
     $this->subscribedClients = $subscribedClients;
@@ -132,6 +188,20 @@ class AuctionPackage extends \Google\Collection
   public function getSubscribedClients()
   {
     return $this->subscribedClients;
+  }
+  /**
+   * @param MediaPlanner[]
+   */
+  public function setSubscribedMediaPlanners($subscribedMediaPlanners)
+  {
+    $this->subscribedMediaPlanners = $subscribedMediaPlanners;
+  }
+  /**
+   * @return MediaPlanner[]
+   */
+  public function getSubscribedMediaPlanners()
+  {
+    return $this->subscribedMediaPlanners;
   }
   /**
    * @param string

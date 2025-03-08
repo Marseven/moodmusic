@@ -17,16 +17,23 @@
 
 namespace Google\Service\Monitoring;
 
-class Documentation extends \Google\Model
+class Documentation extends \Google\Collection
 {
+  protected $collection_key = 'links';
   /**
    * @var string
    */
   public $content;
+  protected $linksType = Link::class;
+  protected $linksDataType = 'array';
   /**
    * @var string
    */
   public $mimeType;
+  /**
+   * @var string
+   */
+  public $subject;
 
   /**
    * @param string
@@ -43,6 +50,20 @@ class Documentation extends \Google\Model
     return $this->content;
   }
   /**
+   * @param Link[]
+   */
+  public function setLinks($links)
+  {
+    $this->links = $links;
+  }
+  /**
+   * @return Link[]
+   */
+  public function getLinks()
+  {
+    return $this->links;
+  }
+  /**
    * @param string
    */
   public function setMimeType($mimeType)
@@ -55,6 +76,20 @@ class Documentation extends \Google\Model
   public function getMimeType()
   {
     return $this->mimeType;
+  }
+  /**
+   * @param string
+   */
+  public function setSubject($subject)
+  {
+    $this->subject = $subject;
+  }
+  /**
+   * @return string
+   */
+  public function getSubject()
+  {
+    return $this->subject;
   }
 }
 

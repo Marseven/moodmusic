@@ -26,6 +26,10 @@ class SigninDetail extends \Google\Model
   /**
    * @var string
    */
+  public $defaultStatus;
+  /**
+   * @var string
+   */
   public $qrCode;
   /**
    * @var string
@@ -35,6 +39,10 @@ class SigninDetail extends \Google\Model
    * @var string
    */
   public $signinUrl;
+  /**
+   * @var string
+   */
+  public $tokenTag;
 
   /**
    * @param string
@@ -49,6 +57,20 @@ class SigninDetail extends \Google\Model
   public function getAllowPersonalUsage()
   {
     return $this->allowPersonalUsage;
+  }
+  /**
+   * @param string
+   */
+  public function setDefaultStatus($defaultStatus)
+  {
+    $this->defaultStatus = $defaultStatus;
+  }
+  /**
+   * @return string
+   */
+  public function getDefaultStatus()
+  {
+    return $this->defaultStatus;
   }
   /**
    * @param string
@@ -91,6 +113,20 @@ class SigninDetail extends \Google\Model
   public function getSigninUrl()
   {
     return $this->signinUrl;
+  }
+  /**
+   * @param string
+   */
+  public function setTokenTag($tokenTag)
+  {
+    $this->tokenTag = $tokenTag;
+  }
+  /**
+   * @return string
+   */
+  public function getTokenTag()
+  {
+    return $this->tokenTag;
   }
 }
 

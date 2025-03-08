@@ -47,6 +47,7 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    * @param AggregateAssetsValuesRequest $postBody
    * @param array $optParams Optional parameters.
    * @return AggregateAssetsValuesResponse
+   * @throws \Google\Service\Exception
    */
   public function aggregateValues($parent, AggregateAssetsValuesRequest $postBody, $optParams = [])
   {
@@ -61,6 +62,7 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    * @param BatchDeleteAssetsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return MigrationcenterEmpty
+   * @throws \Google\Service\Exception
    */
   public function batchDelete($parent, BatchDeleteAssetsRequest $postBody, $optParams = [])
   {
@@ -75,12 +77,39 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    * @param BatchUpdateAssetsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return BatchUpdateAssetsResponse
+   * @throws \Google\Service\Exception
    */
   public function batchUpdate($parent, BatchUpdateAssetsRequest $postBody, $optParams = [])
   {
     $params = ['parent' => $parent, 'postBody' => $postBody];
     $params = array_merge($params, $optParams);
     return $this->call('batchUpdate', [$params], BatchUpdateAssetsResponse::class);
+  }
+  /**
+   * Deletes an asset. (assets.delete)
+   *
+   * @param string $name Required. Name of the resource.
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string requestId Optional. An optional request ID to identify
+   * requests. Specify a unique request ID so that if you must retry your request,
+   * the server will know to ignore the request if it has already been completed.
+   * The server will guarantee that for at least 60 minutes after the first
+   * request. For example, consider a situation where you make an initial request
+   * and the request times out. If you make the request again with the same
+   * request ID, the server can check if original operation with the same request
+   * ID was received, and if so, will ignore the second request. This prevents
+   * clients from accidentally creating duplicate commitments. The request ID must
+   * be a valid UUID with the exception that zero UUID is not supported
+   * (00000000-0000-0000-0000-000000000000).
+   * @return MigrationcenterEmpty
+   * @throws \Google\Service\Exception
+   */
+  public function delete($name, $optParams = [])
+  {
+    $params = ['name' => $name];
+    $params = array_merge($params, $optParams);
+    return $this->call('delete', [$params], MigrationcenterEmpty::class);
   }
   /**
    * Gets the details of an asset. (assets.get)
@@ -90,6 +119,7 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    *
    * @opt_param string view View of the assets. Defaults to BASIC.
    * @return Asset
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -113,12 +143,45 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    * should return.
    * @opt_param string view View of the assets. Defaults to BASIC.
    * @return ListAssetsResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsAssets($parent, $optParams = [])
   {
     $params = ['parent' => $parent];
     $params = array_merge($params, $optParams);
     return $this->call('list', [$params], ListAssetsResponse::class);
+  }
+  /**
+   * Updates the parameters of an asset. (assets.patch)
+   *
+   * @param string $name Output only. The full name of the asset.
+   * @param Asset $postBody
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string requestId Optional. An optional request ID to identify
+   * requests. Specify a unique request ID so that if you must retry your request,
+   * the server will know to ignore the request if it has already been completed.
+   * The server will guarantee that for at least 60 minutes since the first
+   * request. For example, consider a situation where you make an initial request
+   * and the request times out. If you make the request again with the same
+   * request ID, the server can check if original operation with the same request
+   * ID was received, and if so, will ignore the second request. This prevents
+   * clients from accidentally creating duplicate commitments. The request ID must
+   * be a valid UUID with the exception that zero UUID is not supported
+   * (00000000-0000-0000-0000-000000000000).
+   * @opt_param string updateMask Required. Field mask is used to specify the
+   * fields to be overwritten in the `Asset` resource by the update. The values
+   * specified in the `update_mask` field are relative to the resource, not the
+   * full request. A field will be overwritten if it is in the mask. A single *
+   * value in the mask lets you to overwrite all fields.
+   * @return Asset
+   * @throws \Google\Service\Exception
+   */
+  public function patch($name, Asset $postBody, $optParams = [])
+  {
+    $params = ['name' => $name, 'postBody' => $postBody];
+    $params = array_merge($params, $optParams);
+    return $this->call('patch', [$params], Asset::class);
   }
   /**
    * Reports a set of frames. (assets.reportAssetFrames)
@@ -129,6 +192,7 @@ class ProjectsLocationsAssets extends \Google\Service\Resource
    *
    * @opt_param string source Required. Reference to a source.
    * @return ReportAssetFramesResponse
+   * @throws \Google\Service\Exception
    */
   public function reportAssetFrames($parent, Frames $postBody, $optParams = [])
   {

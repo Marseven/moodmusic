@@ -46,6 +46,8 @@ class WorkstationCluster extends \Google\Collection
    * @var string
    */
   public $displayName;
+  protected $domainConfigType = DomainConfig::class;
+  protected $domainConfigDataType = '';
   /**
    * @var string
    */
@@ -72,6 +74,10 @@ class WorkstationCluster extends \Google\Collection
    * @var string
    */
   public $subnetwork;
+  /**
+   * @var string[]
+   */
+  public $tags;
   /**
    * @var string
    */
@@ -180,6 +186,20 @@ class WorkstationCluster extends \Google\Collection
     return $this->displayName;
   }
   /**
+   * @param DomainConfig
+   */
+  public function setDomainConfig(DomainConfig $domainConfig)
+  {
+    $this->domainConfig = $domainConfig;
+  }
+  /**
+   * @return DomainConfig
+   */
+  public function getDomainConfig()
+  {
+    return $this->domainConfig;
+  }
+  /**
    * @param string
    */
   public function setEtag($etag)
@@ -276,6 +296,20 @@ class WorkstationCluster extends \Google\Collection
   public function getSubnetwork()
   {
     return $this->subnetwork;
+  }
+  /**
+   * @param string[]
+   */
+  public function setTags($tags)
+  {
+    $this->tags = $tags;
+  }
+  /**
+   * @return string[]
+   */
+  public function getTags()
+  {
+    return $this->tags;
   }
   /**
    * @param string

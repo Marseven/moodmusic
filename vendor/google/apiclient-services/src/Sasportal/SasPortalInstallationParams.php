@@ -31,11 +31,7 @@ class SasPortalInstallationParams extends \Google\Model
    * @var int
    */
   public $antennaDowntilt;
-  /**
-   * @var int
-   */
   public $antennaGain;
-  public $antennaGainNewField;
   /**
    * @var string
    */
@@ -48,7 +44,6 @@ class SasPortalInstallationParams extends \Google\Model
    * @var int
    */
   public $eirpCapability;
-  public $eirpCapabilityNewField;
   public $height;
   /**
    * @var string
@@ -105,27 +100,13 @@ class SasPortalInstallationParams extends \Google\Model
   {
     return $this->antennaDowntilt;
   }
-  /**
-   * @param int
-   */
   public function setAntennaGain($antennaGain)
   {
     $this->antennaGain = $antennaGain;
   }
-  /**
-   * @return int
-   */
   public function getAntennaGain()
   {
     return $this->antennaGain;
-  }
-  public function setAntennaGainNewField($antennaGainNewField)
-  {
-    $this->antennaGainNewField = $antennaGainNewField;
-  }
-  public function getAntennaGainNewField()
-  {
-    return $this->antennaGainNewField;
   }
   /**
    * @param string
@@ -168,14 +149,6 @@ class SasPortalInstallationParams extends \Google\Model
   public function getEirpCapability()
   {
     return $this->eirpCapability;
-  }
-  public function setEirpCapabilityNewField($eirpCapabilityNewField)
-  {
-    $this->eirpCapabilityNewField = $eirpCapabilityNewField;
-  }
-  public function getEirpCapabilityNewField()
-  {
-    return $this->eirpCapabilityNewField;
   }
   public function setHeight($height)
   {

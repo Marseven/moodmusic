@@ -20,10 +20,18 @@ namespace Google\Service\Integrations;
 class EnterpriseCrmFrontendsEventbusProtoEventExecutionDetails extends \Google\Collection
 {
   protected $collection_key = 'eventExecutionSnapshot';
+  /**
+   * @var string
+   */
+  public $cancelReason;
   protected $eventAttemptStatsType = EnterpriseCrmEventbusProtoEventExecutionDetailsEventAttemptStats::class;
   protected $eventAttemptStatsDataType = 'array';
   protected $eventExecutionSnapshotType = EnterpriseCrmFrontendsEventbusProtoEventExecutionSnapshot::class;
   protected $eventExecutionSnapshotDataType = 'array';
+  /**
+   * @var string
+   */
+  public $eventExecutionSnapshotsSize;
   /**
    * @var string
    */
@@ -49,6 +57,20 @@ class EnterpriseCrmFrontendsEventbusProtoEventExecutionDetails extends \Google\C
    */
   public $ryeLockUnheldCount;
 
+  /**
+   * @param string
+   */
+  public function setCancelReason($cancelReason)
+  {
+    $this->cancelReason = $cancelReason;
+  }
+  /**
+   * @return string
+   */
+  public function getCancelReason()
+  {
+    return $this->cancelReason;
+  }
   /**
    * @param EnterpriseCrmEventbusProtoEventExecutionDetailsEventAttemptStats[]
    */
@@ -76,6 +98,20 @@ class EnterpriseCrmFrontendsEventbusProtoEventExecutionDetails extends \Google\C
   public function getEventExecutionSnapshot()
   {
     return $this->eventExecutionSnapshot;
+  }
+  /**
+   * @param string
+   */
+  public function setEventExecutionSnapshotsSize($eventExecutionSnapshotsSize)
+  {
+    $this->eventExecutionSnapshotsSize = $eventExecutionSnapshotsSize;
+  }
+  /**
+   * @return string
+   */
+  public function getEventExecutionSnapshotsSize()
+  {
+    return $this->eventExecutionSnapshotsSize;
   }
   /**
    * @param string

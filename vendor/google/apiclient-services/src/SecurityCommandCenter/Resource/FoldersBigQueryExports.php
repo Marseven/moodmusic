@@ -35,8 +35,8 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * Creates a BigQuery export. (bigQueryExports.create)
    *
    * @param string $parent Required. The name of the parent resource of the new
-   * BigQuery export. Its format is "organizations/[organization_id]",
-   * "folders/[folder_id]", or "projects/[project_id]".
+   * BigQuery export. Its format is `organizations/[organization_id]`,
+   * `folders/[folder_id]`, or `projects/[project_id]`.
    * @param GoogleCloudSecuritycenterV1BigQueryExport $postBody
    * @param array $optParams Optional parameters.
    *
@@ -45,6 +45,7 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * letters, numbers, and hyphens, must start with a letter, must end with either
    * a letter or a number, and must be 63 characters or less.
    * @return GoogleCloudSecuritycenterV1BigQueryExport
+   * @throws \Google\Service\Exception
    */
   public function create($parent, GoogleCloudSecuritycenterV1BigQueryExport $postBody, $optParams = [])
   {
@@ -56,11 +57,12 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * Deletes an existing BigQuery export. (bigQueryExports.delete)
    *
    * @param string $name Required. The name of the BigQuery export to delete. Its
-   * format is organizations/{organization}/bigQueryExports/{export_id},
-   * folders/{folder}/bigQueryExports/{export_id}, or
-   * projects/{project}/bigQueryExports/{export_id}
+   * format is `organizations/{organization}/bigQueryExports/{export_id}`,
+   * `folders/{folder}/bigQueryExports/{export_id}`, or
+   * `projects/{project}/bigQueryExports/{export_id}`
    * @param array $optParams Optional parameters.
    * @return SecuritycenterEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -72,11 +74,12 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * Gets a BigQuery export. (bigQueryExports.get)
    *
    * @param string $name Required. Name of the BigQuery export to retrieve. Its
-   * format is organizations/{organization}/bigQueryExports/{export_id},
-   * folders/{folder}/bigQueryExports/{export_id}, or
-   * projects/{project}/bigQueryExports/{export_id}
+   * format is `organizations/{organization}/bigQueryExports/{export_id}`,
+   * `folders/{folder}/bigQueryExports/{export_id}`, or
+   * `projects/{project}/bigQueryExports/{export_id}`
    * @param array $optParams Optional parameters.
    * @return GoogleCloudSecuritycenterV1BigQueryExport
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -92,8 +95,8 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * returned. (bigQueryExports.listFoldersBigQueryExports)
    *
    * @param string $parent Required. The parent, which owns the collection of
-   * BigQuery exports. Its format is "organizations/[organization_id]",
-   * "folders/[folder_id]", "projects/[project_id]".
+   * BigQuery exports. Its format is `organizations/[organization_id]`,
+   * `folders/[folder_id]`, `projects/[project_id]`.
    * @param array $optParams Optional parameters.
    *
    * @opt_param int pageSize The maximum number of configs to return. The service
@@ -105,6 +108,7 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * When paginating, all other parameters provided to `ListBigQueryExports` must
    * match the call that provided the page token.
    * @return ListBigQueryExportsResponse
+   * @throws \Google\Service\Exception
    */
   public function listFoldersBigQueryExports($parent, $optParams = [])
   {
@@ -127,6 +131,7 @@ class FoldersBigQueryExports extends \Google\Service\Resource
    * @opt_param string updateMask The list of fields to be updated. If empty all
    * mutable fields will be updated.
    * @return GoogleCloudSecuritycenterV1BigQueryExport
+   * @throws \Google\Service\Exception
    */
   public function patch($name, GoogleCloudSecuritycenterV1BigQueryExport $postBody, $optParams = [])
   {

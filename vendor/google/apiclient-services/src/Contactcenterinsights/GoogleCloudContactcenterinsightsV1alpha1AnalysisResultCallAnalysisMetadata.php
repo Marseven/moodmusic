@@ -30,8 +30,12 @@ class GoogleCloudContactcenterinsightsV1alpha1AnalysisResultCallAnalysisMetadata
   protected $issueModelResultDataType = '';
   protected $phraseMatchersType = GoogleCloudContactcenterinsightsV1alpha1PhraseMatchData::class;
   protected $phraseMatchersDataType = 'map';
+  protected $qaScorecardResultsType = GoogleCloudContactcenterinsightsV1alpha1QaScorecardResult::class;
+  protected $qaScorecardResultsDataType = 'array';
   protected $sentimentsType = GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSentiment::class;
   protected $sentimentsDataType = 'array';
+  protected $silenceType = GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSilence::class;
+  protected $silenceDataType = '';
 
   /**
    * @param GoogleCloudContactcenterinsightsV1alpha1CallAnnotation[]
@@ -104,6 +108,20 @@ class GoogleCloudContactcenterinsightsV1alpha1AnalysisResultCallAnalysisMetadata
     return $this->phraseMatchers;
   }
   /**
+   * @param GoogleCloudContactcenterinsightsV1alpha1QaScorecardResult[]
+   */
+  public function setQaScorecardResults($qaScorecardResults)
+  {
+    $this->qaScorecardResults = $qaScorecardResults;
+  }
+  /**
+   * @return GoogleCloudContactcenterinsightsV1alpha1QaScorecardResult[]
+   */
+  public function getQaScorecardResults()
+  {
+    return $this->qaScorecardResults;
+  }
+  /**
    * @param GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSentiment[]
    */
   public function setSentiments($sentiments)
@@ -116,6 +134,20 @@ class GoogleCloudContactcenterinsightsV1alpha1AnalysisResultCallAnalysisMetadata
   public function getSentiments()
   {
     return $this->sentiments;
+  }
+  /**
+   * @param GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSilence
+   */
+  public function setSilence(GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSilence $silence)
+  {
+    $this->silence = $silence;
+  }
+  /**
+   * @return GoogleCloudContactcenterinsightsV1alpha1ConversationLevelSilence
+   */
+  public function getSilence()
+  {
+    return $this->silence;
   }
 }
 

@@ -77,11 +77,18 @@ class AutoScaler
     protected function timeToClearPerQueue(Supervisor $supervisor, Collection $pools)
     {
         return $pools->mapWithKeys(function ($pool, $queue) use ($supervisor) {
-            $size = $this->queue->connection($supervisor->options->connection)->readyNow($queue);
+            $queues = collect(explode(',', $queue))->map(function ($_queue) use ($supervisor) {
+                $size = $this->queue->connection($supervisor->options->connection)->readyNow($_queue);
+
+                return [
+                    'size' => $size,
+                    'time' => ($size * $this->metrics->runtimeForQueue($_queue)),
+                ];
+            });
 
             return [$queue => [
-                'size' => $size,
-                'time' =>  ($size * $this->metrics->runtimeForQueue($queue)),
+                'size' => $queues->sum('size'),
+                'time' => $queues->sum('time'),
             ]];
         });
     }
@@ -144,7 +151,7 @@ class AutoScaler
             $pool->scale(
                 min(
                     $totalProcessCount + $maxUpShift,
-                    $supervisor->options->maxProcesses - (($supervisor->processPools->count() - 1) * $supervisor->options->minProcesses),
+                    max($supervisor->options->minProcesses, $supervisor->options->maxProcesses - (($supervisor->processPools->count() - 1) * $supervisor->options->minProcesses)),
                     $desiredProcessCount
                 )
             );

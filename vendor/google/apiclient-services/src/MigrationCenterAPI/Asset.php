@@ -32,12 +32,18 @@ class Asset extends \Google\Collection
    * @var string
    */
   public $createTime;
+  protected $databaseDeploymentDetailsType = DatabaseDeploymentDetails::class;
+  protected $databaseDeploymentDetailsDataType = '';
+  protected $databaseDetailsType = DatabaseDetails::class;
+  protected $databaseDetailsDataType = '';
   protected $insightListType = InsightList::class;
   protected $insightListDataType = '';
   /**
    * @var string[]
    */
   public $labels;
+  protected $machineDetailsType = MachineDetails::class;
+  protected $machineDetailsDataType = '';
   /**
    * @var string
    */
@@ -51,9 +57,11 @@ class Asset extends \Google\Collection
   /**
    * @var string
    */
+  public $title;
+  /**
+   * @var string
+   */
   public $updateTime;
-  protected $virtualMachineDetailsType = VirtualMachineDetails::class;
-  protected $virtualMachineDetailsDataType = '';
 
   /**
    * @param string[]
@@ -98,6 +106,34 @@ class Asset extends \Google\Collection
     return $this->createTime;
   }
   /**
+   * @param DatabaseDeploymentDetails
+   */
+  public function setDatabaseDeploymentDetails(DatabaseDeploymentDetails $databaseDeploymentDetails)
+  {
+    $this->databaseDeploymentDetails = $databaseDeploymentDetails;
+  }
+  /**
+   * @return DatabaseDeploymentDetails
+   */
+  public function getDatabaseDeploymentDetails()
+  {
+    return $this->databaseDeploymentDetails;
+  }
+  /**
+   * @param DatabaseDetails
+   */
+  public function setDatabaseDetails(DatabaseDetails $databaseDetails)
+  {
+    $this->databaseDetails = $databaseDetails;
+  }
+  /**
+   * @return DatabaseDetails
+   */
+  public function getDatabaseDetails()
+  {
+    return $this->databaseDetails;
+  }
+  /**
    * @param InsightList
    */
   public function setInsightList(InsightList $insightList)
@@ -124,6 +160,20 @@ class Asset extends \Google\Collection
   public function getLabels()
   {
     return $this->labels;
+  }
+  /**
+   * @param MachineDetails
+   */
+  public function setMachineDetails(MachineDetails $machineDetails)
+  {
+    $this->machineDetails = $machineDetails;
+  }
+  /**
+   * @return MachineDetails
+   */
+  public function getMachineDetails()
+  {
+    return $this->machineDetails;
   }
   /**
    * @param string
@@ -170,6 +220,20 @@ class Asset extends \Google\Collection
   /**
    * @param string
    */
+  public function setTitle($title)
+  {
+    $this->title = $title;
+  }
+  /**
+   * @return string
+   */
+  public function getTitle()
+  {
+    return $this->title;
+  }
+  /**
+   * @param string
+   */
   public function setUpdateTime($updateTime)
   {
     $this->updateTime = $updateTime;
@@ -180,20 +244,6 @@ class Asset extends \Google\Collection
   public function getUpdateTime()
   {
     return $this->updateTime;
-  }
-  /**
-   * @param VirtualMachineDetails
-   */
-  public function setVirtualMachineDetails(VirtualMachineDetails $virtualMachineDetails)
-  {
-    $this->virtualMachineDetails = $virtualMachineDetails;
-  }
-  /**
-   * @return VirtualMachineDetails
-   */
-  public function getVirtualMachineDetails()
-  {
-    return $this->virtualMachineDetails;
   }
 }
 

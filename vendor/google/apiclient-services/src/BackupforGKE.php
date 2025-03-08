@@ -47,6 +47,7 @@ class BackupforGKE extends \Google\Service
   public $projects_locations_restorePlans;
   public $projects_locations_restorePlans_restores;
   public $projects_locations_restorePlans_restores_volumeRestores;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the BackupforGKE service.
@@ -59,6 +60,7 @@ class BackupforGKE extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://gkebackup.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://gkebackup.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -70,17 +72,7 @@ class BackupforGKE extends \Google\Service
         'locations',
         [
           'methods' => [
-            'deleteOperations' => [
-              'path' => 'v1/{+name}/operations',
-              'httpMethod' => 'DELETE',
-              'parameters' => [
-                'name' => [
-                  'location' => 'path',
-                  'type' => 'string',
-                  'required' => true,
-                ],
-              ],
-            ],'get' => [
+            'get' => [
               'path' => 'v1/{+name}',
               'httpMethod' => 'GET',
               'parameters' => [
@@ -286,6 +278,16 @@ class BackupforGKE extends \Google\Service
                   'required' => true,
                 ],
               ],
+            ],'getBackupIndexDownloadUrl' => [
+              'path' => 'v1/{+backup}:getBackupIndexDownloadUrl',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'backup' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
             ],'getIamPolicy' => [
               'path' => 'v1/{+resource}:getIamPolicy',
               'httpMethod' => 'GET',
@@ -453,6 +455,16 @@ class BackupforGKE extends \Google\Service
             'cancel' => [
               'path' => 'v1/{+name}:cancel',
               'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
               'parameters' => [
                 'name' => [
                   'location' => 'path',

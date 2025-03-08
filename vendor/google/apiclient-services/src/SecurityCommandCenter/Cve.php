@@ -25,13 +25,37 @@ class Cve extends \Google\Collection
   /**
    * @var string
    */
+  public $exploitReleaseDate;
+  /**
+   * @var string
+   */
+  public $exploitationActivity;
+  /**
+   * @var string
+   */
+  public $firstExploitationDate;
+  /**
+   * @var string
+   */
   public $id;
+  /**
+   * @var string
+   */
+  public $impact;
+  /**
+   * @var bool
+   */
+  public $observedInTheWild;
   protected $referencesType = Reference::class;
   protected $referencesDataType = 'array';
   /**
    * @var bool
    */
   public $upstreamFixAvailable;
+  /**
+   * @var bool
+   */
+  public $zeroDay;
 
   /**
    * @param Cvssv3
@@ -50,6 +74,48 @@ class Cve extends \Google\Collection
   /**
    * @param string
    */
+  public function setExploitReleaseDate($exploitReleaseDate)
+  {
+    $this->exploitReleaseDate = $exploitReleaseDate;
+  }
+  /**
+   * @return string
+   */
+  public function getExploitReleaseDate()
+  {
+    return $this->exploitReleaseDate;
+  }
+  /**
+   * @param string
+   */
+  public function setExploitationActivity($exploitationActivity)
+  {
+    $this->exploitationActivity = $exploitationActivity;
+  }
+  /**
+   * @return string
+   */
+  public function getExploitationActivity()
+  {
+    return $this->exploitationActivity;
+  }
+  /**
+   * @param string
+   */
+  public function setFirstExploitationDate($firstExploitationDate)
+  {
+    $this->firstExploitationDate = $firstExploitationDate;
+  }
+  /**
+   * @return string
+   */
+  public function getFirstExploitationDate()
+  {
+    return $this->firstExploitationDate;
+  }
+  /**
+   * @param string
+   */
   public function setId($id)
   {
     $this->id = $id;
@@ -60,6 +126,34 @@ class Cve extends \Google\Collection
   public function getId()
   {
     return $this->id;
+  }
+  /**
+   * @param string
+   */
+  public function setImpact($impact)
+  {
+    $this->impact = $impact;
+  }
+  /**
+   * @return string
+   */
+  public function getImpact()
+  {
+    return $this->impact;
+  }
+  /**
+   * @param bool
+   */
+  public function setObservedInTheWild($observedInTheWild)
+  {
+    $this->observedInTheWild = $observedInTheWild;
+  }
+  /**
+   * @return bool
+   */
+  public function getObservedInTheWild()
+  {
+    return $this->observedInTheWild;
   }
   /**
    * @param Reference[]
@@ -88,6 +182,20 @@ class Cve extends \Google\Collection
   public function getUpstreamFixAvailable()
   {
     return $this->upstreamFixAvailable;
+  }
+  /**
+   * @param bool
+   */
+  public function setZeroDay($zeroDay)
+  {
+    $this->zeroDay = $zeroDay;
+  }
+  /**
+   * @return bool
+   */
+  public function getZeroDay()
+  {
+    return $this->zeroDay;
   }
 }
 

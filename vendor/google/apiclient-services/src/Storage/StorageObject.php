@@ -75,6 +75,10 @@ class StorageObject extends \Google\Collection
   /**
    * @var string
    */
+  public $hardDeleteTime;
+  /**
+   * @var string
+   */
   public $id;
   /**
    * @var string
@@ -109,6 +113,12 @@ class StorageObject extends \Google\Collection
   /**
    * @var string
    */
+  public $restoreToken;
+  protected $retentionType = StorageObjectRetention::class;
+  protected $retentionDataType = '';
+  /**
+   * @var string
+   */
   public $retentionExpirationTime;
   /**
    * @var string
@@ -118,6 +128,10 @@ class StorageObject extends \Google\Collection
    * @var string
    */
   public $size;
+  /**
+   * @var string
+   */
+  public $softDeleteTime;
   /**
    * @var string
    */
@@ -134,6 +148,10 @@ class StorageObject extends \Google\Collection
    * @var string
    */
   public $timeDeleted;
+  /**
+   * @var string
+   */
+  public $timeFinalized;
   /**
    * @var string
    */
@@ -342,6 +360,20 @@ class StorageObject extends \Google\Collection
   /**
    * @param string
    */
+  public function setHardDeleteTime($hardDeleteTime)
+  {
+    $this->hardDeleteTime = $hardDeleteTime;
+  }
+  /**
+   * @return string
+   */
+  public function getHardDeleteTime()
+  {
+    return $this->hardDeleteTime;
+  }
+  /**
+   * @param string
+   */
   public function setId($id)
   {
     $this->id = $id;
@@ -468,6 +500,34 @@ class StorageObject extends \Google\Collection
   /**
    * @param string
    */
+  public function setRestoreToken($restoreToken)
+  {
+    $this->restoreToken = $restoreToken;
+  }
+  /**
+   * @return string
+   */
+  public function getRestoreToken()
+  {
+    return $this->restoreToken;
+  }
+  /**
+   * @param StorageObjectRetention
+   */
+  public function setRetention(StorageObjectRetention $retention)
+  {
+    $this->retention = $retention;
+  }
+  /**
+   * @return StorageObjectRetention
+   */
+  public function getRetention()
+  {
+    return $this->retention;
+  }
+  /**
+   * @param string
+   */
   public function setRetentionExpirationTime($retentionExpirationTime)
   {
     $this->retentionExpirationTime = $retentionExpirationTime;
@@ -506,6 +566,20 @@ class StorageObject extends \Google\Collection
   public function getSize()
   {
     return $this->size;
+  }
+  /**
+   * @param string
+   */
+  public function setSoftDeleteTime($softDeleteTime)
+  {
+    $this->softDeleteTime = $softDeleteTime;
+  }
+  /**
+   * @return string
+   */
+  public function getSoftDeleteTime()
+  {
+    return $this->softDeleteTime;
   }
   /**
    * @param string
@@ -562,6 +636,20 @@ class StorageObject extends \Google\Collection
   public function getTimeDeleted()
   {
     return $this->timeDeleted;
+  }
+  /**
+   * @param string
+   */
+  public function setTimeFinalized($timeFinalized)
+  {
+    $this->timeFinalized = $timeFinalized;
+  }
+  /**
+   * @return string
+   */
+  public function getTimeFinalized()
+  {
+    return $this->timeFinalized;
   }
   /**
    * @param string

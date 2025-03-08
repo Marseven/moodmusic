@@ -26,6 +26,10 @@ class DataExchange extends \Google\Model
   /**
    * @var string
    */
+  public $discoveryType;
+  /**
+   * @var string
+   */
   public $displayName;
   /**
    * @var string
@@ -40,6 +44,10 @@ class DataExchange extends \Google\Model
    */
   public $listingCount;
   /**
+   * @var bool
+   */
+  public $logLinkedDatasetQueryUserEmail;
+  /**
    * @var string
    */
   public $name;
@@ -47,6 +55,8 @@ class DataExchange extends \Google\Model
    * @var string
    */
   public $primaryContact;
+  protected $sharingEnvironmentConfigType = SharingEnvironmentConfig::class;
+  protected $sharingEnvironmentConfigDataType = '';
 
   /**
    * @param string
@@ -61,6 +71,20 @@ class DataExchange extends \Google\Model
   public function getDescription()
   {
     return $this->description;
+  }
+  /**
+   * @param string
+   */
+  public function setDiscoveryType($discoveryType)
+  {
+    $this->discoveryType = $discoveryType;
+  }
+  /**
+   * @return string
+   */
+  public function getDiscoveryType()
+  {
+    return $this->discoveryType;
   }
   /**
    * @param string
@@ -119,6 +143,20 @@ class DataExchange extends \Google\Model
     return $this->listingCount;
   }
   /**
+   * @param bool
+   */
+  public function setLogLinkedDatasetQueryUserEmail($logLinkedDatasetQueryUserEmail)
+  {
+    $this->logLinkedDatasetQueryUserEmail = $logLinkedDatasetQueryUserEmail;
+  }
+  /**
+   * @return bool
+   */
+  public function getLogLinkedDatasetQueryUserEmail()
+  {
+    return $this->logLinkedDatasetQueryUserEmail;
+  }
+  /**
    * @param string
    */
   public function setName($name)
@@ -145,6 +183,20 @@ class DataExchange extends \Google\Model
   public function getPrimaryContact()
   {
     return $this->primaryContact;
+  }
+  /**
+   * @param SharingEnvironmentConfig
+   */
+  public function setSharingEnvironmentConfig(SharingEnvironmentConfig $sharingEnvironmentConfig)
+  {
+    $this->sharingEnvironmentConfig = $sharingEnvironmentConfig;
+  }
+  /**
+   * @return SharingEnvironmentConfig
+   */
+  public function getSharingEnvironmentConfig()
+  {
+    return $this->sharingEnvironmentConfig;
   }
 }
 

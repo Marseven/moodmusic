@@ -13,12 +13,15 @@ use Sentry\SentrySdk;
 use Sentry\Severity;
 use Sentry\Tracing\TransactionSource;
 use Throwable;
-use function Sentry\addBreadcrumb;
-use function Sentry\configureScope;
 use Sentry\Breadcrumb;
 use Sentry\Event;
 use Sentry\Integration\IntegrationInterface;
 use Sentry\State\Scope;
+
+use function Sentry\addBreadcrumb;
+use function Sentry\configureScope;
+use function Sentry\getBaggage;
+use function Sentry\getTraceparent;
 
 class Integration implements IntegrationInterface
 {
@@ -175,13 +178,7 @@ class Integration implements IntegrationInterface
      */
     public static function sentryTracingMeta(): string
     {
-        $span = SentrySdk::getCurrentHub()->getSpan();
-
-        if ($span === null) {
-            return '';
-        }
-
-        return sprintf('<meta name="sentry-trace" content="%s"/>', $span->toTraceparent());
+        return sprintf('<meta name="sentry-trace" content="%s"/>', getTraceparent());
     }
 
     /**
@@ -192,13 +189,7 @@ class Integration implements IntegrationInterface
      */
     public static function sentryBaggageMeta(): string
     {
-        $span = SentrySdk::getCurrentHub()->getSpan();
-
-        if ($span === null) {
-            return '';
-        }
-
-        return sprintf('<meta name="baggage" content="%s"/>', $span->toBaggage());
+        return sprintf('<meta name="baggage" content="%s"/>', getBaggage());
     }
 
     /**
@@ -246,6 +237,12 @@ class Integration implements IntegrationInterface
 
             public function __invoke(Model $model, string $relation): void
             {
+                // Laravel uses these checks itself to not throw an exception if the model doesn't exist or was just created
+                // See: https://github.com/laravel/framework/blob/438d02d3a891ab4d73ffea2c223b5d37947b5e93/src/Illuminate/Database/Eloquent/Concerns/HasAttributes.php#L563
+                if (!$model->exists || $model->wasRecentlyCreated) {
+                    return;
+                }
+
                 SentrySdk::getCurrentHub()->withScope(function (Scope $scope) use ($model, $relation) {
                     $scope->setContext('violation', [
                         'model'    => get_class($model),

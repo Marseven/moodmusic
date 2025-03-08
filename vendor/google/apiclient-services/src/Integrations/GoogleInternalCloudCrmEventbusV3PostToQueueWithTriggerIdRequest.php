@@ -34,6 +34,10 @@ class GoogleInternalCloudCrmEventbusV3PostToQueueWithTriggerIdRequest extends \G
    */
   public $priority;
   /**
+   * @var int
+   */
+  public $quotaRetryCount;
+  /**
    * @var string
    */
   public $requestId;
@@ -53,6 +57,10 @@ class GoogleInternalCloudCrmEventbusV3PostToQueueWithTriggerIdRequest extends \G
    * @var string
    */
   public $triggerId;
+  /**
+   * @var string
+   */
+  public $userGeneratedExecutionId;
   /**
    * @var string
    */
@@ -113,6 +121,20 @@ class GoogleInternalCloudCrmEventbusV3PostToQueueWithTriggerIdRequest extends \G
   public function getPriority()
   {
     return $this->priority;
+  }
+  /**
+   * @param int
+   */
+  public function setQuotaRetryCount($quotaRetryCount)
+  {
+    $this->quotaRetryCount = $quotaRetryCount;
+  }
+  /**
+   * @return int
+   */
+  public function getQuotaRetryCount()
+  {
+    return $this->quotaRetryCount;
   }
   /**
    * @param string
@@ -183,6 +205,20 @@ class GoogleInternalCloudCrmEventbusV3PostToQueueWithTriggerIdRequest extends \G
   public function getTriggerId()
   {
     return $this->triggerId;
+  }
+  /**
+   * @param string
+   */
+  public function setUserGeneratedExecutionId($userGeneratedExecutionId)
+  {
+    $this->userGeneratedExecutionId = $userGeneratedExecutionId;
+  }
+  /**
+   * @return string
+   */
+  public function getUserGeneratedExecutionId()
+  {
+    return $this->userGeneratedExecutionId;
   }
   /**
    * @param string

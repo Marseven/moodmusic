@@ -48,18 +48,23 @@ class Spanner extends \Google\Service
   public $projects_instanceConfigOperations;
   public $projects_instanceConfigs;
   public $projects_instanceConfigs_operations;
+  public $projects_instanceConfigs_ssdCaches_operations;
   public $projects_instances;
   public $projects_instances_backupOperations;
   public $projects_instances_backups;
   public $projects_instances_backups_operations;
   public $projects_instances_databaseOperations;
   public $projects_instances_databases;
+  public $projects_instances_databases_backupSchedules;
   public $projects_instances_databases_databaseRoles;
   public $projects_instances_databases_operations;
   public $projects_instances_databases_sessions;
+  public $projects_instances_instancePartitionOperations;
+  public $projects_instances_instancePartitions;
   public $projects_instances_instancePartitions_operations;
   public $projects_instances_operations;
   public $scans;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Spanner service.
@@ -72,6 +77,7 @@ class Spanner extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://spanner.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://spanner.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -247,6 +253,68 @@ class Spanner extends \Google\Service
           ]
         ]
     );
+    $this->projects_instanceConfigs_ssdCaches_operations = new Spanner\Resource\ProjectsInstanceConfigsSsdCachesOperations(
+        $this,
+        $this->serviceName,
+        'operations',
+        [
+          'methods' => [
+            'cancel' => [
+              'path' => 'v1/{+name}:cancel',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'list' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'filter' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
     $this->projects_instances = new Spanner\Resource\ProjectsInstances(
         $this,
         $this->serviceName,
@@ -321,6 +389,16 @@ class Spanner extends \Google\Service
                 'pageToken' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+              ],
+            ],'move' => [
+              'path' => 'v1/{+name}:move',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
                 ],
               ],
             ],'patch' => [
@@ -425,6 +503,11 @@ class Spanner extends \Google\Service
                 'encryptionConfig.kmsKeyName' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+                'encryptionConfig.kmsKeyNames' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                  'repeated' => true,
                 ],
               ],
             ],'delete' => [
@@ -617,7 +700,27 @@ class Spanner extends \Google\Service
         'databases',
         [
           'methods' => [
-            'create' => [
+            'addSplitPoints' => [
+              'path' => 'v1/{+database}:addSplitPoints',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'database' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'changequorum' => [
+              'path' => 'v1/{+name}:changequorum',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'create' => [
               'path' => 'v1/{+parent}/databases',
               'httpMethod' => 'POST',
               'parameters' => [
@@ -765,6 +868,112 @@ class Spanner extends \Google\Service
           ]
         ]
     );
+    $this->projects_instances_databases_backupSchedules = new Spanner\Resource\ProjectsInstancesDatabasesBackupSchedules(
+        $this,
+        $this->serviceName,
+        'backupSchedules',
+        [
+          'methods' => [
+            'create' => [
+              'path' => 'v1/{+parent}/backupSchedules',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'backupScheduleId' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'getIamPolicy' => [
+              'path' => 'v1/{+resource}:getIamPolicy',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'resource' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'list' => [
+              'path' => 'v1/{+parent}/backupSchedules',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'patch' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'PATCH',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'updateMask' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'setIamPolicy' => [
+              'path' => 'v1/{+resource}:setIamPolicy',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'resource' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'testIamPermissions' => [
+              'path' => 'v1/{+resource}:testIamPermissions',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'resource' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
     $this->projects_instances_databases_databaseRoles = new Spanner\Resource\ProjectsInstancesDatabasesDatabaseRoles(
         $this,
         $this->serviceName,
@@ -876,6 +1085,16 @@ class Spanner extends \Google\Service
               'httpMethod' => 'POST',
               'parameters' => [
                 'database' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'batchWrite' => [
+              'path' => 'v1/{+session}:batchWrite',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'session' => [
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,
@@ -1028,6 +1247,118 @@ class Spanner extends \Google\Service
               'httpMethod' => 'POST',
               'parameters' => [
                 'session' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_instances_instancePartitionOperations = new Spanner\Resource\ProjectsInstancesInstancePartitionOperations(
+        $this,
+        $this->serviceName,
+        'instancePartitionOperations',
+        [
+          'methods' => [
+            'list' => [
+              'path' => 'v1/{+parent}/instancePartitionOperations',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'filter' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'instancePartitionDeadline' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_instances_instancePartitions = new Spanner\Resource\ProjectsInstancesInstancePartitions(
+        $this,
+        $this->serviceName,
+        'instancePartitions',
+        [
+          'methods' => [
+            'create' => [
+              'path' => 'v1/{+parent}/instancePartitions',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'etag' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'list' => [
+              'path' => 'v1/{+parent}/instancePartitions',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'instancePartitionDeadline' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'patch' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'PATCH',
+              'parameters' => [
+                'name' => [
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,

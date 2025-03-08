@@ -1,5 +1,162 @@
 # CHANGELOG
 
+## 3.22.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.22.1.
+
+### Bug Fixes
+
+- Fix capturing out-of-memory errors when memory-constrained [(#1633)](https://github.com/getsentry/sentry-php/pull/1633)
+
+## 3.22.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.22.0.
+
+### Features
+
+- Adopt Starfish HTTP attributes in spans and breadcrumbs [(#1581)](https://github.com/getsentry/sentry-php/pull/1581)
+
+### Bug Fixes
+
+- Don't add empty HTTP fragment or query strings to breadcrumb data [(#1588)](https://github.com/getsentry/sentry-php/pull/1588)
+
+### Misc
+
+- Remove obsolete `tags` option depreaction [(#1588)](https://github.com/getsentry/sentry-php/pull/1588)
+- Run CI on PHP 8.3 [(1591)](https://github.com/getsentry/sentry-php/pull/1591)
+- Add support for `symfony/options-resolver: ^7.0` [(1597)](https://github.com/getsentry/sentry-php/pull/1597)
+
+## 3.21.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.21.0.
+
+### Features
+
+- Add `Sentry::captureCheckIn()` [(#1573)](https://github.com/getsentry/sentry-php/pull/1573)
+
+  Sending check-ins from the SDK is now simplified.
+
+  ```php
+  $checkInId = Sentry\captureCheckIn(
+      slug: 'monitor-slug',
+      status: CheckInStatus::inProgress()
+  );
+
+
+  // do something
+
+  Sentry\captureCheckIn(
+      checkInId: $checkInId,
+      slug: 'monitor-slug',
+      status: CheckInStatus::ok()
+  );
+  ```
+
+  You can also pass in a `monitorConfig` object as well as the `duration`.
+
+- Undeprecate the `tags` option [(#1561)](https://github.com/getsentry/sentry-php/pull/1561)
+
+  You can now set tags that are applied to each event when calling `Sentry::init()`.
+
+  ```php
+  Sentry\init([
+      'tags' => [
+          'foo' => 'bar',
+      ],
+  ])
+  ```
+
+- Apply the `prefixes`option to profiling frames [(#1568)](https://github.com/getsentry/sentry-php/pull/1568)
+
+  If you added the `prefixes` option when calling `Sentry::init()`, this option will now also apply to profile frames.
+
+  ```php
+  Sentry\init([
+      'prefixes' => ['/var/www/html'],
+  ])
+  ```
+
+### Misc
+
+- Deduplicate profile stacks and frames [(#1570)](https://github.com/getsentry/sentry-php/pull/1570)
+
+  This will decrease the payload size of the `profile` event payload.
+
+- Add the transaction's sampling decision to the trace envelope header [(#1562)](https://github.com/getsentry/sentry-php/pull/1562)
+
+## 3.20.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.20.1.
+
+### Bug Fixes
+
+- Use the result of `isTracingEnabled()` to determine the behaviour of `getBaggage()` and `getTraceparent()` [(#1555)](https://github.com/getsentry/sentry-php/pull/1555)
+
+### Misc
+
+- Always return a `TransactionContext` from `continueTrace()` [(#1556)](https://github.com/getsentry/sentry-php/pull/1556)
+
+## 3.20.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.20.0.
+
+### Features
+
+- Tracing without Performance [(#1516)](https://github.com/getsentry/sentry-php/pull/1516)
+
+  You can now set up distributed tracing without the need to use the performance APIs.
+  This allows you to connect your errors that hail from other Sentry instrumented applications to errors in your PHP application.
+
+  To continue a trace, fetch the incoming Sentry tracing headers and call `\Sentry\continueTrace()` as early as possible in the request cycle.
+
+  ```php
+  $sentryTraceHeader = $request->getHeaderLine('sentry-trace');
+  $baggageHeader = $request->getHeaderLine('baggage');
+
+  continueTrace($sentryTraceHeader, $baggageHeader);
+  ```
+
+  To continue a trace outward, you may attach the Sentry tracing headers to any HTTP client request.
+  You can fetch the required header values by calling `\Sentry\getBaggage()` and `\Sentry\getTraceparent()`.
+
+- Upserting Cron Monitors [(#1511)](https://github.com/getsentry/sentry-php/pull/1511)
+
+  You can now create and update your Cron Monitors programmatically with code.
+  Read more about this in our [docs](https://docs.sentry.io/platforms/php/crons/#upserting-cron-monitors).
+
+## 3.19.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.19.1.
+
+### Bug Fixes
+
+- Use HTTP/1.1 when compression is enabled [(#1542)](https://github.com/getsentry/sentry-php/pull/1542)
+
+## 3.19.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.19.0.
+
+### Misc
+
+- Add support for `guzzlehttp/promises` v2 [(#1536)](https://github.com/getsentry/sentry-php/pull/1536)
+
+## 3.18.2
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.18.2.
+
+### Bug Fixes
+
+- Require php-http/message-factory [(#1534)](https://github.com/getsentry/sentry-php/pull/1534)
+
+## 3.18.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.18.1.
+
+### Bug Fixes
+
+- Guard against empty profiles [(#1528)](https://github.com/getsentry/sentry-php/pull/1528)
+- Ignore empty context values [(#1529)](https://github.com/getsentry/sentry-php/pull/1529)
+
 ## 3.18.0
 
 The Sentry SDK team is happy to announce the immediate availability of Sentry PHP SDK v3.18.0.

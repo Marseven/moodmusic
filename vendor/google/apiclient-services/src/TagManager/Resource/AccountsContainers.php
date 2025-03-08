@@ -46,6 +46,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @opt_param string settingSource Specify the source of config setting after
    * combine
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function combine($path, $optParams = [])
   {
@@ -61,6 +62,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @param Container $postBody
    * @param array $optParams Optional parameters.
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function create($parent, Container $postBody, $optParams = [])
   {
@@ -74,6 +76,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @param string $path GTM Container's API relative path. Example:
    * accounts/{account_id}/containers/{container_id}
    * @param array $optParams Optional parameters.
+   * @throws \Google\Service\Exception
    */
   public function delete($path, $optParams = [])
   {
@@ -88,6 +91,7 @@ class AccountsContainers extends \Google\Service\Resource
    * accounts/{account_id}/containers/{container_id}
    * @param array $optParams Optional parameters.
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function get($path, $optParams = [])
   {
@@ -106,6 +110,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @opt_param string pageToken Continuation token for fetching the next page of
    * results.
    * @return ListContainersResponse
+   * @throws \Google\Service\Exception
    */
   public function listAccountsContainers($parent, $optParams = [])
   {
@@ -114,14 +119,19 @@ class AccountsContainers extends \Google\Service\Resource
     return $this->call('list', [$params], ListContainersResponse::class);
   }
   /**
-   * Looks up a Container by destination ID. (containers.lookup)
+   * Looks up a Container by destination ID or tag ID. (containers.lookup)
    *
    * @param array $optParams Optional parameters.
    *
    * @opt_param string destinationId Destination ID linked to a GTM Container,
    * e.g. AW-123456789. Example:
-   * accounts/containers:lookup?destination_id={destination_id}.
+   * accounts/containers:lookup?destination_id={destination_id}. Only one of
+   * destination_id or tag_id should be set.
+   * @opt_param string tagId Tag ID for a GTM Container, e.g. GTM-123456789.
+   * Example: accounts/containers:lookup?tag_id={tag_id}. Only one of
+   * destination_id or tag_id should be set.
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function lookup($optParams = [])
   {
@@ -149,6 +159,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @opt_param string tagId Tag ID to be removed from the current Container.
    * @opt_param string tagName The name for the newly created tag.
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function move_tag_id($path, $optParams = [])
   {
@@ -163,6 +174,7 @@ class AccountsContainers extends \Google\Service\Resource
    * accounts/{account_id}/containers/{container_id}:snippet
    * @param array $optParams Optional parameters.
    * @return GetContainerSnippetResponse
+   * @throws \Google\Service\Exception
    */
   public function snippet($path, $optParams = [])
   {
@@ -181,6 +193,7 @@ class AccountsContainers extends \Google\Service\Resource
    * @opt_param string fingerprint When provided, this fingerprint must match the
    * fingerprint of the container in storage.
    * @return Container
+   * @throws \Google\Service\Exception
    */
   public function update($path, Container $postBody, $optParams = [])
   {

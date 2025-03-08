@@ -45,6 +45,7 @@ class MyBusinessBusinessInformation extends \Google\Service
   public $googleLocations;
   public $locations;
   public $locations_attributes;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the MyBusinessBusinessInformation
@@ -58,6 +59,7 @@ class MyBusinessBusinessInformation extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://mybusinessbusinessinformation.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://mybusinessbusinessinformation.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -278,27 +280,7 @@ class MyBusinessBusinessInformation extends \Google\Service
         'locations',
         [
           'methods' => [
-            'associate' => [
-              'path' => 'v1/{+name}:associate',
-              'httpMethod' => 'POST',
-              'parameters' => [
-                'name' => [
-                  'location' => 'path',
-                  'type' => 'string',
-                  'required' => true,
-                ],
-              ],
-            ],'clearLocationAssociation' => [
-              'path' => 'v1/{+name}:clearLocationAssociation',
-              'httpMethod' => 'POST',
-              'parameters' => [
-                'name' => [
-                  'location' => 'path',
-                  'type' => 'string',
-                  'required' => true,
-                ],
-              ],
-            ],'delete' => [
+            'delete' => [
               'path' => 'v1/{+name}',
               'httpMethod' => 'DELETE',
               'parameters' => [

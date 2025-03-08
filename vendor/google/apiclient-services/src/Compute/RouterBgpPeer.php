@@ -19,7 +19,7 @@ namespace Google\Service\Compute;
 
 class RouterBgpPeer extends \Google\Collection
 {
-  protected $collection_key = 'advertisedIpRanges';
+  protected $collection_key = 'importPolicies';
   /**
    * @var string
    */
@@ -36,6 +36,12 @@ class RouterBgpPeer extends \Google\Collection
   public $advertisedRoutePriority;
   protected $bfdType = RouterBgpPeerBfd::class;
   protected $bfdDataType = '';
+  protected $customLearnedIpRangesType = RouterBgpPeerCustomLearnedIpRange::class;
+  protected $customLearnedIpRangesDataType = 'array';
+  /**
+   * @var int
+   */
+  public $customLearnedRoutePriority;
   /**
    * @var string
    */
@@ -43,7 +49,19 @@ class RouterBgpPeer extends \Google\Collection
   /**
    * @var bool
    */
+  public $enableIpv4;
+  /**
+   * @var bool
+   */
   public $enableIpv6;
+  /**
+   * @var string[]
+   */
+  public $exportPolicies;
+  /**
+   * @var string[]
+   */
+  public $importPolicies;
   /**
    * @var string
    */
@@ -52,6 +70,10 @@ class RouterBgpPeer extends \Google\Collection
    * @var string
    */
   public $ipAddress;
+  /**
+   * @var string
+   */
+  public $ipv4NexthopAddress;
   /**
    * @var string
    */
@@ -76,6 +98,10 @@ class RouterBgpPeer extends \Google\Collection
    * @var string
    */
   public $peerIpAddress;
+  /**
+   * @var string
+   */
+  public $peerIpv4NexthopAddress;
   /**
    * @var string
    */
@@ -156,6 +182,34 @@ class RouterBgpPeer extends \Google\Collection
     return $this->bfd;
   }
   /**
+   * @param RouterBgpPeerCustomLearnedIpRange[]
+   */
+  public function setCustomLearnedIpRanges($customLearnedIpRanges)
+  {
+    $this->customLearnedIpRanges = $customLearnedIpRanges;
+  }
+  /**
+   * @return RouterBgpPeerCustomLearnedIpRange[]
+   */
+  public function getCustomLearnedIpRanges()
+  {
+    return $this->customLearnedIpRanges;
+  }
+  /**
+   * @param int
+   */
+  public function setCustomLearnedRoutePriority($customLearnedRoutePriority)
+  {
+    $this->customLearnedRoutePriority = $customLearnedRoutePriority;
+  }
+  /**
+   * @return int
+   */
+  public function getCustomLearnedRoutePriority()
+  {
+    return $this->customLearnedRoutePriority;
+  }
+  /**
    * @param string
    */
   public function setEnable($enable)
@@ -172,6 +226,20 @@ class RouterBgpPeer extends \Google\Collection
   /**
    * @param bool
    */
+  public function setEnableIpv4($enableIpv4)
+  {
+    $this->enableIpv4 = $enableIpv4;
+  }
+  /**
+   * @return bool
+   */
+  public function getEnableIpv4()
+  {
+    return $this->enableIpv4;
+  }
+  /**
+   * @param bool
+   */
   public function setEnableIpv6($enableIpv6)
   {
     $this->enableIpv6 = $enableIpv6;
@@ -182,6 +250,34 @@ class RouterBgpPeer extends \Google\Collection
   public function getEnableIpv6()
   {
     return $this->enableIpv6;
+  }
+  /**
+   * @param string[]
+   */
+  public function setExportPolicies($exportPolicies)
+  {
+    $this->exportPolicies = $exportPolicies;
+  }
+  /**
+   * @return string[]
+   */
+  public function getExportPolicies()
+  {
+    return $this->exportPolicies;
+  }
+  /**
+   * @param string[]
+   */
+  public function setImportPolicies($importPolicies)
+  {
+    $this->importPolicies = $importPolicies;
+  }
+  /**
+   * @return string[]
+   */
+  public function getImportPolicies()
+  {
+    return $this->importPolicies;
   }
   /**
    * @param string
@@ -210,6 +306,20 @@ class RouterBgpPeer extends \Google\Collection
   public function getIpAddress()
   {
     return $this->ipAddress;
+  }
+  /**
+   * @param string
+   */
+  public function setIpv4NexthopAddress($ipv4NexthopAddress)
+  {
+    $this->ipv4NexthopAddress = $ipv4NexthopAddress;
+  }
+  /**
+   * @return string
+   */
+  public function getIpv4NexthopAddress()
+  {
+    return $this->ipv4NexthopAddress;
   }
   /**
    * @param string
@@ -294,6 +404,20 @@ class RouterBgpPeer extends \Google\Collection
   public function getPeerIpAddress()
   {
     return $this->peerIpAddress;
+  }
+  /**
+   * @param string
+   */
+  public function setPeerIpv4NexthopAddress($peerIpv4NexthopAddress)
+  {
+    $this->peerIpv4NexthopAddress = $peerIpv4NexthopAddress;
+  }
+  /**
+   * @return string
+   */
+  public function getPeerIpv4NexthopAddress()
+  {
+    return $this->peerIpv4NexthopAddress;
   }
   /**
    * @param string

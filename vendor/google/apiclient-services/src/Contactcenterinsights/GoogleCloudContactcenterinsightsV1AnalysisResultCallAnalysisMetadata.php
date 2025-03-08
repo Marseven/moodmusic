@@ -30,8 +30,12 @@ class GoogleCloudContactcenterinsightsV1AnalysisResultCallAnalysisMetadata exten
   protected $issueModelResultDataType = '';
   protected $phraseMatchersType = GoogleCloudContactcenterinsightsV1PhraseMatchData::class;
   protected $phraseMatchersDataType = 'map';
+  protected $qaScorecardResultsType = GoogleCloudContactcenterinsightsV1QaScorecardResult::class;
+  protected $qaScorecardResultsDataType = 'array';
   protected $sentimentsType = GoogleCloudContactcenterinsightsV1ConversationLevelSentiment::class;
   protected $sentimentsDataType = 'array';
+  protected $silenceType = GoogleCloudContactcenterinsightsV1ConversationLevelSilence::class;
+  protected $silenceDataType = '';
 
   /**
    * @param GoogleCloudContactcenterinsightsV1CallAnnotation[]
@@ -104,6 +108,20 @@ class GoogleCloudContactcenterinsightsV1AnalysisResultCallAnalysisMetadata exten
     return $this->phraseMatchers;
   }
   /**
+   * @param GoogleCloudContactcenterinsightsV1QaScorecardResult[]
+   */
+  public function setQaScorecardResults($qaScorecardResults)
+  {
+    $this->qaScorecardResults = $qaScorecardResults;
+  }
+  /**
+   * @return GoogleCloudContactcenterinsightsV1QaScorecardResult[]
+   */
+  public function getQaScorecardResults()
+  {
+    return $this->qaScorecardResults;
+  }
+  /**
    * @param GoogleCloudContactcenterinsightsV1ConversationLevelSentiment[]
    */
   public function setSentiments($sentiments)
@@ -116,6 +134,20 @@ class GoogleCloudContactcenterinsightsV1AnalysisResultCallAnalysisMetadata exten
   public function getSentiments()
   {
     return $this->sentiments;
+  }
+  /**
+   * @param GoogleCloudContactcenterinsightsV1ConversationLevelSilence
+   */
+  public function setSilence(GoogleCloudContactcenterinsightsV1ConversationLevelSilence $silence)
+  {
+    $this->silence = $silence;
+  }
+  /**
+   * @return GoogleCloudContactcenterinsightsV1ConversationLevelSilence
+   */
+  public function getSilence()
+  {
+    return $this->silence;
   }
 }
 

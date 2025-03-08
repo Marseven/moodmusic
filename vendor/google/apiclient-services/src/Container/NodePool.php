@@ -20,8 +20,12 @@ namespace Google\Service\Container;
 class NodePool extends \Google\Collection
 {
   protected $collection_key = 'locations';
+  protected $autopilotConfigType = AutopilotConfig::class;
+  protected $autopilotConfigDataType = '';
   protected $autoscalingType = NodePoolAutoscaling::class;
   protected $autoscalingDataType = '';
+  protected $bestEffortProvisioningType = BestEffortProvisioning::class;
+  protected $bestEffortProvisioningDataType = '';
   protected $conditionsType = StatusCondition::class;
   protected $conditionsDataType = 'array';
   protected $configType = NodeConfig::class;
@@ -58,6 +62,8 @@ class NodePool extends \Google\Collection
    * @var int
    */
   public $podIpv4CidrSize;
+  protected $queuedProvisioningType = QueuedProvisioning::class;
+  protected $queuedProvisioningDataType = '';
   /**
    * @var string
    */
@@ -80,6 +86,20 @@ class NodePool extends \Google\Collection
   public $version;
 
   /**
+   * @param AutopilotConfig
+   */
+  public function setAutopilotConfig(AutopilotConfig $autopilotConfig)
+  {
+    $this->autopilotConfig = $autopilotConfig;
+  }
+  /**
+   * @return AutopilotConfig
+   */
+  public function getAutopilotConfig()
+  {
+    return $this->autopilotConfig;
+  }
+  /**
    * @param NodePoolAutoscaling
    */
   public function setAutoscaling(NodePoolAutoscaling $autoscaling)
@@ -92,6 +112,20 @@ class NodePool extends \Google\Collection
   public function getAutoscaling()
   {
     return $this->autoscaling;
+  }
+  /**
+   * @param BestEffortProvisioning
+   */
+  public function setBestEffortProvisioning(BestEffortProvisioning $bestEffortProvisioning)
+  {
+    $this->bestEffortProvisioning = $bestEffortProvisioning;
+  }
+  /**
+   * @return BestEffortProvisioning
+   */
+  public function getBestEffortProvisioning()
+  {
+    return $this->bestEffortProvisioning;
   }
   /**
    * @param StatusCondition[]
@@ -260,6 +294,20 @@ class NodePool extends \Google\Collection
   public function getPodIpv4CidrSize()
   {
     return $this->podIpv4CidrSize;
+  }
+  /**
+   * @param QueuedProvisioning
+   */
+  public function setQueuedProvisioning(QueuedProvisioning $queuedProvisioning)
+  {
+    $this->queuedProvisioning = $queuedProvisioning;
+  }
+  /**
+   * @return QueuedProvisioning
+   */
+  public function getQueuedProvisioning()
+  {
+    return $this->queuedProvisioning;
   }
   /**
    * @param string

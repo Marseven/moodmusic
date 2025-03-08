@@ -35,8 +35,10 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * Assigns a targeting option to a line item. Returns the assigned targeting
    * option if successful. Requests to this endpoint cannot be made concurrently
    * with the following requests updating the same line item: *
-   * BulkEditAssignedTargetingOptions * BulkUpdate * UpdateLineItem *
-   * DeleteLineItemAssignedTargetingOption (assignedTargetingOptions.create)
+   * lineItems.bulkEditAssignedTargetingOptions * lineItems.bulkUpdate *
+   * lineItems.patch * DeleteLineItemAssignedTargetingOption YouTube & Partners
+   * line items cannot be created or updated using the API.
+   * (assignedTargetingOptions.create)
    *
    * @param string $advertiserId Required. The ID of the advertiser the line item
    * belongs to.
@@ -73,6 +75,7 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * @param AssignedTargetingOption $postBody
    * @param array $optParams Optional parameters.
    * @return AssignedTargetingOption
+   * @throws \Google\Service\Exception
    */
   public function create($advertiserId, $lineItemId, $targetingType, AssignedTargetingOption $postBody, $optParams = [])
   {
@@ -83,9 +86,10 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
   /**
    * Deletes an assigned targeting option from a line item. Requests to this
    * endpoint cannot be made concurrently with the following requests updating the
-   * same line item: * BulkEditAssignedTargetingOptions * BulkUpdate *
-   * UpdateLineItem * CreateLineItemAssignedTargetingOption
-   * (assignedTargetingOptions.delete)
+   * same line item: * lineItems.bulkEditAssignedTargetingOptions *
+   * lineItems.bulkUpdate * lineItems.patch *
+   * CreateLineItemAssignedTargetingOption YouTube & Partners line items cannot be
+   * created or updated using the API. (assignedTargetingOptions.delete)
    *
    * @param string $advertiserId Required. The ID of the advertiser the line item
    * belongs to.
@@ -123,6 +127,7 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * targeting option to delete.
    * @param array $optParams Optional parameters.
    * @return DisplayvideoEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($advertiserId, $lineItemId, $targetingType, $assignedTargetingOptionId, $optParams = [])
   {
@@ -174,6 +179,7 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * option being requested.
    * @param array $optParams Optional parameters.
    * @return AssignedTargetingOption
+   * @throws \Google\Service\Exception
    */
   public function get($advertiserId, $lineItemId, $targetingType, $assignedTargetingOptionId, $optParams = [])
   {
@@ -223,16 +229,18 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter Allows filtering by assigned targeting option
-   * properties. Supported syntax: * Filter expressions are made up of one or more
+   * fields. Supported syntax: * Filter expressions are made up of one or more
    * restrictions. * Restrictions can be combined by the logical operator `OR`. *
-   * A restriction has the form of `{field} {operator} {value}`. * The operator
-   * must be `EQUALS (=)`. * Supported fields: - `assignedTargetingOptionId` -
-   * `inheritance` Examples: * AssignedTargetingOptions with ID 1 or 2
+   * A restriction has the form of `{field} {operator} {value}`. * All fields must
+   * use the `EQUALS (=)` operator. Supported fields: *
+   * `assignedTargetingOptionId` * `inheritance` Examples: *
+   * `AssignedTargetingOption` resources with ID 1 or 2:
    * `assignedTargetingOptionId="1" OR assignedTargetingOptionId="2"` *
-   * AssignedTargetingOptions with inheritance status of NOT_INHERITED or
-   * INHERITED_FROM_PARTNER `inheritance="NOT_INHERITED" OR
+   * `AssignedTargetingOption` resources with inheritance status of
+   * `NOT_INHERITED` or `INHERITED_FROM_PARTNER`: `inheritance="NOT_INHERITED" OR
    * inheritance="INHERITED_FROM_PARTNER"` The length of this field should be no
-   * more than 500 characters.
+   * more than 500 characters. Reference our [filter `LIST` requests](/display-
+   * video/api/guides/how-tos/filters) guide for more information.
    * @opt_param string orderBy Field by which to sort the list. Acceptable values
    * are: * `assignedTargetingOptionId` (default) The default sorting order is
    * ascending. To specify descending order for a field, a suffix "desc" should be
@@ -245,6 +253,7 @@ class AdvertisersLineItemsTargetingTypesAssignedTargetingOptions extends \Google
    * the previous call to `ListLineItemAssignedTargetingOptions` method. If not
    * specified, the first page of results will be returned.
    * @return ListLineItemAssignedTargetingOptionsResponse
+   * @throws \Google\Service\Exception
    */
   public function listAdvertisersLineItemsTargetingTypesAssignedTargetingOptions($advertiserId, $lineItemId, $targetingType, $optParams = [])
   {

@@ -50,6 +50,7 @@ class Advertisers extends \Google\Service\Resource
    * usedCampaignsCount * channelsCount * negativelyTargetedChannelsCount *
    * negativeKeywordListsCount * adGroupCriteriaCount * campaignCriteriaCount
    * @return AuditAdvertiserResponse
+   * @throws \Google\Service\Exception
    */
   public function audit($advertiserId, $optParams = [])
   {
@@ -59,11 +60,15 @@ class Advertisers extends \Google\Service\Resource
   }
   /**
    * Creates a new advertiser. Returns the newly created advertiser if successful.
-   * This method can take up to 180 seconds to complete. (advertisers.create)
+   * **This method regularly experiences high latency.** We recommend [increasing
+   * your default timeout](/display-video/api/guides/best-
+   * practices/timeouts#client_library_timeout) to avoid errors.
+   * (advertisers.create)
    *
    * @param Advertiser $postBody
    * @param array $optParams Optional parameters.
    * @return Advertiser
+   * @throws \Google\Service\Exception
    */
   public function create(Advertiser $postBody, $optParams = [])
   {
@@ -79,6 +84,7 @@ class Advertisers extends \Google\Service\Resource
    * @param string $advertiserId The ID of the advertiser we need to delete.
    * @param array $optParams Optional parameters.
    * @return DisplayvideoEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($advertiserId, $optParams = [])
   {
@@ -98,6 +104,7 @@ class Advertisers extends \Google\Service\Resource
    * @param BulkEditAdvertiserAssignedTargetingOptionsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return BulkEditAdvertiserAssignedTargetingOptionsResponse
+   * @throws \Google\Service\Exception
    */
   public function editAssignedTargetingOptions($advertiserId, BulkEditAdvertiserAssignedTargetingOptionsRequest $postBody, $optParams = [])
   {
@@ -111,6 +118,7 @@ class Advertisers extends \Google\Service\Resource
    * @param string $advertiserId Required. The ID of the advertiser to fetch.
    * @param array $optParams Optional parameters.
    * @return Advertiser
+   * @throws \Google\Service\Exception
    */
   public function get($advertiserId, $optParams = [])
   {
@@ -125,21 +133,22 @@ class Advertisers extends \Google\Service\Resource
    *
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string filter Allows filtering by advertiser properties. Supported
+   * @opt_param string filter Allows filtering by advertiser fields. Supported
    * syntax: * Filter expressions are made up of one or more restrictions. *
-   * Restrictions can be combined by `AND` or `OR` logical operators. A sequence
-   * of restrictions implicitly uses `AND`. * A restriction has the form of
-   * `{field} {operator} {value}`. * The operator used on `updateTime` must be
-   * `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO (<=)`. * The
-   * operator must be `EQUALS (=)`. * Supported fields: - `advertiserId` -
-   * `displayName` - `entityStatus` - `updateTime` (input in ISO 8601 format, or
-   * YYYY-MM-DDTHH:MM:SSZ) Examples: * All active advertisers under a partner:
+   * Restrictions can be combined by `AND` or `OR` logical operators. * A
+   * restriction has the form of `{field} {operator} {value}`. * The `updateTime`
+   * field must use the `GREATER THAN OR EQUAL TO (>=)` or `LESS THAN OR EQUAL TO
+   * (<=)` operators. * All other fields must use the `EQUALS (=)` operator.
+   * Supported fields: * `advertiserId` * `displayName` * `entityStatus` *
+   * `updateTime` (input in ISO 8601 format, or `YYYY-MM-DDTHH:MM:SSZ`) Examples:
+   * * All active advertisers under a partner:
    * `entityStatus="ENTITY_STATUS_ACTIVE"` * All advertisers with an update time
-   * less than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`:
+   * less than or equal to 2020-11-04T18:54:47Z (format of ISO 8601):
    * `updateTime<="2020-11-04T18:54:47Z"` * All advertisers with an update time
-   * greater than or equal to `2020-11-04T18:54:47Z (format of ISO 8601)`:
+   * greater than or equal to 2020-11-04T18:54:47Z (format of ISO 8601):
    * `updateTime>="2020-11-04T18:54:47Z"` The length of this field should be no
-   * more than 500 characters.
+   * more than 500 characters. Reference our [filter `LIST` requests](/display-
+   * video/api/guides/how-tos/filters) guide for more information.
    * @opt_param string orderBy Field by which to sort the list. Acceptable values
    * are: * `displayName` (default) * `entityStatus` * `updateTime` The default
    * sorting order is ascending. To specify descending order for a field, a suffix
@@ -154,6 +163,7 @@ class Advertisers extends \Google\Service\Resource
    * advertisers should all belong to. The system only supports listing
    * advertisers for one partner at a time.
    * @return ListAdvertisersResponse
+   * @throws \Google\Service\Exception
    */
   public function listAdvertisers($optParams = [])
   {
@@ -170,13 +180,14 @@ class Advertisers extends \Google\Service\Resource
    * @param array $optParams Optional parameters.
    *
    * @opt_param string filter Allows filtering by assigned targeting option
-   * properties. Supported syntax: * Filter expressions are made up of one or more
-   * restrictions. * Restrictions can be combined by the logical operator `OR`.. *
-   * A restriction has the form of `{field} {operator} {value}`. * The operator
-   * must be `EQUALS (=)`. * Supported fields: - `targetingType` Examples: *
-   * targetingType with value TARGETING_TYPE_CHANNEL
+   * fields. Supported syntax: * Filter expressions are made up of one or more
+   * restrictions. * Restrictions can be combined by the `OR` logical operator. *
+   * A restriction has the form of `{field} {operator} {value}`. * All fields must
+   * use the `EQUALS (=) operator`. Supported fields: * `targetingType` Examples:
+   * * targetingType with value TARGETING_TYPE_CHANNEL
    * `targetingType="TARGETING_TYPE_CHANNEL"` The length of this field should be
-   * no more than 500 characters.
+   * no more than 500 characters. Reference our [filter `LIST` requests](/display-
+   * video/api/guides/how-tos/filters) guide for more information.
    * @opt_param string orderBy Field by which to sort the list. Acceptable values
    * are: * `targetingType` (default) The default sorting order is ascending. To
    * specify descending order for a field, a suffix "desc" should be added to the
@@ -189,6 +200,7 @@ class Advertisers extends \Google\Service\Resource
    * previous call to `BulkListAdvertiserAssignedTargetingOptions` method. If not
    * specified, the first page of results will be returned.
    * @return BulkListAdvertiserAssignedTargetingOptionsResponse
+   * @throws \Google\Service\Exception
    */
   public function listAssignedTargetingOptions($advertiserId, $optParams = [])
   {
@@ -208,6 +220,7 @@ class Advertisers extends \Google\Service\Resource
    * @opt_param string updateMask Required. The mask to control which fields to
    * update.
    * @return Advertiser
+   * @throws \Google\Service\Exception
    */
   public function patch($advertiserId, Advertiser $postBody, $optParams = [])
   {

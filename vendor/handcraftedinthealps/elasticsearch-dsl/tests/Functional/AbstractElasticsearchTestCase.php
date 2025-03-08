@@ -21,7 +21,7 @@ abstract class AbstractElasticsearchTestCase extends TestCase
     /**
      * Test index name in the elasticsearch.
      */
-    const INDEX_NAME = 'elasticsaerch-dsl-test';
+    const INDEX_NAME = 'elasticsearch-dsl-test';
 
     /**
      * @var Client
@@ -35,17 +35,18 @@ abstract class AbstractElasticsearchTestCase extends TestCase
     {
         parent::setUp();
 
-        $this->client = ClientBuilder::create()->build();
+        $this->client = ClientBuilder::create()
+            ->build();
         $this->deleteIndex();
 
-        $this->client->indices()->create(
-            array_filter(
-                [
-                    'index' => self::INDEX_NAME,
-                    'mapping' => $this->getMapping()
-                ]
-            )
-        );
+        $params = [
+            'index' => self::INDEX_NAME
+        ];
+        if ($this->getMapping()) {
+            $params['body']['mappings'] = $this->getMapping();
+        }
+
+        $response = $this->client->indices()->create($params);
 
         $bulkBody = [];
 

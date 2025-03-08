@@ -41,6 +41,7 @@ class Assuredworkloads extends \Google\Service
   public $organizations_locations_operations;
   public $organizations_locations_workloads;
   public $organizations_locations_workloads_violations;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Assuredworkloads service.
@@ -53,6 +54,7 @@ class Assuredworkloads extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://assuredworkloads.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://assuredworkloads.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -106,7 +108,34 @@ class Assuredworkloads extends \Google\Service
         'workloads',
         [
           'methods' => [
-            'create' => [
+            'analyzeWorkloadMove' => [
+              'path' => 'v1/{+target}:analyzeWorkloadMove',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'target' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'assetTypes' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                  'repeated' => true,
+                ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'project' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'create' => [
               'path' => 'v1/{+parent}/workloads',
               'httpMethod' => 'POST',
               'parameters' => [
@@ -132,6 +161,16 @@ class Assuredworkloads extends \Google\Service
                 'etag' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+              ],
+            ],'enableResourceMonitoring' => [
+              'path' => 'v1/{+name}:enableResourceMonitoring',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
                 ],
               ],
             ],'get' => [

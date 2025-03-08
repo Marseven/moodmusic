@@ -41,6 +41,7 @@ class PartnersChannels extends \Google\Service\Resource
    * @opt_param string advertiserId The ID of the advertiser that owns the created
    * channel.
    * @return Channel
+   * @throws \Google\Service\Exception
    */
   public function create($partnerId, Channel $postBody, $optParams = [])
   {
@@ -58,6 +59,7 @@ class PartnersChannels extends \Google\Service\Resource
    * @opt_param string advertiserId The ID of the advertiser that owns the fetched
    * channel.
    * @return Channel
+   * @throws \Google\Service\Exception
    */
   public function get($partnerId, $channelId, $optParams = [])
   {
@@ -74,12 +76,13 @@ class PartnersChannels extends \Google\Service\Resource
    * @opt_param string advertiserId The ID of the advertiser that owns the
    * channels.
    * @opt_param string filter Allows filtering by channel fields. Supported
-   * syntax: * Filter expressions for channel currently can only contain at most
-   * one * restriction. * A restriction has the form of `{field} {operator}
-   * {value}`. * The operator must be `CONTAINS (:)`. * Supported fields: -
-   * `displayName` Examples: * All channels for which the display name contains
-   * "google": `displayName : "google"`. The length of this field should be no
-   * more than 500 characters.
+   * syntax: * Filter expressions for channel can only contain at most one
+   * restriction. * A restriction has the form of `{field} {operator} {value}`. *
+   * All fields must use the `HAS (:)` operator. Supported fields: * `displayName`
+   * Examples: * All channels for which the display name contains "google":
+   * `displayName : "google"`. The length of this field should be no more than 500
+   * characters. Reference our [filter `LIST` requests](/display-
+   * video/api/guides/how-tos/filters) guide for more information.
    * @opt_param string orderBy Field by which to sort the list. Acceptable values
    * are: * `displayName` (default) * `channelId` The default sorting order is
    * ascending. To specify descending order for a field, a suffix " desc" should
@@ -92,6 +95,7 @@ class PartnersChannels extends \Google\Service\Resource
    * the previous call to `ListChannels` method. If not specified, the first page
    * of results will be returned.
    * @return ListChannelsResponse
+   * @throws \Google\Service\Exception
    */
   public function listPartnersChannels($partnerId, $optParams = [])
   {
@@ -114,6 +118,7 @@ class PartnersChannels extends \Google\Service\Resource
    * @opt_param string updateMask Required. The mask to control which fields to
    * update.
    * @return Channel
+   * @throws \Google\Service\Exception
    */
   public function patch($partnerId, $channelId, Channel $postBody, $optParams = [])
   {

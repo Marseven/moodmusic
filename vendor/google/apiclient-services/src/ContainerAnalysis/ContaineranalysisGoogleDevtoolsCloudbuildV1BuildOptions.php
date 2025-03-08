@@ -21,6 +21,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
 {
   protected $collection_key = 'volumes';
   /**
+   * @var bool
+   */
+  public $automapSubstitutions;
+  /**
    * @var string
    */
   public $defaultLogsBucketBehavior;
@@ -32,6 +36,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
    * @var bool
    */
   public $dynamicSubstitutions;
+  /**
+   * @var bool
+   */
+  public $enableStructuredLogging;
   /**
    * @var string[]
    */
@@ -50,6 +58,10 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
   public $machineType;
   protected $poolType = ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptionsPoolOption::class;
   protected $poolDataType = '';
+  /**
+   * @var string
+   */
+  public $pubsubTopic;
   /**
    * @var string
    */
@@ -73,6 +85,20 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
    */
   public $workerPool;
 
+  /**
+   * @param bool
+   */
+  public function setAutomapSubstitutions($automapSubstitutions)
+  {
+    $this->automapSubstitutions = $automapSubstitutions;
+  }
+  /**
+   * @return bool
+   */
+  public function getAutomapSubstitutions()
+  {
+    return $this->automapSubstitutions;
+  }
   /**
    * @param string
    */
@@ -114,6 +140,20 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
   public function getDynamicSubstitutions()
   {
     return $this->dynamicSubstitutions;
+  }
+  /**
+   * @param bool
+   */
+  public function setEnableStructuredLogging($enableStructuredLogging)
+  {
+    $this->enableStructuredLogging = $enableStructuredLogging;
+  }
+  /**
+   * @return bool
+   */
+  public function getEnableStructuredLogging()
+  {
+    return $this->enableStructuredLogging;
   }
   /**
    * @param string[]
@@ -184,6 +224,20 @@ class ContaineranalysisGoogleDevtoolsCloudbuildV1BuildOptions extends \Google\Co
   public function getPool()
   {
     return $this->pool;
+  }
+  /**
+   * @param string
+   */
+  public function setPubsubTopic($pubsubTopic)
+  {
+    $this->pubsubTopic = $pubsubTopic;
+  }
+  /**
+   * @return string
+   */
+  public function getPubsubTopic()
+  {
+    return $this->pubsubTopic;
   }
   /**
    * @param string

@@ -46,6 +46,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * @param GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleProtobufEmpty
+   * @throws \Google\Service\Exception
    */
   public function batchDelete($parent, GoogleCloudDialogflowCxV3BatchDeleteTestCasesRequest $postBody, $optParams = [])
   {
@@ -61,10 +62,11 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * BatchRunTestCasesResponse (testCases.batchRun)
    *
    * @param string $parent Required. Agent name. Format:
-   * `projects//locations//agents/ `.
+   * `projects//locations//agents/`.
    * @param GoogleCloudDialogflowCxV3BatchRunTestCasesRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleLongrunningOperation
+   * @throws \Google\Service\Exception
    */
   public function batchRun($parent, GoogleCloudDialogflowCxV3BatchRunTestCasesRequest $postBody, $optParams = [])
   {
@@ -81,6 +83,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    *
    * @opt_param string type Required. The type of coverage requested.
    * @return GoogleCloudDialogflowCxV3CalculateCoverageResponse
+   * @throws \Google\Service\Exception
    */
   public function calculateCoverage($agent, $optParams = [])
   {
@@ -96,6 +99,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * @param GoogleCloudDialogflowCxV3TestCase $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudDialogflowCxV3TestCase
+   * @throws \Google\Service\Exception
    */
   public function create($parent, GoogleCloudDialogflowCxV3TestCase $postBody, $optParams = [])
   {
@@ -106,9 +110,10 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
   /**
    * Exports the test cases under the agent to a Cloud Storage bucket or a local
    * file. Filter can be applied to export a subset of test cases. This method is
-   * a [long-running operation](https://cloud.google.com/dialogflow/cx/docs/how
-   * /long-running-operation). The returned `Operation` type has the following
-   * method-specific fields: - `metadata`: ExportTestCasesMetadata - `response`:
+   * a [long-running
+   * operation](https://cloud.google.com/dialogflow/cx/docs/how/long-running-
+   * operation). The returned `Operation` type has the following method-specific
+   * fields: - `metadata`: ExportTestCasesMetadata - `response`:
    * ExportTestCasesResponse (testCases.export)
    *
    * @param string $parent Required. The agent where to export test cases from.
@@ -116,6 +121,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * @param GoogleCloudDialogflowCxV3ExportTestCasesRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleLongrunningOperation
+   * @throws \Google\Service\Exception
    */
   public function export($parent, GoogleCloudDialogflowCxV3ExportTestCasesRequest $postBody, $optParams = [])
   {
@@ -130,6 +136,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * `projects//locations//agents//testCases/`.
    * @param array $optParams Optional parameters.
    * @return GoogleCloudDialogflowCxV3TestCase
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -151,6 +158,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * @param GoogleCloudDialogflowCxV3ImportTestCasesRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleLongrunningOperation
+   * @throws \Google\Service\Exception
    */
   public function import($parent, GoogleCloudDialogflowCxV3ImportTestCasesRequest $postBody, $optParams = [])
   {
@@ -175,6 +183,7 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * @opt_param string view Specifies whether response should include all fields
    * or just the metadata.
    * @return GoogleCloudDialogflowCxV3ListTestCasesResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsAgentsTestCases($parent, $optParams = [])
   {
@@ -187,13 +196,14 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    *
    * @param string $name The unique identifier of the test case.
    * TestCases.CreateTestCase will populate the name automatically. Otherwise use
-   * format: `projects//locations//agents/ /testCases/`.
+   * format: `projects//locations//agents//testCases/`.
    * @param GoogleCloudDialogflowCxV3TestCase $postBody
    * @param array $optParams Optional parameters.
    *
    * @opt_param string updateMask Required. The mask to specify which fields
    * should be updated. The `creationTime` and `lastTestResult` cannot be updated.
    * @return GoogleCloudDialogflowCxV3TestCase
+   * @throws \Google\Service\Exception
    */
   public function patch($name, GoogleCloudDialogflowCxV3TestCase $postBody, $optParams = [])
   {
@@ -209,10 +219,11 @@ class ProjectsLocationsAgentsTestCases extends \Google\Service\Resource
    * (testCases.run)
    *
    * @param string $name Required. Format of test case name to run:
-   * `projects//locations/ /agents//testCases/`.
+   * `projects//locations//agents//testCases/`.
    * @param GoogleCloudDialogflowCxV3RunTestCaseRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleLongrunningOperation
+   * @throws \Google\Service\Exception
    */
   public function run($name, GoogleCloudDialogflowCxV3RunTestCaseRequest $postBody, $optParams = [])
   {

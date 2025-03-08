@@ -20,6 +20,8 @@ namespace Google\Service\ChromeManagement;
 class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
 {
   protected $collection_key = 'thunderboltInfo';
+  protected $appReportType = GoogleChromeManagementV1AppReport::class;
+  protected $appReportDataType = 'array';
   protected $audioStatusReportType = GoogleChromeManagementV1AudioStatusReport::class;
   protected $audioStatusReportDataType = 'array';
   protected $batteryInfoType = GoogleChromeManagementV1BatteryInfo::class;
@@ -44,6 +46,10 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
   protected $graphicsInfoDataType = '';
   protected $graphicsStatusReportType = GoogleChromeManagementV1GraphicsStatusReport::class;
   protected $graphicsStatusReportDataType = 'array';
+  protected $heartbeatStatusReportType = GoogleChromeManagementV1HeartbeatStatusReport::class;
+  protected $heartbeatStatusReportDataType = 'array';
+  protected $kioskAppStatusReportType = GoogleChromeManagementV1KioskAppStatusReport::class;
+  protected $kioskAppStatusReportDataType = 'array';
   protected $memoryInfoType = GoogleChromeManagementV1MemoryInfo::class;
   protected $memoryInfoDataType = '';
   protected $memoryStatusReportType = GoogleChromeManagementV1MemoryStatusReport::class;
@@ -52,6 +58,8 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
    * @var string
    */
   public $name;
+  protected $networkBandwidthReportType = GoogleChromeManagementV1NetworkBandwidthReport::class;
+  protected $networkBandwidthReportDataType = 'array';
   protected $networkDiagnosticsReportType = GoogleChromeManagementV1NetworkDiagnosticsReport::class;
   protected $networkDiagnosticsReportDataType = 'array';
   protected $networkInfoType = GoogleChromeManagementV1NetworkInfo::class;
@@ -66,6 +74,8 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
   protected $osUpdateStatusDataType = 'array';
   protected $peripheralsReportType = GoogleChromeManagementV1PeripheralsReport::class;
   protected $peripheralsReportDataType = 'array';
+  protected $runtimeCountersReportType = GoogleChromeManagementV1RuntimeCountersReport::class;
+  protected $runtimeCountersReportDataType = 'array';
   /**
    * @var string
    */
@@ -77,6 +87,20 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
   protected $thunderboltInfoType = GoogleChromeManagementV1ThunderboltInfo::class;
   protected $thunderboltInfoDataType = 'array';
 
+  /**
+   * @param GoogleChromeManagementV1AppReport[]
+   */
+  public function setAppReport($appReport)
+  {
+    $this->appReport = $appReport;
+  }
+  /**
+   * @return GoogleChromeManagementV1AppReport[]
+   */
+  public function getAppReport()
+  {
+    return $this->appReport;
+  }
   /**
    * @param GoogleChromeManagementV1AudioStatusReport[]
    */
@@ -218,6 +242,34 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
     return $this->graphicsStatusReport;
   }
   /**
+   * @param GoogleChromeManagementV1HeartbeatStatusReport[]
+   */
+  public function setHeartbeatStatusReport($heartbeatStatusReport)
+  {
+    $this->heartbeatStatusReport = $heartbeatStatusReport;
+  }
+  /**
+   * @return GoogleChromeManagementV1HeartbeatStatusReport[]
+   */
+  public function getHeartbeatStatusReport()
+  {
+    return $this->heartbeatStatusReport;
+  }
+  /**
+   * @param GoogleChromeManagementV1KioskAppStatusReport[]
+   */
+  public function setKioskAppStatusReport($kioskAppStatusReport)
+  {
+    $this->kioskAppStatusReport = $kioskAppStatusReport;
+  }
+  /**
+   * @return GoogleChromeManagementV1KioskAppStatusReport[]
+   */
+  public function getKioskAppStatusReport()
+  {
+    return $this->kioskAppStatusReport;
+  }
+  /**
    * @param GoogleChromeManagementV1MemoryInfo
    */
   public function setMemoryInfo(GoogleChromeManagementV1MemoryInfo $memoryInfo)
@@ -258,6 +310,20 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * @param GoogleChromeManagementV1NetworkBandwidthReport[]
+   */
+  public function setNetworkBandwidthReport($networkBandwidthReport)
+  {
+    $this->networkBandwidthReport = $networkBandwidthReport;
+  }
+  /**
+   * @return GoogleChromeManagementV1NetworkBandwidthReport[]
+   */
+  public function getNetworkBandwidthReport()
+  {
+    return $this->networkBandwidthReport;
   }
   /**
    * @param GoogleChromeManagementV1NetworkDiagnosticsReport[]
@@ -342,6 +408,20 @@ class GoogleChromeManagementV1TelemetryDevice extends \Google\Collection
   public function getPeripheralsReport()
   {
     return $this->peripheralsReport;
+  }
+  /**
+   * @param GoogleChromeManagementV1RuntimeCountersReport[]
+   */
+  public function setRuntimeCountersReport($runtimeCountersReport)
+  {
+    $this->runtimeCountersReport = $runtimeCountersReport;
+  }
+  /**
+   * @return GoogleChromeManagementV1RuntimeCountersReport[]
+   */
+  public function getRuntimeCountersReport()
+  {
+    return $this->runtimeCountersReport;
   }
   /**
    * @param string

@@ -22,7 +22,15 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Model
   /**
    * @var string
    */
+  public $consumerNetwork;
+  /**
+   * @var string
+   */
   public $endpoint;
+  /**
+   * @var string
+   */
+  public $propagatedConnectionCount;
   /**
    * @var string
    */
@@ -32,6 +40,20 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Model
    */
   public $status;
 
+  /**
+   * @param string
+   */
+  public function setConsumerNetwork($consumerNetwork)
+  {
+    $this->consumerNetwork = $consumerNetwork;
+  }
+  /**
+   * @return string
+   */
+  public function getConsumerNetwork()
+  {
+    return $this->consumerNetwork;
+  }
   /**
    * @param string
    */
@@ -45,6 +67,20 @@ class ServiceAttachmentConnectedEndpoint extends \Google\Model
   public function getEndpoint()
   {
     return $this->endpoint;
+  }
+  /**
+   * @param string
+   */
+  public function setPropagatedConnectionCount($propagatedConnectionCount)
+  {
+    $this->propagatedConnectionCount = $propagatedConnectionCount;
+  }
+  /**
+   * @return string
+   */
+  public function getPropagatedConnectionCount()
+  {
+    return $this->propagatedConnectionCount;
   }
   /**
    * @param string

@@ -19,10 +19,11 @@ class CacheIntegration extends Feature
 
     public function isApplicable(): bool
     {
-        return $this->isTracingFeatureEnabled('redis_commands') || $this->isBreadcrumbFeatureEnabled('cache');
+        return $this->isTracingFeatureEnabled('redis_commands')
+            || $this->isBreadcrumbFeatureEnabled('cache');
     }
 
-    public function setup(Dispatcher $events): void
+    public function onBoot(Dispatcher $events): void
     {
         if ($this->isBreadcrumbFeatureEnabled('cache')) {
             $events->listen([

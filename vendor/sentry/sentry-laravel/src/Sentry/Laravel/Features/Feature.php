@@ -3,12 +3,13 @@
 namespace Sentry\Laravel\Features;
 
 use Illuminate\Contracts\Container\Container;
-use Sentry\Integration\IntegrationInterface;
 use Sentry\Laravel\BaseServiceProvider;
 use Sentry\SentrySdk;
+use Throwable;
 
 /**
- * @method void setup() Setup the feature in the environment.
+ * @method void onBoot() Setup the feature in the environment.
+ * @method void onBootInactive() Setup the feature in the environment in an inactive state (when no DSN was set).
  *
  * @internal
  */
@@ -49,14 +50,36 @@ abstract class Feature
     abstract public function isApplicable(): bool;
 
     /**
-     * Initializes the feature.
+     * Register the feature in the environment.
+     */
+    public function register(): void
+    {
+        // ...
+    }
+
+    /**
+     * Initialize the feature.
      */
     public function boot(): void
     {
-        if (method_exists($this, 'setup') && $this->isApplicable()) {
+        if (method_exists($this, 'onBoot') && $this->isApplicable()) {
             try {
-                $this->container->call([$this, 'setup']);
-            } catch (\Throwable $exception) {
+                $this->container->call([$this, 'onBoot']);
+            } catch (Throwable $exception) {
+                // If the feature setup fails, we don't want to prevent the rest of the SDK from working.
+            }
+        }
+    }
+
+    /**
+     * Initialize the feature in an inactive state (when no DSN was set).
+     */
+    public function bootInactive(): void
+    {
+        if (method_exists($this, 'onBootInactive') && $this->isApplicable()) {
+            try {
+                $this->container->call([$this, 'onBootInactive']);
+            } catch (Throwable $exception) {
                 // If the feature setup fails, we don't want to prevent the rest of the SDK from working.
             }
         }

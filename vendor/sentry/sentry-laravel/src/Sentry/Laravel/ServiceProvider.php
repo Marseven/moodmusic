@@ -6,9 +6,9 @@ use Illuminate\Contracts\Container\BindingResolutionException;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Contracts\Http\Kernel as HttpKernelInterface;
 use Illuminate\Foundation\Application as Laravel;
+use Illuminate\Foundation\Console\AboutCommand;
 use Illuminate\Foundation\Http\Kernel as HttpKernel;
 use Illuminate\Http\Request;
-use Illuminate\Log\LogManager;
 use Laravel\Lumen\Application as Lumen;
 use RuntimeException;
 use Sentry\ClientBuilder;
@@ -16,16 +16,21 @@ use Sentry\ClientBuilderInterface;
 use Sentry\Event;
 use Sentry\EventHint;
 use Sentry\Integration as SdkIntegration;
+use Sentry\Laravel\Console\AboutCommandIntegration;
 use Sentry\Laravel\Console\PublishCommand;
 use Sentry\Laravel\Console\TestCommand;
+use Sentry\Laravel\Features\Feature;
 use Sentry\Laravel\Http\LaravelRequestFetcher;
 use Sentry\Laravel\Http\SetRequestIpMiddleware;
 use Sentry\Laravel\Http\SetRequestMiddleware;
+use Sentry\Laravel\Tracing\BacktraceHelper;
 use Sentry\Laravel\Tracing\ServiceProvider as TracingServiceProvider;
 use Sentry\SentrySdk;
+use Sentry\Serializer\RepresentationSerializer;
 use Sentry\State\Hub;
 use Sentry\State\HubInterface;
 use Sentry\Tracing\TransactionMetadata;
+use Throwable;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -49,8 +54,12 @@ class ServiceProvider extends BaseServiceProvider
      * List of features that are provided by the SDK.
      */
     protected const FEATURES = [
+        Features\LogIntegration::class,
         Features\CacheIntegration::class,
+        Features\QueueIntegration::class,
         Features\ConsoleIntegration::class,
+        Features\FolioPackageIntegration::class,
+        Features\Storage\Integration::class,
         Features\LivewirePackageIntegration::class,
     ];
 
@@ -61,10 +70,10 @@ class ServiceProvider extends BaseServiceProvider
     {
         $this->app->make(HubInterface::class);
 
+        $this->bootFeatures();
+
         if ($this->hasDsnSet()) {
             $this->bindEvents();
-
-            $this->setupFeatures();
 
             if ($this->app instanceof Lumen) {
                 $this->app->middleware(SetRequestMiddleware::class);
@@ -88,6 +97,8 @@ class ServiceProvider extends BaseServiceProvider
 
             $this->registerArtisanCommands();
         }
+
+        $this->registerAboutCommandIntegration();
     }
 
     /**
@@ -103,11 +114,7 @@ class ServiceProvider extends BaseServiceProvider
 
         $this->configureAndRegisterClient();
 
-        if (($logManager = $this->app->make('log')) instanceof LogManager) {
-            $logManager->extend('sentry', function ($app, array $config) {
-                return (new LogChannel($app))($config);
-            });
-        }
+        $this->registerFeatures();
     }
 
     /**
@@ -129,10 +136,6 @@ class ServiceProvider extends BaseServiceProvider
                 $handler->subscribeOctaneEvents($dispatcher);
             }
 
-            if ($this->app->bound('queue')) {
-                $handler->subscribeQueueEvents($dispatcher);
-            }
-
             if (isset($userConfig['send_default_pii']) && $userConfig['send_default_pii'] !== false) {
                 $handler->subscribeAuthEvents($dispatcher);
             }
@@ -142,14 +145,43 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
-     * Setup the default SDK features.
+     * Bind and register all the features.
      */
-    protected function setupFeatures(): void
+    protected function registerFeatures(): void
     {
+        // Register all the features as singletons, so there is only one instance of each feature in the application
+        foreach (self::FEATURES as $feature) {
+            $this->app->singleton($feature);
+        }
+
         foreach (self::FEATURES as $feature) {
             try {
-                $this->app->make($feature)->boot();
-            } catch (\Throwable $e) {
+                /** @var Feature $featureInstance */
+                $featureInstance = $this->app->make($feature);
+
+                $featureInstance->register();
+            } catch (Throwable $e) {
+                // Ensure that features do not break the whole application
+            }
+        }
+    }
+
+    /**
+     * Boot all the features.
+     */
+    protected function bootFeatures(): void
+    {
+        $bootActive = $this->hasDsnSet();
+
+        foreach (self::FEATURES as $feature) {
+            try {
+                /** @var Feature $featureInstance */
+                $featureInstance = $this->app->make($feature);
+
+                $bootActive
+                    ? $featureInstance->boot()
+                    : $featureInstance->bootInactive();
+            } catch (Throwable $e) {
                 // Ensure that features do not break the whole application
             }
         }
@@ -167,12 +199,25 @@ class ServiceProvider extends BaseServiceProvider
     }
 
     /**
+     * Register the `php artisan about` command integration.
+     */
+    protected function registerAboutCommandIntegration(): void
+    {
+        // The about command is only available in Laravel 9 and up so we need to check if it's available to us
+        if (!class_exists(AboutCommand::class)) {
+            return;
+        }
+
+        AboutCommand::add('Sentry', AboutCommandIntegration::class);
+    }
+
+    /**
      * Configure and register the Sentry client with the container.
      */
     protected function configureAndRegisterClient(): void
     {
         $this->app->bind(ClientBuilderInterface::class, function () {
-            $basePath   = base_path();
+            $basePath = base_path();
             $userConfig = $this->getUserConfig();
 
             foreach (static::LARAVEL_SPECIFIC_OPTIONS as $laravelSpecificOptionName) {
@@ -181,7 +226,7 @@ class ServiceProvider extends BaseServiceProvider
 
             $options = \array_merge(
                 [
-                    'prefixes'       => [$basePath],
+                    'prefixes' => [$basePath],
                     'in_app_exclude' => ["{$basePath}/vendor"],
                 ],
                 $userConfig
@@ -286,6 +331,14 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         $this->app->alias(HubInterface::class, static::$abstract);
+
+        $this->app->singleton(BacktraceHelper::class, function () {
+            $sentry = $this->app->make(HubInterface::class);
+
+            $options = $sentry->getClient()->getOptions();
+
+            return new BacktraceHelper($options, new RepresentationSerializer($options));
+        });
     }
 
     /**

@@ -30,6 +30,14 @@ class Execution extends \Google\Model
   /**
    * @var string
    */
+  public $createTime;
+  /**
+   * @var bool
+   */
+  public $disableConcurrencyQuotaOverflowBuffering;
+  /**
+   * @var string
+   */
   public $duration;
   /**
    * @var string
@@ -37,6 +45,10 @@ class Execution extends \Google\Model
   public $endTime;
   protected $errorType = Error::class;
   protected $errorDataType = '';
+  /**
+   * @var string
+   */
+  public $executionHistoryLevel;
   /**
    * @var string[]
    */
@@ -97,6 +109,34 @@ class Execution extends \Google\Model
   /**
    * @param string
    */
+  public function setCreateTime($createTime)
+  {
+    $this->createTime = $createTime;
+  }
+  /**
+   * @return string
+   */
+  public function getCreateTime()
+  {
+    return $this->createTime;
+  }
+  /**
+   * @param bool
+   */
+  public function setDisableConcurrencyQuotaOverflowBuffering($disableConcurrencyQuotaOverflowBuffering)
+  {
+    $this->disableConcurrencyQuotaOverflowBuffering = $disableConcurrencyQuotaOverflowBuffering;
+  }
+  /**
+   * @return bool
+   */
+  public function getDisableConcurrencyQuotaOverflowBuffering()
+  {
+    return $this->disableConcurrencyQuotaOverflowBuffering;
+  }
+  /**
+   * @param string
+   */
   public function setDuration($duration)
   {
     $this->duration = $duration;
@@ -135,6 +175,20 @@ class Execution extends \Google\Model
   public function getError()
   {
     return $this->error;
+  }
+  /**
+   * @param string
+   */
+  public function setExecutionHistoryLevel($executionHistoryLevel)
+  {
+    $this->executionHistoryLevel = $executionHistoryLevel;
+  }
+  /**
+   * @return string
+   */
+  public function getExecutionHistoryLevel()
+  {
+    return $this->executionHistoryLevel;
   }
   /**
    * @param string[]

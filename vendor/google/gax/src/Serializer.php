@@ -47,6 +47,11 @@ class Serializer
     const MAP_VALUE_FIELD_NAME = 'value';
 
     private static $phpArraySerializer;
+    // Caches for different helper functions
+    private static array $getterMap = [];
+    private static array $setterMap = [];
+    private static array $snakeCaseMap = [];
+    private static array $camelCaseMap = [];
 
     private static $metadataKnownTypes = [
         'google.rpc.retryinfo-bin' => \Google\Rpc\RetryInfo::class,
@@ -64,6 +69,11 @@ class Serializer
     private $messageTypeTransformers;
     private $decodeFieldTransformers;
     private $decodeMessageTypeTransformers;
+    // Array of key-value pairs which specify a custom encoding function.
+    // The key is the proto class and the value is the function
+    // which will be used to convert the proto instead of the
+    // encodeMessage method from the Serializer class.
+    private $customEncoders;
 
     private $descriptorMaps = [];
 
@@ -79,12 +89,14 @@ class Serializer
         $fieldTransformers = [],
         $messageTypeTransformers = [],
         $decodeFieldTransformers = [],
-        $decodeMessageTypeTransformers = []
+        $decodeMessageTypeTransformers = [],
+        $customEncoders = [],
     ) {
         $this->fieldTransformers = $fieldTransformers;
         $this->messageTypeTransformers = $messageTypeTransformers;
         $this->decodeFieldTransformers = $decodeFieldTransformers;
         $this->decodeMessageTypeTransformers = $decodeMessageTypeTransformers;
+        $this->customEncoders = $customEncoders;
     }
 
     /**
@@ -96,6 +108,14 @@ class Serializer
      */
     public function encodeMessage($message)
     {
+        $cls = get_class($message);
+
+        // If we have supplied a customEncoder for this class type,
+        // then we use that instead of the general encodeMessage definition.
+        if (array_key_exists($cls, $this->customEncoders)) {
+            $func = $this->customEncoders[$cls];
+            return call_user_func($func, $message);
+        }
         // Get message descriptor
         $pool = DescriptorPool::getGeneratedPool();
         $messageType = $pool->getDescriptorByClassName(get_class($message));
@@ -103,7 +123,7 @@ class Serializer
             return $this->encodeMessageImpl($message, $messageType);
         } catch (\Exception $e) {
             throw new ValidationException(
-                "Error encoding message: " . $e->getMessage(),
+                'Error encoding message: ' . $e->getMessage(),
                 $e->getCode(),
                 $e
             );
@@ -127,7 +147,7 @@ class Serializer
             return $this->decodeMessageImpl($message, $messageType, $data);
         } catch (\Exception $e) {
             throw new ValidationException(
-                "Error decoding message: " . $e->getMessage(),
+                'Error decoding message: ' . $e->getMessage(),
                 $e->getCode(),
                 $e
             );
@@ -294,9 +314,10 @@ class Serializer
     {
         $data = [];
 
-        $fieldCount = $messageType->getFieldCount();
-        for ($i = 0; $i < $fieldCount; $i++) {
-            $field = $messageType->getField($i);
+        // Call the getDescriptorMaps outside of the loop to save processing.
+        // Use the same set of fields to loop over, instead of using field count.
+        list($fields, $fieldsToOneof) = $this->getDescriptorMaps($messageType);
+        foreach ($fields as $field) {
             $key = $field->getName();
             $getter = $this->getGetter($key);
             $v = $message->$getter();
@@ -306,7 +327,6 @@ class Serializer
             }
 
             // Check and skip unset fields inside oneofs
-            list($_, $fieldsToOneof) = $this->getDescriptorMaps($messageType);
             if (isset($fieldsToOneof[$key])) {
                 $oneofName = $fieldsToOneof[$key];
                 $oneofGetter =  $this->getGetter($oneofName);
@@ -389,7 +409,7 @@ class Serializer
             // Unknown field found
             if (!isset($fieldsByName[$fieldName])) {
                 throw new RuntimeException(sprintf(
-                    "cannot handle unknown field %s on message %s",
+                    'cannot handle unknown field %s on message %s',
                     $fieldName,
                     $messageType->getFullName()
                 ));
@@ -433,7 +453,10 @@ class Serializer
      */
     public static function getGetter(string $name)
     {
-        return 'get' . ucfirst(self::toCamelCase($name));
+        if (!isset(self::$getterMap[$name])) {
+            self::$getterMap[$name] = 'get' . ucfirst(self::toCamelCase($name));
+        }
+        return self::$getterMap[$name];
     }
 
     /**
@@ -442,7 +465,10 @@ class Serializer
      */
     public static function getSetter(string $name)
     {
-        return 'set' . ucfirst(self::toCamelCase($name));
+        if (!isset(self::$setterMap[$name])) {
+            self::$setterMap[$name] = 'set' . ucfirst(self::toCamelCase($name));
+        }
+        return self::$setterMap[$name];
     }
 
     /**
@@ -453,7 +479,12 @@ class Serializer
      */
     public static function toSnakeCase(string $key)
     {
-        return strtolower(preg_replace(['/([a-z\d])([A-Z])/', '/([^_])([A-Z][a-z])/'], '$1_$2', $key));
+        if (!isset(self::$snakeCaseMap[$key])) {
+            self::$snakeCaseMap[$key] = strtolower(
+                preg_replace(['/([a-z\d])([A-Z])/', '/([^_])([A-Z][a-z])/'], '$1_$2', $key)
+            );
+        }
+        return self::$snakeCaseMap[$key];
     }
 
     /**
@@ -464,12 +495,15 @@ class Serializer
      */
     public static function toCamelCase(string $key)
     {
-        return lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+        if (!isset(self::$camelCaseMap[$key])) {
+            self::$camelCaseMap[$key] = lcfirst(str_replace(' ', '', ucwords(str_replace('_', ' ', $key))));
+        }
+        return self::$camelCaseMap[$key];
     }
 
     private static function hasBinaryHeaderSuffix(string $key)
     {
-        return substr_compare($key, "-bin", strlen($key) - 4) === 0;
+        return substr_compare($key, '-bin', strlen($key) - 4) === 0;
     }
 
     private static function getPhpArraySerializer()
@@ -483,7 +517,7 @@ class Serializer
     public static function loadKnownMetadataTypes()
     {
         foreach (self::$metadataKnownTypes as $key => $class) {
-            new $class;
+            new $class();
         }
     }
 }

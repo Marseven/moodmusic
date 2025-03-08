@@ -43,11 +43,14 @@ class Firestore extends \Google\Service
       "https://www.googleapis.com/auth/datastore";
 
   public $projects_databases;
+  public $projects_databases_backupSchedules;
   public $projects_databases_collectionGroups_fields;
   public $projects_databases_collectionGroups_indexes;
   public $projects_databases_documents;
   public $projects_databases_operations;
   public $projects_locations;
+  public $projects_locations_backups;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Firestore service.
@@ -60,6 +63,7 @@ class Firestore extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://firestore.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://firestore.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -71,7 +75,17 @@ class Firestore extends \Google\Service
         'databases',
         [
           'methods' => [
-            'create' => [
+            'bulkDeleteDocuments' => [
+              'path' => 'v1/{+name}:bulkDeleteDocuments',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'create' => [
               'path' => 'v1/{+parent}/databases',
               'httpMethod' => 'POST',
               'parameters' => [
@@ -94,17 +108,9 @@ class Firestore extends \Google\Service
                   'type' => 'string',
                   'required' => true,
                 ],
-                'allowMissing' => [
-                  'location' => 'query',
-                  'type' => 'boolean',
-                ],
                 'etag' => [
                   'location' => 'query',
                   'type' => 'string',
-                ],
-                'validateOnly' => [
-                  'location' => 'query',
-                  'type' => 'boolean',
                 ],
               ],
             ],'exportDocuments' => [
@@ -139,6 +145,84 @@ class Firestore extends \Google\Service
               ],
             ],'list' => [
               'path' => 'v1/{+parent}/databases',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'showDeleted' => [
+                  'location' => 'query',
+                  'type' => 'boolean',
+                ],
+              ],
+            ],'patch' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'PATCH',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'updateMask' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],'restore' => [
+              'path' => 'v1/{+parent}/databases:restore',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_databases_backupSchedules = new Firestore\Resource\ProjectsDatabasesBackupSchedules(
+        $this,
+        $this->serviceName,
+        'backupSchedules',
+        [
+          'methods' => [
+            'create' => [
+              'path' => 'v1/{+parent}/backupSchedules',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'list' => [
+              'path' => 'v1/{+parent}/backupSchedules',
               'httpMethod' => 'GET',
               'parameters' => [
                 'parent' => [
@@ -680,6 +764,50 @@ class Firestore extends \Google\Service
                   'type' => 'integer',
                 ],
                 'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_locations_backups = new Firestore\Resource\ProjectsLocationsBackups(
+        $this,
+        $this->serviceName,
+        'backups',
+        [
+          'methods' => [
+            'delete' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'DELETE',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'list' => [
+              'path' => 'v1/{+parent}/backups',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'parent' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+                'filter' => [
                   'location' => 'query',
                   'type' => 'string',
                 ],

@@ -27,9 +27,17 @@ class ReleaseConfig extends \Google\Collection
    */
   public $cronSchedule;
   /**
+   * @var bool
+   */
+  public $disabled;
+  /**
    * @var string
    */
   public $gitCommitish;
+  /**
+   * @var string
+   */
+  public $internalMetadata;
   /**
    * @var string
    */
@@ -74,6 +82,20 @@ class ReleaseConfig extends \Google\Collection
     return $this->cronSchedule;
   }
   /**
+   * @param bool
+   */
+  public function setDisabled($disabled)
+  {
+    $this->disabled = $disabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getDisabled()
+  {
+    return $this->disabled;
+  }
+  /**
    * @param string
    */
   public function setGitCommitish($gitCommitish)
@@ -86,6 +108,20 @@ class ReleaseConfig extends \Google\Collection
   public function getGitCommitish()
   {
     return $this->gitCommitish;
+  }
+  /**
+   * @param string
+   */
+  public function setInternalMetadata($internalMetadata)
+  {
+    $this->internalMetadata = $internalMetadata;
+  }
+  /**
+   * @return string
+   */
+  public function getInternalMetadata()
+  {
+    return $this->internalMetadata;
   }
   /**
    * @param string

@@ -58,6 +58,22 @@ class BackupPlan extends \Google\Model
   protected $retentionPolicyType = RetentionPolicy::class;
   protected $retentionPolicyDataType = '';
   /**
+   * @var int
+   */
+  public $rpoRiskLevel;
+  /**
+   * @var string
+   */
+  public $rpoRiskReason;
+  /**
+   * @var string
+   */
+  public $state;
+  /**
+   * @var string
+   */
+  public $stateReason;
+  /**
    * @var string
    */
   public $uid;
@@ -219,6 +235,62 @@ class BackupPlan extends \Google\Model
   public function getRetentionPolicy()
   {
     return $this->retentionPolicy;
+  }
+  /**
+   * @param int
+   */
+  public function setRpoRiskLevel($rpoRiskLevel)
+  {
+    $this->rpoRiskLevel = $rpoRiskLevel;
+  }
+  /**
+   * @return int
+   */
+  public function getRpoRiskLevel()
+  {
+    return $this->rpoRiskLevel;
+  }
+  /**
+   * @param string
+   */
+  public function setRpoRiskReason($rpoRiskReason)
+  {
+    $this->rpoRiskReason = $rpoRiskReason;
+  }
+  /**
+   * @return string
+   */
+  public function getRpoRiskReason()
+  {
+    return $this->rpoRiskReason;
+  }
+  /**
+   * @param string
+   */
+  public function setState($state)
+  {
+    $this->state = $state;
+  }
+  /**
+   * @return string
+   */
+  public function getState()
+  {
+    return $this->state;
+  }
+  /**
+   * @param string
+   */
+  public function setStateReason($stateReason)
+  {
+    $this->stateReason = $stateReason;
+  }
+  /**
+   * @return string
+   */
+  public function getStateReason()
+  {
+    return $this->stateReason;
   }
   /**
    * @param string

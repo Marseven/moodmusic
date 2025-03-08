@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Sentry\Profiling;
 
+use Sentry\Options;
+
 /**
  * @internal
  */
@@ -29,9 +31,9 @@ final class Profiler
      */
     private const MAX_STACK_DEPTH = 128;
 
-    public function __construct()
+    public function __construct(?Options $options = null)
     {
-        $this->profile = new Profile();
+        $this->profile = new Profile($options);
 
         $this->initProfiler();
     }
@@ -52,8 +54,12 @@ final class Profiler
         }
     }
 
-    public function getProfile(): Profile
+    public function getProfile(): ?Profile
     {
+        if (null === $this->profiler) {
+            return null;
+        }
+
         return $this->profile;
     }
 

@@ -45,6 +45,10 @@ class AddSubnetworkRequest extends \Google\Collection
    */
   public $description;
   /**
+   * @var string
+   */
+  public $internalRange;
+  /**
    * @var int
    */
   public $ipPrefixLength;
@@ -78,6 +82,10 @@ class AddSubnetworkRequest extends \Google\Collection
   public $role;
   protected $secondaryIpRangeSpecsType = SecondaryIpRangeSpec::class;
   protected $secondaryIpRangeSpecsDataType = 'array';
+  /**
+   * @var bool
+   */
+  public $skipRequestedAddressValidation;
   /**
    * @var string
    */
@@ -174,6 +182,20 @@ class AddSubnetworkRequest extends \Google\Collection
   public function getDescription()
   {
     return $this->description;
+  }
+  /**
+   * @param string
+   */
+  public function setInternalRange($internalRange)
+  {
+    $this->internalRange = $internalRange;
+  }
+  /**
+   * @return string
+   */
+  public function getInternalRange()
+  {
+    return $this->internalRange;
   }
   /**
    * @param int
@@ -300,6 +322,20 @@ class AddSubnetworkRequest extends \Google\Collection
   public function getSecondaryIpRangeSpecs()
   {
     return $this->secondaryIpRangeSpecs;
+  }
+  /**
+   * @param bool
+   */
+  public function setSkipRequestedAddressValidation($skipRequestedAddressValidation)
+  {
+    $this->skipRequestedAddressValidation = $skipRequestedAddressValidation;
+  }
+  /**
+   * @return bool
+   */
+  public function getSkipRequestedAddressValidation()
+  {
+    return $this->skipRequestedAddressValidation;
   }
   /**
    * @param string

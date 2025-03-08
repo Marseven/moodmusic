@@ -23,6 +23,12 @@ class ExecuteSqlRequest extends \Google\Model
    * @var bool
    */
   public $dataBoostEnabled;
+  protected $directedReadOptionsType = DirectedReadOptions::class;
+  protected $directedReadOptionsDataType = '';
+  /**
+   * @var bool
+   */
+  public $lastStatement;
   protected $paramTypesType = Type::class;
   protected $paramTypesDataType = 'map';
   /**
@@ -69,6 +75,34 @@ class ExecuteSqlRequest extends \Google\Model
   public function getDataBoostEnabled()
   {
     return $this->dataBoostEnabled;
+  }
+  /**
+   * @param DirectedReadOptions
+   */
+  public function setDirectedReadOptions(DirectedReadOptions $directedReadOptions)
+  {
+    $this->directedReadOptions = $directedReadOptions;
+  }
+  /**
+   * @return DirectedReadOptions
+   */
+  public function getDirectedReadOptions()
+  {
+    return $this->directedReadOptions;
+  }
+  /**
+   * @param bool
+   */
+  public function setLastStatement($lastStatement)
+  {
+    $this->lastStatement = $lastStatement;
+  }
+  /**
+   * @return bool
+   */
+  public function getLastStatement()
+  {
+    return $this->lastStatement;
   }
   /**
    * @param Type[]

@@ -17,7 +17,6 @@ use Laravel\Lumen\Application as Lumen;
 use Sentry\Laravel\BaseServiceProvider;
 use Sentry\Laravel\Tracing\Routing\TracingCallableDispatcherTracing;
 use Sentry\Laravel\Tracing\Routing\TracingControllerDispatcherTracing;
-use Sentry\Serializer\RepresentationSerializer;
 
 class ServiceProvider extends BaseServiceProvider
 {
@@ -38,7 +37,7 @@ class ServiceProvider extends BaseServiceProvider
             });
         }
 
-        $tracingConfig = $this->getUserConfig()['tracing'] ?? [];
+        $tracingConfig = $this->getTracingConfig();
 
         $this->bindEvents($tracingConfig);
 
@@ -59,34 +58,22 @@ class ServiceProvider extends BaseServiceProvider
 
     public function register(): void
     {
-        $this->app->singleton(Middleware::class);
+        $this->app->singleton(Middleware::class, function () {
+            $continueAfterResponse = ($this->getTracingConfig()['continue_after_response'] ?? true) === true;
 
-        $this->app->singleton(BacktraceHelper::class, function () {
-            /** @var \Sentry\State\Hub $sentry */
-            $sentry = $this->app->make(self::$abstract);
-
-            $options = $sentry->getClient()->getOptions();
-
-            return new BacktraceHelper($options, new RepresentationSerializer($options));
+            return new Middleware($this->app, $continueAfterResponse);
         });
     }
 
     private function bindEvents(array $tracingConfig): void
     {
-        $handler = new EventHandler(
-            $tracingConfig,
-            $this->app->make(BacktraceHelper::class)
-        );
+        $handler = new EventHandler($tracingConfig);
 
         try {
             /** @var \Illuminate\Contracts\Events\Dispatcher $dispatcher */
             $dispatcher = $this->app->make(Dispatcher::class);
 
             $handler->subscribe($dispatcher);
-
-            if ($this->app->bound('queue')) {
-                $handler->subscribeQueueEvents($dispatcher, $this->app->make('queue'));
-            }
         } catch (BindingResolutionException $e) {
             // If we cannot resolve the event dispatcher we also cannot listen to events
         }
@@ -131,6 +118,11 @@ class ServiceProvider extends BaseServiceProvider
         });
 
         return new ViewEngineDecorator($realEngine, $viewFactory);
+    }
+
+    private function getTracingConfig(): array
+    {
+        return $this->getUserConfig()['tracing'] ?? [];
     }
 
     private function decorateRoutingDispatchers(): void

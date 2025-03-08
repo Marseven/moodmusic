@@ -4,7 +4,7 @@
  * This file is part of the Predis package.
  *
  * (c) 2009-2020 Daniele Alessandri
- * (c) 2021-2023 Till Krüss
+ * (c) 2021-2024 Till Krüss
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -53,6 +53,7 @@ abstract class ClusterStrategy implements StrategyInterface
             'SORT' => [$this, 'getKeyFromSortCommand'],
             'DUMP' => $getKeyFromFirstArgument,
             'RESTORE' => $getKeyFromFirstArgument,
+            'FLUSHDB' => [$this, 'getFakeKey'],
 
             /* commands operating on string values */
             'APPEND' => $getKeyFromFirstArgument,
@@ -163,6 +164,9 @@ abstract class ClusterStrategy implements StrategyInterface
             'EVAL' => [$this, 'getKeyFromScriptingCommands'],
             'EVALSHA' => [$this, 'getKeyFromScriptingCommands'],
 
+            /* server */
+            'INFO' => [$this, 'getFakeKey'],
+
             /* commands performing geospatial operations */
             'GEOADD' => $getKeyFromFirstArgument,
             'GEOHASH' => $getKeyFromFirstArgument,
@@ -170,6 +174,9 @@ abstract class ClusterStrategy implements StrategyInterface
             'GEODIST' => $getKeyFromFirstArgument,
             'GEORADIUS' => [$this, 'getKeyFromGeoradiusCommands'],
             'GEORADIUSBYMEMBER' => [$this, 'getKeyFromGeoradiusCommands'],
+
+            /* cluster */
+            'CLUSTER' => [$this, 'getFakeKey'],
         ];
     }
 
@@ -214,6 +221,16 @@ abstract class ClusterStrategy implements StrategyInterface
         }
 
         $this->commands[$commandID] = $callback;
+    }
+
+    /**
+     * Get fake key for commands with no key argument.
+     *
+     * @return string
+     */
+    protected function getFakeKey(): string
+    {
+        return 'key';
     }
 
     /**

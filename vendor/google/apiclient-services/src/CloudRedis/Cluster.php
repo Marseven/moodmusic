@@ -19,63 +19,168 @@ namespace Google\Service\CloudRedis;
 
 class Cluster extends \Google\Collection
 {
-  protected $collection_key = 'slots';
+  protected $collection_key = 'pscServiceAttachments';
+  /**
+   * @var bool
+   */
+  public $asyncClusterEndpointsDeletionEnabled;
   /**
    * @var string
    */
-  public $clusterUid;
+  public $authorizationMode;
+  protected $automatedBackupConfigType = AutomatedBackupConfig::class;
+  protected $automatedBackupConfigDataType = '';
+  /**
+   * @var string
+   */
+  public $backupCollection;
+  protected $clusterEndpointsType = ClusterEndpoint::class;
+  protected $clusterEndpointsDataType = 'array';
   /**
    * @var string
    */
   public $createTime;
+  protected $crossClusterReplicationConfigType = CrossClusterReplicationConfig::class;
+  protected $crossClusterReplicationConfigDataType = '';
+  /**
+   * @var bool
+   */
+  public $deletionProtectionEnabled;
+  protected $discoveryEndpointsType = DiscoveryEndpoint::class;
+  protected $discoveryEndpointsDataType = 'array';
+  protected $encryptionInfoType = EncryptionInfo::class;
+  protected $encryptionInfoDataType = '';
+  protected $gcsSourceType = GcsBackupSource::class;
+  protected $gcsSourceDataType = '';
   /**
    * @var string
    */
-  public $customerManagedKey;
-  /**
-   * @var int
-   */
-  public $defaultReplicaCount;
-  /**
-   * @var string
-   */
-  public $displayName;
-  protected $endpointsType = Endpoint::class;
-  protected $endpointsDataType = 'array';
+  public $kmsKey;
+  protected $maintenancePolicyType = ClusterMaintenancePolicy::class;
+  protected $maintenancePolicyDataType = '';
+  protected $maintenanceScheduleType = ClusterMaintenanceSchedule::class;
+  protected $maintenanceScheduleDataType = '';
+  protected $managedBackupSourceType = ManagedBackupSource::class;
+  protected $managedBackupSourceDataType = '';
   /**
    * @var string
    */
   public $name;
-  protected $privateServiceConnectType = PrivateServiceConnect::class;
-  protected $privateServiceConnectDataType = '';
+  /**
+   * @var string
+   */
+  public $nodeType;
+  protected $persistenceConfigType = ClusterPersistenceConfig::class;
+  protected $persistenceConfigDataType = '';
+  public $preciseSizeGb;
+  protected $pscConfigsType = PscConfig::class;
+  protected $pscConfigsDataType = 'array';
+  protected $pscConnectionsType = PscConnection::class;
+  protected $pscConnectionsDataType = 'array';
+  protected $pscServiceAttachmentsType = PscServiceAttachment::class;
+  protected $pscServiceAttachmentsDataType = 'array';
   /**
    * @var string[]
    */
   public $redisConfigs;
-  protected $slotsType = ClusterSlots::class;
-  protected $slotsDataType = 'array';
+  /**
+   * @var int
+   */
+  public $replicaCount;
+  /**
+   * @var int
+   */
+  public $shardCount;
+  /**
+   * @var int
+   */
+  public $sizeGb;
   /**
    * @var string
    */
   public $state;
+  protected $stateInfoType = StateInfo::class;
+  protected $stateInfoDataType = '';
   /**
-   * @var int
+   * @var string
    */
-  public $totalMemorySizeGb;
+  public $transitEncryptionMode;
+  /**
+   * @var string
+   */
+  public $uid;
+  protected $zoneDistributionConfigType = ZoneDistributionConfig::class;
+  protected $zoneDistributionConfigDataType = '';
 
+  /**
+   * @param bool
+   */
+  public function setAsyncClusterEndpointsDeletionEnabled($asyncClusterEndpointsDeletionEnabled)
+  {
+    $this->asyncClusterEndpointsDeletionEnabled = $asyncClusterEndpointsDeletionEnabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getAsyncClusterEndpointsDeletionEnabled()
+  {
+    return $this->asyncClusterEndpointsDeletionEnabled;
+  }
   /**
    * @param string
    */
-  public function setClusterUid($clusterUid)
+  public function setAuthorizationMode($authorizationMode)
   {
-    $this->clusterUid = $clusterUid;
+    $this->authorizationMode = $authorizationMode;
   }
   /**
    * @return string
    */
-  public function getClusterUid()
+  public function getAuthorizationMode()
   {
-    return $this->clusterUid;
+    return $this->authorizationMode;
+  }
+  /**
+   * @param AutomatedBackupConfig
+   */
+  public function setAutomatedBackupConfig(AutomatedBackupConfig $automatedBackupConfig)
+  {
+    $this->automatedBackupConfig = $automatedBackupConfig;
+  }
+  /**
+   * @return AutomatedBackupConfig
+   */
+  public function getAutomatedBackupConfig()
+  {
+    return $this->automatedBackupConfig;
+  }
+  /**
+   * @param string
+   */
+  public function setBackupCollection($backupCollection)
+  {
+    $this->backupCollection = $backupCollection;
+  }
+  /**
+   * @return string
+   */
+  public function getBackupCollection()
+  {
+    return $this->backupCollection;
+  }
+  /**
+   * @param ClusterEndpoint[]
+   */
+  public function setClusterEndpoints($clusterEndpoints)
+  {
+    $this->clusterEndpoints = $clusterEndpoints;
+  }
+  /**
+   * @return ClusterEndpoint[]
+   */
+  public function getClusterEndpoints()
+  {
+    return $this->clusterEndpoints;
   }
   /**
    * @param string
@@ -92,60 +197,130 @@ class Cluster extends \Google\Collection
     return $this->createTime;
   }
   /**
+   * @param CrossClusterReplicationConfig
+   */
+  public function setCrossClusterReplicationConfig(CrossClusterReplicationConfig $crossClusterReplicationConfig)
+  {
+    $this->crossClusterReplicationConfig = $crossClusterReplicationConfig;
+  }
+  /**
+   * @return CrossClusterReplicationConfig
+   */
+  public function getCrossClusterReplicationConfig()
+  {
+    return $this->crossClusterReplicationConfig;
+  }
+  /**
+   * @param bool
+   */
+  public function setDeletionProtectionEnabled($deletionProtectionEnabled)
+  {
+    $this->deletionProtectionEnabled = $deletionProtectionEnabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getDeletionProtectionEnabled()
+  {
+    return $this->deletionProtectionEnabled;
+  }
+  /**
+   * @param DiscoveryEndpoint[]
+   */
+  public function setDiscoveryEndpoints($discoveryEndpoints)
+  {
+    $this->discoveryEndpoints = $discoveryEndpoints;
+  }
+  /**
+   * @return DiscoveryEndpoint[]
+   */
+  public function getDiscoveryEndpoints()
+  {
+    return $this->discoveryEndpoints;
+  }
+  /**
+   * @param EncryptionInfo
+   */
+  public function setEncryptionInfo(EncryptionInfo $encryptionInfo)
+  {
+    $this->encryptionInfo = $encryptionInfo;
+  }
+  /**
+   * @return EncryptionInfo
+   */
+  public function getEncryptionInfo()
+  {
+    return $this->encryptionInfo;
+  }
+  /**
+   * @param GcsBackupSource
+   */
+  public function setGcsSource(GcsBackupSource $gcsSource)
+  {
+    $this->gcsSource = $gcsSource;
+  }
+  /**
+   * @return GcsBackupSource
+   */
+  public function getGcsSource()
+  {
+    return $this->gcsSource;
+  }
+  /**
    * @param string
    */
-  public function setCustomerManagedKey($customerManagedKey)
+  public function setKmsKey($kmsKey)
   {
-    $this->customerManagedKey = $customerManagedKey;
+    $this->kmsKey = $kmsKey;
   }
   /**
    * @return string
    */
-  public function getCustomerManagedKey()
+  public function getKmsKey()
   {
-    return $this->customerManagedKey;
+    return $this->kmsKey;
   }
   /**
-   * @param int
+   * @param ClusterMaintenancePolicy
    */
-  public function setDefaultReplicaCount($defaultReplicaCount)
+  public function setMaintenancePolicy(ClusterMaintenancePolicy $maintenancePolicy)
   {
-    $this->defaultReplicaCount = $defaultReplicaCount;
+    $this->maintenancePolicy = $maintenancePolicy;
   }
   /**
-   * @return int
+   * @return ClusterMaintenancePolicy
    */
-  public function getDefaultReplicaCount()
+  public function getMaintenancePolicy()
   {
-    return $this->defaultReplicaCount;
+    return $this->maintenancePolicy;
   }
   /**
-   * @param string
+   * @param ClusterMaintenanceSchedule
    */
-  public function setDisplayName($displayName)
+  public function setMaintenanceSchedule(ClusterMaintenanceSchedule $maintenanceSchedule)
   {
-    $this->displayName = $displayName;
+    $this->maintenanceSchedule = $maintenanceSchedule;
   }
   /**
-   * @return string
+   * @return ClusterMaintenanceSchedule
    */
-  public function getDisplayName()
+  public function getMaintenanceSchedule()
   {
-    return $this->displayName;
+    return $this->maintenanceSchedule;
   }
   /**
-   * @param Endpoint[]
+   * @param ManagedBackupSource
    */
-  public function setEndpoints($endpoints)
+  public function setManagedBackupSource(ManagedBackupSource $managedBackupSource)
   {
-    $this->endpoints = $endpoints;
+    $this->managedBackupSource = $managedBackupSource;
   }
   /**
-   * @return Endpoint[]
+   * @return ManagedBackupSource
    */
-  public function getEndpoints()
+  public function getManagedBackupSource()
   {
-    return $this->endpoints;
+    return $this->managedBackupSource;
   }
   /**
    * @param string
@@ -162,18 +337,82 @@ class Cluster extends \Google\Collection
     return $this->name;
   }
   /**
-   * @param PrivateServiceConnect
+   * @param string
    */
-  public function setPrivateServiceConnect(PrivateServiceConnect $privateServiceConnect)
+  public function setNodeType($nodeType)
   {
-    $this->privateServiceConnect = $privateServiceConnect;
+    $this->nodeType = $nodeType;
   }
   /**
-   * @return PrivateServiceConnect
+   * @return string
    */
-  public function getPrivateServiceConnect()
+  public function getNodeType()
   {
-    return $this->privateServiceConnect;
+    return $this->nodeType;
+  }
+  /**
+   * @param ClusterPersistenceConfig
+   */
+  public function setPersistenceConfig(ClusterPersistenceConfig $persistenceConfig)
+  {
+    $this->persistenceConfig = $persistenceConfig;
+  }
+  /**
+   * @return ClusterPersistenceConfig
+   */
+  public function getPersistenceConfig()
+  {
+    return $this->persistenceConfig;
+  }
+  public function setPreciseSizeGb($preciseSizeGb)
+  {
+    $this->preciseSizeGb = $preciseSizeGb;
+  }
+  public function getPreciseSizeGb()
+  {
+    return $this->preciseSizeGb;
+  }
+  /**
+   * @param PscConfig[]
+   */
+  public function setPscConfigs($pscConfigs)
+  {
+    $this->pscConfigs = $pscConfigs;
+  }
+  /**
+   * @return PscConfig[]
+   */
+  public function getPscConfigs()
+  {
+    return $this->pscConfigs;
+  }
+  /**
+   * @param PscConnection[]
+   */
+  public function setPscConnections($pscConnections)
+  {
+    $this->pscConnections = $pscConnections;
+  }
+  /**
+   * @return PscConnection[]
+   */
+  public function getPscConnections()
+  {
+    return $this->pscConnections;
+  }
+  /**
+   * @param PscServiceAttachment[]
+   */
+  public function setPscServiceAttachments($pscServiceAttachments)
+  {
+    $this->pscServiceAttachments = $pscServiceAttachments;
+  }
+  /**
+   * @return PscServiceAttachment[]
+   */
+  public function getPscServiceAttachments()
+  {
+    return $this->pscServiceAttachments;
   }
   /**
    * @param string[]
@@ -190,18 +429,46 @@ class Cluster extends \Google\Collection
     return $this->redisConfigs;
   }
   /**
-   * @param ClusterSlots[]
+   * @param int
    */
-  public function setSlots($slots)
+  public function setReplicaCount($replicaCount)
   {
-    $this->slots = $slots;
+    $this->replicaCount = $replicaCount;
   }
   /**
-   * @return ClusterSlots[]
+   * @return int
    */
-  public function getSlots()
+  public function getReplicaCount()
   {
-    return $this->slots;
+    return $this->replicaCount;
+  }
+  /**
+   * @param int
+   */
+  public function setShardCount($shardCount)
+  {
+    $this->shardCount = $shardCount;
+  }
+  /**
+   * @return int
+   */
+  public function getShardCount()
+  {
+    return $this->shardCount;
+  }
+  /**
+   * @param int
+   */
+  public function setSizeGb($sizeGb)
+  {
+    $this->sizeGb = $sizeGb;
+  }
+  /**
+   * @return int
+   */
+  public function getSizeGb()
+  {
+    return $this->sizeGb;
   }
   /**
    * @param string
@@ -218,18 +485,60 @@ class Cluster extends \Google\Collection
     return $this->state;
   }
   /**
-   * @param int
+   * @param StateInfo
    */
-  public function setTotalMemorySizeGb($totalMemorySizeGb)
+  public function setStateInfo(StateInfo $stateInfo)
   {
-    $this->totalMemorySizeGb = $totalMemorySizeGb;
+    $this->stateInfo = $stateInfo;
   }
   /**
-   * @return int
+   * @return StateInfo
    */
-  public function getTotalMemorySizeGb()
+  public function getStateInfo()
   {
-    return $this->totalMemorySizeGb;
+    return $this->stateInfo;
+  }
+  /**
+   * @param string
+   */
+  public function setTransitEncryptionMode($transitEncryptionMode)
+  {
+    $this->transitEncryptionMode = $transitEncryptionMode;
+  }
+  /**
+   * @return string
+   */
+  public function getTransitEncryptionMode()
+  {
+    return $this->transitEncryptionMode;
+  }
+  /**
+   * @param string
+   */
+  public function setUid($uid)
+  {
+    $this->uid = $uid;
+  }
+  /**
+   * @return string
+   */
+  public function getUid()
+  {
+    return $this->uid;
+  }
+  /**
+   * @param ZoneDistributionConfig
+   */
+  public function setZoneDistributionConfig(ZoneDistributionConfig $zoneDistributionConfig)
+  {
+    $this->zoneDistributionConfig = $zoneDistributionConfig;
+  }
+  /**
+   * @return ZoneDistributionConfig
+   */
+  public function getZoneDistributionConfig()
+  {
+    return $this->zoneDistributionConfig;
   }
 }
 

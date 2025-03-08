@@ -6,26 +6,20 @@ use Exception;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Database\Events as DatabaseEvents;
 use Illuminate\Http\Client\Events as HttpClientEvents;
-use Illuminate\Queue\Events as QueueEvents;
-use Illuminate\Queue\Queue;
-use Illuminate\Queue\QueueManager;
 use Illuminate\Routing\Events as RoutingEvents;
 use RuntimeException;
+use Sentry\Laravel\Features\Concerns\ResolvesEventOrigin;
 use Sentry\Laravel\Integration;
 use Sentry\Laravel\Util\WorksWithUris;
 use Sentry\SentrySdk;
 use Sentry\Tracing\Span;
 use Sentry\Tracing\SpanContext;
 use Sentry\Tracing\SpanStatus;
-use Sentry\Tracing\TransactionContext;
-use Sentry\Tracing\TransactionSource;
+use Symfony\Component\HttpFoundation\Response;
 
 class EventHandler
 {
-    use WorksWithUris;
-
-    public const QUEUE_PAYLOAD_BAGGAGE_DATA = 'sentry_baggage_data';
-    public const QUEUE_PAYLOAD_TRACE_PARENT_DATA = 'sentry_trace_parent_data';
+    use WorksWithUris, ResolvesEventOrigin;
 
     /**
      * Map event handlers to events.
@@ -35,23 +29,14 @@ class EventHandler
     protected static $eventHandlerMap = [
         RoutingEvents\RouteMatched::class => 'routeMatched',
         DatabaseEvents\QueryExecuted::class => 'queryExecuted',
+        RoutingEvents\ResponsePrepared::class => 'responsePrepared',
+        RoutingEvents\PreparingResponse::class => 'responsePreparing',
         HttpClientEvents\RequestSending::class => 'httpClientRequestSending',
         HttpClientEvents\ResponseReceived::class => 'httpClientResponseReceived',
         HttpClientEvents\ConnectionFailed::class => 'httpClientConnectionFailed',
         DatabaseEvents\TransactionBeginning::class => 'transactionBeginning',
         DatabaseEvents\TransactionCommitted::class => 'transactionCommitted',
         DatabaseEvents\TransactionRolledBack::class => 'transactionRolledBack',
-    ];
-
-    /**
-     * Map queue event handlers to events.
-     *
-     * @var array
-     */
-    protected static $queueEventHandlerMap = [
-        QueueEvents\JobProcessing::class => 'queueJobProcessing',
-        QueueEvents\JobProcessed::class => 'queueJobProcessed',
-        QueueEvents\JobExceptionOccurred::class => 'queueJobExceptionOccurred',
     ];
 
     /**
@@ -92,28 +77,21 @@ class EventHandler
     /**
      * Hold the stack of parent spans that need to be put back on the scope.
      *
-     * @var array<int, \Sentry\Tracing\Span|null>
+     * @var array<int, Span|null>
      */
     private $parentSpanStack = [];
 
     /**
      * Hold the stack of current spans that need to be finished still.
      *
-     * @var array<int, \Sentry\Tracing\Span|null>
+     * @var array<int, Span|null>
      */
     private $currentSpanStack = [];
 
     /**
-     * The backtrace helper.
-     *
-     * @var \Sentry\Laravel\Tracing\BacktraceHelper
-     */
-    private $backtraceHelper;
-
-    /**
      * EventHandler constructor.
      */
-    public function __construct(array $config, BacktraceHelper $backtraceHelper)
+    public function __construct(array $config)
     {
         $this->traceSqlQueries = ($config['sql_queries'] ?? true) === true;
         $this->traceSqlQueryOrigins = ($config['sql_origin'] ?? true) === true;
@@ -122,8 +100,6 @@ class EventHandler
 
         $this->traceQueueJobs = ($config['queue_jobs'] ?? false) === true;
         $this->traceQueueJobsAsTransactions = ($config['queue_job_transactions'] ?? false) === true;
-
-        $this->backtraceHelper = $backtraceHelper;
     }
 
     /**
@@ -131,6 +107,8 @@ class EventHandler
      *
      * @uses self::routeMatchedHandler()
      * @uses self::queryExecutedHandler()
+     * @uses self::responsePreparedHandler()
+     * @uses self::responsePreparingHandler()
      * @uses self::transactionBeginningHandler()
      * @uses self::transactionCommittedHandler()
      * @uses self::transactionRolledBackHandler()
@@ -141,36 +119,6 @@ class EventHandler
     public function subscribe(Dispatcher $dispatcher): void
     {
         foreach (static::$eventHandlerMap as $eventName => $handler) {
-            $dispatcher->listen($eventName, [$this, $handler]);
-        }
-    }
-
-    /**
-     * Attach all queue event handlers.
-     *
-     * @uses self::queueJobProcessingHandler()
-     * @uses self::queueJobProcessedHandler()
-     * @uses self::queueJobExceptionOccurredHandler()
-     */
-    public function subscribeQueueEvents(Dispatcher $dispatcher, QueueManager $queue): void
-    {
-        // If both types of queue job tracing is disabled also do not register the events
-        if (!$this->traceQueueJobs && !$this->traceQueueJobsAsTransactions) {
-            return;
-        }
-
-        Queue::createPayloadUsing(static function (?string $connection, ?string $queue, ?array $payload): ?array {
-            $currentSpan = SentrySdk::getCurrentHub()->getSpan();
-
-            if ($currentSpan !== null && $payload !== null) {
-                $payload[self::QUEUE_PAYLOAD_TRACE_PARENT_DATA] = $currentSpan->toTraceparent();
-                $payload[self::QUEUE_PAYLOAD_BAGGAGE_DATA] = $currentSpan->toBaggage();
-            }
-
-            return $payload;
-        });
-
-        foreach (static::$queueEventHandlerMap as $eventName => $handler) {
             $dispatcher->listen($eventName, [$this, $handler]);
         }
     }
@@ -190,7 +138,7 @@ class EventHandler
         }
 
         try {
-            call_user_func_array([$this, $handlerMethod], $arguments);
+            $this->{$handlerMethod}(...$arguments);
         } catch (Exception $e) {
             // Ignore to prevent bubbling up errors in the SDK
         }
@@ -226,6 +174,12 @@ class EventHandler
         $context = new SpanContext();
         $context->setOp('db.sql.query');
         $context->setDescription($query->sql);
+        $context->setData([
+            'db.name' => $query->connection->getDatabaseName(),
+            'db.system' => $query->connection->getDriverName(),
+            'server.address' => $query->connection->getConfig('host'),
+            'server.port' => $query->connection->getConfig('port'),
+        ]);
         $context->setStartTimestamp(microtime(true) - $query->time / 1000);
         $context->setEndTimestamp($context->getStartTimestamp() + $query->time / 1000);
 
@@ -233,7 +187,9 @@ class EventHandler
             $queryOrigin = $this->resolveQueryOriginFromBacktrace();
 
             if ($queryOrigin !== null) {
-                $context->setData(['db.sql.origin' => $queryOrigin]);
+                $context->setData(array_merge($context->getData(), [
+                    'db.sql.origin' => $queryOrigin
+                ]));
             }
         }
 
@@ -247,15 +203,48 @@ class EventHandler
      */
     private function resolveQueryOriginFromBacktrace(): ?string
     {
-        $firstAppFrame = $this->backtraceHelper->findFirstInAppFrameForBacktrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
+        $backtraceHelper = $this->makeBacktraceHelper();
+
+        $firstAppFrame = $backtraceHelper->findFirstInAppFrameForBacktrace(debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS));
 
         if ($firstAppFrame === null) {
             return null;
         }
 
-        $filePath = $this->backtraceHelper->getOriginalViewPathForFrameOfCompiledViewPath($firstAppFrame) ?? $firstAppFrame->getFile();
+        $filePath = $backtraceHelper->getOriginalViewPathForFrameOfCompiledViewPath($firstAppFrame) ?? $firstAppFrame->getFile();
 
         return "{$filePath}:{$firstAppFrame->getLine()}";
+    }
+
+    protected function responsePreparedHandler(RoutingEvents\ResponsePrepared $event): void
+    {
+        $span = $this->popSpan();
+
+        if ($span !== null) {
+            $span->finish();
+        }
+    }
+
+    protected function responsePreparingHandler(RoutingEvents\PreparingResponse $event): void
+    {
+        // If the response is already a Response object there is no need to handle the event anymore
+        // since there isn't going to be any real work going on, the response is already as prepared
+        // as it can be. So we ignore the event to prevent loggin a very short empty duplicated span
+        if ($event->response instanceof Response) {
+            return;
+        }
+
+        $parentSpan = SentrySdk::getCurrentHub()->getSpan();
+
+        // If there is no tracing span active there is no need to handle the event
+        if ($parentSpan === null) {
+            return;
+        }
+
+        $context = new SpanContext;
+        $context->setOp('http.route.response');
+
+        $this->pushSpan($parentSpan->startChild($context));
     }
 
     protected function transactionBeginningHandler(DatabaseEvents\TransactionBeginning $event): void
@@ -315,7 +304,7 @@ class EventHandler
         $context->setDescription($event->request->method() . ' ' . $partialUri);
         $context->setData([
             'url' => $partialUri,
-            'method' => $event->request->method(),
+            'http.request.method' => $event->request->method(),
             'http.query' => $fullUri->getQuery(),
             'http.fragment' => $fullUri->getFragment(),
         ]);
@@ -348,83 +337,6 @@ class EventHandler
         if ($span !== null) {
             $span->finish();
             $span->setStatus(SpanStatus::internalError());
-        }
-    }
-
-    protected function queueJobProcessingHandler(QueueEvents\JobProcessing $event): void
-    {
-        $parentSpan = SentrySdk::getCurrentHub()->getSpan();
-
-        // If there is no tracing span active and we don't trace jobs as transactions there is no need to handle the event
-        if ($parentSpan === null && !$this->traceQueueJobsAsTransactions) {
-            return;
-        }
-
-        // If there is a parent span we can record that job as a child unless configured to not do so
-        if ($parentSpan !== null && !$this->traceQueueJobs) {
-            return;
-        }
-
-        if ($parentSpan === null) {
-            $baggage = $event->job->payload()[self::QUEUE_PAYLOAD_BAGGAGE_DATA] ?? null;
-            $traceParent = $event->job->payload()[self::QUEUE_PAYLOAD_TRACE_PARENT_DATA] ?? null;
-
-            $context = TransactionContext::fromHeaders($traceParent ?? '', $baggage ?? '');
-
-            // If the parent transaction was not sampled we also stop the queue job from being recorded
-            if ($context->getParentSampled() === false) {
-                return;
-            }
-        } else {
-            $context = new SpanContext;
-        }
-
-        $resolvedJobName = $event->job->resolveName();
-
-        $job = [
-            'job' => $event->job->getName(),
-            'queue' => $event->job->getQueue(),
-            'resolved' => $resolvedJobName,
-            'attempts' => $event->job->attempts(),
-            'connection' => $event->connectionName,
-        ];
-
-        if ($context instanceof TransactionContext) {
-            $context->setName($resolvedJobName);
-            $context->setSource(TransactionSource::task());
-        }
-
-        $context->setOp('queue.process');
-        $context->setData($job);
-        $context->setStartTimestamp(microtime(true));
-
-        // When the parent span is null we start a new transaction otherwise we start a child of the current span
-        if ($parentSpan === null) {
-            $span = SentrySdk::getCurrentHub()->startTransaction($context);
-        } else {
-            $span = $parentSpan->startChild($context);
-        }
-
-        $this->pushSpan($span);
-    }
-
-    protected function queueJobExceptionOccurredHandler(QueueEvents\JobExceptionOccurred $event): void
-    {
-        $this->afterQueuedJob(SpanStatus::internalError());
-    }
-
-    protected function queueJobProcessedHandler(QueueEvents\JobProcessed $event): void
-    {
-        $this->afterQueuedJob(SpanStatus::ok());
-    }
-
-    private function afterQueuedJob(?SpanStatus $status = null): void
-    {
-        $span = $this->popSpan();
-
-        if ($span !== null) {
-            $span->finish();
-            $span->setStatus($status);
         }
     }
 

@@ -20,10 +20,46 @@ namespace Google\Service\CloudDataplex;
 class GoogleCloudDataplexV1DataScanEventDataProfileAppliedConfigs extends \Google\Model
 {
   /**
+   * @var bool
+   */
+  public $columnFilterApplied;
+  /**
+   * @var bool
+   */
+  public $rowFilterApplied;
+  /**
    * @var float
    */
   public $samplingPercent;
 
+  /**
+   * @param bool
+   */
+  public function setColumnFilterApplied($columnFilterApplied)
+  {
+    $this->columnFilterApplied = $columnFilterApplied;
+  }
+  /**
+   * @return bool
+   */
+  public function getColumnFilterApplied()
+  {
+    return $this->columnFilterApplied;
+  }
+  /**
+   * @param bool
+   */
+  public function setRowFilterApplied($rowFilterApplied)
+  {
+    $this->rowFilterApplied = $rowFilterApplied;
+  }
+  /**
+   * @return bool
+   */
+  public function getRowFilterApplied()
+  {
+    return $this->rowFilterApplied;
+  }
   /**
    * @param float
    */

@@ -45,6 +45,7 @@ class ManagedServiceforMicrosoftActiveDirectoryConsumerAPI extends \Google\Servi
   public $projects_locations_global_domains_sqlIntegrations;
   public $projects_locations_global_operations;
   public $projects_locations_global_peerings;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the
@@ -58,6 +59,7 @@ class ManagedServiceforMicrosoftActiveDirectoryConsumerAPI extends \Google\Servi
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://managedidentities.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://managedidentities.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -121,6 +123,16 @@ class ManagedServiceforMicrosoftActiveDirectoryConsumerAPI extends \Google\Servi
                   'required' => true,
                 ],
               ],
+            ],'checkMigrationPermission' => [
+              'path' => 'v1/{+domain}:checkMigrationPermission',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'domain' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
             ],'create' => [
               'path' => 'v1/{+parent}/domains',
               'httpMethod' => 'POST',
@@ -155,8 +167,28 @@ class ManagedServiceforMicrosoftActiveDirectoryConsumerAPI extends \Google\Servi
                   'required' => true,
                 ],
               ],
+            ],'disableMigration' => [
+              'path' => 'v1/{+domain}:disableMigration',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'domain' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
             ],'domainJoinMachine' => [
               'path' => 'v1/{+domain}:domainJoinMachine',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'domain' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'enableMigration' => [
+              'path' => 'v1/{+domain}:enableMigration',
               'httpMethod' => 'POST',
               'parameters' => [
                 'domain' => [

@@ -20,6 +20,8 @@ namespace Google\Service\WorkloadManager;
 class SapDiscoveryResource extends \Google\Collection
 {
   protected $collection_key = 'relatedResources';
+  protected $instancePropertiesType = SapDiscoveryResourceInstanceProperties::class;
+  protected $instancePropertiesDataType = '';
   /**
    * @var string[]
    */
@@ -28,10 +30,6 @@ class SapDiscoveryResource extends \Google\Collection
    * @var string
    */
   public $resourceKind;
-  /**
-   * @var string
-   */
-  public $resourceState;
   /**
    * @var string
    */
@@ -45,6 +43,20 @@ class SapDiscoveryResource extends \Google\Collection
    */
   public $updateTime;
 
+  /**
+   * @param SapDiscoveryResourceInstanceProperties
+   */
+  public function setInstanceProperties(SapDiscoveryResourceInstanceProperties $instanceProperties)
+  {
+    $this->instanceProperties = $instanceProperties;
+  }
+  /**
+   * @return SapDiscoveryResourceInstanceProperties
+   */
+  public function getInstanceProperties()
+  {
+    return $this->instanceProperties;
+  }
   /**
    * @param string[]
    */
@@ -72,20 +84,6 @@ class SapDiscoveryResource extends \Google\Collection
   public function getResourceKind()
   {
     return $this->resourceKind;
-  }
-  /**
-   * @param string
-   */
-  public function setResourceState($resourceState)
-  {
-    $this->resourceState = $resourceState;
-  }
-  /**
-   * @return string
-   */
-  public function getResourceState()
-  {
-    return $this->resourceState;
   }
   /**
    * @param string

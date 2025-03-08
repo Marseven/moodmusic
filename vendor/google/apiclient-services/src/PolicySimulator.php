@@ -44,16 +44,20 @@ class PolicySimulator extends \Google\Service
   const CLOUD_PLATFORM =
       "https://www.googleapis.com/auth/cloud-platform";
 
+  public $folders_locations_orgPolicyViolationsPreviews_operations;
   public $folders_locations_replays;
   public $folders_locations_replays_operations;
   public $folders_locations_replays_results;
   public $operations;
+  public $organizations_locations_orgPolicyViolationsPreviews_operations;
   public $organizations_locations_replays;
   public $organizations_locations_replays_operations;
   public $organizations_locations_replays_results;
+  public $projects_locations_orgPolicyViolationsPreviews_operations;
   public $projects_locations_replays;
   public $projects_locations_replays_operations;
   public $projects_locations_replays_results;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the PolicySimulator service.
@@ -66,11 +70,32 @@ class PolicySimulator extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://policysimulator.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://policysimulator.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
     $this->serviceName = 'policysimulator';
 
+    $this->folders_locations_orgPolicyViolationsPreviews_operations = new PolicySimulator\Resource\FoldersLocationsOrgPolicyViolationsPreviewsOperations(
+        $this,
+        $this->serviceName,
+        'operations',
+        [
+          'methods' => [
+            'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
     $this->folders_locations_replays = new PolicySimulator\Resource\FoldersLocationsReplays(
         $this,
         $this->serviceName,
@@ -213,6 +238,26 @@ class PolicySimulator extends \Google\Service
           ]
         ]
     );
+    $this->organizations_locations_orgPolicyViolationsPreviews_operations = new PolicySimulator\Resource\OrganizationsLocationsOrgPolicyViolationsPreviewsOperations(
+        $this,
+        $this->serviceName,
+        'operations',
+        [
+          'methods' => [
+            'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
     $this->organizations_locations_replays = new PolicySimulator\Resource\OrganizationsLocationsReplays(
         $this,
         $this->serviceName,
@@ -307,6 +352,26 @@ class PolicySimulator extends \Google\Service
                 'pageToken' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->projects_locations_orgPolicyViolationsPreviews_operations = new PolicySimulator\Resource\ProjectsLocationsOrgPolicyViolationsPreviewsOperations(
+        $this,
+        $this->serviceName,
+        'operations',
+        [
+          'methods' => [
+            'get' => [
+              'path' => 'v1/{+name}',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
                 ],
               ],
             ],

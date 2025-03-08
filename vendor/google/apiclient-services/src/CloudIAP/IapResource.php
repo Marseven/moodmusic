@@ -20,6 +20,10 @@ namespace Google\Service\CloudIAP;
 class IapResource extends \Google\Model
 {
   /**
+   * @var array[]
+   */
+  public $expectedNextState;
+  /**
    * @var string[]
    */
   public $labels;
@@ -27,6 +31,8 @@ class IapResource extends \Google\Model
    * @var string
    */
   public $name;
+  protected $nextStateOfTagsType = NextStateOfTags::class;
+  protected $nextStateOfTagsDataType = '';
   /**
    * @var string
    */
@@ -36,6 +42,20 @@ class IapResource extends \Google\Model
    */
   public $type;
 
+  /**
+   * @param array[]
+   */
+  public function setExpectedNextState($expectedNextState)
+  {
+    $this->expectedNextState = $expectedNextState;
+  }
+  /**
+   * @return array[]
+   */
+  public function getExpectedNextState()
+  {
+    return $this->expectedNextState;
+  }
   /**
    * @param string[]
    */
@@ -63,6 +83,20 @@ class IapResource extends \Google\Model
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * @param NextStateOfTags
+   */
+  public function setNextStateOfTags(NextStateOfTags $nextStateOfTags)
+  {
+    $this->nextStateOfTags = $nextStateOfTags;
+  }
+  /**
+   * @return NextStateOfTags
+   */
+  public function getNextStateOfTags()
+  {
+    return $this->nextStateOfTags;
   }
   /**
    * @param string

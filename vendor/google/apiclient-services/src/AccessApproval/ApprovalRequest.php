@@ -31,6 +31,12 @@ class ApprovalRequest extends \Google\Model
    * @var string
    */
   public $requestTime;
+  protected $requestedAugmentedInfoType = AugmentedInfo::class;
+  protected $requestedAugmentedInfoDataType = '';
+  /**
+   * @var string
+   */
+  public $requestedDuration;
   /**
    * @var string
    */
@@ -101,6 +107,34 @@ class ApprovalRequest extends \Google\Model
   public function getRequestTime()
   {
     return $this->requestTime;
+  }
+  /**
+   * @param AugmentedInfo
+   */
+  public function setRequestedAugmentedInfo(AugmentedInfo $requestedAugmentedInfo)
+  {
+    $this->requestedAugmentedInfo = $requestedAugmentedInfo;
+  }
+  /**
+   * @return AugmentedInfo
+   */
+  public function getRequestedAugmentedInfo()
+  {
+    return $this->requestedAugmentedInfo;
+  }
+  /**
+   * @param string
+   */
+  public function setRequestedDuration($requestedDuration)
+  {
+    $this->requestedDuration = $requestedDuration;
+  }
+  /**
+   * @return string
+   */
+  public function getRequestedDuration()
+  {
+    return $this->requestedDuration;
   }
   /**
    * @param string

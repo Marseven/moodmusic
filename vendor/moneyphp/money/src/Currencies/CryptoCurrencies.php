@@ -25,10 +25,10 @@ final class CryptoCurrencies implements Currencies
      *
      * @psalm-var non-empty-array<non-empty-string, array{
      *     symbol: non-empty-string,
-     *     minorUnit: positive-int|0
+     *     minorUnit: non-negative-int
      * }>|null
      */
-    private static ?array $currencies = null;
+    private static array|null $currencies = null;
 
     public function contains(Currency $currency): bool
     {
@@ -64,7 +64,7 @@ final class CryptoCurrencies implements Currencies
      *
      * @psalm-return non-empty-array<non-empty-string, array{
      *     symbol: non-empty-string,
-     *     minorUnit: positive-int|0
+     *     minorUnit: non-negative-int
      * }>
      */
     private function getCurrencies(): array
@@ -79,17 +79,14 @@ final class CryptoCurrencies implements Currencies
     /**
      * @psalm-return non-empty-array<non-empty-string, array{
      *     symbol: non-empty-string,
-     *     minorUnit: positive-int|0
+     *     minorUnit: non-negative-int
      * }>
-     *
-     * @psalm-suppress MoreSpecificReturnType do not specify all keys and values
      */
     private function loadCurrencies(): array
     {
         $file = __DIR__ . '/../../resources/binance.php';
 
         if (is_file($file)) {
-            /** @psalm-suppress LessSpecificReturnStatement */
             return require $file;
         }
 

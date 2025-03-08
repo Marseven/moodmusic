@@ -65,7 +65,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'block'], $request, 'indices.add_block');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -104,7 +106,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.analyze');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -148,7 +152,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.clear_cache');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -189,7 +195,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'target'], $request, 'indices.clone');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -230,7 +238,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.close');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -270,7 +280,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.create');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -281,6 +293,8 @@ class Indices extends AbstractEndpoint
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the data stream
+	 *     timeout: time, // Specify timeout for acknowledging the cluster state update
+	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -301,11 +315,13 @@ class Indices extends AbstractEndpoint
 		$url = '/_data_stream/' . $this->encode($params['name']);
 		$method = 'PUT';
 
-		$url = $this->addQueryString($url, $params, ['pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['timeout','master_timeout','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.create_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -342,7 +358,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.data_streams_stats');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -382,7 +400,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.delete');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -420,7 +440,49 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'name'], $request, 'indices.delete_alias');
+		return $this->client->sendRequest($request);
+	}
+
+
+	/**
+	 * Deletes the data stream lifecycle of the selected data streams.
+	 *
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/data-streams-delete-lifecycle.html
+	 *
+	 * @param array{
+	 *     name: list, // (REQUIRED) A comma-separated list of data streams of which the data stream lifecycle will be deleted; use `*` to get all data streams
+	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     timeout: time, // Explicit timestamp for the document
+	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
+	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
+	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
+	 *     source: string, // The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests.
+	 *     filter_path: list, // A comma-separated list of filters used to reduce the response.
+	 * } $params
+	 *
+	 * @throws MissingParameterException if a required parameter is missing
+	 * @throws NoNodeAvailableException if all the hosts are offline
+	 * @throws ClientResponseException if the status code of response is 4xx
+	 * @throws ServerResponseException if the status code of response is 5xx
+	 *
+	 * @return Elasticsearch|Promise
+	 */
+	public function deleteDataLifecycle(array $params = [])
+	{
+		$this->checkRequiredParameters(['name'], $params);
+		$url = '/_data_stream/' . $this->encode($params['name']) . '/_lifecycle';
+		$method = 'DELETE';
+
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','timeout','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$headers = [
+			'Accept' => 'application/json',
+		];
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.delete_data_lifecycle');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -432,6 +494,7 @@ class Indices extends AbstractEndpoint
 	 * @param array{
 	 *     name: list, // (REQUIRED) A comma-separated list of data streams to delete; use `*` to delete all data streams
 	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -452,18 +515,20 @@ class Indices extends AbstractEndpoint
 		$url = '/_data_stream/' . $this->encode($params['name']);
 		$method = 'DELETE';
 
-		$url = $this->addQueryString($url, $params, ['expand_wildcards','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','master_timeout','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.delete_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Deletes an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-delete-template.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the template
@@ -493,14 +558,16 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.delete_index_template');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Deletes an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-delete-template-v1.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the template
@@ -530,7 +597,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.delete_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -571,7 +640,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.disk_usage');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -610,7 +681,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'target_index'], $request, 'indices.downsample');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -651,7 +724,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.exists');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -695,14 +770,16 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name', 'index'], $request, 'indices.exists_alias');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Returns information about whether a particular index template exists.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/index-templates.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the template
@@ -733,14 +810,16 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.exists_index_template');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Returns information about whether a particular index template exists.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-template-exists-v1.html
 	 *
 	 * @param array{
 	 *     name: list, // (REQUIRED) The comma separated names of the index templates
@@ -771,7 +850,48 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.exists_template');
+		return $this->client->sendRequest($request);
+	}
+
+
+	/**
+	 * Retrieves information about the index's current data stream lifecycle, such as any potential encountered error, time since creation etc.
+	 *
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/current/data-streams-explain-lifecycle.html
+	 *
+	 * @param array{
+	 *     index: string, // (REQUIRED) The name of the index to explain
+	 *     include_defaults: boolean, // indicates if the API should return the default values the system uses for the index's lifecycle
+	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
+	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
+	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
+	 *     source: string, // The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests.
+	 *     filter_path: list, // A comma-separated list of filters used to reduce the response.
+	 * } $params
+	 *
+	 * @throws MissingParameterException if a required parameter is missing
+	 * @throws NoNodeAvailableException if all the hosts are offline
+	 * @throws ClientResponseException if the status code of response is 4xx
+	 * @throws ServerResponseException if the status code of response is 5xx
+	 *
+	 * @return Elasticsearch|Promise
+	 */
+	public function explainDataLifecycle(array $params = [])
+	{
+		$this->checkRequiredParameters(['index'], $params);
+		$url = '/' . $this->encode($params['index']) . '/_lifecycle/explain';
+		$method = 'GET';
+
+		$url = $this->addQueryString($url, $params, ['include_defaults','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$headers = [
+			'Accept' => 'application/json',
+		];
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.explain_data_lifecycle');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -811,7 +931,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.field_usage_stats');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -853,7 +975,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.flush');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -897,7 +1021,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.forcemerge');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -940,7 +1066,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.get');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -988,7 +1116,49 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name', 'index'], $request, 'indices.get_alias');
+		return $this->client->sendRequest($request);
+	}
+
+
+	/**
+	 * Returns the data stream lifecycle of the selected data streams.
+	 *
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/data-streams-get-lifecycle.html
+	 *
+	 * @param array{
+	 *     name: list, // (REQUIRED) A comma-separated list of data streams to get; use `*` to get all data streams
+	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     include_defaults: boolean, // Return all relevant default configurations for the data stream (default: false)
+	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
+	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
+	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
+	 *     source: string, // The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests.
+	 *     filter_path: list, // A comma-separated list of filters used to reduce the response.
+	 * } $params
+	 *
+	 * @throws MissingParameterException if a required parameter is missing
+	 * @throws NoNodeAvailableException if all the hosts are offline
+	 * @throws ClientResponseException if the status code of response is 4xx
+	 * @throws ServerResponseException if the status code of response is 5xx
+	 *
+	 * @return Elasticsearch|Promise
+	 */
+	public function getDataLifecycle(array $params = [])
+	{
+		$this->checkRequiredParameters(['name'], $params);
+		$url = '/_data_stream/' . $this->encode($params['name']) . '/_lifecycle';
+		$method = 'GET';
+
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','include_defaults','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$headers = [
+			'Accept' => 'application/json',
+		];
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.get_data_lifecycle');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1000,6 +1170,9 @@ class Indices extends AbstractEndpoint
 	 * @param array{
 	 *     name: list, //  A comma-separated list of data streams to get; use `*` to get all data streams
 	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     include_defaults: boolean, // Return all relevant default configurations for the data stream (default: false)
+	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     verbose: boolean, // Whether the maximum timestamp for each data stream should be calculated and returned (default: false)
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1022,11 +1195,13 @@ class Indices extends AbstractEndpoint
 			$url = '/_data_stream';
 			$method = 'GET';
 		}
-		$url = $this->addQueryString($url, $params, ['expand_wildcards','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','include_defaults','master_timeout','verbose','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.get_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1071,20 +1246,23 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['fields', 'index'], $request, 'indices.get_field_mapping');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Returns an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-template.html
 	 *
 	 * @param array{
 	 *     name: string, //  A pattern that returned template names must match
 	 *     flat_settings: boolean, // Return settings in flat format (default: false)
 	 *     master_timeout: time, // Explicit operation timeout for connection to master node
 	 *     local: boolean, // Return local information, do not retrieve the state from master node (default: false)
+	 *     include_defaults: boolean, // Return all relevant default configurations for the index template (default: false)
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1107,11 +1285,13 @@ class Indices extends AbstractEndpoint
 			$url = '/_index_template';
 			$method = 'GET';
 		}
-		$url = $this->addQueryString($url, $params, ['flat_settings','master_timeout','local','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['flat_settings','master_timeout','local','include_defaults','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.get_index_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1153,7 +1333,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.get_mapping');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1204,14 +1386,16 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'name'], $request, 'indices.get_settings');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Returns an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-get-template-v1.html
 	 *
 	 * @param array{
 	 *     name: list, //  The comma separated names of the index templates
@@ -1244,7 +1428,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.get_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1255,6 +1441,8 @@ class Indices extends AbstractEndpoint
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the alias to migrate
+	 *     timeout: time, // Specify timeout for acknowledging the cluster state update
+	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1275,11 +1463,13 @@ class Indices extends AbstractEndpoint
 		$url = '/_data_stream/_migrate/' . $this->encode($params['name']);
 		$method = 'POST';
 
-		$url = $this->addQueryString($url, $params, ['pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['timeout','master_timeout','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.migrate_to_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1314,7 +1504,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, [], $request, 'indices.modify_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1355,7 +1547,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.open');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1366,6 +1560,7 @@ class Indices extends AbstractEndpoint
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the data stream
+	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1386,11 +1581,13 @@ class Indices extends AbstractEndpoint
 		$url = '/_data_stream/_promote/' . $this->encode($params['name']);
 		$method = 'POST';
 
-		$url = $this->addQueryString($url, $params, ['pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['master_timeout','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.promote_data_stream');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1430,14 +1627,58 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'name'], $request, 'indices.put_alias');
+		return $this->client->sendRequest($request);
+	}
+
+
+	/**
+	 * Updates the data stream lifecycle of the selected data streams.
+	 *
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/data-streams-put-lifecycle.html
+	 *
+	 * @param array{
+	 *     name: list, // (REQUIRED) A comma-separated list of data streams whose lifecycle will be updated; use `*` to set the lifecycle to all data streams
+	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     timeout: time, // Explicit timestamp for the document
+	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
+	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
+	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
+	 *     source: string, // The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests.
+	 *     filter_path: list, // A comma-separated list of filters used to reduce the response.
+	 *     body: array, //  The data stream lifecycle configuration that consist of the data retention
+	 * } $params
+	 *
+	 * @throws MissingParameterException if a required parameter is missing
+	 * @throws NoNodeAvailableException if all the hosts are offline
+	 * @throws ClientResponseException if the status code of response is 4xx
+	 * @throws ServerResponseException if the status code of response is 5xx
+	 *
+	 * @return Elasticsearch|Promise
+	 */
+	public function putDataLifecycle(array $params = [])
+	{
+		$this->checkRequiredParameters(['name'], $params);
+		$url = '/_data_stream/' . $this->encode($params['name']) . '/_lifecycle';
+		$method = 'PUT';
+
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','timeout','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$headers = [
+			'Accept' => 'application/json',
+			'Content-Type' => 'application/json',
+		];
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.put_data_lifecycle');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Creates or updates an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-put-template.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the template
@@ -1470,7 +1711,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.put_index_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1513,7 +1756,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.put_mapping');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1527,6 +1772,7 @@ class Indices extends AbstractEndpoint
 	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     timeout: time, // Explicit operation timeout
 	 *     preserve_existing: boolean, // Whether to update existing settings. If set to `true` existing settings on an index remain unchanged, the default is `false`
+	 *     reopen: boolean, // Whether to close and reopen the index to apply non-dynamic settings. If set to `true` the indices to which the settings are being applied will be closed temporarily and then reopened in order to apply the changes. The default is `false`
 	 *     ignore_unavailable: boolean, // Whether specified concrete indices should be ignored when unavailable (missing or closed)
 	 *     allow_no_indices: boolean, // Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)
 	 *     expand_wildcards: enum, // Whether to expand wildcard expression to concrete indices that are open, closed or both.
@@ -1555,19 +1801,21 @@ class Indices extends AbstractEndpoint
 			$url = '/_settings';
 			$method = 'PUT';
 		}
-		$url = $this->addQueryString($url, $params, ['master_timeout','timeout','preserve_existing','ignore_unavailable','allow_no_indices','expand_wildcards','flat_settings','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['master_timeout','timeout','preserve_existing','reopen','ignore_unavailable','allow_no_indices','expand_wildcards','flat_settings','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.put_settings');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Creates or updates an index template.
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates-v1.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the template
@@ -1600,7 +1848,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.put_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1639,7 +1889,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.recovery');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1679,7 +1931,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.refresh');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1693,6 +1947,7 @@ class Indices extends AbstractEndpoint
 	 *     ignore_unavailable: boolean, // Whether specified concrete indices should be ignored when unavailable (missing or closed)
 	 *     allow_no_indices: boolean, // Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)
 	 *     expand_wildcards: enum, // Whether to expand wildcard expression to concrete indices that are open, closed or both.
+	 *     resource: string, // changed resource to reload analyzers from if applicable
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1713,11 +1968,54 @@ class Indices extends AbstractEndpoint
 		$url = '/' . $this->encode($params['index']) . '/_reload_search_analyzers';
 		$method = empty($params['body']) ? 'GET' : 'POST';
 
-		$url = $this->addQueryString($url, $params, ['ignore_unavailable','allow_no_indices','expand_wildcards','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['ignore_unavailable','allow_no_indices','expand_wildcards','resource','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.reload_search_analyzers');
+		return $this->client->sendRequest($request);
+	}
+
+
+	/**
+	 * Resolves the specified index expressions to return information about each cluster, including the local cluster, if included.
+	 *
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-resolve-cluster-api.html
+	 *
+	 * @param array{
+	 *     name: list, // (REQUIRED) A comma-separated list of cluster:index names or wildcard expressions
+	 *     ignore_unavailable: boolean, // Whether specified concrete indices should be ignored when unavailable (missing or closed)
+	 *     ignore_throttled: boolean, // Whether specified concrete, expanded or aliased indices should be ignored when throttled
+	 *     allow_no_indices: boolean, // Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)
+	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
+	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
+	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
+	 *     source: string, // The URL-encoded request definition. Useful for libraries that do not accept a request body for non-POST requests.
+	 *     filter_path: list, // A comma-separated list of filters used to reduce the response.
+	 * } $params
+	 *
+	 * @throws MissingParameterException if a required parameter is missing
+	 * @throws NoNodeAvailableException if all the hosts are offline
+	 * @throws ClientResponseException if the status code of response is 4xx
+	 * @throws ServerResponseException if the status code of response is 5xx
+	 *
+	 * @return Elasticsearch|Promise
+	 */
+	public function resolveCluster(array $params = [])
+	{
+		$this->checkRequiredParameters(['name'], $params);
+		$url = '/_resolve/cluster/' . $this->encode($params['name']);
+		$method = 'GET';
+
+		$url = $this->addQueryString($url, $params, ['ignore_unavailable','ignore_throttled','allow_no_indices','expand_wildcards','pretty','human','error_trace','source','filter_path']);
+		$headers = [
+			'Accept' => 'application/json',
+		];
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.resolve_cluster');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1729,6 +2027,8 @@ class Indices extends AbstractEndpoint
 	 * @param array{
 	 *     name: list, // (REQUIRED) A comma-separated list of names or wildcard expressions
 	 *     expand_wildcards: enum, // Whether wildcard expressions should get expanded to open or closed indices (default: open)
+	 *     ignore_unavailable: boolean, // Whether specified concrete indices should be ignored when unavailable (missing or closed)
+	 *     allow_no_indices: boolean, // Whether to ignore if a wildcard indices expression resolves into no concrete indices. (This includes `_all` string or when no indices have been specified)
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1749,11 +2049,13 @@ class Indices extends AbstractEndpoint
 		$url = '/_resolve/index/' . $this->encode($params['name']);
 		$method = 'GET';
 
-		$url = $this->addQueryString($url, $params, ['expand_wildcards','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['expand_wildcards','ignore_unavailable','allow_no_indices','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.resolve_index');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1770,6 +2072,8 @@ class Indices extends AbstractEndpoint
 	 *     dry_run: boolean, // If set to true the rollover action will only be validated but not actually performed even if a condition matches. The default is false
 	 *     master_timeout: time, // Specify timeout for connection to master
 	 *     wait_for_active_shards: string, // Set the number of active shards to wait for on the newly created rollover index before the operation returns.
+	 *     lazy: boolean, // If set to true, the rollover action will only mark a data stream to signal that it needs to be rolled over at the next write. Only allowed on data streams.
+	 *     target_failure_store: boolean, // If set to true, the rollover action will be applied on the failure store of the data stream.
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1795,12 +2099,14 @@ class Indices extends AbstractEndpoint
 			$url = '/' . $this->encode($params['alias']) . '/_rollover';
 			$method = 'POST';
 		}
-		$url = $this->addQueryString($url, $params, ['timeout','dry_run','master_timeout','wait_for_active_shards','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['timeout','dry_run','master_timeout','wait_for_active_shards','lazy','target_failure_store','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['alias', 'new_index'], $request, 'indices.rollover');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1841,7 +2147,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.segments');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1882,7 +2190,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.shard_stores');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -1923,20 +2233,23 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'target'], $request, 'indices.shrink');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Simulate matching the given index name against the index templates in the system
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-simulate-index.html
 	 *
 	 * @param array{
 	 *     name: string, // (REQUIRED) The name of the index (it must be a concrete index name)
 	 *     create: boolean, // Whether the index template we optionally defined in the body should only be dry-run added if new or can also replace an existing one
 	 *     cause: string, // User defined reason for dry-run creating the new template for simulation purposes
 	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     include_defaults: boolean, // Return all relevant default configurations for this index template simulation (default: false)
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -1958,25 +2271,28 @@ class Indices extends AbstractEndpoint
 		$url = '/_index_template/_simulate_index/' . $this->encode($params['name']);
 		$method = 'POST';
 
-		$url = $this->addQueryString($url, $params, ['create','cause','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['create','cause','master_timeout','include_defaults','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.simulate_index_template');
+		return $this->client->sendRequest($request);
 	}
 
 
 	/**
 	 * Simulate resolving the given template name or body
 	 *
-	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-templates.html
+	 * @see https://www.elastic.co/guide/en/elasticsearch/reference/master/indices-simulate-template.html
 	 *
 	 * @param array{
 	 *     name: string, //  The name of the index template
 	 *     create: boolean, // Whether the index template we optionally defined in the body should only be dry-run added if new or can also replace an existing one
 	 *     cause: string, // User defined reason for dry-run creating the new template for simulation purposes
 	 *     master_timeout: time, // Specify timeout for connection to master
+	 *     include_defaults: boolean, // Return all relevant default configurations for this template simulation (default: false)
 	 *     pretty: boolean, // Pretty format the returned JSON response. (DEFAULT: false)
 	 *     human: boolean, // Return human readable values for statistics. (DEFAULT: true)
 	 *     error_trace: boolean, // Include the stack trace of returned errors. (DEFAULT: false)
@@ -2000,12 +2316,14 @@ class Indices extends AbstractEndpoint
 			$url = '/_index_template/_simulate';
 			$method = 'POST';
 		}
-		$url = $this->addQueryString($url, $params, ['create','cause','master_timeout','pretty','human','error_trace','source','filter_path']);
+		$url = $this->addQueryString($url, $params, ['create','cause','master_timeout','include_defaults','pretty','human','error_trace','source','filter_path']);
 		$headers = [
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['name'], $request, 'indices.simulate_template');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -2046,7 +2364,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index', 'target'], $request, 'indices.split');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -2099,7 +2419,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['metric', 'index'], $request, 'indices.stats');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -2140,7 +2462,9 @@ class Indices extends AbstractEndpoint
 		$headers = [
 			'Accept' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.unfreeze');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -2177,7 +2501,9 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, [], $request, 'indices.update_aliases');
+		return $this->client->sendRequest($request);
 	}
 
 
@@ -2228,6 +2554,8 @@ class Indices extends AbstractEndpoint
 			'Accept' => 'application/json',
 			'Content-Type' => 'application/json',
 		];
-		return $this->client->sendRequest($this->createRequest($method, $url, $headers, $params['body'] ?? null));
+		$request = $this->createRequest($method, $url, $headers, $params['body'] ?? null);
+		$request = $this->addOtelAttributes($params, ['index'], $request, 'indices.validate_query');
+		return $this->client->sendRequest($request);
 	}
 }

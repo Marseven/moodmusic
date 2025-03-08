@@ -6,7 +6,9 @@ use Exception;
 use Illuminate\Console\Command;
 use Laravel\Horizon\SupervisorFactory;
 use Laravel\Horizon\SupervisorOptions;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'horizon:supervisor')]
 class SupervisorCommand extends Command
 {
     /**
@@ -68,7 +70,7 @@ class SupervisorCommand extends Command
         try {
             $supervisor->ensureNoDuplicateSupervisors();
         } catch (Exception $e) {
-            $this->error('A supervisor with this name is already running.');
+            $this->components->error('A supervisor with this name is already running.');
 
             return 13;
         }
@@ -94,8 +96,9 @@ class SupervisorCommand extends Command
 
         $supervisor->working = ! $this->option('paused');
 
+        $balancedWorkerCount = floor(($this->option('min-processes') + $this->option('max-processes')) / 2);
         $supervisor->scale(max(
-            0, $this->option('max-processes') - $supervisor->totalSystemProcessCount()
+            0, $balancedWorkerCount - $supervisor->totalSystemProcessCount()
         ));
 
         $supervisor->monitor();

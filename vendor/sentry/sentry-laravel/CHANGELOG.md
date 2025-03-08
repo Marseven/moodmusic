@@ -1,5 +1,293 @@
 # Changelog
 
+## 3.8.2
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.8.2.
+
+### Bug Fixes
+
+- Fix `DateTimeZone` not properly converted to a string when using Cron Monitoring [(#783)](https://github.com/getsentry/sentry-laravel/pull/783)
+
+## 3.8.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.8.1.
+
+### Bug Fixes
+
+- Fix a deprecation notice caused by passing `null` to `Str::startsWith()` [(#780)](https://github.com/getsentry/sentry-laravel/pull/780)
+
+## 3.8.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.8.0.
+
+### Features
+
+- Initial support for Laravel Folio [(#738)](https://github.com/getsentry/sentry-laravel/pull/738)
+
+  If you are using Laravel Folio in your application, we'll extract a more meaningful transaction name based on the
+  `VieMatched` event.
+
+- The filesystem adapters for the `sentry` driver now extend the well-known Laravel classes they decorate,
+  `Illuminate\Filesystem\FilesystemAdapter` and `Illuminate\Filesystem\AwsS3V3Adapter`.
+
+  Enabling the feature can be simplified by wrapping the configuration for all disks
+  with a call to `Sentry\Laravel\Features\Storage\Integration::configureDisks()`
+  in your `config/filesystems.php` file:
+
+  ```php
+  'disks' => Sentry\Laravel\Features\Storage\Integration::configureDisks([
+      'local' => [
+          'driver' => 'local',
+          'root' => storage_path('app'),
+          'throw' => false,
+      ],
+
+      // ...
+  ], /* enableSpans: */ true, /* enableBreadcrumbs: */ true),
+  ```
+
+  Alternatively, you can enable this feature only for select disks:
+
+  ```php
+  'disks' => [
+      'local' => [
+          'driver' => 'local',
+          'root' => storage_path('app'),
+          'throw' => false,
+      ],
+
+      's3' => Sentry\Laravel\Features\Storage\Integration::configureDisk('s3', [
+          // ...
+      ], /* enableSpans: */ true, /* enableBreadcrumbs: */ true),
+  ],
+  ```
+
+  By default, both spans and breadcrumbs are enabled.
+  You may disable them by passing the second argument, `$enableSpans` or the third argument, `$enableBreadcrumbs`.
+
+- Add Laravel artisan about command [(#768)](https://github.com/getsentry/sentry-laravel/pull/768)
+
+### Bug Fixes
+
+- Remove usage of `Str::replace` [(#762)](https://github.com/getsentry/sentry-laravel/pull/762)
+
+  - This fixes an issue using Cron Monitoring in Laravel 6, 7 and < 8.41.0
+
+### Misc
+
+- Differentiate between boot and register for features [(#759)](https://github.com/getsentry/sentry-laravel/pull/759)
+
+- Internal improvements [(#769)](https://github.com/getsentry/sentry-laravel/pull/769)
+
+  - Make feature registration agnostic to the service container.
+  - Cleanup tests by using the `@define-env` annotation.
+  - Move the Log channel to a feature and add tests.
+  - Mark BacktraceHelper as `@internal` and make it lazy for the tracing service provider.
+
+## 3.7.3
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.7.3.
+
+### Bug Fixes
+
+- Fix HTTP client integration consuming the PSR request/response body stream [(#756)](https://github.com/getsentry/sentry-laravel/pull/756)
+
+## 3.7.2
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.7.2.
+
+### Bug Fixes
+
+- Fix `app.bootstrap` span not starting at the start of the performance transaction [(#734)](https://github.com/getsentry/sentry-laravel/pull/734)
+
+- Fix `sentry` storage driver not being registered when DSN is not set causing `Driver [sentry] is not supported.` [(#752)](https://github.com/getsentry/sentry-laravel/pull/752)
+
+## 3.7.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.7.1.
+
+### Bug Fixes
+
+- Performance traces and breadcrumbs for filesystem access are now turned off by default [(#746)](https://github.com/getsentry/sentry-laravel/pull/746)
+
+  To enable the feature, you'll need to make some changes in your `config/filesystems.php` file for each disk where you want to enable the tracing filesystem driver.
+  
+  ```php
+  // For example, if you want to trace the `local` disk, you update the disk config from this:
+  'local' => [
+      'driver' => 'local',
+      'root' => storage_path('app'),
+      'throw' => false,
+  ],
+
+  // to this:
+  'local' => [
+      'driver' => 'sentry',
+      'root' => storage_path('app'),
+      'throw' => false,
+
+      'sentry_disk_name' => 'local',
+      'sentry_original_driver' => 'local',
+      'sentry_enable_spans' => true,
+      'sentry_enable_breadcrumbs' => true,
+  ],
+  ```
+
+  For each disk, you replace the `driver` key with `sentry` and add the `sentry_original_driver` key with the original driver name. 
+  For us to construct the original driver, you also need to add the `sentry_disk_name` key with the name of the disk.
+  In addition, you can specify the optional `sentry_enable_spans` and `sentry_enable_breadcrumbs` config keys to turn off that feature for the disk.
+  These options are enabled by default.
+
+  Please note that we replace the driver for the disk with a custom driver that will capture performance traces and breadcrumbs.
+  This means that relying on the disk to be of a specific type might cause problems.
+  If you rely on the disk being an instance of `Illuminate\Contracts\Filesystem\Filesystem` or `Illuminate\Contracts\Filesystem\Cloud`, there should be no problem.
+
+## 3.7.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.7.0.
+
+### Features
+
+- Tracing without Performance [(#719)](https://github.com/getsentry/sentry-laravel/pull/719)
+
+  The SDK will now continue a trace from incoming HTTP requests, even if performance is not enabled.
+  To continue a trace outward, you may attach the Sentry tracing headers to any HTTP client request.
+  You can fetch the required header values by calling `\Sentry\getBaggage()` and `\Sentry\getTraceparent()`.
+
+- Add performance traces and breadcrumbs for filesystem access [(#726)](https://github.com/getsentry/sentry-laravel/pull/726)
+
+  This behaviour can be changed in your `config/sentry.php` file.
+
+  ```php
+  'breadcrumbs' => [
+      // Capture storage access as breadcrumbs
+      'storage' => true,
+  ],
+  `tracing` => [
+      // Capture storage access as spans
+      'storage' => true,
+  ],
+  ```
+
+- GraphQL and HTTP client improvements [(#720)](https://github.com/getsentry/sentry-laravel/pull/720)
+
+  This adds an improved visual representation of the request body on the Sentry web interface, as well as
+  `response_body_size` and `request_body_size` to HTTP client breadcrumbs.
+  
+
+- Less sensitive data send by default [(#732)](https://github.com/getsentry/sentry-laravel/pull/732)
+
+  The SDK will no longer send the value of the configured Laravel session cookie as well as the value of any cookies
+  starting with `remember_*`.
+  Additionally, SQL bindings are no longer set on breadcrumbs by default. This behaviour can be changed in your `config/sentry.php` file.
+
+  ```php
+  'breadcrumbs' => [
+      // Capture bindings on SQL queries logged in breadcrumbs
+      'sql_bindings' => false,
+  ],
+  ```
+
+- Make it configurable if performance traces continue after the response has been sent [(#727)](https://github.com/getsentry/sentry-laravel/pull/727)
+
+  This behaviour can be changed in your `config/sentry.php` file.
+
+  ```php
+  'tracing' => [
+      // Indicates if the performance trace should continue after the response has been sent to the user until the application terminates
+      // This is required to capture any spans that are created after the response has been sent like queue jobs dispatched using `dispatch(...)->afterResponse()` for example
+      'continue_after_response' => true,
+  ],
+  ```
+
+- Expose all config settings as environment variables. [(#735)](https://github.com/getsentry/sentry-laravel/pull/735)
+
+  All config values in `config/sentry.php` can be set with environment variables now.
+  For existing applications, you might need to update your config file with the new defaults manually.
+  The latest version can be found [here](https://github.com/getsentry/sentry-laravel/blob/master/config/sentry.php).
+
+### Bug Fixes
+
+- Handle exceptions being raised while resolving the PSR7 request [(#743)](https://github.com/getsentry/sentry-laravel/pull/743)
+
+## 3.6.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.6.1.
+
+### Bug Fixes
+
+- Fix performance tracing for Lumen applications [(#724)](https://github.com/getsentry/sentry-laravel/pull/724)
+
+## 3.6.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.6.0.
+
+### Features
+
+- Add support for upserting Cron Monitors [(#677)](https://github.com/getsentry/sentry-laravel/pull/677)
+  
+  We simplified setting up monitoring for your scheduled tasks. Now, the only requirement is to add the
+  `sentryMonitor` macro. A corresponding monitor will be created automatically on Sentry.
+
+  ```php
+  protected function schedule(Schedule $schedule)
+  {
+      $schedule->command('emails:send')
+          ->everyHour()
+          ->sentryMonitor(); // add this line
+  }
+  ```
+
+  You can read more about this in our [docs](https://docs.sentry.io/platforms/php/guides/laravel/crons/).
+
+## 3.5.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.5.1.
+
+### Bug Fixes
+
+- Prevent registering terminating callback multiple times and guard against finishing already finished transactions [(#717)](https://github.com/getsentry/sentry-laravel/pull/717)
+
+  This fixes the `Call to a member function finish() on null` that could occur when using long running processes like on the CLI or with Laravel Octane.
+
+## 3.5.0
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.5.0.
+
+### Features
+
+- Improve terminating callbacks visibility [(#707)](https://github.com/getsentry/sentry-laravel/pull/707)
+  
+  This adds support for performance traces that happen after the terminable middleware emits the response.
+
+- Add `http.route.response` span [(#708)](https://github.com/getsentry/sentry-laravel/pull/708)
+  
+  > **Note**: This feature requires Laravel `>= 10.13.0` to hail any new spans.
+    
+  This will add a `http.route.response` span which identifies possible actions taken to prepare the response, especially when using `Illuminate\Contracts\Support\Responsable` classes.
+
+### Bug Fixes
+
+- Refactor queue integration [(#692)](https://github.com/getsentry/sentry-laravel/pull/692)
+  
+  This improves and fixes some edge cases around scope management when running Laravel Queues.
+
+- Improve `lazyLoadingViolationReporter` helper [(#709)](https://github.com/getsentry/sentry-laravel/pull/709)
+  
+  Check for `$model->exists` and `$model->wasRecentlyCreated` before capturing the event.
+
+### Misc
+
+- Bump the underlying PHP SDK to version `^3.19` to enforce an upgrade to fix an issue in libcurl `>= v8.1.0` [(#711)](https://github.com/getsentry/sentry-laravel/pull/711)
+
+## 3.4.1
+
+The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.4.1.
+
+### Bug Fixes
+
+- Fix missing `sentryMonitor` macro if no DSN is set [(#698)](https://github.com/getsentry/sentry-laravel/pull/698)
+
 ## 3.4.0
 
 The Sentry SDK team is happy to announce the immediate availability of Sentry Laravel SDK v3.4.0.

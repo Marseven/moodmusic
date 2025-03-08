@@ -30,7 +30,7 @@ use Google\Service\WorkloadManager\ListExecutionResultsResponse;
 class ProjectsLocationsEvaluationsExecutionsResults extends \Google\Service\Resource
 {
   /**
-   * List the running result of a single Execution.
+   * Lists the result of a single evaluation.
    * (results.listProjectsLocationsEvaluationsExecutionsResults)
    *
    * @param string $parent Required. The execution results. Format:
@@ -43,6 +43,7 @@ class ProjectsLocationsEvaluationsExecutionsResults extends \Google\Service\Reso
    * @opt_param string pageToken A token identifying a page of results the server
    * should return.
    * @return ListExecutionResultsResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsEvaluationsExecutionsResults($parent, $optParams = [])
   {

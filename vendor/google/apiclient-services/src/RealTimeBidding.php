@@ -25,7 +25,7 @@ use Google\Client;
  * <p>
  * Allows external bidders to manage their RTB integration with Google. This
  * includes managing bidder endpoints, QPS quotas, configuring what ad inventory
- * to receive via pretargeting, submitting creatives for verification, and
+ * to receive with pretargeting, submitting creatives for verification, and
  * accessing creative metadata such as approval status.</p>
  *
  * <p>
@@ -49,6 +49,7 @@ class RealTimeBidding extends \Google\Service
   public $buyers;
   public $buyers_creatives;
   public $buyers_userLists;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the RealTimeBidding service.
@@ -61,6 +62,7 @@ class RealTimeBidding extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://realtimebidding.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://realtimebidding.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';

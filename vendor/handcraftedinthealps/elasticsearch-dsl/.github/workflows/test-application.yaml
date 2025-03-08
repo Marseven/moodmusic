@@ -18,10 +18,6 @@ jobs:
                 include:
                     - php-version: '8.0'
                       lint: false
-                      symfony-version: '^2.8'
-
-                    - php-version: '8.0'
-                      lint: false
                       symfony-version: '^3.4'
 
                     - php-version: '8.0'
@@ -29,28 +25,41 @@ jobs:
                       symfony-version: '^4.4'
 
                     - php-version: '8.0'
-                      lint: true
-                      symfony-version: '^4.4'
+                      lint: false
+                      symfony-version: '^5.0'
 
                     - php-version: '8.1'
-                      lint: true
-                      symfony-version: '^5.4'
-
-                    - php-version: '8.1'
-                      lint: true
+                      lint: false
                       symfony-version: '^5.4'
 
                     - php-version: '8.0'
-                      lint: true
+                      lint: false
                       symfony-version: '^6.0'
 
                     - php-version: '8.1'
+                      lint: false
+                      symfony-version: '^6.0'
+
+                    - php-version: '8.2'
                       lint: true
                       symfony-version: '^6.0'
 
+                    - php-version: '8.2'
+                      lint: false
+                      symfony-version: '^7.0'
+
+                    - php-version: '8.3'
+                      lint: false
+                      symfony-version: '^7.0'
+
+                    - php-version: '8.4'
+                      lint: false
+                      symfony-version: '^7.0'
+                      composer-options: '--ignore-platform-reqs'
+
         services:
             elasticsearch:
-                image: elasticsearch:8.0.0
+                image: elasticsearch:8.4.0
                 ports:
                     - 9200:9200
                 env:
@@ -85,7 +94,7 @@ jobs:
               run: |
                   composer validate --strict
                   composer require --no-update symfony/serializer:${{ matrix.symfony-version }}
-                  composer install --no-interaction --prefer-dist
+                  composer update --no-interaction --prefer-dist ${{ matrix.compser-options }}
 
             - name: Fix code style
               if: ${{ matrix.lint }}

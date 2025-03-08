@@ -34,11 +34,15 @@ use Google\Client;
  */
 class PaymentsResellerSubscription extends \Google\Service
 {
-
+  /** Associate you with your personal info on Google. */
+  const OPENID =
+      "openid";
 
   public $partners_products;
   public $partners_promotions;
   public $partners_subscriptions;
+  public $partners_userSessions;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the PaymentsResellerSubscription
@@ -52,6 +56,7 @@ class PaymentsResellerSubscription extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://paymentsresellersubscription.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://paymentsresellersubscription.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -210,6 +215,26 @@ class PaymentsResellerSubscription extends \Google\Service
               'httpMethod' => 'POST',
               'parameters' => [
                 'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->partners_userSessions = new PaymentsResellerSubscription\Resource\PartnersUserSessions(
+        $this,
+        $this->serviceName,
+        'userSessions',
+        [
+          'methods' => [
+            'generate' => [
+              'path' => 'v1/{+parent}/userSessions:generate',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'parent' => [
                   'location' => 'path',
                   'type' => 'string',
                   'required' => true,

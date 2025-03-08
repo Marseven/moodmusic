@@ -576,6 +576,60 @@ class ErrorReason
      * Generated from protobuf enum <code>GCP_SUSPENDED = 30;</code>
      */
     const GCP_SUSPENDED = 30;
+    /**
+     * The request violates the location policies when creating resources in
+     * the restricted region.
+     * Example of an ErrorInfo when creating the Cloud Storage Bucket by
+     * "projects/123" for service storage.googleapis.com:
+     *     { "reason": "LOCATION_POLICY_VIOLATED",
+     *       "domain": "googleapis.com",
+     *       "metadata": {
+     *         "consumer": "projects/123",
+     *         "service": "storage.googleapis.com",
+     *       }
+     *     }
+     * This response indicates creating the Cloud Storage Bucket in
+     * "locations/asia-northeast3" violates at least one location policy.
+     * The troubleshooting guidance is provided in the Help links.
+     *
+     * Generated from protobuf enum <code>LOCATION_POLICY_VIOLATED = 31;</code>
+     */
+    const LOCATION_POLICY_VIOLATED = 31;
+    /**
+     * The request is denied because origin request header is missing.
+     * Example of an ErrorInfo when
+     * accessing "pubsub.googleapis.com" service with an empty "Origin" request
+     * header.
+     * {
+     *   reason: "MISSING_ORIGIN"
+     *   domain: "googleapis.com"
+     *   metadata {
+     *     "consumer":"projects/123456"
+     *     "service": "pubsub.googleapis.com"
+     *   }
+     * }
+     *
+     * Generated from protobuf enum <code>MISSING_ORIGIN = 33;</code>
+     */
+    const MISSING_ORIGIN = 33;
+    /**
+     * The request is denied because the request contains more than one credential
+     * type that are individually acceptable, but not together. The customer
+     * should retry their request with only one set of credentials.
+     * Example of an ErrorInfo when
+     * accessing "pubsub.googleapis.com" service with overloaded credentials.
+     * {
+     *   reason: "OVERLOADED_CREDENTIALS"
+     *   domain: "googleapis.com"
+     *   metadata {
+     *     "consumer":"projects/123456"
+     *     "service": "pubsub.googleapis.com"
+     *   }
+     * }
+     *
+     * Generated from protobuf enum <code>OVERLOADED_CREDENTIALS = 34;</code>
+     */
+    const OVERLOADED_CREDENTIALS = 34;
 
     private static $valueToName = [
         self::ERROR_REASON_UNSPECIFIED => 'ERROR_REASON_UNSPECIFIED',
@@ -608,6 +662,9 @@ class ErrorReason
         self::ORG_RESTRICTION_HEADER_INVALID => 'ORG_RESTRICTION_HEADER_INVALID',
         self::SERVICE_NOT_VISIBLE => 'SERVICE_NOT_VISIBLE',
         self::GCP_SUSPENDED => 'GCP_SUSPENDED',
+        self::LOCATION_POLICY_VIOLATED => 'LOCATION_POLICY_VIOLATED',
+        self::MISSING_ORIGIN => 'MISSING_ORIGIN',
+        self::OVERLOADED_CREDENTIALS => 'OVERLOADED_CREDENTIALS',
     ];
 
     public static function name($value)

@@ -20,6 +20,26 @@ namespace Google\Service\SQLAdmin;
 class ExportContextBakExportOptions extends \Google\Model
 {
   /**
+   * @var string
+   */
+  public $bakType;
+  /**
+   * @var bool
+   */
+  public $copyOnly;
+  /**
+   * @var bool
+   */
+  public $differentialBase;
+  /**
+   * @var string
+   */
+  public $exportLogEndTime;
+  /**
+   * @var string
+   */
+  public $exportLogStartTime;
+  /**
    * @var int
    */
   public $stripeCount;
@@ -28,6 +48,76 @@ class ExportContextBakExportOptions extends \Google\Model
    */
   public $striped;
 
+  /**
+   * @param string
+   */
+  public function setBakType($bakType)
+  {
+    $this->bakType = $bakType;
+  }
+  /**
+   * @return string
+   */
+  public function getBakType()
+  {
+    return $this->bakType;
+  }
+  /**
+   * @param bool
+   */
+  public function setCopyOnly($copyOnly)
+  {
+    $this->copyOnly = $copyOnly;
+  }
+  /**
+   * @return bool
+   */
+  public function getCopyOnly()
+  {
+    return $this->copyOnly;
+  }
+  /**
+   * @param bool
+   */
+  public function setDifferentialBase($differentialBase)
+  {
+    $this->differentialBase = $differentialBase;
+  }
+  /**
+   * @return bool
+   */
+  public function getDifferentialBase()
+  {
+    return $this->differentialBase;
+  }
+  /**
+   * @param string
+   */
+  public function setExportLogEndTime($exportLogEndTime)
+  {
+    $this->exportLogEndTime = $exportLogEndTime;
+  }
+  /**
+   * @return string
+   */
+  public function getExportLogEndTime()
+  {
+    return $this->exportLogEndTime;
+  }
+  /**
+   * @param string
+   */
+  public function setExportLogStartTime($exportLogStartTime)
+  {
+    $this->exportLogStartTime = $exportLogStartTime;
+  }
+  /**
+   * @return string
+   */
+  public function getExportLogStartTime()
+  {
+    return $this->exportLogStartTime;
+  }
   /**
    * @param int
    */

@@ -19,6 +19,8 @@ namespace Google\Service\BigtableAdmin;
 
 class AppProfile extends \Google\Model
 {
+  protected $dataBoostIsolationReadOnlyType = DataBoostIsolationReadOnly::class;
+  protected $dataBoostIsolationReadOnlyDataType = '';
   /**
    * @var string
    */
@@ -33,9 +35,29 @@ class AppProfile extends \Google\Model
    * @var string
    */
   public $name;
+  /**
+   * @var string
+   */
+  public $priority;
   protected $singleClusterRoutingType = SingleClusterRouting::class;
   protected $singleClusterRoutingDataType = '';
+  protected $standardIsolationType = StandardIsolation::class;
+  protected $standardIsolationDataType = '';
 
+  /**
+   * @param DataBoostIsolationReadOnly
+   */
+  public function setDataBoostIsolationReadOnly(DataBoostIsolationReadOnly $dataBoostIsolationReadOnly)
+  {
+    $this->dataBoostIsolationReadOnly = $dataBoostIsolationReadOnly;
+  }
+  /**
+   * @return DataBoostIsolationReadOnly
+   */
+  public function getDataBoostIsolationReadOnly()
+  {
+    return $this->dataBoostIsolationReadOnly;
+  }
   /**
    * @param string
    */
@@ -93,6 +115,20 @@ class AppProfile extends \Google\Model
     return $this->name;
   }
   /**
+   * @param string
+   */
+  public function setPriority($priority)
+  {
+    $this->priority = $priority;
+  }
+  /**
+   * @return string
+   */
+  public function getPriority()
+  {
+    return $this->priority;
+  }
+  /**
    * @param SingleClusterRouting
    */
   public function setSingleClusterRouting(SingleClusterRouting $singleClusterRouting)
@@ -105,6 +141,20 @@ class AppProfile extends \Google\Model
   public function getSingleClusterRouting()
   {
     return $this->singleClusterRouting;
+  }
+  /**
+   * @param StandardIsolation
+   */
+  public function setStandardIsolation(StandardIsolation $standardIsolation)
+  {
+    $this->standardIsolation = $standardIsolation;
+  }
+  /**
+   * @return StandardIsolation
+   */
+  public function getStandardIsolation()
+  {
+    return $this->standardIsolation;
   }
 }
 

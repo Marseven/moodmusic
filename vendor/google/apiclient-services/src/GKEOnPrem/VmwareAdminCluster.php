@@ -27,6 +27,8 @@ class VmwareAdminCluster extends \Google\Model
   public $annotations;
   protected $antiAffinityGroupsType = VmwareAAGConfig::class;
   protected $antiAffinityGroupsDataType = '';
+  protected $authorizationType = VmwareAdminAuthorizationConfig::class;
+  protected $authorizationDataType = '';
   protected $autoRepairConfigType = VmwareAutoRepairConfig::class;
   protected $autoRepairConfigDataType = '';
   /**
@@ -75,6 +77,8 @@ class VmwareAdminCluster extends \Google\Model
   public $onPremVersion;
   protected $platformConfigType = VmwarePlatformConfig::class;
   protected $platformConfigDataType = '';
+  protected $preparedSecretsType = VmwareAdminPreparedSecretsConfig::class;
+  protected $preparedSecretsDataType = '';
   /**
    * @var bool
    */
@@ -93,6 +97,8 @@ class VmwareAdminCluster extends \Google\Model
    * @var string
    */
   public $updateTime;
+  protected $validationCheckType = ValidationCheck::class;
+  protected $validationCheckDataType = '';
   protected $vcenterType = VmwareAdminVCenterConfig::class;
   protected $vcenterDataType = '';
 
@@ -137,6 +143,20 @@ class VmwareAdminCluster extends \Google\Model
   public function getAntiAffinityGroups()
   {
     return $this->antiAffinityGroups;
+  }
+  /**
+   * @param VmwareAdminAuthorizationConfig
+   */
+  public function setAuthorization(VmwareAdminAuthorizationConfig $authorization)
+  {
+    $this->authorization = $authorization;
+  }
+  /**
+   * @return VmwareAdminAuthorizationConfig
+   */
+  public function getAuthorization()
+  {
+    return $this->authorization;
   }
   /**
    * @param VmwareAutoRepairConfig
@@ -349,6 +369,20 @@ class VmwareAdminCluster extends \Google\Model
     return $this->platformConfig;
   }
   /**
+   * @param VmwareAdminPreparedSecretsConfig
+   */
+  public function setPreparedSecrets(VmwareAdminPreparedSecretsConfig $preparedSecrets)
+  {
+    $this->preparedSecrets = $preparedSecrets;
+  }
+  /**
+   * @return VmwareAdminPreparedSecretsConfig
+   */
+  public function getPreparedSecrets()
+  {
+    return $this->preparedSecrets;
+  }
+  /**
    * @param bool
    */
   public function setReconciling($reconciling)
@@ -417,6 +451,20 @@ class VmwareAdminCluster extends \Google\Model
   public function getUpdateTime()
   {
     return $this->updateTime;
+  }
+  /**
+   * @param ValidationCheck
+   */
+  public function setValidationCheck(ValidationCheck $validationCheck)
+  {
+    $this->validationCheck = $validationCheck;
+  }
+  /**
+   * @return ValidationCheck
+   */
+  public function getValidationCheck()
+  {
+    return $this->validationCheck;
   }
   /**
    * @param VmwareAdminVCenterConfig

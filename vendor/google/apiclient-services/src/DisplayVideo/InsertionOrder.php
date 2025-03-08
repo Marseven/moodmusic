@@ -26,10 +26,6 @@ class InsertionOrder extends \Google\Collection
   public $advertiserId;
   protected $bidStrategyType = BiddingStrategy::class;
   protected $bidStrategyDataType = '';
-  /**
-   * @var string
-   */
-  public $billableOutcome;
   protected $budgetType = InsertionOrderBudget::class;
   protected $budgetDataType = '';
   /**
@@ -56,16 +52,20 @@ class InsertionOrder extends \Google\Collection
   public $insertionOrderType;
   protected $integrationDetailsType = IntegrationDetails::class;
   protected $integrationDetailsDataType = '';
+  protected $kpiType = Kpi::class;
+  protected $kpiDataType = '';
   /**
    * @var string
    */
   public $name;
+  /**
+   * @var string
+   */
+  public $optimizationObjective;
   protected $pacingType = Pacing::class;
   protected $pacingDataType = '';
   protected $partnerCostsType = PartnerCost::class;
   protected $partnerCostsDataType = 'array';
-  protected $performanceGoalType = PerformanceGoal::class;
-  protected $performanceGoalDataType = '';
   /**
    * @var string
    */
@@ -102,20 +102,6 @@ class InsertionOrder extends \Google\Collection
   public function getBidStrategy()
   {
     return $this->bidStrategy;
-  }
-  /**
-   * @param string
-   */
-  public function setBillableOutcome($billableOutcome)
-  {
-    $this->billableOutcome = $billableOutcome;
-  }
-  /**
-   * @return string
-   */
-  public function getBillableOutcome()
-  {
-    return $this->billableOutcome;
   }
   /**
    * @param InsertionOrderBudget
@@ -230,6 +216,20 @@ class InsertionOrder extends \Google\Collection
     return $this->integrationDetails;
   }
   /**
+   * @param Kpi
+   */
+  public function setKpi(Kpi $kpi)
+  {
+    $this->kpi = $kpi;
+  }
+  /**
+   * @return Kpi
+   */
+  public function getKpi()
+  {
+    return $this->kpi;
+  }
+  /**
    * @param string
    */
   public function setName($name)
@@ -242,6 +242,20 @@ class InsertionOrder extends \Google\Collection
   public function getName()
   {
     return $this->name;
+  }
+  /**
+   * @param string
+   */
+  public function setOptimizationObjective($optimizationObjective)
+  {
+    $this->optimizationObjective = $optimizationObjective;
+  }
+  /**
+   * @return string
+   */
+  public function getOptimizationObjective()
+  {
+    return $this->optimizationObjective;
   }
   /**
    * @param Pacing
@@ -270,20 +284,6 @@ class InsertionOrder extends \Google\Collection
   public function getPartnerCosts()
   {
     return $this->partnerCosts;
-  }
-  /**
-   * @param PerformanceGoal
-   */
-  public function setPerformanceGoal(PerformanceGoal $performanceGoal)
-  {
-    $this->performanceGoal = $performanceGoal;
-  }
-  /**
-   * @return PerformanceGoal
-   */
-  public function getPerformanceGoal()
-  {
-    return $this->performanceGoal;
   }
   /**
    * @param string

@@ -55,6 +55,10 @@ class InstanceConfig extends \Google\Collection
   protected $optionalReplicasType = ReplicaInfo::class;
   protected $optionalReplicasDataType = 'array';
   /**
+   * @var string
+   */
+  public $quorumType;
+  /**
    * @var bool
    */
   public $reconciling;
@@ -64,6 +68,10 @@ class InstanceConfig extends \Google\Collection
    * @var string
    */
   public $state;
+  /**
+   * @var string
+   */
+  public $storageLimitPerProcessingUnit;
 
   /**
    * @param string
@@ -192,6 +200,20 @@ class InstanceConfig extends \Google\Collection
     return $this->optionalReplicas;
   }
   /**
+   * @param string
+   */
+  public function setQuorumType($quorumType)
+  {
+    $this->quorumType = $quorumType;
+  }
+  /**
+   * @return string
+   */
+  public function getQuorumType()
+  {
+    return $this->quorumType;
+  }
+  /**
    * @param bool
    */
   public function setReconciling($reconciling)
@@ -232,6 +254,20 @@ class InstanceConfig extends \Google\Collection
   public function getState()
   {
     return $this->state;
+  }
+  /**
+   * @param string
+   */
+  public function setStorageLimitPerProcessingUnit($storageLimitPerProcessingUnit)
+  {
+    $this->storageLimitPerProcessingUnit = $storageLimitPerProcessingUnit;
+  }
+  /**
+   * @return string
+   */
+  public function getStorageLimitPerProcessingUnit()
+  {
+    return $this->storageLimitPerProcessingUnit;
   }
 }
 

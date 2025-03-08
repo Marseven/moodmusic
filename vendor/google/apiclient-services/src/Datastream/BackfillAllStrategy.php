@@ -25,6 +25,10 @@ class BackfillAllStrategy extends \Google\Model
   protected $oracleExcludedObjectsDataType = '';
   protected $postgresqlExcludedObjectsType = PostgresqlRdbms::class;
   protected $postgresqlExcludedObjectsDataType = '';
+  protected $salesforceExcludedObjectsType = SalesforceOrg::class;
+  protected $salesforceExcludedObjectsDataType = '';
+  protected $sqlServerExcludedObjectsType = SqlServerRdbms::class;
+  protected $sqlServerExcludedObjectsDataType = '';
 
   /**
    * @param MysqlRdbms
@@ -67,6 +71,34 @@ class BackfillAllStrategy extends \Google\Model
   public function getPostgresqlExcludedObjects()
   {
     return $this->postgresqlExcludedObjects;
+  }
+  /**
+   * @param SalesforceOrg
+   */
+  public function setSalesforceExcludedObjects(SalesforceOrg $salesforceExcludedObjects)
+  {
+    $this->salesforceExcludedObjects = $salesforceExcludedObjects;
+  }
+  /**
+   * @return SalesforceOrg
+   */
+  public function getSalesforceExcludedObjects()
+  {
+    return $this->salesforceExcludedObjects;
+  }
+  /**
+   * @param SqlServerRdbms
+   */
+  public function setSqlServerExcludedObjects(SqlServerRdbms $sqlServerExcludedObjects)
+  {
+    $this->sqlServerExcludedObjects = $sqlServerExcludedObjects;
+  }
+  /**
+   * @return SqlServerRdbms
+   */
+  public function getSqlServerExcludedObjects()
+  {
+    return $this->sqlServerExcludedObjects;
   }
 }
 

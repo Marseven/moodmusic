@@ -41,6 +41,10 @@ class TargetHttpsProxy extends \Google\Collection
    */
   public $fingerprint;
   /**
+   * @var int
+   */
+  public $httpKeepAliveTimeoutSec;
+  /**
    * @var string
    */
   public $id;
@@ -80,6 +84,10 @@ class TargetHttpsProxy extends \Google\Collection
    * @var string
    */
   public $sslPolicy;
+  /**
+   * @var string
+   */
+  public $tlsEarlyData;
   /**
    * @var string
    */
@@ -154,6 +162,20 @@ class TargetHttpsProxy extends \Google\Collection
   public function getFingerprint()
   {
     return $this->fingerprint;
+  }
+  /**
+   * @param int
+   */
+  public function setHttpKeepAliveTimeoutSec($httpKeepAliveTimeoutSec)
+  {
+    $this->httpKeepAliveTimeoutSec = $httpKeepAliveTimeoutSec;
+  }
+  /**
+   * @return int
+   */
+  public function getHttpKeepAliveTimeoutSec()
+  {
+    return $this->httpKeepAliveTimeoutSec;
   }
   /**
    * @param string
@@ -294,6 +316,20 @@ class TargetHttpsProxy extends \Google\Collection
   public function getSslPolicy()
   {
     return $this->sslPolicy;
+  }
+  /**
+   * @param string
+   */
+  public function setTlsEarlyData($tlsEarlyData)
+  {
+    $this->tlsEarlyData = $tlsEarlyData;
+  }
+  /**
+   * @return string
+   */
+  public function getTlsEarlyData()
+  {
+    return $this->tlsEarlyData;
   }
   /**
    * @param string

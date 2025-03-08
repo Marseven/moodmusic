@@ -33,7 +33,19 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
   /**
    * @var string
    */
+  public $encryptionKeyRevocationAction;
+  /**
+   * @var string
+   */
+  public $encryptionKeyShutdownDuration;
+  /**
+   * @var string
+   */
   public $executionEnvironment;
+  /**
+   * @var bool
+   */
+  public $healthCheckDisabled;
   /**
    * @var string[]
    */
@@ -42,6 +54,8 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
    * @var int
    */
   public $maxInstanceRequestConcurrency;
+  protected $nodeSelectorType = GoogleCloudRunV2NodeSelector::class;
+  protected $nodeSelectorDataType = '';
   /**
    * @var string
    */
@@ -52,6 +66,8 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
    * @var string
    */
   public $serviceAccount;
+  protected $serviceMeshType = GoogleCloudRunV2ServiceMesh::class;
+  protected $serviceMeshDataType = '';
   /**
    * @var bool
    */
@@ -110,6 +126,34 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
   /**
    * @param string
    */
+  public function setEncryptionKeyRevocationAction($encryptionKeyRevocationAction)
+  {
+    $this->encryptionKeyRevocationAction = $encryptionKeyRevocationAction;
+  }
+  /**
+   * @return string
+   */
+  public function getEncryptionKeyRevocationAction()
+  {
+    return $this->encryptionKeyRevocationAction;
+  }
+  /**
+   * @param string
+   */
+  public function setEncryptionKeyShutdownDuration($encryptionKeyShutdownDuration)
+  {
+    $this->encryptionKeyShutdownDuration = $encryptionKeyShutdownDuration;
+  }
+  /**
+   * @return string
+   */
+  public function getEncryptionKeyShutdownDuration()
+  {
+    return $this->encryptionKeyShutdownDuration;
+  }
+  /**
+   * @param string
+   */
   public function setExecutionEnvironment($executionEnvironment)
   {
     $this->executionEnvironment = $executionEnvironment;
@@ -120,6 +164,20 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
   public function getExecutionEnvironment()
   {
     return $this->executionEnvironment;
+  }
+  /**
+   * @param bool
+   */
+  public function setHealthCheckDisabled($healthCheckDisabled)
+  {
+    $this->healthCheckDisabled = $healthCheckDisabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getHealthCheckDisabled()
+  {
+    return $this->healthCheckDisabled;
   }
   /**
    * @param string[]
@@ -148,6 +206,20 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
   public function getMaxInstanceRequestConcurrency()
   {
     return $this->maxInstanceRequestConcurrency;
+  }
+  /**
+   * @param GoogleCloudRunV2NodeSelector
+   */
+  public function setNodeSelector(GoogleCloudRunV2NodeSelector $nodeSelector)
+  {
+    $this->nodeSelector = $nodeSelector;
+  }
+  /**
+   * @return GoogleCloudRunV2NodeSelector
+   */
+  public function getNodeSelector()
+  {
+    return $this->nodeSelector;
   }
   /**
    * @param string
@@ -190,6 +262,20 @@ class GoogleCloudRunV2RevisionTemplate extends \Google\Collection
   public function getServiceAccount()
   {
     return $this->serviceAccount;
+  }
+  /**
+   * @param GoogleCloudRunV2ServiceMesh
+   */
+  public function setServiceMesh(GoogleCloudRunV2ServiceMesh $serviceMesh)
+  {
+    $this->serviceMesh = $serviceMesh;
+  }
+  /**
+   * @return GoogleCloudRunV2ServiceMesh
+   */
+  public function getServiceMesh()
+  {
+    return $this->serviceMesh;
   }
   /**
    * @param bool

@@ -17,11 +17,15 @@
 
 namespace Google\Service\Integrations\Resource;
 
+use Google\Service\Integrations\ExecuteEventRequestContent;
+use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaExecuteEventResponse;
 use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaExecuteIntegrationsRequest;
 use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaExecuteIntegrationsResponse;
 use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaListIntegrationsResponse;
 use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaScheduleIntegrationsRequest;
 use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaScheduleIntegrationsResponse;
+use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaTestIntegrationsRequest;
+use Google\Service\Integrations\GoogleCloudIntegrationsV1alphaTestIntegrationsResponse;
 use Google\Service\Integrations\GoogleProtobufEmpty;
 
 /**
@@ -40,6 +44,7 @@ class ProjectsLocationsIntegrations extends \Google\Service\Resource
    * @param string $name Required. The location resource of the request.
    * @param array $optParams Optional parameters.
    * @return GoogleProtobufEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -60,12 +65,39 @@ class ProjectsLocationsIntegrations extends \Google\Service\Resource
    * @param GoogleCloudIntegrationsV1alphaExecuteIntegrationsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudIntegrationsV1alphaExecuteIntegrationsResponse
+   * @throws \Google\Service\Exception
    */
   public function execute($name, GoogleCloudIntegrationsV1alphaExecuteIntegrationsRequest $postBody, $optParams = [])
   {
     $params = ['name' => $name, 'postBody' => $postBody];
     $params = array_merge($params, $optParams);
     return $this->call('execute', [$params], GoogleCloudIntegrationsV1alphaExecuteIntegrationsResponse::class);
+  }
+  /**
+   * Executes an integration on receiving events from Integration Connector
+   * triggers, Eventarc or CPS Trigger. Input data to integration is received in
+   * body in json format (integrations.executeEvent)
+   *
+   * @param string $name Required. The integration resource name. Format:
+   * projects/{gcp_project_id}/locations/{location}/integrations/{integration_id}
+   * @param ExecuteEventRequestContent $postBody
+   * @param array $optParams Optional parameters.
+   *
+   * @opt_param string GCPCloudEventsMode Optional. LINT: LEGACY_NAMES The query
+   * parameter value for __GCP_CloudEventsMode, set by the Eventarc service when
+   * configuring triggers.
+   * @opt_param string triggerId Required. Id of the integration trigger config.
+   * The trigger_id is in the format: `integration_connector_trigger/projects/{gcp
+   * _project_id}/location/{location}/connections/{connection_name}/subscriptions/
+   * {subscription_name}`.
+   * @return GoogleCloudIntegrationsV1alphaExecuteEventResponse
+   * @throws \Google\Service\Exception
+   */
+  public function executeEvent($name, ExecuteEventRequestContent $postBody, $optParams = [])
+  {
+    $params = ['name' => $name, 'postBody' => $postBody];
+    $params = array_merge($params, $optParams);
+    return $this->call('executeEvent', [$params], GoogleCloudIntegrationsV1alphaExecuteEventResponse::class);
   }
   /**
    * Returns the list of all integrations in the specified project.
@@ -89,6 +121,7 @@ class ProjectsLocationsIntegrations extends \Google\Service\Resource
    * @opt_param int pageSize The page size for the resquest.
    * @opt_param string pageToken The page token for the resquest.
    * @return GoogleCloudIntegrationsV1alphaListIntegrationsResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsIntegrations($parent, $optParams = [])
   {
@@ -104,12 +137,28 @@ class ProjectsLocationsIntegrations extends \Google\Service\Resource
    * @param GoogleCloudIntegrationsV1alphaScheduleIntegrationsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudIntegrationsV1alphaScheduleIntegrationsResponse
+   * @throws \Google\Service\Exception
    */
   public function schedule($name, GoogleCloudIntegrationsV1alphaScheduleIntegrationsRequest $postBody, $optParams = [])
   {
     $params = ['name' => $name, 'postBody' => $postBody];
     $params = array_merge($params, $optParams);
     return $this->call('schedule', [$params], GoogleCloudIntegrationsV1alphaScheduleIntegrationsResponse::class);
+  }
+  /**
+   * Execute the integration in draft state (integrations.test)
+   *
+   * @param string $name Output only. Auto-generated primary key.
+   * @param GoogleCloudIntegrationsV1alphaTestIntegrationsRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return GoogleCloudIntegrationsV1alphaTestIntegrationsResponse
+   * @throws \Google\Service\Exception
+   */
+  public function test($name, GoogleCloudIntegrationsV1alphaTestIntegrationsRequest $postBody, $optParams = [])
+  {
+    $params = ['name' => $name, 'postBody' => $postBody];
+    $params = array_merge($params, $optParams);
+    return $this->call('test', [$params], GoogleCloudIntegrationsV1alphaTestIntegrationsResponse::class);
   }
 }
 

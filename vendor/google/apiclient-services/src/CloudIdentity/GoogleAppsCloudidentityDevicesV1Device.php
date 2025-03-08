@@ -70,6 +70,12 @@ class GoogleAppsCloudidentityDevicesV1Device extends \Google\Collection
    * @var string
    */
   public $encryptionState;
+  protected $endpointVerificationSpecificAttributesType = GoogleAppsCloudidentityDevicesV1EndpointVerificationSpecificAttributes::class;
+  protected $endpointVerificationSpecificAttributesDataType = '';
+  /**
+   * @var string
+   */
+  public $hostname;
   /**
    * @var string
    */
@@ -130,6 +136,10 @@ class GoogleAppsCloudidentityDevicesV1Device extends \Google\Collection
    * @var string
    */
   public $serialNumber;
+  /**
+   * @var string
+   */
+  public $unifiedDeviceId;
   /**
    * @var string[]
    */
@@ -316,6 +326,34 @@ class GoogleAppsCloudidentityDevicesV1Device extends \Google\Collection
   public function getEncryptionState()
   {
     return $this->encryptionState;
+  }
+  /**
+   * @param GoogleAppsCloudidentityDevicesV1EndpointVerificationSpecificAttributes
+   */
+  public function setEndpointVerificationSpecificAttributes(GoogleAppsCloudidentityDevicesV1EndpointVerificationSpecificAttributes $endpointVerificationSpecificAttributes)
+  {
+    $this->endpointVerificationSpecificAttributes = $endpointVerificationSpecificAttributes;
+  }
+  /**
+   * @return GoogleAppsCloudidentityDevicesV1EndpointVerificationSpecificAttributes
+   */
+  public function getEndpointVerificationSpecificAttributes()
+  {
+    return $this->endpointVerificationSpecificAttributes;
+  }
+  /**
+   * @param string
+   */
+  public function setHostname($hostname)
+  {
+    $this->hostname = $hostname;
+  }
+  /**
+   * @return string
+   */
+  public function getHostname()
+  {
+    return $this->hostname;
   }
   /**
    * @param string
@@ -526,6 +564,20 @@ class GoogleAppsCloudidentityDevicesV1Device extends \Google\Collection
   public function getSerialNumber()
   {
     return $this->serialNumber;
+  }
+  /**
+   * @param string
+   */
+  public function setUnifiedDeviceId($unifiedDeviceId)
+  {
+    $this->unifiedDeviceId = $unifiedDeviceId;
+  }
+  /**
+   * @return string
+   */
+  public function getUnifiedDeviceId()
+  {
+    return $this->unifiedDeviceId;
   }
   /**
    * @param string[]

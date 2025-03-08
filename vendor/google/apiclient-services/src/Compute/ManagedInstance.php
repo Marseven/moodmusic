@@ -40,10 +40,16 @@ class ManagedInstance extends \Google\Collection
   public $instanceStatus;
   protected $lastAttemptType = ManagedInstanceLastAttempt::class;
   protected $lastAttemptDataType = '';
+  /**
+   * @var string
+   */
+  public $name;
   protected $preservedStateFromConfigType = PreservedState::class;
   protected $preservedStateFromConfigDataType = '';
   protected $preservedStateFromPolicyType = PreservedState::class;
   protected $preservedStateFromPolicyDataType = '';
+  protected $propertiesFromFlexibilityPolicyType = ManagedInstancePropertiesFromFlexibilityPolicy::class;
+  protected $propertiesFromFlexibilityPolicyDataType = '';
   protected $versionType = ManagedInstanceVersion::class;
   protected $versionDataType = '';
 
@@ -132,6 +138,20 @@ class ManagedInstance extends \Google\Collection
     return $this->lastAttempt;
   }
   /**
+   * @param string
+   */
+  public function setName($name)
+  {
+    $this->name = $name;
+  }
+  /**
+   * @return string
+   */
+  public function getName()
+  {
+    return $this->name;
+  }
+  /**
    * @param PreservedState
    */
   public function setPreservedStateFromConfig(PreservedState $preservedStateFromConfig)
@@ -158,6 +178,20 @@ class ManagedInstance extends \Google\Collection
   public function getPreservedStateFromPolicy()
   {
     return $this->preservedStateFromPolicy;
+  }
+  /**
+   * @param ManagedInstancePropertiesFromFlexibilityPolicy
+   */
+  public function setPropertiesFromFlexibilityPolicy(ManagedInstancePropertiesFromFlexibilityPolicy $propertiesFromFlexibilityPolicy)
+  {
+    $this->propertiesFromFlexibilityPolicy = $propertiesFromFlexibilityPolicy;
+  }
+  /**
+   * @return ManagedInstancePropertiesFromFlexibilityPolicy
+   */
+  public function getPropertiesFromFlexibilityPolicy()
+  {
+    return $this->propertiesFromFlexibilityPolicy;
   }
   /**
    * @param ManagedInstanceVersion

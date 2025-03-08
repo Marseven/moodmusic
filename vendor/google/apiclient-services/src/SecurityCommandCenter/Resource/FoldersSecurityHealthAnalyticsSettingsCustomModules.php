@@ -21,6 +21,8 @@ use Google\Service\SecurityCommandCenter\GoogleCloudSecuritycenterV1SecurityHeal
 use Google\Service\SecurityCommandCenter\ListDescendantSecurityHealthAnalyticsCustomModulesResponse;
 use Google\Service\SecurityCommandCenter\ListSecurityHealthAnalyticsCustomModulesResponse;
 use Google\Service\SecurityCommandCenter\SecuritycenterEmpty;
+use Google\Service\SecurityCommandCenter\SimulateSecurityHealthAnalyticsCustomModuleRequest;
+use Google\Service\SecurityCommandCenter\SimulateSecurityHealthAnalyticsCustomModuleResponse;
 
 /**
  * The "customModules" collection of methods.
@@ -40,12 +42,13 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    *
    * @param string $parent Required. Resource name of the new custom module's
    * parent. Its format is
-   * "organizations/{organization}/securityHealthAnalyticsSettings",
-   * "folders/{folder}/securityHealthAnalyticsSettings", or
-   * "projects/{project}/securityHealthAnalyticsSettings"
+   * `organizations/{organization}/securityHealthAnalyticsSettings`,
+   * `folders/{folder}/securityHealthAnalyticsSettings`, or
+   * `projects/{project}/securityHealthAnalyticsSettings`
    * @param GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule
+   * @throws \Google\Service\Exception
    */
   public function create($parent, GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule $postBody, $optParams = [])
   {
@@ -59,12 +62,13 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * custom modules. (customModules.delete)
    *
    * @param string $name Required. Name of the custom module to delete. Its format
-   * is "organizations/{organization}/securityHealthAnalyticsSettings/customModule
-   * s/{customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customMo
-   * dules/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings
-   * /customModules/{customModule}"
+   * is `organizations/{organization}/securityHealthAnalyticsSettings/customModule
+   * s/{customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customMo
+   * dules/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings
+   * /customModules/{customModule}`
    * @param array $optParams Optional parameters.
    * @return SecuritycenterEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -76,12 +80,13 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * Retrieves a SecurityHealthAnalyticsCustomModule. (customModules.get)
    *
    * @param string $name Required. Name of the custom module to get. Its format is
-   * "organizations/{organization}/securityHealthAnalyticsSettings/customModules/{
-   * customModule}", "folders/{folder}/securityHealthAnalyticsSettings/customModul
-   * es/{customModule}", or "projects/{project}/securityHealthAnalyticsSettings/cu
-   * stomModules/{customModule}"
+   * `organizations/{organization}/securityHealthAnalyticsSettings/customModules/{
+   * customModule}`, `folders/{folder}/securityHealthAnalyticsSettings/customModul
+   * es/{customModule}`, or `projects/{project}/securityHealthAnalyticsSettings/cu
+   * stomModules/{customModule}`
    * @param array $optParams Optional parameters.
    * @return GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -96,9 +101,9 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * (customModules.listFoldersSecurityHealthAnalyticsSettingsCustomModules)
    *
    * @param string $parent Required. Name of parent to list custom modules. Its
-   * format is "organizations/{organization}/securityHealthAnalyticsSettings",
-   * "folders/{folder}/securityHealthAnalyticsSettings", or
-   * "projects/{project}/securityHealthAnalyticsSettings"
+   * format is `organizations/{organization}/securityHealthAnalyticsSettings`,
+   * `folders/{folder}/securityHealthAnalyticsSettings`, or
+   * `projects/{project}/securityHealthAnalyticsSettings`
    * @param array $optParams Optional parameters.
    *
    * @opt_param int pageSize The maximum number of results to return in a single
@@ -106,6 +111,7 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * @opt_param string pageToken The value returned by the last call indicating a
    * continuation
    * @return ListSecurityHealthAnalyticsCustomModulesResponse
+   * @throws \Google\Service\Exception
    */
   public function listFoldersSecurityHealthAnalyticsSettingsCustomModules($parent, $optParams = [])
   {
@@ -120,9 +126,9 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    *
    * @param string $parent Required. Name of parent to list descendant custom
    * modules. Its format is
-   * "organizations/{organization}/securityHealthAnalyticsSettings",
-   * "folders/{folder}/securityHealthAnalyticsSettings", or
-   * "projects/{project}/securityHealthAnalyticsSettings"
+   * `organizations/{organization}/securityHealthAnalyticsSettings`,
+   * `folders/{folder}/securityHealthAnalyticsSettings`, or
+   * `projects/{project}/securityHealthAnalyticsSettings`
    * @param array $optParams Optional parameters.
    *
    * @opt_param int pageSize The maximum number of results to return in a single
@@ -130,6 +136,7 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * @opt_param string pageToken The value returned by the last call indicating a
    * continuation
    * @return ListDescendantSecurityHealthAnalyticsCustomModulesResponse
+   * @throws \Google\Service\Exception
    */
   public function listDescendant($parent, $optParams = [])
   {
@@ -154,14 +161,38 @@ class FoldersSecurityHealthAnalyticsSettingsCustomModules extends \Google\Servic
    * @param GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule $postBody
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string updateMask The list of fields to update.
+   * @opt_param string updateMask The list of fields to be updated. The only
+   * fields that can be updated are `enablement_state` and `custom_config`. If
+   * empty or set to the wildcard value `*`, both `enablement_state` and
+   * `custom_config` are updated.
    * @return GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule
+   * @throws \Google\Service\Exception
    */
   public function patch($name, GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule $postBody, $optParams = [])
   {
     $params = ['name' => $name, 'postBody' => $postBody];
     $params = array_merge($params, $optParams);
     return $this->call('patch', [$params], GoogleCloudSecuritycenterV1SecurityHealthAnalyticsCustomModule::class);
+  }
+  /**
+   * Simulates a given SecurityHealthAnalyticsCustomModule and Resource.
+   * (customModules.simulate)
+   *
+   * @param string $parent Required. The relative resource name of the
+   * organization, project, or folder. For more information about relative
+   * resource names, see [Relative Resource Name](https://cloud.google.com/apis/de
+   * sign/resource_names#relative_resource_name) Example:
+   * `organizations/{organization_id}`
+   * @param SimulateSecurityHealthAnalyticsCustomModuleRequest $postBody
+   * @param array $optParams Optional parameters.
+   * @return SimulateSecurityHealthAnalyticsCustomModuleResponse
+   * @throws \Google\Service\Exception
+   */
+  public function simulate($parent, SimulateSecurityHealthAnalyticsCustomModuleRequest $postBody, $optParams = [])
+  {
+    $params = ['parent' => $parent, 'postBody' => $postBody];
+    $params = array_merge($params, $optParams);
+    return $this->call('simulate', [$params], SimulateSecurityHealthAnalyticsCustomModuleResponse::class);
   }
 }
 

@@ -1,5 +1,21 @@
 # Changelog
 
+## 7.2.6
+
+* Bump supported versions to include PHP8.2, 8.3
+
+## 7.2.5
+
+* Bump supported versions to include PHP8.2, 8.3.
+
+## 7.2.4
+
+* [Fixed] Timeout option is propagated to guzzle client
+
+## 7.2.3
+
+* [Fixed] Include socket_id in batch trigger if included.
+
 ## 7.2.2
 
 * [FIXED] composer.phar file removed from package

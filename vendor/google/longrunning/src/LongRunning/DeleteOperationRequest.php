@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Operations.DeleteOperation][google.longrunning.Operations.DeleteOperation].
+ * The request message for
+ * [Operations.DeleteOperation][google.longrunning.Operations.DeleteOperation].
  *
  * Generated from protobuf message <code>google.longrunning.DeleteOperationRequest</code>
  */
@@ -21,6 +22,19 @@ class DeleteOperationRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string name = 1;</code>
      */
     private $name = '';
+
+    /**
+     * @param string $name The name of the operation resource to be deleted.
+     *
+     * @return \Google\LongRunning\DeleteOperationRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name): self
+    {
+        return (new self())
+            ->setName($name);
+    }
 
     /**
      * Constructor.

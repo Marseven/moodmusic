@@ -48,6 +48,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * @param GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionResponse
+   * @throws \Google\Service\Exception
    */
   public function cancel($name, GoogleCloudPaymentsResellerSubscriptionV1CancelSubscriptionRequest $postBody, $optParams = [])
   {
@@ -72,6 +73,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * at the maximum. If a subscription was previously created with the same
    * subscription_id, we will directly return that one.
    * @return GoogleCloudPaymentsResellerSubscriptionV1Subscription
+   * @throws \Google\Service\Exception
    */
   public function create($parent, GoogleCloudPaymentsResellerSubscriptionV1Subscription $postBody, $optParams = [])
   {
@@ -91,6 +93,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * @param GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionResponse
+   * @throws \Google\Service\Exception
    */
   public function entitle($name, GoogleCloudPaymentsResellerSubscriptionV1EntitleSubscriptionRequest $postBody, $optParams = [])
   {
@@ -110,6 +113,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * @param GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionResponse
+   * @throws \Google\Service\Exception
    */
   public function extend($name, GoogleCloudPaymentsResellerSubscriptionV1ExtendSubscriptionRequest $postBody, $optParams = [])
   {
@@ -126,6 +130,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * "partners/{partner_id}/subscriptions/{subscription_id}"
    * @param array $optParams Optional parameters.
    * @return GoogleCloudPaymentsResellerSubscriptionV1Subscription
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -151,6 +156,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * at the maximum. If a subscription was previously created with the same
    * subscription_id, we will directly return that one.
    * @return GoogleCloudPaymentsResellerSubscriptionV1Subscription
+   * @throws \Google\Service\Exception
    */
   public function provision($parent, GoogleCloudPaymentsResellerSubscriptionV1Subscription $postBody, $optParams = [])
   {
@@ -159,10 +165,11 @@ class PartnersSubscriptions extends \Google\Service\Resource
     return $this->call('provision', [$params], GoogleCloudPaymentsResellerSubscriptionV1Subscription::class);
   }
   /**
-   * Used by partners to revoke the pending cancellation of a subscription, which
-   * is currently in `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is
-   * already cancelled, the request will fail. It should be called directly by the
-   * partner using service accounts. (subscriptions.undoCancel)
+   * Revokes the pending cancellation of a subscription, which is currently in
+   * `STATE_CANCEL_AT_END_OF_CYCLE` state. If the subscription is already
+   * cancelled, the request will fail. - **This API doesn't apply to YouTube
+   * subscriptions.** It should be called directly by the partner using service
+   * accounts. (subscriptions.undoCancel)
    *
    * @param string $name Required. The name of the subscription resource whose
    * pending cancellation needs to be undone. It will have the format of
@@ -170,6 +177,7 @@ class PartnersSubscriptions extends \Google\Service\Resource
    * @param GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionResponse
+   * @throws \Google\Service\Exception
    */
   public function undoCancel($name, GoogleCloudPaymentsResellerSubscriptionV1UndoCancelSubscriptionRequest $postBody, $optParams = [])
   {

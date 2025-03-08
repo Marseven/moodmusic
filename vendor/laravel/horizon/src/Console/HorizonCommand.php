@@ -6,7 +6,9 @@ use Illuminate\Console\Command;
 use Laravel\Horizon\Contracts\MasterSupervisorRepository;
 use Laravel\Horizon\MasterSupervisor;
 use Laravel\Horizon\ProvisioningPlan;
+use Symfony\Component\Console\Attribute\AsCommand;
 
+#[AsCommand(name: 'horizon')]
 class HorizonCommand extends Command
 {
     /**
@@ -32,23 +34,25 @@ class HorizonCommand extends Command
     public function handle(MasterSupervisorRepository $masters)
     {
         if ($masters->find(MasterSupervisor::name())) {
-            return $this->comment('A master supervisor is already running on this machine.');
+            return $this->components->warn('A master supervisor is already running on this machine.');
         }
 
-        $master = (new MasterSupervisor)->handleOutputUsing(function ($type, $line) {
+        $environment = $this->option('environment') ?? config('horizon.env') ?? config('app.env');
+
+        $master = (new MasterSupervisor($environment))->handleOutputUsing(function ($type, $line) {
             $this->output->write($line);
         });
 
-        ProvisioningPlan::get(MasterSupervisor::name())->deploy(
-            $this->option('environment') ?? config('horizon.env') ?? config('app.env')
-        );
+        ProvisioningPlan::get(MasterSupervisor::name())->deploy($environment);
 
-        $this->info('Horizon started successfully.');
+        $this->components->info('Horizon started successfully.');
 
         pcntl_async_signals(true);
 
         pcntl_signal(SIGINT, function () use ($master) {
-            $this->line('Shutting down...');
+            $this->output->writeln('');
+
+            $this->components->info('Shutting down.');
 
             return $master->terminate();
         });

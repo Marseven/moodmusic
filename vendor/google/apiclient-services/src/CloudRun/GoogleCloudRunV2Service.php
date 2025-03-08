@@ -19,13 +19,15 @@ namespace Google\Service\CloudRun;
 
 class GoogleCloudRunV2Service extends \Google\Collection
 {
-  protected $collection_key = 'trafficStatuses';
+  protected $collection_key = 'urls';
   /**
    * @var string[]
    */
   public $annotations;
   protected $binaryAuthorizationType = GoogleCloudRunV2BinaryAuthorization::class;
   protected $binaryAuthorizationDataType = '';
+  protected $buildConfigType = GoogleCloudRunV2BuildConfig::class;
+  protected $buildConfigDataType = '';
   /**
    * @var string
    */
@@ -44,6 +46,14 @@ class GoogleCloudRunV2Service extends \Google\Collection
    * @var string
    */
   public $creator;
+  /**
+   * @var string[]
+   */
+  public $customAudiences;
+  /**
+   * @var bool
+   */
+  public $defaultUriDisabled;
   /**
    * @var string
    */
@@ -68,6 +78,10 @@ class GoogleCloudRunV2Service extends \Google\Collection
    * @var string
    */
   public $ingress;
+  /**
+   * @var bool
+   */
+  public $invokerIamDisabled;
   /**
    * @var string[]
    */
@@ -104,6 +118,8 @@ class GoogleCloudRunV2Service extends \Google\Collection
    * @var bool
    */
   public $satisfiesPzs;
+  protected $scalingType = GoogleCloudRunV2ServiceScaling::class;
+  protected $scalingDataType = '';
   protected $templateType = GoogleCloudRunV2RevisionTemplate::class;
   protected $templateDataType = '';
   protected $terminalConditionType = GoogleCloudRunV2Condition::class;
@@ -124,6 +140,10 @@ class GoogleCloudRunV2Service extends \Google\Collection
    * @var string
    */
   public $uri;
+  /**
+   * @var string[]
+   */
+  public $urls;
 
   /**
    * @param string[]
@@ -152,6 +172,20 @@ class GoogleCloudRunV2Service extends \Google\Collection
   public function getBinaryAuthorization()
   {
     return $this->binaryAuthorization;
+  }
+  /**
+   * @param GoogleCloudRunV2BuildConfig
+   */
+  public function setBuildConfig(GoogleCloudRunV2BuildConfig $buildConfig)
+  {
+    $this->buildConfig = $buildConfig;
+  }
+  /**
+   * @return GoogleCloudRunV2BuildConfig
+   */
+  public function getBuildConfig()
+  {
+    return $this->buildConfig;
   }
   /**
    * @param string
@@ -222,6 +256,34 @@ class GoogleCloudRunV2Service extends \Google\Collection
   public function getCreator()
   {
     return $this->creator;
+  }
+  /**
+   * @param string[]
+   */
+  public function setCustomAudiences($customAudiences)
+  {
+    $this->customAudiences = $customAudiences;
+  }
+  /**
+   * @return string[]
+   */
+  public function getCustomAudiences()
+  {
+    return $this->customAudiences;
+  }
+  /**
+   * @param bool
+   */
+  public function setDefaultUriDisabled($defaultUriDisabled)
+  {
+    $this->defaultUriDisabled = $defaultUriDisabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getDefaultUriDisabled()
+  {
+    return $this->defaultUriDisabled;
   }
   /**
    * @param string
@@ -306,6 +368,20 @@ class GoogleCloudRunV2Service extends \Google\Collection
   public function getIngress()
   {
     return $this->ingress;
+  }
+  /**
+   * @param bool
+   */
+  public function setInvokerIamDisabled($invokerIamDisabled)
+  {
+    $this->invokerIamDisabled = $invokerIamDisabled;
+  }
+  /**
+   * @return bool
+   */
+  public function getInvokerIamDisabled()
+  {
+    return $this->invokerIamDisabled;
   }
   /**
    * @param string[]
@@ -434,6 +510,20 @@ class GoogleCloudRunV2Service extends \Google\Collection
     return $this->satisfiesPzs;
   }
   /**
+   * @param GoogleCloudRunV2ServiceScaling
+   */
+  public function setScaling(GoogleCloudRunV2ServiceScaling $scaling)
+  {
+    $this->scaling = $scaling;
+  }
+  /**
+   * @return GoogleCloudRunV2ServiceScaling
+   */
+  public function getScaling()
+  {
+    return $this->scaling;
+  }
+  /**
    * @param GoogleCloudRunV2RevisionTemplate
    */
   public function setTemplate(GoogleCloudRunV2RevisionTemplate $template)
@@ -530,6 +620,20 @@ class GoogleCloudRunV2Service extends \Google\Collection
   public function getUri()
   {
     return $this->uri;
+  }
+  /**
+   * @param string[]
+   */
+  public function setUrls($urls)
+  {
+    $this->urls = $urls;
+  }
+  /**
+   * @return string[]
+   */
+  public function getUrls()
+  {
+    return $this->urls;
   }
 }
 

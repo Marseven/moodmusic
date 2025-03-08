@@ -9,7 +9,8 @@ use Google\Protobuf\Internal\RepeatedField;
 use Google\Protobuf\Internal\GPBUtil;
 
 /**
- * The request message for [Operations.ListOperations][google.longrunning.Operations.ListOperations].
+ * The request message for
+ * [Operations.ListOperations][google.longrunning.Operations.ListOperations].
  *
  * Generated from protobuf message <code>google.longrunning.ListOperationsRequest</code>
  */
@@ -39,6 +40,21 @@ class ListOperationsRequest extends \Google\Protobuf\Internal\Message
      * Generated from protobuf field <code>string page_token = 3;</code>
      */
     private $page_token = '';
+
+    /**
+     * @param string $name   The name of the operation's parent resource.
+     * @param string $filter The standard list filter.
+     *
+     * @return \Google\LongRunning\ListOperationsRequest
+     *
+     * @experimental
+     */
+    public static function build(string $name, string $filter): self
+    {
+        return (new self())
+            ->setName($name)
+            ->setFilter($filter);
+    }
 
     /**
      * Constructor.

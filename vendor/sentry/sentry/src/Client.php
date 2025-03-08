@@ -35,7 +35,7 @@ final class Client implements ClientInterface
     /**
      * The version of the SDK.
      */
-    public const SDK_VERSION = '3.18.0';
+    public const SDK_VERSION = '3.22.1';
 
     /**
      * @var Options The client options
@@ -254,7 +254,7 @@ final class Client implements ClientInterface
 
         $event->setSdkIdentifier($this->sdkIdentifier);
         $event->setSdkVersion($this->sdkVersion);
-        $event->setTags(array_merge($this->options->getTags(false), $event->getTags()));
+        $event->setTags(array_merge($this->options->getTags(), $event->getTags()));
 
         if (null === $event->getServerName()) {
             $event->setServerName($this->options->getServerName());
@@ -289,7 +289,7 @@ final class Client implements ClientInterface
 
         if (null !== $scope) {
             $beforeEventProcessors = $event;
-            $event = $scope->applyToEvent($event, $hint);
+            $event = $scope->applyToEvent($event, $hint, $this->options);
 
             if (null === $event) {
                 $this->logger->info(

@@ -23,7 +23,7 @@ use Google\Client;
  * Service definition for Batch (v1).
  *
  * <p>
- * An API to manage the running of batch jobs on Google Cloud Platform.</p>
+ * An API to manage the running of Batch resources on Google Cloud Platform.</p>
  *
  * <p>
  * For more information about this service, see the API
@@ -43,6 +43,7 @@ class Batch extends \Google\Service
   public $projects_locations_jobs_taskGroups_tasks;
   public $projects_locations_operations;
   public $projects_locations_state;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Batch service.
@@ -55,6 +56,7 @@ class Batch extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://batch.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://batch.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -108,7 +110,17 @@ class Batch extends \Google\Service
         'jobs',
         [
           'methods' => [
-            'create' => [
+            'cancel' => [
+              'path' => 'v1/{+name}:cancel',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'create' => [
               'path' => 'v1/{+parent}/jobs',
               'httpMethod' => 'POST',
               'parameters' => [
@@ -164,6 +176,10 @@ class Batch extends \Google\Service
                   'required' => true,
                 ],
                 'filter' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+                'orderBy' => [
                   'location' => 'query',
                   'type' => 'string',
                 ],

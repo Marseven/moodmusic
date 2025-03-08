@@ -20,24 +20,6 @@ namespace Google\Service\AIPlatformNotebooks;
 class Instance extends \Google\Collection
 {
   protected $collection_key = 'upgradeHistory';
-  protected $acceleratorConfigType = AcceleratorConfig::class;
-  protected $acceleratorConfigDataType = '';
-  public $acceleratorConfig;
-  /**
-   * @var string
-   */
-  public $bootDiskSizeGb;
-  /**
-   * @var string
-   */
-  public $bootDiskType;
-  /**
-   * @var bool
-   */
-  public $canIpForward;
-  protected $containerImageType = ContainerImage::class;
-  protected $containerImageDataType = '';
-  public $containerImage;
   /**
    * @var string
    */
@@ -47,48 +29,35 @@ class Instance extends \Google\Collection
    */
   public $creator;
   /**
-   * @var string
+   * @var bool
    */
-  public $customGpuDriverPath;
-  /**
-   * @var string
-   */
-  public $dataDiskSizeGb;
-  /**
-   * @var string
-   */
-  public $dataDiskType;
-  /**
-   * @var string
-   */
-  public $diskEncryption;
-  protected $disksType = Disk::class;
-  protected $disksDataType = 'array';
-  public $disks = [];
+  public $disableProxyAccess;
   /**
    * @var bool
    */
-  public $installGpuDriver;
+  public $enableThirdPartyIdentity;
+  protected $gceSetupType = GceSetup::class;
+  protected $gceSetupDataType = '';
   /**
    * @var string[]
    */
-  public $instanceOwners = [];
+  public $healthInfo;
   /**
    * @var string
    */
-  public $kmsKey;
-  /**
-   * @var string[]
-   */
-  public $labels = [];
+  public $healthState;
   /**
    * @var string
    */
-  public $machineType;
+  public $id;
   /**
    * @var string[]
    */
-  public $metadata = [];
+  public $instanceOwners;
+  /**
+   * @var string[]
+   */
+  public $labels;
   /**
    * @var string
    */
@@ -96,45 +65,15 @@ class Instance extends \Google\Collection
   /**
    * @var string
    */
-  public $network;
-  /**
-   * @var string
-   */
-  public $nicType;
-  /**
-   * @var bool
-   */
-  public $noProxyAccess;
-  /**
-   * @var bool
-   */
-  public $noPublicIp;
-  /**
-   * @var bool
-   */
-  public $noRemoveDataDisk;
-  /**
-   * @var string
-   */
-  public $postStartupScript;
-  /**
-   * @var string
-   */
   public $proxyUri;
-  protected $reservationAffinityType = ReservationAffinity::class;
-  protected $reservationAffinityDataType = '';
-  public $reservationAffinity;
   /**
-   * @var string
+   * @var bool
    */
-  public $serviceAccount;
+  public $satisfiesPzi;
   /**
-   * @var string[]
+   * @var bool
    */
-  public $serviceAccountScopes = [];
-  protected $shieldedInstanceConfigType = ShieldedInstanceConfig::class;
-  protected $shieldedInstanceConfigDataType = '';
-  public $shieldedInstanceConfig;
+  public $satisfiesPzs;
   /**
    * @var string
    */
@@ -142,92 +81,14 @@ class Instance extends \Google\Collection
   /**
    * @var string
    */
-  public $subnet;
-  /**
-   * @var string[]
-   */
-  public $tags = [];
+  public $thirdPartyProxyUrl;
   /**
    * @var string
    */
   public $updateTime;
   protected $upgradeHistoryType = UpgradeHistoryEntry::class;
   protected $upgradeHistoryDataType = 'array';
-  public $upgradeHistory = [];
-  protected $vmImageType = VmImage::class;
-  protected $vmImageDataType = '';
-  public $vmImage;
 
-  /**
-   * @param AcceleratorConfig
-   */
-  public function setAcceleratorConfig(AcceleratorConfig $acceleratorConfig)
-  {
-    $this->acceleratorConfig = $acceleratorConfig;
-  }
-  /**
-   * @return AcceleratorConfig
-   */
-  public function getAcceleratorConfig()
-  {
-    return $this->acceleratorConfig;
-  }
-  /**
-   * @param string
-   */
-  public function setBootDiskSizeGb($bootDiskSizeGb)
-  {
-    $this->bootDiskSizeGb = $bootDiskSizeGb;
-  }
-  /**
-   * @return string
-   */
-  public function getBootDiskSizeGb()
-  {
-    return $this->bootDiskSizeGb;
-  }
-  /**
-   * @param string
-   */
-  public function setBootDiskType($bootDiskType)
-  {
-    $this->bootDiskType = $bootDiskType;
-  }
-  /**
-   * @return string
-   */
-  public function getBootDiskType()
-  {
-    return $this->bootDiskType;
-  }
-  /**
-   * @param bool
-   */
-  public function setCanIpForward($canIpForward)
-  {
-    $this->canIpForward = $canIpForward;
-  }
-  /**
-   * @return bool
-   */
-  public function getCanIpForward()
-  {
-    return $this->canIpForward;
-  }
-  /**
-   * @param ContainerImage
-   */
-  public function setContainerImage(ContainerImage $containerImage)
-  {
-    $this->containerImage = $containerImage;
-  }
-  /**
-   * @return ContainerImage
-   */
-  public function getContainerImage()
-  {
-    return $this->containerImage;
-  }
   /**
    * @param string
    */
@@ -257,88 +118,88 @@ class Instance extends \Google\Collection
     return $this->creator;
   }
   /**
-   * @param string
-   */
-  public function setCustomGpuDriverPath($customGpuDriverPath)
-  {
-    $this->customGpuDriverPath = $customGpuDriverPath;
-  }
-  /**
-   * @return string
-   */
-  public function getCustomGpuDriverPath()
-  {
-    return $this->customGpuDriverPath;
-  }
-  /**
-   * @param string
-   */
-  public function setDataDiskSizeGb($dataDiskSizeGb)
-  {
-    $this->dataDiskSizeGb = $dataDiskSizeGb;
-  }
-  /**
-   * @return string
-   */
-  public function getDataDiskSizeGb()
-  {
-    return $this->dataDiskSizeGb;
-  }
-  /**
-   * @param string
-   */
-  public function setDataDiskType($dataDiskType)
-  {
-    $this->dataDiskType = $dataDiskType;
-  }
-  /**
-   * @return string
-   */
-  public function getDataDiskType()
-  {
-    return $this->dataDiskType;
-  }
-  /**
-   * @param string
-   */
-  public function setDiskEncryption($diskEncryption)
-  {
-    $this->diskEncryption = $diskEncryption;
-  }
-  /**
-   * @return string
-   */
-  public function getDiskEncryption()
-  {
-    return $this->diskEncryption;
-  }
-  /**
-   * @param Disk[]
-   */
-  public function setDisks($disks)
-  {
-    $this->disks = $disks;
-  }
-  /**
-   * @return Disk[]
-   */
-  public function getDisks()
-  {
-    return $this->disks;
-  }
-  /**
    * @param bool
    */
-  public function setInstallGpuDriver($installGpuDriver)
+  public function setDisableProxyAccess($disableProxyAccess)
   {
-    $this->installGpuDriver = $installGpuDriver;
+    $this->disableProxyAccess = $disableProxyAccess;
   }
   /**
    * @return bool
    */
-  public function getInstallGpuDriver()
+  public function getDisableProxyAccess()
   {
-    return $this->installGpuDriver;
+    return $this->disableProxyAccess;
+  }
+  /**
+   * @param bool
+   */
+  public function setEnableThirdPartyIdentity($enableThirdPartyIdentity)
+  {
+    $this->enableThirdPartyIdentity = $enableThirdPartyIdentity;
+  }
+  /**
+   * @return bool
+   */
+  public function getEnableThirdPartyIdentity()
+  {
+    return $this->enableThirdPartyIdentity;
+  }
+  /**
+   * @param GceSetup
+   */
+  public function setGceSetup(GceSetup $gceSetup)
+  {
+    $this->gceSetup = $gceSetup;
+  }
+  /**
+   * @return GceSetup
+   */
+  public function getGceSetup()
+  {
+    return $this->gceSetup;
+  }
+  /**
+   * @param string[]
+   */
+  public function setHealthInfo($healthInfo)
+  {
+    $this->healthInfo = $healthInfo;
+  }
+  /**
+   * @return string[]
+   */
+  public function getHealthInfo()
+  {
+    return $this->healthInfo;
+  }
+  /**
+   * @param string
+   */
+  public function setHealthState($healthState)
+  {
+    $this->healthState = $healthState;
+  }
+  /**
+   * @return string
+   */
+  public function getHealthState()
+  {
+    return $this->healthState;
+  }
+  /**
+   * @param string
+   */
+  public function setId($id)
+  {
+    $this->id = $id;
+  }
+  /**
+   * @return string
+   */
+  public function getId()
+  {
+    return $this->id;
   }
   /**
    * @param string[]
@@ -353,20 +214,6 @@ class Instance extends \Google\Collection
   public function getInstanceOwners()
   {
     return $this->instanceOwners;
-  }
-  /**
-   * @param string
-   */
-  public function setKmsKey($kmsKey)
-  {
-    $this->kmsKey = $kmsKey;
-  }
-  /**
-   * @return string
-   */
-  public function getKmsKey()
-  {
-    return $this->kmsKey;
   }
   /**
    * @param string[]
@@ -385,34 +232,6 @@ class Instance extends \Google\Collection
   /**
    * @param string
    */
-  public function setMachineType($machineType)
-  {
-    $this->machineType = $machineType;
-  }
-  /**
-   * @return string
-   */
-  public function getMachineType()
-  {
-    return $this->machineType;
-  }
-  /**
-   * @param string[]
-   */
-  public function setMetadata($metadata)
-  {
-    $this->metadata = $metadata;
-  }
-  /**
-   * @return string[]
-   */
-  public function getMetadata()
-  {
-    return $this->metadata;
-  }
-  /**
-   * @param string
-   */
   public function setName($name)
   {
     $this->name = $name;
@@ -423,90 +242,6 @@ class Instance extends \Google\Collection
   public function getName()
   {
     return $this->name;
-  }
-  /**
-   * @param string
-   */
-  public function setNetwork($network)
-  {
-    $this->network = $network;
-  }
-  /**
-   * @return string
-   */
-  public function getNetwork()
-  {
-    return $this->network;
-  }
-  /**
-   * @param string
-   */
-  public function setNicType($nicType)
-  {
-    $this->nicType = $nicType;
-  }
-  /**
-   * @return string
-   */
-  public function getNicType()
-  {
-    return $this->nicType;
-  }
-  /**
-   * @param bool
-   */
-  public function setNoProxyAccess($noProxyAccess)
-  {
-    $this->noProxyAccess = $noProxyAccess;
-  }
-  /**
-   * @return bool
-   */
-  public function getNoProxyAccess()
-  {
-    return $this->noProxyAccess;
-  }
-  /**
-   * @param bool
-   */
-  public function setNoPublicIp($noPublicIp)
-  {
-    $this->noPublicIp = $noPublicIp;
-  }
-  /**
-   * @return bool
-   */
-  public function getNoPublicIp()
-  {
-    return $this->noPublicIp;
-  }
-  /**
-   * @param bool
-   */
-  public function setNoRemoveDataDisk($noRemoveDataDisk)
-  {
-    $this->noRemoveDataDisk = $noRemoveDataDisk;
-  }
-  /**
-   * @return bool
-   */
-  public function getNoRemoveDataDisk()
-  {
-    return $this->noRemoveDataDisk;
-  }
-  /**
-   * @param string
-   */
-  public function setPostStartupScript($postStartupScript)
-  {
-    $this->postStartupScript = $postStartupScript;
-  }
-  /**
-   * @return string
-   */
-  public function getPostStartupScript()
-  {
-    return $this->postStartupScript;
   }
   /**
    * @param string
@@ -523,60 +258,32 @@ class Instance extends \Google\Collection
     return $this->proxyUri;
   }
   /**
-   * @param ReservationAffinity
+   * @param bool
    */
-  public function setReservationAffinity(ReservationAffinity $reservationAffinity)
+  public function setSatisfiesPzi($satisfiesPzi)
   {
-    $this->reservationAffinity = $reservationAffinity;
+    $this->satisfiesPzi = $satisfiesPzi;
   }
   /**
-   * @return ReservationAffinity
+   * @return bool
    */
-  public function getReservationAffinity()
+  public function getSatisfiesPzi()
   {
-    return $this->reservationAffinity;
+    return $this->satisfiesPzi;
   }
   /**
-   * @param string
+   * @param bool
    */
-  public function setServiceAccount($serviceAccount)
+  public function setSatisfiesPzs($satisfiesPzs)
   {
-    $this->serviceAccount = $serviceAccount;
+    $this->satisfiesPzs = $satisfiesPzs;
   }
   /**
-   * @return string
+   * @return bool
    */
-  public function getServiceAccount()
+  public function getSatisfiesPzs()
   {
-    return $this->serviceAccount;
-  }
-  /**
-   * @param string[]
-   */
-  public function setServiceAccountScopes($serviceAccountScopes)
-  {
-    $this->serviceAccountScopes = $serviceAccountScopes;
-  }
-  /**
-   * @return string[]
-   */
-  public function getServiceAccountScopes()
-  {
-    return $this->serviceAccountScopes;
-  }
-  /**
-   * @param ShieldedInstanceConfig
-   */
-  public function setShieldedInstanceConfig(ShieldedInstanceConfig $shieldedInstanceConfig)
-  {
-    $this->shieldedInstanceConfig = $shieldedInstanceConfig;
-  }
-  /**
-   * @return ShieldedInstanceConfig
-   */
-  public function getShieldedInstanceConfig()
-  {
-    return $this->shieldedInstanceConfig;
+    return $this->satisfiesPzs;
   }
   /**
    * @param string
@@ -595,30 +302,16 @@ class Instance extends \Google\Collection
   /**
    * @param string
    */
-  public function setSubnet($subnet)
+  public function setThirdPartyProxyUrl($thirdPartyProxyUrl)
   {
-    $this->subnet = $subnet;
+    $this->thirdPartyProxyUrl = $thirdPartyProxyUrl;
   }
   /**
    * @return string
    */
-  public function getSubnet()
+  public function getThirdPartyProxyUrl()
   {
-    return $this->subnet;
-  }
-  /**
-   * @param string[]
-   */
-  public function setTags($tags)
-  {
-    $this->tags = $tags;
-  }
-  /**
-   * @return string[]
-   */
-  public function getTags()
-  {
-    return $this->tags;
+    return $this->thirdPartyProxyUrl;
   }
   /**
    * @param string
@@ -647,20 +340,6 @@ class Instance extends \Google\Collection
   public function getUpgradeHistory()
   {
     return $this->upgradeHistory;
-  }
-  /**
-   * @param VmImage
-   */
-  public function setVmImage(VmImage $vmImage)
-  {
-    $this->vmImage = $vmImage;
-  }
-  /**
-   * @return VmImage
-   */
-  public function getVmImage()
-  {
-    return $this->vmImage;
   }
 }
 

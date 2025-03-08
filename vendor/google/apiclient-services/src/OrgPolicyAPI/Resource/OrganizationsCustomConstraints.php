@@ -42,6 +42,7 @@ class OrganizationsCustomConstraints extends \Google\Service\Resource
    * @param GoogleCloudOrgpolicyV2CustomConstraint $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudOrgpolicyV2CustomConstraint
+   * @throws \Google\Service\Exception
    */
   public function create($parent, GoogleCloudOrgpolicyV2CustomConstraint $postBody, $optParams = [])
   {
@@ -58,6 +59,7 @@ class OrganizationsCustomConstraints extends \Google\Service\Resource
    * the custom constraint entry for naming rules.
    * @param array $optParams Optional parameters.
    * @return GoogleProtobufEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -66,14 +68,15 @@ class OrganizationsCustomConstraints extends \Google\Service\Resource
     return $this->call('delete', [$params], GoogleProtobufEmpty::class);
   }
   /**
-   * Gets a custom constraint. Returns a `google.rpc.Status` with
-   * `google.rpc.Code.NOT_FOUND` if the custom constraint does not exist.
-   * (customConstraints.get)
+   * Gets a custom or managed constraint. Returns a `google.rpc.Status` with
+   * `google.rpc.Code.NOT_FOUND` if the custom or managed constraint does not
+   * exist. (customConstraints.get)
    *
-   * @param string $name Required. Resource name of the custom constraint. See the
-   * custom constraint entry for naming requirements.
+   * @param string $name Required. Resource name of the custom or managed
+   * constraint. See the custom constraint entry for naming requirements.
    * @param array $optParams Optional parameters.
    * @return GoogleCloudOrgpolicyV2CustomConstraint
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -97,6 +100,7 @@ class OrganizationsCustomConstraints extends \Google\Service\Resource
    * is currently unsupported and will be ignored. The server may at any point
    * start using this field.
    * @return GoogleCloudOrgpolicyV2ListCustomConstraintsResponse
+   * @throws \Google\Service\Exception
    */
   public function listOrganizationsCustomConstraints($parent, $optParams = [])
   {
@@ -119,6 +123,7 @@ class OrganizationsCustomConstraints extends \Google\Service\Resource
    * @param GoogleCloudOrgpolicyV2CustomConstraint $postBody
    * @param array $optParams Optional parameters.
    * @return GoogleCloudOrgpolicyV2CustomConstraint
+   * @throws \Google\Service\Exception
    */
   public function patch($name, GoogleCloudOrgpolicyV2CustomConstraint $postBody, $optParams = [])
   {

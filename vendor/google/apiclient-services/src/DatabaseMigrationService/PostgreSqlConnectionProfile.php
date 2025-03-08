@@ -22,7 +22,15 @@ class PostgreSqlConnectionProfile extends \Google\Model
   /**
    * @var string
    */
+  public $alloydbClusterId;
+  /**
+   * @var string
+   */
   public $cloudSqlId;
+  /**
+   * @var string
+   */
+  public $database;
   /**
    * @var string
    */
@@ -57,6 +65,20 @@ class PostgreSqlConnectionProfile extends \Google\Model
   /**
    * @param string
    */
+  public function setAlloydbClusterId($alloydbClusterId)
+  {
+    $this->alloydbClusterId = $alloydbClusterId;
+  }
+  /**
+   * @return string
+   */
+  public function getAlloydbClusterId()
+  {
+    return $this->alloydbClusterId;
+  }
+  /**
+   * @param string
+   */
   public function setCloudSqlId($cloudSqlId)
   {
     $this->cloudSqlId = $cloudSqlId;
@@ -67,6 +89,20 @@ class PostgreSqlConnectionProfile extends \Google\Model
   public function getCloudSqlId()
   {
     return $this->cloudSqlId;
+  }
+  /**
+   * @param string
+   */
+  public function setDatabase($database)
+  {
+    $this->database = $database;
+  }
+  /**
+   * @return string
+   */
+  public function getDatabase()
+  {
+    return $this->database;
   }
   /**
    * @param string

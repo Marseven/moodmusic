@@ -44,6 +44,7 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * @param AuthorizedOrgsDesc $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function create($parent, AuthorizedOrgsDesc $postBody, $optParams = [])
   {
@@ -61,6 +62,7 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * `accessPolicies/{policy_id}/authorizedOrgsDesc/{authorized_orgs_desc_id}`
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -77,6 +79,7 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * `accessPolicies/{policy_id}/authorizedOrgsDescs/{authorized_orgs_descs_id}`
    * @param array $optParams Optional parameters.
    * @return AuthorizedOrgsDesc
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -97,6 +100,7 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * @opt_param string pageToken Next page token for the next batch of Authorized
    * Orgs Desc instances. Defaults to the first page of results.
    * @return ListAuthorizedOrgsDescsResponse
+   * @throws \Google\Service\Exception
    */
   public function listAccessPoliciesAuthorizedOrgsDescs($parent, $optParams = [])
   {
@@ -112,7 +116,8 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * `AuthorizedOrgsDesc` can be updated. The name, authorization_type, asset_type
    * and authorization_direction cannot be updated. (authorizedOrgsDescs.patch)
    *
-   * @param string $name Resource name for the `AuthorizedOrgsDesc`. Format:
+   * @param string $name Identifier. Resource name for the `AuthorizedOrgsDesc`.
+   * Format:
    * `accessPolicies/{access_policy}/authorizedOrgsDescs/{authorized_orgs_desc}`.
    * The `authorized_orgs_desc` component must begin with a letter, followed by
    * alphanumeric characters or `_`. After you create an `AuthorizedOrgsDesc`, you
@@ -123,6 +128,7 @@ class AccessPoliciesAuthorizedOrgsDescs extends \Google\Service\Resource
    * @opt_param string updateMask Required. Mask to control which fields get
    * updated. Must be non-empty.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function patch($name, AuthorizedOrgsDesc $postBody, $optParams = [])
   {

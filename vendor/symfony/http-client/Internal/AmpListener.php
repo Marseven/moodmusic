@@ -28,6 +28,7 @@ class AmpListener implements EventListener
     private array $info;
     private array $pinSha256;
     private \Closure $onProgress;
+    /** @var resource|null */
     private $handle;
 
     public function __construct(array &$info, array $pinSha256, \Closure $onProgress, &$handle)
@@ -50,7 +51,7 @@ class AmpListener implements EventListener
 
     public function startRequest(Request $request): Promise
     {
-        $this->info['start_time'] = $this->info['start_time'] ?? microtime(true);
+        $this->info['start_time'] ??= microtime(true);
         ($this->onProgress)();
 
         return new Success();
@@ -80,12 +81,12 @@ class AmpListener implements EventListener
     public function startSendingRequest(Request $request, Stream $stream): Promise
     {
         $host = $stream->getRemoteAddress()->getHost();
+        $this->info['primary_ip'] = $host;
 
-        if (false !== strpos($host, ':')) {
+        if (str_contains($host, ':')) {
             $host = '['.$host.']';
         }
 
-        $this->info['primary_ip'] = $host;
         $this->info['primary_port'] = $stream->getRemoteAddress()->getPort();
         $this->info['pretransfer_time'] = microtime(true) - $this->info['start_time'];
         $this->info['debug'] .= sprintf("* Connected to %s (%s) port %d\n", $request->getUri()->getHost(), $host, $this->info['primary_port']);

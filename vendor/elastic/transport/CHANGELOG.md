@@ -1,5 +1,30 @@
 # Changelog
 
+## 8.10.0 (2024-08-14)
+
+- Added the OpenTelemetry support
+  [#27](https://github.com/elastic/elastic-transport-php/pull/27)
+- Refactored the OpenTelemetry using PSR-7 attributes
+  [2be33cd](https://github.com/elastic/elastic-transport-php/commit/2be33cdc8be161fc7dc9a1989da5d550ffc4a230)
+
+## 8.8.0 (2023-11-08)
+
+- Support path in host connection URI
+  [#21](https://github.com/elastic/elastic-transport-php/pull/21)
+
+- Support userInfo in host connection URI
+  [#22](https://github.com/elastic/elastic-transport-php/pull/22)
+
+## 8.7.0 (2023-05-23)
+
+- Allow installation of psr/http-message v2.0
+  [#17](https://github.com/elastic/elastic-transport-php/pull/17)
+
+## 8.6.0 (2023-01-12)
+
+- Add full request and response to the log message context for better integration using [Clockwork](https://underground.works/clockwork/)
+  [#13](https://github.com/elastic/elastic-transport-php/pull/13)
+
 ## 8.5.0 (2022-10-14)
 
 - Release created to be compatible with 8.5 Elastic clients

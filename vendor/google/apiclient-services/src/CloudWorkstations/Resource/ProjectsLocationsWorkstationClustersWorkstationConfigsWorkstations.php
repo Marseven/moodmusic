@@ -47,10 +47,11 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param Workstation $postBody
    * @param array $optParams Optional parameters.
    *
-   * @opt_param bool validateOnly If set, validate the request and preview the
-   * review, but do not actually apply it.
+   * @opt_param bool validateOnly Optional. If set, validate the request and
+   * preview the review, but do not actually apply it.
    * @opt_param string workstationId Required. ID to use for the workstation.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function create($parent, Workstation $postBody, $optParams = [])
   {
@@ -64,11 +65,12 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param string $name Required. Name of the workstation to delete.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param string etag If set, the request will be rejected if the latest
-   * version of the workstation on the server does not have this ETag.
-   * @opt_param bool validateOnly If set, validate the request and preview the
-   * review, but do not actually apply it.
+   * @opt_param string etag Optional. If set, the request will be rejected if the
+   * latest version of the workstation on the server does not have this ETag.
+   * @opt_param bool validateOnly Optional. If set, validate the request and
+   * preview the review, but do not actually apply it.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -78,13 +80,16 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
   }
   /**
    * Returns a short-lived credential that can be used to send authenticated and
-   * authorized traffic to a workstation. (workstations.generateAccessToken)
+   * authorized traffic to a workstation. Once generated this token cannot be
+   * revoked and is good for the lifetime of the token.
+   * (workstations.generateAccessToken)
    *
    * @param string $workstation Required. Name of the workstation for which the
    * access token should be generated.
    * @param GenerateAccessTokenRequest $postBody
    * @param array $optParams Optional parameters.
    * @return GenerateAccessTokenResponse
+   * @throws \Google\Service\Exception
    */
   public function generateAccessToken($workstation, GenerateAccessTokenRequest $postBody, $optParams = [])
   {
@@ -98,6 +103,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param string $name Required. Name of the requested resource.
    * @param array $optParams Optional parameters.
    * @return Workstation
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -128,6 +134,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * documentation](https://cloud.google.com/iam/help/conditions/resource-
    * policies).
    * @return Policy
+   * @throws \Google\Service\Exception
    */
   public function getIamPolicy($resource, $optParams = [])
   {
@@ -143,10 +150,11 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param string $parent Required. Parent resource name.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int pageSize Maximum number of items to return.
-   * @opt_param string pageToken next_page_token value returned from a previous
-   * List request, if any.
+   * @opt_param int pageSize Optional. Maximum number of items to return.
+   * @opt_param string pageToken Optional. next_page_token value returned from a
+   * previous List request, if any.
    * @return ListWorkstationsResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations($parent, $optParams = [])
   {
@@ -162,10 +170,11 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param string $parent Required. Parent resource name.
    * @param array $optParams Optional parameters.
    *
-   * @opt_param int pageSize Maximum number of items to return.
-   * @opt_param string pageToken next_page_token value returned from a previous
-   * List request, if any.
+   * @opt_param int pageSize Optional. Maximum number of items to return.
+   * @opt_param string pageToken Optional. next_page_token value returned from a
+   * previous List request, if any.
    * @return ListUsableWorkstationsResponse
+   * @throws \Google\Service\Exception
    */
   public function listUsable($parent, $optParams = [])
   {
@@ -176,18 +185,19 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
   /**
    * Updates an existing workstation. (workstations.patch)
    *
-   * @param string $name Full name of this resource.
+   * @param string $name Identifier. Full name of this workstation.
    * @param Workstation $postBody
    * @param array $optParams Optional parameters.
    *
-   * @opt_param bool allowMissing If set and the workstation configuration is not
-   * found, a new workstation configuration is created. In this situation,
-   * update_mask is ignored.
+   * @opt_param bool allowMissing Optional. If set and the workstation
+   * configuration is not found, a new workstation configuration is created. In
+   * this situation, update_mask is ignored.
    * @opt_param string updateMask Required. Mask specifying which fields in the
    * workstation configuration should be updated.
-   * @opt_param bool validateOnly If set, validate the request and preview the
-   * review, but do not actually apply it.
+   * @opt_param bool validateOnly Optional. If set, validate the request and
+   * preview the review, but do not actually apply it.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function patch($name, Workstation $postBody, $optParams = [])
   {
@@ -207,6 +217,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param SetIamPolicyRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Policy
+   * @throws \Google\Service\Exception
    */
   public function setIamPolicy($resource, SetIamPolicyRequest $postBody, $optParams = [])
   {
@@ -222,6 +233,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param StartWorkstationRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function start($name, StartWorkstationRequest $postBody, $optParams = [])
   {
@@ -236,6 +248,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param StopWorkstationRequest $postBody
    * @param array $optParams Optional parameters.
    * @return Operation
+   * @throws \Google\Service\Exception
    */
   public function stop($name, StopWorkstationRequest $postBody, $optParams = [])
   {
@@ -258,6 +271,7 @@ class ProjectsLocationsWorkstationClustersWorkstationConfigsWorkstations extends
    * @param TestIamPermissionsRequest $postBody
    * @param array $optParams Optional parameters.
    * @return TestIamPermissionsResponse
+   * @throws \Google\Service\Exception
    */
   public function testIamPermissions($resource, TestIamPermissionsRequest $postBody, $optParams = [])
   {

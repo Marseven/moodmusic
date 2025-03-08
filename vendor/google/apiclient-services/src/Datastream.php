@@ -45,6 +45,7 @@ class Datastream extends \Google\Service
   public $projects_locations_privateConnections_routes;
   public $projects_locations_streams;
   public $projects_locations_streams_objects;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Datastream service.
@@ -57,6 +58,7 @@ class Datastream extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://datastream.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://datastream.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -576,6 +578,16 @@ class Datastream extends \Google\Service
                 'validateOnly' => [
                   'location' => 'query',
                   'type' => 'boolean',
+                ],
+              ],
+            ],'run' => [
+              'path' => 'v1/{+name}:run',
+              'httpMethod' => 'POST',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
                 ],
               ],
             ],

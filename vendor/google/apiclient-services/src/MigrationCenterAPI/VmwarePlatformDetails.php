@@ -22,6 +22,10 @@ class VmwarePlatformDetails extends \Google\Model
   /**
    * @var string
    */
+  public $esxHyperthreading;
+  /**
+   * @var string
+   */
   public $esxVersion;
   /**
    * @var string
@@ -30,8 +34,34 @@ class VmwarePlatformDetails extends \Google\Model
   /**
    * @var string
    */
+  public $vcenterFolder;
+  /**
+   * @var string
+   */
+  public $vcenterUri;
+  /**
+   * @var string
+   */
   public $vcenterVersion;
+  /**
+   * @var string
+   */
+  public $vcenterVmId;
 
+  /**
+   * @param string
+   */
+  public function setEsxHyperthreading($esxHyperthreading)
+  {
+    $this->esxHyperthreading = $esxHyperthreading;
+  }
+  /**
+   * @return string
+   */
+  public function getEsxHyperthreading()
+  {
+    return $this->esxHyperthreading;
+  }
   /**
    * @param string
    */
@@ -63,6 +93,34 @@ class VmwarePlatformDetails extends \Google\Model
   /**
    * @param string
    */
+  public function setVcenterFolder($vcenterFolder)
+  {
+    $this->vcenterFolder = $vcenterFolder;
+  }
+  /**
+   * @return string
+   */
+  public function getVcenterFolder()
+  {
+    return $this->vcenterFolder;
+  }
+  /**
+   * @param string
+   */
+  public function setVcenterUri($vcenterUri)
+  {
+    $this->vcenterUri = $vcenterUri;
+  }
+  /**
+   * @return string
+   */
+  public function getVcenterUri()
+  {
+    return $this->vcenterUri;
+  }
+  /**
+   * @param string
+   */
   public function setVcenterVersion($vcenterVersion)
   {
     $this->vcenterVersion = $vcenterVersion;
@@ -73,6 +131,20 @@ class VmwarePlatformDetails extends \Google\Model
   public function getVcenterVersion()
   {
     return $this->vcenterVersion;
+  }
+  /**
+   * @param string
+   */
+  public function setVcenterVmId($vcenterVmId)
+  {
+    $this->vcenterVmId = $vcenterVmId;
+  }
+  /**
+   * @return string
+   */
+  public function getVcenterVmId()
+  {
+    return $this->vcenterVmId;
   }
 }
 

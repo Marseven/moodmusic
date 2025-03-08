@@ -22,12 +22,52 @@ class DeliverInfo extends \Google\Model
   /**
    * @var string
    */
+  public $ipAddress;
+  /**
+   * @var string
+   */
+  public $pscGoogleApiTarget;
+  /**
+   * @var string
+   */
   public $resourceUri;
+  /**
+   * @var string
+   */
+  public $storageBucket;
   /**
    * @var string
    */
   public $target;
 
+  /**
+   * @param string
+   */
+  public function setIpAddress($ipAddress)
+  {
+    $this->ipAddress = $ipAddress;
+  }
+  /**
+   * @return string
+   */
+  public function getIpAddress()
+  {
+    return $this->ipAddress;
+  }
+  /**
+   * @param string
+   */
+  public function setPscGoogleApiTarget($pscGoogleApiTarget)
+  {
+    $this->pscGoogleApiTarget = $pscGoogleApiTarget;
+  }
+  /**
+   * @return string
+   */
+  public function getPscGoogleApiTarget()
+  {
+    return $this->pscGoogleApiTarget;
+  }
   /**
    * @param string
    */
@@ -41,6 +81,20 @@ class DeliverInfo extends \Google\Model
   public function getResourceUri()
   {
     return $this->resourceUri;
+  }
+  /**
+   * @param string
+   */
+  public function setStorageBucket($storageBucket)
+  {
+    $this->storageBucket = $storageBucket;
+  }
+  /**
+   * @return string
+   */
+  public function getStorageBucket()
+  {
+    return $this->storageBucket;
   }
   /**
    * @param string

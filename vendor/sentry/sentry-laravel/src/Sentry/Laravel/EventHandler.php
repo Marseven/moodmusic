@@ -14,7 +14,6 @@ use Illuminate\Database\Events as DatabaseEvents;
 use Illuminate\Http\Client\Events as HttpClientEvents;
 use Illuminate\Http\Request;
 use Illuminate\Log\Events as LogEvents;
-use Illuminate\Queue\Events as QueueEvents;
 use Illuminate\Routing\Events as RoutingEvents;
 use Laravel\Octane\Events as Octane;
 use Laravel\Sanctum\Events as Sanctum;
@@ -53,18 +52,6 @@ class EventHandler
     protected static $authEventHandlerMap = [
         AuthEvents\Authenticated::class => 'authenticated',
         Sanctum\TokenAuthenticated::class => 'sanctumTokenAuthenticated', // Since Sanctum 2.13
-    ];
-
-    /**
-     * Map queue event handlers to events.
-     *
-     * @var array
-     */
-    protected static $queueEventHandlerMap = [
-        QueueEvents\JobProcessed::class => 'queueJobProcessed',
-        QueueEvents\JobProcessing::class => 'queueJobProcessing',
-        QueueEvents\WorkerStopping::class => 'queueWorkerStopping',
-        QueueEvents\JobExceptionOccurred::class => 'queueJobExceptionOccurred',
     ];
 
     /**
@@ -115,13 +102,6 @@ class EventHandler
     private $recordLaravelLogs;
 
     /**
-     * Indicates if we should add queue info to the breadcrumbs.
-     *
-     * @var bool
-     */
-    private $recordQueueInfo;
-
-    /**
      * Indicates if we should add command info to the breadcrumbs.
      *
      * @var bool
@@ -150,13 +130,6 @@ class EventHandler
     private $recordHttpClientRequests;
 
     /**
-     * Indicates if we pushed a scope for the queue.
-     *
-     * @var int
-     */
-    private $pushedQueueScopeCount = 0;
-
-    /**
      * Indicates if we pushed a scope for Octane.
      *
      * @var bool
@@ -176,7 +149,6 @@ class EventHandler
         $this->recordSqlQueries = ($config['breadcrumbs.sql_queries'] ?? $config['breadcrumbs']['sql_queries'] ?? true) === true;
         $this->recordSqlBindings = ($config['breadcrumbs.sql_bindings'] ?? $config['breadcrumbs']['sql_bindings'] ?? false) === true;
         $this->recordLaravelLogs = ($config['breadcrumbs.logs'] ?? $config['breadcrumbs']['logs'] ?? true) === true;
-        $this->recordQueueInfo = ($config['breadcrumbs.queue_info'] ?? $config['breadcrumbs']['queue_info'] ?? true) === true;
         $this->recordCommandInfo = ($config['breadcrumbs.command_info'] ?? $config['breadcrumbs']['command_info'] ?? true) === true;
         $this->recordOctaneTickInfo = ($config['breadcrumbs.octane_tick_info'] ?? $config['breadcrumbs']['octane_tick_info'] ?? true) === true;
         $this->recordOctaneTaskInfo = ($config['breadcrumbs.octane_task_info'] ?? $config['breadcrumbs']['octane_task_info'] ?? true) === true;
@@ -204,21 +176,11 @@ class EventHandler
     }
 
     /**
-     * Attach all queue event handlers.
+     * Attach all Octane event handlers.
      */
     public function subscribeOctaneEvents(Dispatcher $dispatcher): void
     {
         foreach (static::$octaneEventHandlerMap as $eventName => $handler) {
-            $dispatcher->listen($eventName, [$this, $handler]);
-        }
-    }
-
-    /**
-     * Attach all queue event handlers.
-     */
-    public function subscribeQueueEvents(Dispatcher $dispatcher): void
-    {
-        foreach (static::$queueEventHandlerMap as $eventName => $handler) {
             $dispatcher->listen($eventName, [$this, $handler]);
         }
     }
@@ -238,7 +200,7 @@ class EventHandler
         }
 
         try {
-            call_user_func_array([$this, $handlerMethod], $arguments);
+            $this->{$handlerMethod}(...$arguments);
         } catch (Exception $exception) {
             // Ignore
         }
@@ -246,6 +208,14 @@ class EventHandler
 
     protected function routeMatchedHandler(RoutingEvents\RouteMatched $match): void
     {
+        $routeAlias = $match->route->action['as'] ?? '';
+
+        // Ignore the route if it is the route for the Laravel Folio package
+        // We handle that route separately in the FolioPackageIntegration
+        if ($routeAlias === 'laravel-folio') {
+            return;
+        }
+
         [$routeName] = Integration::extractNameAndSourceForRoute($match->route);
 
         Integration::addBreadcrumb(new Breadcrumb(
@@ -277,7 +247,7 @@ class EventHandler
         Integration::addBreadcrumb(new Breadcrumb(
             Breadcrumb::LEVEL_INFO,
             Breadcrumb::TYPE_DEFAULT,
-            'sql.query',
+            'db.sql.query',
             $query->sql,
             $data
         ));
@@ -325,10 +295,12 @@ class EventHandler
             null,
             [
                 'url' => $this->getPartialUri($fullUri),
-                'method' => $event->request->method(),
-                'status_code' => $event->response->status(),
+                'http.request.method' => $event->request->method(),
+                'http.response.status_code' => $event->response->status(),
                 'http.query' => $fullUri->getQuery(),
                 'http.fragment' => $fullUri->getFragment(),
+                'http.request.body.size' => $event->request->toPsrRequest()->getBody()->getSize(),
+                'http.response.body.size' => $event->response->toPsrResponse()->getBody()->getSize(),
             ]
         ));
     }
@@ -348,9 +320,10 @@ class EventHandler
             null,
             [
                 'url' => $this->getPartialUri($fullUri),
-                'method' => $event->request->method(),
+                'http.request.method' => $event->request->method(),
                 'http.query' => $fullUri->getQuery(),
                 'http.fragment' => $fullUri->getFragment(),
+                'http.request.body.size' => $event->request->toPsrRequest()->getBody()->getSize(),
             ]
         ));
     }
@@ -405,57 +378,6 @@ class EventHandler
         Integration::configureScope(static function (Scope $scope) use ($userData): void {
             $scope->setUser(array_filter($userData));
         });
-    }
-
-    protected function queueJobProcessingHandler(QueueEvents\JobProcessing $event): void
-    {
-        $this->cleanupScopeForTaskWithinLongRunningProcessWhen($this->pushedQueueScopeCount > 0);
-
-        $this->prepareScopeForTaskWithinLongRunningProcess();
-
-        ++$this->pushedQueueScopeCount;
-
-        if (!$this->recordQueueInfo) {
-            return;
-        }
-
-        $job = [
-            'job' => $event->job->getName(),
-            'queue' => $event->job->getQueue(),
-            'attempts' => $event->job->attempts(),
-            'connection' => $event->connectionName,
-        ];
-
-        // Resolve name exists only from Laravel 5.3+
-        if (method_exists($event->job, 'resolveName')) {
-            $job['resolved'] = $event->job->resolveName();
-        }
-
-        Integration::addBreadcrumb(new Breadcrumb(
-            Breadcrumb::LEVEL_INFO,
-            Breadcrumb::TYPE_DEFAULT,
-            'queue.job',
-            'Processing queue job',
-            $job
-        ));
-    }
-
-    protected function queueJobExceptionOccurredHandler(QueueEvents\JobExceptionOccurred $event): void
-    {
-        $this->afterTaskWithinLongRunningProcess();
-    }
-
-    protected function queueJobProcessedHandler(QueueEvents\JobProcessed $event): void
-    {
-        $this->cleanupScopeForTaskWithinLongRunningProcessWhen($this->pushedQueueScopeCount > 0);
-
-        $this->afterTaskWithinLongRunningProcess();
-    }
-
-    protected function queueWorkerStoppingHandler(QueueEvents\WorkerStopping $event): void
-    {
-        // Flush any and all events that were possibly generated by queue jobs
-        Integration::flushEvents();
     }
 
     protected function commandStartingHandler(ConsoleEvents\CommandStarting $event): void
@@ -630,7 +552,6 @@ class EventHandler
      */
     private function afterTaskWithinLongRunningProcess(): void
     {
-        // Flush any and all events that were possibly generated by queue jobs
         Integration::flushEvents();
     }
 

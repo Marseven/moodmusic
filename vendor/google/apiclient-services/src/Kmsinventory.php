@@ -41,6 +41,7 @@ class Kmsinventory extends \Google\Service
   public $organizations_protectedResources;
   public $projects_cryptoKeys;
   public $projects_locations_keyRings_cryptoKeys;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Kmsinventory service.
@@ -53,6 +54,7 @@ class Kmsinventory extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://kmsinventory.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://kmsinventory.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1';
@@ -84,6 +86,11 @@ class Kmsinventory extends \Google\Service
                 'pageToken' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+                'resourceTypes' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                  'repeated' => true,
                 ],
               ],
             ],

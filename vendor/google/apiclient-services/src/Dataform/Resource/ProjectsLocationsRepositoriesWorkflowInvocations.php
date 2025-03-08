@@ -41,6 +41,7 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * @param CancelWorkflowInvocationRequest $postBody
    * @param array $optParams Optional parameters.
    * @return DataformEmpty
+   * @throws \Google\Service\Exception
    */
   public function cancel($name, CancelWorkflowInvocationRequest $postBody, $optParams = [])
   {
@@ -57,6 +58,7 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * @param WorkflowInvocation $postBody
    * @param array $optParams Optional parameters.
    * @return WorkflowInvocation
+   * @throws \Google\Service\Exception
    */
   public function create($parent, WorkflowInvocation $postBody, $optParams = [])
   {
@@ -70,6 +72,7 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * @param string $name Required. The workflow invocation resource's name.
    * @param array $optParams Optional parameters.
    * @return DataformEmpty
+   * @throws \Google\Service\Exception
    */
   public function delete($name, $optParams = [])
   {
@@ -83,6 +86,7 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * @param string $name Required. The workflow invocation resource's name.
    * @param array $optParams Optional parameters.
    * @return WorkflowInvocation
+   * @throws \Google\Service\Exception
    */
   public function get($name, $optParams = [])
   {
@@ -107,9 +111,11 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * server will pick an appropriate default.
    * @opt_param string pageToken Optional. Page token received from a previous
    * `ListWorkflowInvocations` call. Provide this to retrieve the subsequent page.
-   * When paginating, all other parameters provided to `ListWorkflowInvocations`
-   * must match the call that provided the page token.
+   * When paginating, all other parameters provided to `ListWorkflowInvocations`,
+   * with the exception of `page_size`, must match the call that provided the page
+   * token.
    * @return ListWorkflowInvocationsResponse
+   * @throws \Google\Service\Exception
    */
   public function listProjectsLocationsRepositoriesWorkflowInvocations($parent, $optParams = [])
   {
@@ -130,9 +136,10 @@ class ProjectsLocationsRepositoriesWorkflowInvocations extends \Google\Service\R
    * @opt_param string pageToken Optional. Page token received from a previous
    * `QueryWorkflowInvocationActions` call. Provide this to retrieve the
    * subsequent page. When paginating, all other parameters provided to
-   * `QueryWorkflowInvocationActions` must match the call that provided the page
-   * token.
+   * `QueryWorkflowInvocationActions`, with the exception of `page_size`, must
+   * match the call that provided the page token.
    * @return QueryWorkflowInvocationActionsResponse
+   * @throws \Google\Service\Exception
    */
   public function query($name, $optParams = [])
   {

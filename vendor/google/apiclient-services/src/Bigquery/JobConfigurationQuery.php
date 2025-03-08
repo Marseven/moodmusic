@@ -82,6 +82,10 @@ class JobConfigurationQuery extends \Google\Collection
    * @var string[]
    */
   public $schemaUpdateOptions;
+  protected $scriptOptionsType = ScriptOptions::class;
+  protected $scriptOptionsDataType = '';
+  protected $systemVariablesType = SystemVariables::class;
+  protected $systemVariablesDataType = '';
   protected $tableDefinitionsType = ExternalDataConfiguration::class;
   protected $tableDefinitionsDataType = 'map';
   protected $timePartitioningType = TimePartitioning::class;
@@ -100,6 +104,10 @@ class JobConfigurationQuery extends \Google\Collection
    * @var string
    */
   public $writeDisposition;
+  /**
+   * @var bool
+   */
+  public $writeIncrementalResults;
 
   /**
    * @param bool
@@ -368,6 +376,34 @@ class JobConfigurationQuery extends \Google\Collection
     return $this->schemaUpdateOptions;
   }
   /**
+   * @param ScriptOptions
+   */
+  public function setScriptOptions(ScriptOptions $scriptOptions)
+  {
+    $this->scriptOptions = $scriptOptions;
+  }
+  /**
+   * @return ScriptOptions
+   */
+  public function getScriptOptions()
+  {
+    return $this->scriptOptions;
+  }
+  /**
+   * @param SystemVariables
+   */
+  public function setSystemVariables(SystemVariables $systemVariables)
+  {
+    $this->systemVariables = $systemVariables;
+  }
+  /**
+   * @return SystemVariables
+   */
+  public function getSystemVariables()
+  {
+    return $this->systemVariables;
+  }
+  /**
    * @param ExternalDataConfiguration[]
    */
   public function setTableDefinitions($tableDefinitions)
@@ -450,6 +486,20 @@ class JobConfigurationQuery extends \Google\Collection
   public function getWriteDisposition()
   {
     return $this->writeDisposition;
+  }
+  /**
+   * @param bool
+   */
+  public function setWriteIncrementalResults($writeIncrementalResults)
+  {
+    $this->writeIncrementalResults = $writeIncrementalResults;
+  }
+  /**
+   * @return bool
+   */
+  public function getWriteIncrementalResults()
+  {
+    return $this->writeIncrementalResults;
   }
 }
 

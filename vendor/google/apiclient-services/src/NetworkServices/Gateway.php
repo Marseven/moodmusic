@@ -39,7 +39,15 @@ class Gateway extends \Google\Collection
   /**
    * @var string
    */
+  public $envoyHeaders;
+  /**
+   * @var string
+   */
   public $gatewaySecurityPolicy;
+  /**
+   * @var string
+   */
+  public $ipVersion;
   /**
    * @var string[]
    */
@@ -56,6 +64,10 @@ class Gateway extends \Google\Collection
    * @var int[]
    */
   public $ports;
+  /**
+   * @var string
+   */
+  public $routingMode;
   /**
    * @var string
    */
@@ -140,6 +152,20 @@ class Gateway extends \Google\Collection
   /**
    * @param string
    */
+  public function setEnvoyHeaders($envoyHeaders)
+  {
+    $this->envoyHeaders = $envoyHeaders;
+  }
+  /**
+   * @return string
+   */
+  public function getEnvoyHeaders()
+  {
+    return $this->envoyHeaders;
+  }
+  /**
+   * @param string
+   */
   public function setGatewaySecurityPolicy($gatewaySecurityPolicy)
   {
     $this->gatewaySecurityPolicy = $gatewaySecurityPolicy;
@@ -150,6 +176,20 @@ class Gateway extends \Google\Collection
   public function getGatewaySecurityPolicy()
   {
     return $this->gatewaySecurityPolicy;
+  }
+  /**
+   * @param string
+   */
+  public function setIpVersion($ipVersion)
+  {
+    $this->ipVersion = $ipVersion;
+  }
+  /**
+   * @return string
+   */
+  public function getIpVersion()
+  {
+    return $this->ipVersion;
   }
   /**
    * @param string[]
@@ -206,6 +246,20 @@ class Gateway extends \Google\Collection
   public function getPorts()
   {
     return $this->ports;
+  }
+  /**
+   * @param string
+   */
+  public function setRoutingMode($routingMode)
+  {
+    $this->routingMode = $routingMode;
+  }
+  /**
+   * @return string
+   */
+  public function getRoutingMode()
+  {
+    return $this->routingMode;
   }
   /**
    * @param string

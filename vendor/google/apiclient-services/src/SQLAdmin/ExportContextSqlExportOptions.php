@@ -25,11 +25,21 @@ class ExportContextSqlExportOptions extends \Google\Collection
   /**
    * @var bool
    */
+  public $parallel;
+  protected $postgresExportOptionsType = ExportContextSqlExportOptionsPostgresExportOptions::class;
+  protected $postgresExportOptionsDataType = '';
+  /**
+   * @var bool
+   */
   public $schemaOnly;
   /**
    * @var string[]
    */
   public $tables;
+  /**
+   * @var int
+   */
+  public $threads;
 
   /**
    * @param ExportContextSqlExportOptionsMysqlExportOptions
@@ -44,6 +54,34 @@ class ExportContextSqlExportOptions extends \Google\Collection
   public function getMysqlExportOptions()
   {
     return $this->mysqlExportOptions;
+  }
+  /**
+   * @param bool
+   */
+  public function setParallel($parallel)
+  {
+    $this->parallel = $parallel;
+  }
+  /**
+   * @return bool
+   */
+  public function getParallel()
+  {
+    return $this->parallel;
+  }
+  /**
+   * @param ExportContextSqlExportOptionsPostgresExportOptions
+   */
+  public function setPostgresExportOptions(ExportContextSqlExportOptionsPostgresExportOptions $postgresExportOptions)
+  {
+    $this->postgresExportOptions = $postgresExportOptions;
+  }
+  /**
+   * @return ExportContextSqlExportOptionsPostgresExportOptions
+   */
+  public function getPostgresExportOptions()
+  {
+    return $this->postgresExportOptions;
   }
   /**
    * @param bool
@@ -72,6 +110,20 @@ class ExportContextSqlExportOptions extends \Google\Collection
   public function getTables()
   {
     return $this->tables;
+  }
+  /**
+   * @param int
+   */
+  public function setThreads($threads)
+  {
+    $this->threads = $threads;
+  }
+  /**
+   * @return int
+   */
+  public function getThreads()
+  {
+    return $this->threads;
   }
 }
 

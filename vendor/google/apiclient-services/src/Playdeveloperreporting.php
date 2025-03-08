@@ -39,6 +39,7 @@ class Playdeveloperreporting extends \Google\Service
       "https://www.googleapis.com/auth/playdeveloperreporting";
 
   public $anomalies;
+  public $apps;
   public $vitals_anrrate;
   public $vitals_crashrate;
   public $vitals_errors_counts;
@@ -48,6 +49,7 @@ class Playdeveloperreporting extends \Google\Service
   public $vitals_slowrenderingrate;
   public $vitals_slowstartrate;
   public $vitals_stuckbackgroundwakelockrate;
+  public $rootUrlTemplate;
 
   /**
    * Constructs the internal representation of the Playdeveloperreporting
@@ -61,6 +63,7 @@ class Playdeveloperreporting extends \Google\Service
   {
     parent::__construct($clientOrConfig);
     $this->rootUrl = $rootUrl ?: 'https://playdeveloperreporting.googleapis.com/';
+    $this->rootUrlTemplate = $rootUrl ?: 'https://playdeveloperreporting.UNIVERSE_DOMAIN/';
     $this->servicePath = '';
     $this->batchPath = 'batch';
     $this->version = 'v1beta1';
@@ -85,6 +88,39 @@ class Playdeveloperreporting extends \Google\Service
                   'location' => 'query',
                   'type' => 'string',
                 ],
+                'pageSize' => [
+                  'location' => 'query',
+                  'type' => 'integer',
+                ],
+                'pageToken' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
+              ],
+            ],
+          ]
+        ]
+    );
+    $this->apps = new Playdeveloperreporting\Resource\Apps(
+        $this,
+        $this->serviceName,
+        'apps',
+        [
+          'methods' => [
+            'fetchReleaseFilterOptions' => [
+              'path' => 'v1beta1/{+name}:fetchReleaseFilterOptions',
+              'httpMethod' => 'GET',
+              'parameters' => [
+                'name' => [
+                  'location' => 'path',
+                  'type' => 'string',
+                  'required' => true,
+                ],
+              ],
+            ],'search' => [
+              'path' => 'v1beta1/apps:search',
+              'httpMethod' => 'GET',
+              'parameters' => [
                 'pageSize' => [
                   'location' => 'query',
                   'type' => 'integer',
@@ -287,6 +323,10 @@ class Playdeveloperreporting extends \Google\Service
                   'location' => 'query',
                   'type' => 'integer',
                 ],
+                'orderBy' => [
+                  'location' => 'query',
+                  'type' => 'string',
+                ],
                 'pageSize' => [
                   'location' => 'query',
                   'type' => 'integer',
@@ -294,6 +334,10 @@ class Playdeveloperreporting extends \Google\Service
                 'pageToken' => [
                   'location' => 'query',
                   'type' => 'string',
+                ],
+                'sampleErrorReportLimit' => [
+                  'location' => 'query',
+                  'type' => 'integer',
                 ],
               ],
             ],

@@ -25,13 +25,25 @@ class Scheduling extends \Google\Collection
    */
   public $automaticRestart;
   /**
+   * @var int
+   */
+  public $availabilityDomain;
+  /**
+   * @var int
+   */
+  public $hostErrorTimeoutSeconds;
+  /**
    * @var string
    */
   public $instanceTerminationAction;
+  protected $localSsdRecoveryTimeoutType = Duration::class;
+  protected $localSsdRecoveryTimeoutDataType = '';
   /**
    * @var string
    */
   public $locationHint;
+  protected $maxRunDurationType = Duration::class;
+  protected $maxRunDurationDataType = '';
   /**
    * @var int
    */
@@ -42,6 +54,8 @@ class Scheduling extends \Google\Collection
    * @var string
    */
   public $onHostMaintenance;
+  protected $onInstanceStopActionType = SchedulingOnInstanceStopAction::class;
+  protected $onInstanceStopActionDataType = '';
   /**
    * @var bool
    */
@@ -50,6 +64,10 @@ class Scheduling extends \Google\Collection
    * @var string
    */
   public $provisioningModel;
+  /**
+   * @var string
+   */
+  public $terminationTime;
 
   /**
    * @param bool
@@ -66,6 +84,34 @@ class Scheduling extends \Google\Collection
     return $this->automaticRestart;
   }
   /**
+   * @param int
+   */
+  public function setAvailabilityDomain($availabilityDomain)
+  {
+    $this->availabilityDomain = $availabilityDomain;
+  }
+  /**
+   * @return int
+   */
+  public function getAvailabilityDomain()
+  {
+    return $this->availabilityDomain;
+  }
+  /**
+   * @param int
+   */
+  public function setHostErrorTimeoutSeconds($hostErrorTimeoutSeconds)
+  {
+    $this->hostErrorTimeoutSeconds = $hostErrorTimeoutSeconds;
+  }
+  /**
+   * @return int
+   */
+  public function getHostErrorTimeoutSeconds()
+  {
+    return $this->hostErrorTimeoutSeconds;
+  }
+  /**
    * @param string
    */
   public function setInstanceTerminationAction($instanceTerminationAction)
@@ -80,6 +126,20 @@ class Scheduling extends \Google\Collection
     return $this->instanceTerminationAction;
   }
   /**
+   * @param Duration
+   */
+  public function setLocalSsdRecoveryTimeout(Duration $localSsdRecoveryTimeout)
+  {
+    $this->localSsdRecoveryTimeout = $localSsdRecoveryTimeout;
+  }
+  /**
+   * @return Duration
+   */
+  public function getLocalSsdRecoveryTimeout()
+  {
+    return $this->localSsdRecoveryTimeout;
+  }
+  /**
    * @param string
    */
   public function setLocationHint($locationHint)
@@ -92,6 +152,20 @@ class Scheduling extends \Google\Collection
   public function getLocationHint()
   {
     return $this->locationHint;
+  }
+  /**
+   * @param Duration
+   */
+  public function setMaxRunDuration(Duration $maxRunDuration)
+  {
+    $this->maxRunDuration = $maxRunDuration;
+  }
+  /**
+   * @return Duration
+   */
+  public function getMaxRunDuration()
+  {
+    return $this->maxRunDuration;
   }
   /**
    * @param int
@@ -136,6 +210,20 @@ class Scheduling extends \Google\Collection
     return $this->onHostMaintenance;
   }
   /**
+   * @param SchedulingOnInstanceStopAction
+   */
+  public function setOnInstanceStopAction(SchedulingOnInstanceStopAction $onInstanceStopAction)
+  {
+    $this->onInstanceStopAction = $onInstanceStopAction;
+  }
+  /**
+   * @return SchedulingOnInstanceStopAction
+   */
+  public function getOnInstanceStopAction()
+  {
+    return $this->onInstanceStopAction;
+  }
+  /**
    * @param bool
    */
   public function setPreemptible($preemptible)
@@ -162,6 +250,20 @@ class Scheduling extends \Google\Collection
   public function getProvisioningModel()
   {
     return $this->provisioningModel;
+  }
+  /**
+   * @param string
+   */
+  public function setTerminationTime($terminationTime)
+  {
+    $this->terminationTime = $terminationTime;
+  }
+  /**
+   * @return string
+   */
+  public function getTerminationTime()
+  {
+    return $this->terminationTime;
   }
 }
 

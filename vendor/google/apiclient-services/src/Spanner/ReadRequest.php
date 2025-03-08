@@ -28,6 +28,8 @@ class ReadRequest extends \Google\Collection
    * @var bool
    */
   public $dataBoostEnabled;
+  protected $directedReadOptionsType = DirectedReadOptions::class;
+  protected $directedReadOptionsDataType = '';
   /**
    * @var string
    */
@@ -38,6 +40,14 @@ class ReadRequest extends \Google\Collection
    * @var string
    */
   public $limit;
+  /**
+   * @var string
+   */
+  public $lockHint;
+  /**
+   * @var string
+   */
+  public $orderBy;
   /**
    * @var string
    */
@@ -84,6 +94,20 @@ class ReadRequest extends \Google\Collection
     return $this->dataBoostEnabled;
   }
   /**
+   * @param DirectedReadOptions
+   */
+  public function setDirectedReadOptions(DirectedReadOptions $directedReadOptions)
+  {
+    $this->directedReadOptions = $directedReadOptions;
+  }
+  /**
+   * @return DirectedReadOptions
+   */
+  public function getDirectedReadOptions()
+  {
+    return $this->directedReadOptions;
+  }
+  /**
    * @param string
    */
   public function setIndex($index)
@@ -124,6 +148,34 @@ class ReadRequest extends \Google\Collection
   public function getLimit()
   {
     return $this->limit;
+  }
+  /**
+   * @param string
+   */
+  public function setLockHint($lockHint)
+  {
+    $this->lockHint = $lockHint;
+  }
+  /**
+   * @return string
+   */
+  public function getLockHint()
+  {
+    return $this->lockHint;
+  }
+  /**
+   * @param string
+   */
+  public function setOrderBy($orderBy)
+  {
+    $this->orderBy = $orderBy;
+  }
+  /**
+   * @return string
+   */
+  public function getOrderBy()
+  {
+    return $this->orderBy;
   }
   /**
    * @param string

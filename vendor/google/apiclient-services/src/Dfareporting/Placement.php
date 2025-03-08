@@ -32,6 +32,10 @@ class Placement extends \Google\Collection
    * @var bool
    */
   public $adBlockingOptOut;
+  /**
+   * @var string
+   */
+  public $adServingPlatformId;
   protected $additionalSizesType = Size::class;
   protected $additionalSizesDataType = 'array';
   /**
@@ -58,6 +62,8 @@ class Placement extends \Google\Collection
    * @var string
    */
   public $contentCategoryId;
+  protected $conversionDomainOverrideType = PlacementConversionDomainOverride::class;
+  protected $conversionDomainOverrideDataType = '';
   protected $createInfoType = LastModifiedInfo::class;
   protected $createInfoDataType = '';
   /**
@@ -126,6 +132,10 @@ class Placement extends \Google\Collection
   public $siteId;
   protected $siteIdDimensionValueType = DimensionValue::class;
   protected $siteIdDimensionValueDataType = '';
+  /**
+   * @var bool
+   */
+  public $siteServed;
   protected $sizeType = Size::class;
   protected $sizeDataType = '';
   /**
@@ -202,6 +212,20 @@ class Placement extends \Google\Collection
   public function getAdBlockingOptOut()
   {
     return $this->adBlockingOptOut;
+  }
+  /**
+   * @param string
+   */
+  public function setAdServingPlatformId($adServingPlatformId)
+  {
+    $this->adServingPlatformId = $adServingPlatformId;
+  }
+  /**
+   * @return string
+   */
+  public function getAdServingPlatformId()
+  {
+    return $this->adServingPlatformId;
   }
   /**
    * @param Size[]
@@ -314,6 +338,20 @@ class Placement extends \Google\Collection
   public function getContentCategoryId()
   {
     return $this->contentCategoryId;
+  }
+  /**
+   * @param PlacementConversionDomainOverride
+   */
+  public function setConversionDomainOverride(PlacementConversionDomainOverride $conversionDomainOverride)
+  {
+    $this->conversionDomainOverride = $conversionDomainOverride;
+  }
+  /**
+   * @return PlacementConversionDomainOverride
+   */
+  public function getConversionDomainOverride()
+  {
+    return $this->conversionDomainOverride;
   }
   /**
    * @param LastModifiedInfo
@@ -622,6 +660,20 @@ class Placement extends \Google\Collection
   public function getSiteIdDimensionValue()
   {
     return $this->siteIdDimensionValue;
+  }
+  /**
+   * @param bool
+   */
+  public function setSiteServed($siteServed)
+  {
+    $this->siteServed = $siteServed;
+  }
+  /**
+   * @return bool
+   */
+  public function getSiteServed()
+  {
+    return $this->siteServed;
   }
   /**
    * @param Size

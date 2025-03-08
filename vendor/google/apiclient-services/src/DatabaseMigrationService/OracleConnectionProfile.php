@@ -29,6 +29,8 @@ class OracleConnectionProfile extends \Google\Model
    * @var string
    */
   public $host;
+  protected $oracleAsmConfigType = OracleAsmConfig::class;
+  protected $oracleAsmConfigDataType = '';
   /**
    * @var string
    */
@@ -43,6 +45,8 @@ class OracleConnectionProfile extends \Google\Model
   public $port;
   protected $privateConnectivityType = PrivateConnectivity::class;
   protected $privateConnectivityDataType = '';
+  protected $sslType = SslConfig::class;
+  protected $sslDataType = '';
   protected $staticServiceIpConnectivityType = StaticServiceIpConnectivity::class;
   protected $staticServiceIpConnectivityDataType = '';
   /**
@@ -91,6 +95,20 @@ class OracleConnectionProfile extends \Google\Model
   public function getHost()
   {
     return $this->host;
+  }
+  /**
+   * @param OracleAsmConfig
+   */
+  public function setOracleAsmConfig(OracleAsmConfig $oracleAsmConfig)
+  {
+    $this->oracleAsmConfig = $oracleAsmConfig;
+  }
+  /**
+   * @return OracleAsmConfig
+   */
+  public function getOracleAsmConfig()
+  {
+    return $this->oracleAsmConfig;
   }
   /**
    * @param string
@@ -147,6 +165,20 @@ class OracleConnectionProfile extends \Google\Model
   public function getPrivateConnectivity()
   {
     return $this->privateConnectivity;
+  }
+  /**
+   * @param SslConfig
+   */
+  public function setSsl(SslConfig $ssl)
+  {
+    $this->ssl = $ssl;
+  }
+  /**
+   * @return SslConfig
+   */
+  public function getSsl()
+  {
+    return $this->ssl;
   }
   /**
    * @param StaticServiceIpConnectivity

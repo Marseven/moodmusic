@@ -20,8 +20,16 @@ namespace Google\Service\Dialogflow;
 class GoogleCloudDialogflowCxV3QueryResult extends \Google\Collection
 {
   protected $collection_key = 'webhookStatuses';
+  protected $advancedSettingsType = GoogleCloudDialogflowCxV3AdvancedSettings::class;
+  protected $advancedSettingsDataType = '';
+  /**
+   * @var bool
+   */
+  public $allowAnswerFeedback;
   protected $currentPageType = GoogleCloudDialogflowCxV3Page::class;
   protected $currentPageDataType = '';
+  protected $dataStoreConnectionSignalsType = GoogleCloudDialogflowCxV3DataStoreConnectionSignals::class;
+  protected $dataStoreConnectionSignalsDataType = '';
   /**
    * @var array[]
    */
@@ -72,6 +80,34 @@ class GoogleCloudDialogflowCxV3QueryResult extends \Google\Collection
   protected $webhookStatusesDataType = 'array';
 
   /**
+   * @param GoogleCloudDialogflowCxV3AdvancedSettings
+   */
+  public function setAdvancedSettings(GoogleCloudDialogflowCxV3AdvancedSettings $advancedSettings)
+  {
+    $this->advancedSettings = $advancedSettings;
+  }
+  /**
+   * @return GoogleCloudDialogflowCxV3AdvancedSettings
+   */
+  public function getAdvancedSettings()
+  {
+    return $this->advancedSettings;
+  }
+  /**
+   * @param bool
+   */
+  public function setAllowAnswerFeedback($allowAnswerFeedback)
+  {
+    $this->allowAnswerFeedback = $allowAnswerFeedback;
+  }
+  /**
+   * @return bool
+   */
+  public function getAllowAnswerFeedback()
+  {
+    return $this->allowAnswerFeedback;
+  }
+  /**
    * @param GoogleCloudDialogflowCxV3Page
    */
   public function setCurrentPage(GoogleCloudDialogflowCxV3Page $currentPage)
@@ -84,6 +120,20 @@ class GoogleCloudDialogflowCxV3QueryResult extends \Google\Collection
   public function getCurrentPage()
   {
     return $this->currentPage;
+  }
+  /**
+   * @param GoogleCloudDialogflowCxV3DataStoreConnectionSignals
+   */
+  public function setDataStoreConnectionSignals(GoogleCloudDialogflowCxV3DataStoreConnectionSignals $dataStoreConnectionSignals)
+  {
+    $this->dataStoreConnectionSignals = $dataStoreConnectionSignals;
+  }
+  /**
+   * @return GoogleCloudDialogflowCxV3DataStoreConnectionSignals
+   */
+  public function getDataStoreConnectionSignals()
+  {
+    return $this->dataStoreConnectionSignals;
   }
   /**
    * @param array[]

@@ -39,6 +39,7 @@ class AdvertisersLocationLists extends \Google\Service\Resource
    * @param LocationList $postBody
    * @param array $optParams Optional parameters.
    * @return LocationList
+   * @throws \Google\Service\Exception
    */
   public function create($advertiserId, LocationList $postBody, $optParams = [])
   {
@@ -54,6 +55,7 @@ class AdvertisersLocationLists extends \Google\Service\Resource
    * @param string $locationListId Required. The ID of the location list to fetch.
    * @param array $optParams Optional parameters.
    * @return LocationList
+   * @throws \Google\Service\Exception
    */
   public function get($advertiserId, $locationListId, $optParams = [])
   {
@@ -73,10 +75,13 @@ class AdvertisersLocationLists extends \Google\Service\Resource
    * syntax: * Filter expressions are made up of one or more restrictions. *
    * Restrictions can be combined by `AND` or `OR` logical operators. A sequence
    * of restrictions implicitly uses `AND`. * A restriction has the form of
-   * `{field} {operator} {value}`. * The operator must be `EQUALS (=)`. *
-   * Supported fields: - `locationType` Examples: * All regional location list:
-   * `locationType="TARGETING_LOCATION_TYPE_REGIONAL"` * All proximity location
-   * list: `locationType="TARGETING_LOCATION_TYPE_PROXIMITY"`
+   * `{field} {operator} {value}`. * All fields must use the `EQUALS (=)`
+   * operator. Supported fields: * `locationType` Examples: * All regional
+   * location list: `locationType="TARGETING_LOCATION_TYPE_REGIONAL"` * All
+   * proximity location list: `locationType="TARGETING_LOCATION_TYPE_PROXIMITY"`
+   * The length of this field should be no more than 500 characters. Reference our
+   * [filter `LIST` requests](/display-video/api/guides/how-tos/filters) guide for
+   * more information.
    * @opt_param string orderBy Field by which to sort the list. Acceptable values
    * are: * `locationListId` (default) * `displayName` The default sorting order
    * is ascending. To specify descending order for a field, a suffix "desc" should
@@ -89,6 +94,7 @@ class AdvertisersLocationLists extends \Google\Service\Resource
    * the previous call to `ListLocationLists` method. If not specified, the first
    * page of results will be returned.
    * @return ListLocationListsResponse
+   * @throws \Google\Service\Exception
    */
   public function listAdvertisersLocationLists($advertiserId, $optParams = [])
   {
@@ -110,6 +116,7 @@ class AdvertisersLocationLists extends \Google\Service\Resource
    * @opt_param string updateMask Required. The mask to control which fields to
    * update.
    * @return LocationList
+   * @throws \Google\Service\Exception
    */
   public function patch($advertiserId, $locationListId, LocationList $postBody, $optParams = [])
   {
