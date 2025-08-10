@@ -1,85 +1,76 @@
-import {useEffect, useRef, useState} from 'react';
-import {loadScript} from '@paypal/paypal-js';
+import {useCallback} from 'react';
+import {useNavigate} from 'react-router-dom';
 import {useProducts} from '../../pricing-table/use-products';
 import {useSettings} from '../../../core/settings/use-settings';
+import {useAuth} from '@common/auth/use-auth';
 
-interface UsePaypalProps {
-  productId?: string;
-  priceId?: string;
+interface EbillingOrderResponse {
+  checkout_url: string;
+  bill_id: string;
+  error?: string;
 }
-export function usePaypal({productId, priceId}: UsePaypalProps) {
-  const {data} = useProducts();
-  const paypalLoadStarted = useRef<boolean>(false);
-  const paypalButtonsRendered = useRef<boolean>(false);
-  const [paypalIsLoaded, setPaypalIsLoaded] = useState(false);
-  const paypalElementRef = useRef<HTMLDivElement>(null);
-  const {
-    base_url,
-    billing: {
-      stripe: {enable: stripeEnabled},
-      paypal: {enable: paypalEnabled, public_key},
+
+export function useEbilling() {
+  const {base_url} = useSettings();
+  const {user} = useAuth();
+  const navigate = useNavigate();
+  const {data: products} = useProducts();
+
+  const initiatePayment = useCallback(
+    async (productId: string, priceId: string) => {
+      if (!user) {
+        console.error('Vous devez être connecté pour payer.');
+        navigate('/login');
+        return;
+      }
+
+      const product = products?.products.find(p => p.id === parseInt(productId));
+      const price = product?.prices.find(p => p.id === parseInt(priceId));
+
+      if (!product || !price) {
+        console.error('Produit ou tarif introuvable.');
+        return;
+      }
+
+      try {
+        const response = await fetch(`${base_url}/api/v1/billing/ebilling/create-order`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json',
+          },
+          body: JSON.stringify({
+            product_id: product.id,
+            price_id: price.id,
+            user_id: user.id,
+          }),
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          throw new Error(`Erreur API ${response.status}: ${errorText}`);
+        }
+
+        const data = await response.json() as EbillingOrderResponse;
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        if (data.checkout_url) {
+          window.location.href = data.checkout_url;
+        }
+      } catch (error) {
+        console.error('Erreur Ebilling :', error);
+        alert(
+          error instanceof Error
+            ? error.message
+            : 'Une erreur est survenue pendant le paiement Ebilling.'
+        );
+      }
     },
-  } = useSettings();
+    [base_url, products, user, navigate],
+  );
 
-  useEffect(() => {
-    if (!paypalEnabled || !public_key || paypalLoadStarted.current) return;
-    loadScript({
-      'client-id': public_key,
-      intent: 'subscription',
-      vault: true,
-      'disable-funding': stripeEnabled ? 'card' : undefined,
-    }).then(() => {
-      setPaypalIsLoaded(true);
-    });
-    paypalLoadStarted.current = true;
-  }, [public_key, paypalEnabled, stripeEnabled]);
-
-  useEffect(() => {
-    if (
-      !paypalIsLoaded ||
-      !window.paypal?.Buttons ||
-      !paypalElementRef.current ||
-      !data?.products.length ||
-      !productId ||
-      !priceId ||
-      paypalButtonsRendered.current
-    )
-      return;
-
-    const product = data.products.find(p => p.id === parseInt(productId));
-    const price = product?.prices.find(p => p.id === parseInt(priceId));
-
-    window.paypal
-      .Buttons({
-        style: {
-          label: 'pay',
-        },
-        createSubscription: (data, actions) => {
-          return actions.subscription.create({
-            application_context: {
-              shipping_preference: 'NO_SHIPPING',
-            },
-            plan_id: price?.paypal_id!,
-          });
-        },
-        onApprove: (data, actions) => {
-          actions.redirect(
-            `${base_url}/checkout/${productId}/${priceId}/paypal/done?subscriptionId=${data.subscriptionID}&status=success`
-          );
-          return Promise.resolve();
-        },
-        onError: e => {
-          location.href = `${base_url}/checkout/${productId}/${priceId}/paypal/done?status=error`;
-        },
-      })
-      .render(paypalElementRef.current)
-      .then(() => {
-        paypalButtonsRendered.current = true;
-      });
-  }, [productId, priceId, data, paypalIsLoaded, base_url]);
-
-  return {
-    paypalElementRef,
-    stripeIsEnabled: public_key != null && paypalEnabled,
-  };
+  return {initiatePayment};
 }

@@ -1,33 +1,25 @@
-<?php namespace Common\Billing\Gateways\Ebilling;
+<?php
 
-use Common\Billing\GatewayException;
+namespace Common\Billing\Gateways\Ebilling;
+
 use Common\Billing\Models\Price;
 use Common\Billing\Models\Product;
-use Illuminate\Support\Str;
 
 class EbillingPlans
 {
-    use InteractsWithPaypalRestApi;
+    use InteractsWithEbillingRestApi;
 
     public function sync(Product $product): bool
     {
+        // For Ebilling, we don't need to sync plans since each payment is a one-time e-bill
+        // The plans are managed locally in the database
+        // Just mark prices as available for Ebilling
         $product->load('prices');
-
-        // there's only one global product on PayPal and not one per plan as on stripe
-        $productId = config('services.ebilling.product_id');
-        $response = $this->paypal()->get("catalogs/products/$productId");
-        if (!$response->successful()) {
-            $this->paypal()->post('catalogs/products', [
-                'id' => $productId,
-                'name' => config('services.ebilling.product_name'),
-                'type' => 'DIGITAL',
-            ]);
-        }
-
-        // create any local product prices (plans) on PayPal, that don't exist there already
-        $product->prices->each(function (Price $price) use ($product) {
-            if (!$price->paypal_id) {
-                $this->create($product, $price);
+        
+        $product->prices->each(function (Price $price) {
+            if (!$price->ebilling_id) {
+                // Use the local price ID as the ebilling_id for reference
+                $price->fill(['ebilling_id' => 'local_' . $price->id])->save();
             }
         });
 
@@ -36,55 +28,19 @@ class EbillingPlans
 
     protected function create(Product $product, Price $price): bool
     {
-        $response = $this->paypal()->post('billing/plans', [
-            'name' => $product->name,
-            'product_id' => config('services.ebilling.product_id'),
-            'status' => 'ACTIVE',
-            'payment_preferences' => [
-                'auto_bill_outstanding' => true,
-                'payment_failure_threshold' => 2,
-            ],
-            'billing_cycles' => [
-                [
-                    'frequency' => [
-                        'interval_unit' => Str::upper($price->interval),
-                        'interval_count' => $price->interval_count,
-                    ],
-                    'tenure_type' => 'REGULAR',
-                    'sequence' => 1,
-                    'total_cycles' => 0, // infinite
-                    'pricing_scheme' => [
-                        'fixed_price' => [
-                            'value' => number_format(
-                                $price->amount,
-                                2,
-                                '.',
-                                '',
-                            ),
-                            'currency_code' => Str::upper($price->currency),
-                        ],
-                    ],
-                ],
-            ],
-        ]);
-
-        if (!$response->successful()) {
-            throw new GatewayException('Could not create plan on PayPal');
-        }
-
-        $price->fill(['ebilling_id' => $response['id']])->save();
+        // For Ebilling, no need to create plans remotely
+        // Plans are local and e-bills are created per transaction
+        $price->fill(['ebilling_id' => 'local_' . $price->id])->save();
         return true;
     }
 
     public function delete(Product $product): bool
     {
-        $statuses = $product->prices->map(function (Price $price) {
-            $response = $this->paypal()->post(
-                "billing/plans/{$price->ebilling_id}/deactivate",
-            );
-            return $response->successful();
+        // For Ebilling, just remove the ebilling_id reference
+        $product->prices->each(function (Price $price) {
+            $price->fill(['ebilling_id' => null])->save();
         });
 
-        return $statuses->every(fn($status) => $status);
+        return true;
     }
 }

@@ -36,7 +36,7 @@ export const SubscriptionIndexPageFilters: BackendFilter[] = [
   {
     control: {
       type: FilterControlType.Select,
-      defaultValue: 'stripe',
+      defaultValue: 'ebilling',
       options: [
         {
           key: 'stripe',
@@ -47,6 +47,11 @@ export const SubscriptionIndexPageFilters: BackendFilter[] = [
           key: 'paypal',
           label: message('PayPal'),
           value: 'paypal',
+        },
+        {
+          key: 'ebilling',
+          label: message('ebilling'),
+          value: 'ebilling',
         },
         {
           key: 'none',

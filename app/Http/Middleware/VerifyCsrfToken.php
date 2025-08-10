@@ -11,5 +11,7 @@ class VerifyCsrfToken extends BaseVerifyCsrfToken
      *
      * @var array
      */
-    protected $except = [];
+    protected $except = [
+        'api/v1/billing/ebilling/*' // Désactive CSRF pour les routes API eBilling
+    ];
 }

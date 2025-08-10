@@ -8,6 +8,7 @@ import {Fragment} from 'react';
 import {useProducts} from '../pricing-table/use-products';
 import {FullPageLoader} from '../../ui/progress/full-page-loader';
 import {useSettings} from '../../core/settings/use-settings';
+import {EbillingButton} from './ebilling/ebilling-button';
 
 export function Checkout() {
   const {productId, priceId} = useParams();
@@ -18,7 +19,7 @@ export function Checkout() {
   });
   const {
     base_url,
-    billing: {stripe},
+    billing: {stripe, ebilling},
   } = useSettings();
 
   if (productQuery.isLoading) {
@@ -34,6 +35,7 @@ export function Checkout() {
   if (!product || !price || productQuery.status === 'error') {
     return <Navigate to="/pricing" replace />;
   }
+
 
   return (
     <CheckoutLayout>
@@ -52,6 +54,18 @@ export function Checkout() {
             <Separator />
           </Fragment>
         ) : null}
+
+        {ebilling.enable && (
+          <Fragment>
+            <EbillingButton
+              productId={productId!}
+              priceId={priceId!}
+              className="w-full mb-20"
+            />
+            <Separator />
+          </Fragment>
+        )}
+
         <div ref={paypalElementRef} />
         <div className="text-xs text-muted mt-30">
           <Trans message="You’ll be charged until you cancel your subscription. Previous charges won’t be refunded when you cancel unless it’s legally required. Your payment data is encrypted and secure. By subscribing your agree to our terms of service and privacy policy." />

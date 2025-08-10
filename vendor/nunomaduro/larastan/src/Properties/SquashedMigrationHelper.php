@@ -4,23 +4,20 @@ declare(strict_types=1);
 
 namespace Larastan\Larastan\Properties;
 
-use Larastan\Larastan\Properties\Schema\PhpMyAdminDataTypeToPhpTypeConverter;
-use PhpMyAdmin\SqlParser\Components\CreateDefinition;
-use PhpMyAdmin\SqlParser\Exceptions\ParserException;
-use PhpMyAdmin\SqlParser\Parser;
-use PhpMyAdmin\SqlParser\Statement;
-use PhpMyAdmin\SqlParser\Statements\CreateStatement;
+use iamcal\SQLParser;
+use iamcal\SQLParserSyntaxException;
+use Larastan\Larastan\Properties\Schema\MySqlDataTypeToPhpTypeConverter;
 use PHPStan\File\FileHelper;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
 use SplFileInfo;
 
-use function array_filter;
 use function array_key_exists;
 use function database_path;
 use function file_get_contents;
 use function is_array;
+use function is_bool;
 use function is_dir;
 use function iterator_to_array;
 use function ksort;
@@ -31,7 +28,7 @@ final class SquashedMigrationHelper
     public function __construct(
         private array $schemaPaths,
         private FileHelper $fileHelper,
-        private PhpMyAdminDataTypeToPhpTypeConverter $converter,
+        private MySqlDataTypeToPhpTypeConverter $converter,
         private bool $disableSchemaScan,
     ) {
     }
@@ -66,35 +63,37 @@ final class SquashedMigrationHelper
             }
 
             try {
-                $parser = new Parser($fileContents);
-            } catch (ParserException) {
+                $parser                      = new SQLParser();
+                $parser->throw_on_bad_syntax = true; // @phpcs:ignore
+                $tableDefinitions            = $parser->parse($fileContents);
+            } catch (SQLParserSyntaxException) {
                 // TODO: re-throw the exception with a clear message?
                 continue;
             }
 
-            /** @var CreateStatement[] $createStatements */
-            $createStatements = array_filter($parser->statements, static fn (Statement $statement) => $statement instanceof CreateStatement && $statement->name !== null);
-
-            foreach ($createStatements as $createStatement) {
-                if ($createStatement->name?->table === null || array_key_exists($createStatement->name->table, $tables)) {
+            foreach ($tableDefinitions as $definition) {
+                if (array_key_exists($definition['name'], $tables)) {
                     continue;
                 }
 
-                $table = new SchemaTable($createStatement->name->table);
-
-                if (! is_array($createStatement->fields)) {
+                if (! is_array($definition['fields'])) {
                     continue;
                 }
 
-                foreach ($createStatement->fields as $field) {
-                    if ($field->name === null || $field->type === null) {
+                $table = new SchemaTable($definition['name']);
+                foreach ($definition['fields'] as $field) {
+                    if ($field['name'] === null || $field['type'] === null) {
                         continue;
                     }
 
-                    $table->setColumn(new SchemaColumn($field->name, $this->converter->convert($field->type), $this->isNullable($field)));
+                    $table->setColumn(new SchemaColumn(
+                        $field['name'],
+                        $this->converter->convert($field['type']),
+                        $this->isNullable($field),
+                    ));
                 }
 
-                $tables[$createStatement->name->table] = $table;
+                $tables[$definition['name']] = $table;
             }
         }
 
@@ -125,8 +124,17 @@ final class SquashedMigrationHelper
         return $schemaFiles;
     }
 
-    private function isNullable(CreateDefinition $definition): bool
+    /** @param  array<string, string|bool|null> $definition */
+    private function isNullable(array $definition): bool
     {
-        return ! $definition->options?->has('NOT NULL');
+        if (! array_key_exists('null', $definition)) {
+            return false;
+        }
+
+        if (is_bool($definition['null'])) {
+            return $definition['null'];
+        }
+
+        return false;
     }
 }

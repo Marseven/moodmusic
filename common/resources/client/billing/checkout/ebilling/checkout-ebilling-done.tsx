@@ -9,32 +9,64 @@ import {
 } from '../../billing-redirect-message';
 import {apiClient} from '@common/http/query-client';
 import {useBootstrapData} from '@common/core/bootstrap-data/bootstrap-data-context';
+import {FullPageLoader} from '../../../ui/progress/full-page-loader';
+import type {Subscription} from '@common/billing/subscription';
 
-export function CheckoutPaypalDone() {
+export function CheckoutEbillingDone() {
   const {invalidateBootstrapData} = useBootstrapData();
+  const [searchParams] = useSearchParams();
   const {productId, priceId} = useParams();
-  const [params] = useSearchParams();
+  const [subscription, setSubscription] = useState<Subscription | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const [messageConfig, setMessageConfig] =
-    useState<BillingRedirectMessageConfig>();
+  const billId = searchParams.get('invoice');
+  const status = searchParams.get('status');
 
   useEffect(() => {
-    const subscriptionId = params.get('subscriptionId');
-    const status = params.get('status');
-    setMessageConfig(getRedirectMessageConfig(status, productId, priceId));
-    if (subscriptionId && status === 'success') {
-      storeSubscriptionDetailsLocally(subscriptionId).then(() => {
-        invalidateBootstrapData();
-      });
+    if (billId) {
+      verifyPaymentStatus(billId);
+    } else {
+      setIsLoading(false);
     }
-  }, [priceId, productId, params, invalidateBootstrapData]);
+  }, [billId]);
+
+  const verifyPaymentStatus = async (billId: string) => {
+    try {
+      const response = await apiClient.get(`billing/ebilling/verify-payment/${billId}`);
+      setSubscription(response.data.subscription);
+      
+      if (response.data.status === 'PAID') {
+        await storeSubscriptionDetailsLocally(response.data.subscription.id);
+        invalidateBootstrapData();
+      }
+    } catch (error: any) {
+      console.error('Payment verification failed:', error);
+      // Set error status to show appropriate message
+      const urlParams = new URLSearchParams(window.location.search);
+      urlParams.set('status', 'error');
+      window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  if (isLoading) {
+    return <FullPageLoader />;
+  }
+
+  const config = getRedirectMessageConfig(
+    status,
+    productId,
+    priceId
+  );
 
   return (
     <CheckoutLayout>
-      <BillingRedirectMessage config={messageConfig} />
+      <BillingRedirectMessage config={config} />
       <CheckoutProductSummary showBillingLine={false} />
     </CheckoutLayout>
   );
+
 }
 
 function getRedirectMessageConfig(
@@ -65,7 +97,7 @@ function errorLink(productId?: string, priceId?: string): string {
 }
 
 function storeSubscriptionDetailsLocally(subscriptionId: string) {
-  return apiClient.post('billing/paypal/store-subscription-details-locally', {
-    paypal_subscription_id: subscriptionId,
+  return apiClient.post('billing/ebilling/store-subscription-details-locally', {
+    ebilling_subscription_id: subscriptionId,
   });
 }

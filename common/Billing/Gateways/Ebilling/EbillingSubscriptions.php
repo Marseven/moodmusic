@@ -1,10 +1,12 @@
-<?php namespace Common\Billing\Gateways\Ebilling;
+<?php
+
+namespace Common\Billing\Gateways\Ebilling;
 
 use Common\Billing\GatewayException;
 use Common\Billing\Models\Price;
 use Common\Billing\Models\Product;
 use Common\Billing\Subscription;
-use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class EbillingSubscriptions
 {
@@ -15,77 +17,95 @@ class EbillingSubscriptions
         Product $newProduct,
         Price $newPrice,
     ): bool {
-        $response = $this->paypal()->post(
-            "billing/subscriptions/$subscription->gateway_id/revise",
-            [
-                'plan_id' => $newPrice->ebilling_id,
-            ],
-        );
+        // For Ebilling, changing plan means canceling current subscription
+        // and creating a new one with new price
+        $subscription->update([
+            'status' => 'cancelled',
+            'cancelled_at' => now(),
+        ]);
 
-        if (!$response->successful()) {
-            throw new GatewayException(__('Could not change plan on PayPal'));
-        }
-
-        return $response->successful();
+        // The user will need to create a new subscription manually
+        return true;
     }
 
     public function cancel(
         Subscription $subscription,
         $atPeriodEnd = true,
     ): bool {
+        // For Ebilling, we can't cancel remotely since there's no ongoing subscription
+        // Just update locally
         if ($atPeriodEnd) {
-            $response = $this->ebilling()->post(
-                "billing/subscriptions/$subscription->gateway_id/suspend",
-                ['reason' => 'User requested cancellation.'],
-            );
+            $subscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+                'ends_at' => $subscription->ends_at ?? now()->addDays(30), // grace period
+            ]);
         } else {
-            $response = $this->ebilling()->post(
-                "billing/subscriptions/$subscription->gateway_id/cancel",
-                ['reason' => 'Subscription deleted locally.'],
-            );
+            $subscription->update([
+                'status' => 'cancelled',
+                'cancelled_at' => now(),
+                'ends_at' => now(),
+            ]);
         }
 
-        if (!$response->successful()) {
-            throw new GatewayException(
-                'Could not cancel subscription on PayPal',
-            );
-        }
+        Log::info('Ebilling subscription cancelled locally', [
+            'subscription_id' => $subscription->id,
+            'at_period_end' => $atPeriodEnd
+        ]);
 
         return true;
     }
 
     public function resume(Subscription $subscription, array $params): bool
     {
-        $response = $this->ebilling()->get(
-            "billing/subscriptions/$subscription->gateway_id/activate",
-            ['reason' => 'Subscription resumed by user.'],
+        // For Ebilling, resuming means creating a new e-bill
+        // This should redirect user to create a new payment
+        throw new GatewayException(
+            'Cannot resume Ebilling subscription. Please create a new subscription.',
         );
-
-        if (!$response->successful()) {
-            throw new GatewayException(
-                'Could not resume subscription on PayPal',
-            );
-        }
-
-        return true;
     }
 
     public function find(Subscription $subscription)
     {
-        $response = $this->ebilling()->get(
-            "billing/subscriptions/$subscription->gateway_id",
-        );
+        // For Ebilling, check if we have a gateway_id (bill_id) and verify its status
+        if ($subscription->gateway_id) {
+            try {
+                $settings = app(\Common\Settings\Settings::class);
+                $baseUrl = $settings->get('billing.ebilling_test_mode')
+                    ? "https://lab.billing-easy.net/api/v1/merchant/e_bills/{$subscription->gateway_id}"
+                    : "https://stg.billing-easy.com/api/v1/merchant/e_bills/{$subscription->gateway_id}";
 
-        if (!$response->successful()) {
-            throw new GatewayException(
-                "Could not find ebilling subscription: {$response->json()}",
-            );
+                $username = $settings->get('billing.ebilling_username') ?? config('services.ebilling.username');
+                $sharedkey = $settings->get('billing.ebilling_shared_key') ?? config('services.ebilling.sharedkey');
+
+                $response = \Illuminate\Support\Facades\Http::withBasicAuth($username, $sharedkey)
+                    ->withHeaders([
+                        'Content-Type' => 'application/json',
+                        'Accept' => 'application/json',
+                    ])
+                    ->get($baseUrl);
+
+                if ($response->successful()) {
+                    $data = $response->json();
+                    $nextBilling = $subscription->ends_at ?? now()->addMonth();
+                    
+                    return [
+                        'renews_at' => $nextBilling,
+                        'status' => $data['state'] ?? 'unknown'
+                    ];
+                }
+            } catch (\Exception $e) {
+                Log::error('Error finding Ebilling subscription', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage()
+                ]);
+            }
         }
 
+        // Default response
         return [
-            'renews_at' => Carbon::parse(
-                $response['billing_info']['next_billing_time'],
-            ),
+            'renews_at' => $subscription->ends_at ?? now()->addMonth(),
+            'status' => $subscription->status
         ];
     }
 }

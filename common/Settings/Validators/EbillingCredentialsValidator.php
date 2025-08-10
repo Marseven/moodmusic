@@ -2,19 +2,18 @@
 
 namespace Common\Settings\Validators;
 
-use Common\Billing\Gateways\Ebilling\Ebilling;
 use Common\Settings\Settings;
-use Config;
 use GuzzleHttp\Exception\ClientException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Http;
 
 class EbillingCredentialsValidator implements SettingsValidator
 {
     const KEYS = [
-        'paypal_client_id',
-        'paypal_secret',
-        'paypal_webhook_id',
-        'billing.paypal_test_mode',
+        'ebilling_username',
+        'ebilling_shared_key',
+        'billing.ebilling_test_mode',
     ];
 
     /**
@@ -34,17 +33,31 @@ class EbillingCredentialsValidator implements SettingsValidator
     {
         $this->setConfigDynamically($settings);
 
-        // create gateway after setting config dynamically
-        // so gateway uses new configuration
-
+        // Test authentication with a simple API call
         try {
-            $response = app(Paypal::class)
-                ->paypal()
-                ->get('payments/billing-plans');
+            $testMode = $settings['billing.ebilling_test_mode'] ?? $this->settings->get('billing.ebilling_test_mode');
+            $baseUrl = $testMode 
+                ? 'https://lab.billing-easy.net/api/v1/merchant'
+                : 'https://stg.billing-easy.com/api/v1/merchant';
+
+            $username = $settings['ebilling_username'] ?? config('services.ebilling.username');
+            $sharedKey = $settings['ebilling_shared_key'] ?? config('services.ebilling.sharedkey');
+
+            // Test with a simple auth check - attempt to get billing info
+            $response = Http::withBasicAuth($username, $sharedKey)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Accept' => 'application/json',
+                ])
+                ->timeout(10)
+                ->get($baseUrl . '/merchant');
+
             if (!$response->successful()) {
-                return $this->getErrorMessage($response->body());
+                return $this->getErrorMessage($response->json());
             }
         } catch (ClientException $e) {
+            return $this->getDefaultError();
+        } catch (\Exception $e) {
             return $this->getDefaultError();
         }
     }
@@ -56,15 +69,19 @@ class EbillingCredentialsValidator implements SettingsValidator
                 continue;
             }
 
-            if ($key === 'billing.paypal_test_mode') {
+            if ($key === 'billing.ebilling_test_mode') {
                 $this->settings->set(
-                    'billing.paypal_test_mode',
+                    'billing.ebilling_test_mode',
                     $settings[$key],
                 );
             } else {
-                // paypal_client_id => client_id
-                $configKey = str_replace('paypal_', '', $key);
-                Config::set("services.paypal.$configKey", $settings[$key]);
+                // ebilling_username => username, ebilling_shared_key => sharedkey
+                $configKey = str_replace(['ebilling_', '_'], ['', ''], $key);
+                if ($key === 'ebilling_shared_key') {
+                    $configKey = 'sharedkey';
+                }
+
+                Config::set("services.ebilling.$configKey", $settings[$key]);
             }
         }
     }
@@ -76,14 +93,14 @@ class EbillingCredentialsValidator implements SettingsValidator
     private function getErrorMessage($data)
     {
         $message = Arr::get($data, 'message');
-        if ($data['name'] === 'AUTHENTICATION_FAILURE') {
+        if (isset($data['name']) && $data['name'] === 'AUTHENTICATION_FAILURE') {
             return [
-                'paypal_group' =>
-                    'Paypal Client ID or Paypal Secret is invalid.',
+                'ebilling_group' =>
+                'Ebilling Username or Shared Key is invalid.',
             ];
         } elseif ($message) {
             $infoLink = Arr::get($data, 'information_link');
-            return ['paypal_group' => "$message. $infoLink"];
+            return ['ebilling_group' => "$message. $infoLink"];
         } else {
             return $this->getDefaultError();
         }
@@ -91,6 +108,6 @@ class EbillingCredentialsValidator implements SettingsValidator
 
     private function getDefaultError()
     {
-        return ['paypal_group' => 'These paypal credentials are not valid.'];
+        return ['ebilling_group' => 'These Ebilling credentials are not valid.'];
     }
 }

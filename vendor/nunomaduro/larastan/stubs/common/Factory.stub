@@ -17,7 +17,7 @@ class Factory
     /**
      * Get a new factory instance for the given attributes.
      *
-     * @param  callable|array<model-property<TModel>, mixed>  $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed>  $attributes
      * @return static
      */
     public static function new($attributes = []);
@@ -25,7 +25,7 @@ class Factory
     /**
      * Create a single model and persist it to the database.
      *
-     * @param  array<model-property<TModel>, mixed> $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed> $attributes
      * @return TModel
      */
     public function createOne($attributes = []);
@@ -33,7 +33,7 @@ class Factory
     /**
      * Create a single model and persist it to the database.
      *
-     * @param  array<model-property<TModel>, mixed> $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed> $attributes
      * @return TModel
      */
     public function createOneQuietly($attributes = []) {}
@@ -44,12 +44,12 @@ class Factory
      * @param  iterable<callable|array<model-property<TModel>, mixed>>  $records
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>
      */
-    public function createMany(iterable $records);
+    public function createMany(iterable  $records);
 
     /**
      * Create a collection of models and persist them to the database.
      *
-     * @param  array<model-property<TModel>, mixed>  $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed>  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>|TModel
      */
@@ -67,7 +67,7 @@ class Factory
     /**
      * Make a single instance of the model.
      *
-     * @param  callable|array<model-property<TModel>, mixed>  $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed>  $attributes
      * @return TModel
      */
     public function makeOne($attributes = []);
@@ -75,7 +75,7 @@ class Factory
     /**
      * Create a collection of models.
      *
-     * @param  array<model-property<TModel>, mixed>  $attributes
+     * @param  (callable(array<string, mixed>): array<string, mixed>)|array<model-property<TModel>, mixed>  $attributes
      * @param  \Illuminate\Database\Eloquent\Model|null  $parent
      * @return \Illuminate\Database\Eloquent\Collection<int, TModel>|TModel
      */

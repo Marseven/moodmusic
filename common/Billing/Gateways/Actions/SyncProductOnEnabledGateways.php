@@ -2,6 +2,7 @@
 
 namespace Common\Billing\Gateways\Actions;
 
+use Common\Billing\Gateways\Ebilling\Ebilling;
 use Common\Billing\Gateways\Paypal\Paypal;
 use Common\Billing\Gateways\Stripe\Stripe;
 use Common\Billing\Models\Product;
@@ -12,8 +13,7 @@ class SyncProductOnEnabledGateways
         protected Stripe $stripe,
         protected Paypal $paypal,
         protected Ebilling $ebilling
-    ) {
-    }
+    ) {}
 
     public function execute(Product $product): void
     {

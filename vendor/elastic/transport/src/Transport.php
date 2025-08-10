@@ -51,16 +51,19 @@ use function strtolower;
 
 final class Transport implements ClientInterface, HttpAsyncClient
 {
-    const VERSION = "8.10.0";
+    const VERSION = "8.11.0";
 
     private ClientInterface $client;
     private LoggerInterface $logger;
     private NodePoolInterface $nodePool;
+    /**
+     * @var array<mixed>
+     */
     private array $headers = [];
     private string $user;
     private string $password;
-    private RequestInterface $lastRequest;
-    private ResponseInterface $lastResponse;
+    private ?RequestInterface $lastRequest = null;
+    private ?ResponseInterface $lastResponse = null;
     private string $OSVersion;
     private int $retries = 0;
     private HttpAsyncClient $asyncClient;
@@ -132,6 +135,9 @@ final class Transport implements ClientInterface, HttpAsyncClient
         return $this->retries;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getHeaders(): array
     {
         return $this->headers;
@@ -190,12 +196,12 @@ final class Transport implements ClientInterface, HttpAsyncClient
         return str_replace(['alpha', 'beta', 'snapshot', 'rc', 'pre'], 'p', strtolower($version)); 
     }
 
-    public function getLastRequest(): RequestInterface
+    public function getLastRequest(): ?RequestInterface
     {
         return $this->lastRequest;
     }
 
-    public function getLastResponse(): ResponseInterface
+    public function getLastResponse(): ?ResponseInterface
     {
         return $this->lastResponse;
     }
@@ -272,6 +278,8 @@ final class Transport implements ClientInterface, HttpAsyncClient
             json_encode($message->getHeaders()),
             (string) $message->getBody()
         ));
+
+        $message->getBody()->rewind();
     }
 
     private function logRequest(string $title, RequestInterface $request): void
@@ -319,7 +327,8 @@ final class Transport implements ClientInterface, HttpAsyncClient
         if (getenv(OpenTelemetry::ENV_VARIABLE_ENABLED)) {
             $tracer = $this->getOTelTracer();
         }
-        
+
+        $lastNetworkException = null;
         $count = -1;
         while ($count < $this->getRetries()) {
             try {
@@ -346,6 +355,7 @@ final class Transport implements ClientInterface, HttpAsyncClient
 
                 return $response;
             } catch (NetworkExceptionInterface $e) {
+                $lastNetworkException = $e;
                 $this->logger->error(sprintf("Retry %d: %s", $count, $e->getMessage()));
                 if (!empty($span)) {
                     $span->setAttribute('error.type', $e->getMessage());
@@ -370,7 +380,7 @@ final class Transport implements ClientInterface, HttpAsyncClient
         }
         $exceededMsg = sprintf("Exceeded maximum number of retries (%d)", $this->getRetries());
         $this->logger->error($exceededMsg);
-        throw new NoNodeAvailableException($exceededMsg);
+        throw new NoNodeAvailableException($exceededMsg, 0, $lastNetworkException);
     }
 
     public function setAsyncClient(HttpAsyncClient $asyncClient): self
@@ -503,6 +513,8 @@ final class Transport implements ClientInterface, HttpAsyncClient
      * Here a list of supported libraries:
      * gu => guzzlehttp/guzzle
      * sy => symfony/http-client
+     * 
+     * @return array<mixed>
      */
     private function getClientLibraryInfo(): array
     {

@@ -26,6 +26,8 @@ use Common\Auth\Controllers\UserFollowedUsersController;
 use Common\Auth\Controllers\UserFollowersController;
 use Common\Auth\Controllers\UserSessionsController;
 use Common\Auth\Roles\RolesController;
+use Common\Billing\Gateways\Ebilling\EbillingController;
+use Common\Billing\Gateways\Ebilling\EbillingWebhookController;
 use Common\Billing\Gateways\Paypal\PaypalController;
 use Common\Billing\Gateways\Stripe\StripeController;
 use Common\Billing\Gateways\SyncProductsController;
@@ -101,7 +103,7 @@ Route::group(['prefix' => 'v1'], function () {
         // TUS UPLOADS
         Route::post('tus/entries', [TusFileEntryController::class, 'store']);
         Route::any('/tus/upload/{any?}', function () {
-           return app(TusServer::class)->serve();
+            return app(TusServer::class)->serve();
         })->where('any', '.*');
 
         // NOTIFICATIONS
@@ -213,6 +215,10 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('billing/stripe/change-default-payment-method', [StripeController::class, 'changeDefaultPaymentMethod']);
         Route::post('billing/stripe/store-subscription-details-locally', [StripeController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/paypal/store-subscription-details-locally', [PaypalController::class, 'storeSubscriptionDetailsLocally']);
+        Route::post('billing/ebilling/create-order', [EbillingController::class, 'createOrder']);
+        Route::get('billing/ebilling/verify-payment/{billId}', [EbillingController::class, 'verifyPayment']);
+        Route::post('billing/ebilling/store-subscription-details-locally', [EbillingController::class, 'storeSubscriptionDetailsLocally']);
+        Route::post('billing/ebilling/webhook', [EbillingWebhookController::class, 'handleWebhook'])->name('ebilling.webhook');
 
         // INVOICES
         Route::get('billing/invoices', [InvoiceController::class, 'index']);
@@ -252,7 +258,7 @@ Route::group(['prefix' => 'v1'], function () {
     // Mobile app auth
     $limiter = config('fortify.limiters.login');
     Route::post('auth/login', [MobileAuthController::class, 'login'])->middleware(array_filter([
-        $limiter ? 'throttle:'.$limiter : null,
+        $limiter ? 'throttle:' . $limiter : null,
     ]));
     Route::post('auth/register', [MobileAuthController::class, 'register']);
     Route::get('auth/social/{provider}/callback', [SocialAuthController::class, 'loginCallback']);

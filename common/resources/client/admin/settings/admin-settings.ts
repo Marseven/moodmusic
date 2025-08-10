@@ -12,6 +12,8 @@ export interface AdminServerSettings {
   paypal_webhook_id?: string;
   stripe_key?: string;
   stripe_secret?: string;
+  ebilling_username?: string;
+  ebilling_sharedkey?: string;
 
   // social login
   envato_id?: string;
@@ -119,3 +121,4 @@ export interface AdminSettings {
   client: Omit<Settings, 'menus' | 'base_url' | 'site'>;
   server: AdminServerSettings;
 }
+

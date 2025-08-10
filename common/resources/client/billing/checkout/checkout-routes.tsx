@@ -4,6 +4,7 @@ import {Checkout} from './checkout';
 import React from 'react';
 import {CheckoutStripeDone} from './stripe/checkout-stripe-done';
 import {CheckoutPaypalDone} from './paypal/checkout-paypal-done';
+import {CheckoutEbillingDone} from './ebilling/checkout-ebilling-done';
 
 export default function CheckoutRoutes() {
   return (
@@ -29,6 +30,14 @@ export default function CheckoutRoutes() {
         element={
           <NotSubscribedRoute>
             <CheckoutPaypalDone />
+          </NotSubscribedRoute>
+        }
+      />
+      <Route
+        path=":productId/:priceId/ebilling/done"
+        element={
+          <NotSubscribedRoute>
+            <CheckoutEbillingDone />
           </NotSubscribedRoute>
         }
       />

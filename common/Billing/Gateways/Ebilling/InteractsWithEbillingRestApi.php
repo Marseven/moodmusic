@@ -1,6 +1,6 @@
 <?php
 
-namespace Common\Billing\Gateways\Paypal;
+namespace Common\Billing\Gateways\Ebilling;
 
 use Carbon\Carbon;
 use Common\Settings\Settings;
@@ -9,35 +9,24 @@ use Illuminate\Support\Facades\Http;
 
 trait InteractsWithEbillingRestApi
 {
-    protected string|null $accessToken = null;
-    protected Carbon|null $tokenExpires = null;
 
     public function ebilling(): PendingRequest
     {
-        $baseUrl = app(Settings::class)->get('billing.ebilling_test_mode')
+        $settings = app(Settings::class);
+        $baseUrl = $settings->get('billing.ebilling_test_mode')
             ? 'https://lab.billing-easy.net'
             : 'https://stg.billing-easy.com';
 
-        if (
-            !$this->accessToken ||
-            $this->tokenExpires->lessThan(Carbon::now())
-        ) {
-            $clientId = config('services.ebilling.client_id');
-            $secret = config('services.ebilling.secret');
-            $response = Http::withBasicAuth($clientId, $secret)
-                ->asForm()
-                ->post("$baseUrl/oauth2/token", [
-                    'grant_type' => 'client_credentials',
-                ]);
-            if (!$response->successful()) {
-                $response->throw();
-            }
-            $this->accessToken = $response['access_token'];
-            $this->tokenExpires = Carbon::now()->addSeconds(
-                $response['expires_in'],
-            );
-        }
+        // Configuration des identifiants
+        $username = $settings->get('billing.ebilling_username') ?? config('services.ebilling.username');
+        $sharedkey = $settings->get('billing.ebilling_shared_key') ?? config('services.ebilling.sharedkey');
 
-        return Http::withToken($this->accessToken)->baseUrl($baseUrl);
+        // Création de la requête HTTP de base avec authentification
+        return Http::baseUrl($baseUrl)
+            ->withBasicAuth($username, $sharedkey)
+            ->withHeaders([
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json',
+            ]);
     }
 }

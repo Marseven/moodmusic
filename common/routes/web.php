@@ -2,6 +2,7 @@
 
 use Common\Auth\Controllers\SocialAuthController;
 use Common\Auth\Controllers\TwoFactorQrCodeController;
+use Common\Billing\Gateways\Ebilling\EbillingController;
 use Common\Billing\Invoices\InvoiceController;
 use Common\Core\Controllers\HomeController;
 use Common\Core\Controllers\UpdateController;
@@ -34,6 +35,9 @@ Route::group(['middleware' => 'web'], function () {
 
     // INVOICES
     Route::get('billing/invoices/{uuid}', [InvoiceController::class, 'show']);
+
+    Route::get('billing/ebilling/return', [EbillingController::class, 'handleReturn']);
+
 
     // SOCIAL AUTH
     Route::group(['prefix' => 'secure'], function () {
@@ -88,7 +92,7 @@ Route::group(['middleware' => 'web'], function () {
 
     // TWO FACTOR AUTH
     Route::get('auth/user/two-factor/qr-code', [TwoFactorQrCodeController::class, 'show'])
-      ->middleware(['auth', 'password.confirm']);
+        ->middleware(['auth', 'password.confirm']);
 
     // Laravel Auth routes with names so route('login') and similar calls don't error out
     Route::get('login', [HomeController::class, 'show'])->name('login');

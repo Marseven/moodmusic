@@ -1,4 +1,6 @@
-<?php namespace Common\Billing\Gateways\Ebilling;
+<?php
+
+namespace Common\Billing\Gateways\Ebilling;
 
 use App\User;
 use Common\Billing\Gateways\Contracts\CommonSubscriptionGatewayActions;
@@ -9,14 +11,13 @@ use Common\Settings\Settings;
 
 class Ebilling implements CommonSubscriptionGatewayActions
 {
-    use InteractsWithPaypalRestApi;
+    use InteractsWithEbillingRestApi;
 
     public function __construct(
         protected Settings $settings,
         protected EbillingPlans $plans,
         protected EbillingSubscriptions $subscriptions,
-    ) {
-    }
+    ) {}
 
     public function isEnabled(): bool
     {
@@ -37,21 +38,18 @@ class Ebilling implements CommonSubscriptionGatewayActions
         string $ebillingSubscriptionId,
         User $user,
     ): bool {
-        $response = $this->paypal()->get(
-            "billing/subscriptions/$ebillingSubscriptionId",
-        );
-
-        if ($response->successful() && $response['status'] === 'ACTIVE') {
-            $price = Price::where(
-                'ebilling_id',
-                $response['plan_id'],
-            )->firstOrFail();
-            if (!$user->paypal_id) {
-                $user
-                    ->fill(['ebilling_id' => $response['subscriber']['payer_id']])
-                    ->save();
-            }
-            $user->subscribe('ebilling', $response['id'], $price);
+        // For Ebilling, this method should create a local subscription record
+        // based on the successful payment information from the frontend
+        // The ebillingSubscriptionId here is actually the subscription ID from our system
+        
+        $subscription = Subscription::find($ebillingSubscriptionId);
+        
+        if ($subscription && $subscription->user_id === $user->id) {
+            $subscription->update([
+                'status' => 'active',
+                'gateway_id' => $ebillingSubscriptionId,
+                'paid_at' => now(),
+            ]);
             return true;
         }
 

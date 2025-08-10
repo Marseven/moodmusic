@@ -44,8 +44,6 @@ export function SubscriptionSettings() {
               <Trans message="Enable subscriptions" />
             </FormSwitch>
             <SettingsSeparator />
-            <PaypalSection />
-            
             <EbillingSection />
             <SettingsSeparator />
             <JsonChipField
@@ -194,6 +192,7 @@ function StripeSection() {
 function EbillingSection() {
   const {watch} = useFormContext<AdminSettings>();
   const ebillingIsEnabled = watch('client.billing.ebilling.enable');
+
   console.log('Ebilling enabled:', ebillingIsEnabled); // Debug log
 
   return (
@@ -205,27 +204,27 @@ function EbillingSection() {
             <Trans message="Enable ebilling payment gateway integration." />
             <LearnMoreLink
               className="mt-6"
-              link="https://support.vebto.com/help-center/articles/147/configuring-paypal"
+              link="https://documenter.getpostman.com/view/37697279/2sAYkKHxHW#auth-info-11d1b44d-8a1f-4384-8bc8-33934338206d"
             />
           </div>
         }
       >
-        <Trans message="ebilling gateway" />
+        <Trans message="Ebilling Gateway" />
       </FormSwitch>
       {ebillingIsEnabled ? (
         <SettingsErrorGroup name="ebilling_group">
           {isInvalid => (
             <Fragment>
               <FormTextField
-                name="server.ebilling_client_id"
-                label={<Trans message="Ebilling Client ID" />}
+                name="server.ebilling_username"
+                label={<Trans message="Ebilling Username" />}
                 required
                 invalid={isInvalid}
                 className="mb-20"
               />
               <FormTextField
-                name="server.ebilling_secret"
-                label={<Trans message="Ebilling Secret" />}
+                name="server.ebilling_shared_key"
+                label={<Trans message="Ebilling Shared Key" />}
                 required
                 invalid={isInvalid}
                 className="mb-20"

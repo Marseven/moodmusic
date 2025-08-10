@@ -60,6 +60,10 @@ export interface Settings {
     stripe: {
       enable: boolean;
     };
+    ebilling: {
+      enable: boolean;
+      test_mode: boolean;
+    };
   };
   notifications: {
     integrated: boolean;

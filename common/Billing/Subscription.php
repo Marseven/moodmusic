@@ -1,4 +1,6 @@
-<?php namespace Common\Billing;
+<?php
+
+namespace Common\Billing;
 
 use App\User;
 use Carbon\Carbon;
@@ -33,6 +35,19 @@ class Subscription extends Model
         'price_id' => 'integer',
         'product_id' => 'integer',
         'quantity' => 'integer',
+        'amount' => 'decimal:2',
+        'paid_at' => 'datetime',
+    ];
+
+    protected $fillable = [
+        'price_id',
+        'product_id',
+        'gateway_name',
+        'transaction_id',
+        'operator',
+        'amount',
+        'reference',
+        'paid_at',
     ];
 
     public function getOnGracePeriodAttribute(): bool
@@ -65,6 +80,7 @@ class Subscription extends Model
         'renews_at',
         'created_at',
         'updated_at',
+        'paid_at'
     ];
 
     public function user(): BelongsTo
@@ -269,6 +285,11 @@ class Subscription extends Model
             'product_id',
             'price_id',
             'gateway_name',
+            'transaction_id',
+            'operator',
+            'amount',
+            'reference',
+            'paid_at',
             'ends_at',
             'created_at',
             'updated_at',

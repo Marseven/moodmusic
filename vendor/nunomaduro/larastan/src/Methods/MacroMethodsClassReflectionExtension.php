@@ -8,9 +8,13 @@ use Carbon\Carbon;
 use Carbon\Traits\Macro as CarbonMacro;
 use Closure;
 use Illuminate\Auth\RequestGuard;
+use Illuminate\Auth\SessionGuard;
+use Illuminate\Cache\CacheManager;
+use Illuminate\Cache\Repository as CacheRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Query\Builder as QueryBuilder;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Facade;
 use Illuminate\Support\Str;
 use Illuminate\Support\Traits\Macroable;
@@ -26,8 +30,10 @@ use ReflectionException;
 use Throwable;
 
 use function array_key_exists;
+use function array_keys;
 use function explode;
 use function get_class;
+use function in_array;
 use function is_array;
 use function is_callable;
 use function is_string;
@@ -39,6 +45,9 @@ class MacroMethodsClassReflectionExtension implements MethodsClassReflectionExte
 
     /** @var array<string, MethodReflection> */
     private array $methods = [];
+
+    /** @var array<string, array<string, bool>> */
+    private array $traitCache = [];
 
     public function __construct(private ReflectionProvider $reflectionProvider, private ClosureTypeFactory $closureTypeFactory)
     {
@@ -83,7 +92,10 @@ class MacroMethodsClassReflectionExtension implements MethodsClassReflectionExte
             $facadeClass = $classReflection->getName();
 
             if ($facadeClass === Auth::class) {
-                $classNames         = ['Illuminate\Auth\SessionGuard', RequestGuard::class];
+                $classNames         = [SessionGuard::class, RequestGuard::class];
+                $macroTraitProperty = 'macros';
+            } elseif ($facadeClass === Cache::class) {
+                $classNames         = [CacheManager::class, CacheRepository::class];
                 $macroTraitProperty = 'macros';
             } else {
                 $concrete = null;
@@ -125,7 +137,6 @@ class MacroMethodsClassReflectionExtension implements MethodsClassReflectionExte
                 }
 
                 $refProperty = $macroClassReflection->getNativeReflection()->getProperty($macroTraitProperty);
-                $refProperty->setAccessible(true);
 
                 $found = array_key_exists($methodName, $refProperty->getValue());
 
@@ -169,7 +180,7 @@ class MacroMethodsClassReflectionExtension implements MethodsClassReflectionExte
                     $methodReflection = new Macro(
                         $macroClassReflection,
                         $methodName,
-                        $this->closureTypeFactory->fromClosureObject($refProperty->getValue()[$methodName]),
+                        $this->closureTypeFactory->fromClosureObject($macroDefinition),
                     );
 
                     $methodReflection->setIsStatic(true);
@@ -193,12 +204,14 @@ class MacroMethodsClassReflectionExtension implements MethodsClassReflectionExte
 
     private function hasIndirectTraitUse(ClassReflection $class, string $traitName): bool
     {
-        foreach ($class->getTraits() as $trait) {
-            if ($this->hasIndirectTraitUse($trait, $traitName)) {
-                return true;
-            }
+        $className = $class->getName();
+
+        if (array_key_exists($className, $this->traitCache) && array_key_exists($traitName, $this->traitCache[$className])) {
+            return $this->traitCache[$className][$traitName];
         }
 
-        return $class->hasTraitUse($traitName);
+        $this->traitCache[$className][$traitName] = in_array($traitName, array_keys($class->getTraits(true)), true);
+
+        return $this->traitCache[$className][$traitName];
     }
 }
