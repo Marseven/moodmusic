@@ -38,6 +38,15 @@ export function CheckoutEbillingDone() {
       if (response.data.status === 'PAID') {
         await storeSubscriptionDetailsLocally(response.data.subscription.id);
         invalidateBootstrapData();
+        // Set success status
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('status', 'success');
+        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
+      } else {
+        // Payment not completed yet, show pending/retry state
+        const urlParams = new URLSearchParams(window.location.search);
+        urlParams.set('status', 'pending');
+        window.history.replaceState({}, '', `${window.location.pathname}?${urlParams}`);
       }
     } catch (error: any) {
       console.error('Payment verification failed:', error);
@@ -70,7 +79,7 @@ export function CheckoutEbillingDone() {
 }
 
 function getRedirectMessageConfig(
-  status?: 'success' | 'error' | string | null,
+  status?: 'success' | 'error' | 'pending' | string | null,
   productId?: string,
   priceId?: string
 ): BillingRedirectMessageConfig {
@@ -82,11 +91,18 @@ function getRedirectMessageConfig(
         buttonLabel: message('Return to site'),
         link: '/billing',
       };
+    case 'pending':
+      return {
+        message: message('Payment is being processed. Please wait or try refreshing the page.'),
+        status: 'warning',
+        buttonLabel: message('Refresh page'),
+        link: window.location.href,
+      };
     default:
       return {
-        message: message('Something went wrong. Please try again.'),
+        message: message('Payment failed or was cancelled. Please try again.'),
         status: 'error',
-        buttonLabel: message('Go back'),
+        buttonLabel: message('Try again'),
         link: errorLink(productId, priceId),
       };
   }

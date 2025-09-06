@@ -36,7 +36,7 @@ Route::group(['middleware' => 'web'], function () {
     // INVOICES
     Route::get('billing/invoices/{uuid}', [InvoiceController::class, 'show']);
 
-    Route::get('billing/ebilling/return', [EbillingController::class, 'handleReturn']);
+    // Route::get('billing/ebilling/return', [EbillingController::class, 'handleReturn']); // Désactivée - conflit avec React route
 
 
     // SOCIAL AUTH

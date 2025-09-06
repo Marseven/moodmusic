@@ -117,7 +117,7 @@ class EbillingController extends BaseController
             // ------------------------------
 
             // Générer l'URL de retour pour ce paiement spécifique
-            $callback_url = url("/billing/checkout/{$product->id}/{$price->id}/ebilling/done") . '?invoice=' . $bill_id . '&status=success';
+            $callback_url = url("/billing/checkout/{$product->id}/{$price->id}/ebilling/done") . '?invoice=' . $bill_id;
 
             $paymentPortalUrl = $settings->get('billing.ebilling_test_mode')
                 ? 'https://test.billing-easy.net'

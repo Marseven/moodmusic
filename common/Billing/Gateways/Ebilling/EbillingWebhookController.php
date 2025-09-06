@@ -61,6 +61,8 @@ class EbillingWebhookController extends Controller
                     'paid_at' => now(),
                     'ends_at' => now()->addMonths($subscription->plan->interval_count)
                 ]);
+                Log::info('eBilling payment confirmed', ['subscription_id' => $subscription->id]);
+                break;
 
             case 'FAILED':
                 $subscription->update(['status' => 'failed']);
