@@ -8,7 +8,7 @@
     <p>{{ $meta->getDescription() }}</p>
 
     <ul class="albums">
-        @foreach($meta->getData('albums') as $album)
+        @foreach($meta->getData('albums') ?? [] as $album)
             <li>
                 <figure>
                     <img src="{{$album['image']}}">

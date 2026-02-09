@@ -8,7 +8,7 @@
     <p>{{ $meta->getDescription() }}</p>
 
     <ul class="genres">
-        @foreach($meta->getData('genres') as $genre)
+        @foreach($meta->getData('genres') ?? [] as $genre)
             <li>
                 <figure>
                     <img src="{{$genre->image}}">

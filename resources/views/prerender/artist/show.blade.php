@@ -10,12 +10,12 @@
     <img src="{{$meta->get('og:image')}}">
 
     <ul>
-        @foreach($meta->getData('artist.genres') as $genre)
+        @foreach($meta->getData('artist.genres') ?? [] as $genre)
             <li><a href="{{$meta->urls->genre($genre)}}">{{$genre['name']}}</a></li>
         @endforeach
     </ul>
 
-    @foreach($meta->getData('albums') as $album)
+    @foreach($meta->getData('albums') ?? [] as $album)
         <h3><a href="{{ $meta->urls->album($album) }}">{{ $album['name'] }}</a> - {{ $album['release_date'] }}</h3>
 
         <ul>
@@ -28,7 +28,7 @@
     @if($meta->getData('artist.similar'))
         <h2>Similar Artists</h2>
 
-        @foreach($meta->getData('artist.similar') as $similarArtist)
+        @foreach($meta->getData('artist.similar') ?? [] as $similarArtist)
             <h3><a href="{{ $meta->urls->artist($similarArtist) }}">{{ $similarArtist['name'] }}</a></h3>
         @endforeach
     @endif

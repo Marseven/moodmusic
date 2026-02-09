@@ -12,7 +12,7 @@
 
     @if($meta->getData('track.album'))
         <ul class="tracks">
-            @foreach($meta->getData('track.album.tracks') as $track)
+            @foreach($meta->getData('track.album.tracks') ?? [] as $track)
                 <li>
                     <figure>
                         <img src="{{$track['album']['image']}}">

@@ -45,7 +45,7 @@ class ArtistSaver
     public function saveGenres(array $genres, Artist $artist): void
     {
         $dbGenres = app(Genre::class)->insertOrRetrieve($genres);
-        $artist->genres()->sync($dbGenres->pluck('id'), false);
+        $artist->genres()->syncWithoutDetaching($dbGenres->pluck('id'));
     }
 
     public function saveSimilar(Collection $similar, Artist $artist): void

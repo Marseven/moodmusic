@@ -12,7 +12,7 @@
 
     <p>{{__('Release Date')}}: {{$meta->getData('album.release_date')}}</p>
 
-    @foreach($meta->getData('album.tracks') as $track)
+    @foreach($meta->getData('album.tracks') ?? [] as $track)
         <li><a href="{{ $meta->urls->track($track) }}">{{ $track['name'] }}</a></li>
     @endforeach
 @endsection

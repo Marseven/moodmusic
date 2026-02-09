@@ -9,7 +9,7 @@
 
     @switch($meta->getData('channel.config.contentModel'))
         @case(\App\Channel::class)
-            @foreach($meta->getData('channel.content.data') as $channel)
+            @foreach($meta->getData('channel.content.data') ?? [] as $channel)
                 <h2>{{$channel['name']}}</h2>
                 <ul style="display: flex; flex-wrap: wrap">
                     @foreach($channel['content']['data'] as $subContent)
@@ -28,7 +28,7 @@
         @break
 
         @default
-        @foreach($meta->getData('channel.content.data') as $track)
+        @foreach($meta->getData('channel.content.data') ?? [] as $track)
             <figure>
                 <img src="{{$track['album']['image'] ?? $track['image'] ?? url('client/assets/images/default/album.png')}}" alt="">
                 <figcaption>{{$track['name']}}</figcaption>
