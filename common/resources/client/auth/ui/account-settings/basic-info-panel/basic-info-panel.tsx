@@ -32,7 +32,7 @@ export function BasicInfoPanel({user}: Props) {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.AccountDetails}
-      title={<Trans message="Update name and profile image" />}
+      title={<Trans message="Mettre à jour le nom et l'image de profil" />}
       actions={
         <Button
           type="submit"
@@ -41,7 +41,7 @@ export function BasicInfoPanel({user}: Props) {
           form={formId}
           disabled={updateDetails.isLoading || !form.formState.isValid}
         >
-          <Trans message="Save" />
+          <Trans message="Enregistrer" />
         </Button>
       }
     >
@@ -57,11 +57,11 @@ export function BasicInfoPanel({user}: Props) {
           <FormTextField
             className="mb-24"
             name="first_name"
-            label={<Trans message="First name" />}
+            label={<Trans message="Prénom" />}
           />
           <FormTextField
             name="last_name"
-            label={<Trans message="Last name" />}
+            label={<Trans message="Nom" />}
           />
         </div>
         <FileUploadProvider>
@@ -72,7 +72,7 @@ export function BasicInfoPanel({user}: Props) {
             showRemoveButton
             name="avatar"
             diskPrefix="avatars"
-            label={<Trans message="Profile image" />}
+            label={<Trans message="Image de profil" />}
             onChange={url => {
               if (url) {
                 uploadAvatar.mutate({url});

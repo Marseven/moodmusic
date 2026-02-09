@@ -15,21 +15,21 @@ export function ActivePlanPanel() {
   );
 
   return (
-    <BillingPlanPanel title={<Trans message="Current plan" />}>
-      <div className="flex gap-20 justify-between mt-24">
-        <div>
+    <BillingPlanPanel title={<Trans message="Plan actuel" />}>
+      <div className="flex flex-col md:flex-row gap-20 md:justify-between mt-24">
+        <div className="min-w-0">
           <div className="text-xl font-bold mb-2">
             {subscription.product.name}
           </div>
           <FormattedPrice className="text-xl mb-2" price={subscription.price} />
           <div className="text-base">
             <Trans
-              message="Your plan renews on :date"
+              message="Votre plan se renouvelle le :date"
               values={{date: renewDate}}
             />
           </div>
         </div>
-        <div className="w-[233px]">
+        <div className="w-full md:w-[233px] flex-shrink-0">
           <Button
             variant="flat"
             color="primary"
@@ -38,7 +38,7 @@ export function ActivePlanPanel() {
             elementType={Link}
             to="/billing/change-plan"
           >
-            <Trans message="Change plan" />
+            <Trans message="Changer de plan" />
           </Button>
           <Button
             variant="outline"
@@ -48,7 +48,7 @@ export function ActivePlanPanel() {
             elementType={Link}
             to="/billing/cancel"
           >
-            <Trans message="Cancel plan" />
+            <Trans message="Annuler le plan" />
           </Button>
         </div>
       </div>

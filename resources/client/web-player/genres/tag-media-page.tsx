@@ -2,12 +2,12 @@ import {useInfiniteData} from '@common/ui/infinite-scroll/use-infinite-data';
 import {Track} from '@app/web-player/tracks/track';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {AudiotrackIcon} from '@common/icons/material/Audiotrack';
+import {ModernMusicNoteIcon} from '@app/web-player/icons/modern-icons';
 import {Trans} from '@common/i18n/trans';
 import React, {Fragment, useState} from 'react';
 import {Link, useParams} from 'react-router-dom';
 import {Album} from '@app/web-player/albums/album';
-import {AlbumIcon} from '@common/icons/material/Album';
+import {ModernDiscIcon} from '@app/web-player/icons/modern-icons';
 import {Tabs} from '@common/ui/tabs/tabs';
 import {TabList} from '@common/ui/tabs/tab-list';
 import {Tab} from '@common/ui/tabs/tab';
@@ -82,7 +82,7 @@ function AlbumsPanel({tagName}: TracksPanelProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AlbumIcon size="lg" className="text-muted" />}
+        image={<ModernDiscIcon size="lg" className="text-muted" />}
         title={<Trans message="No albums yet" />}
         description={
           <Trans message="This tag is not attached to any albums yet, check back later." />
@@ -109,7 +109,7 @@ function TracksPanel({tagName}: TracksPanelProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AudiotrackIcon size="lg" className="text-muted" />}
+        image={<ModernMusicNoteIcon size="lg" className="text-muted" />}
         title={<Trans message="No tracks yet" />}
         description={
           <Trans message="This tag is not attached to any tracks yet, check back later." />

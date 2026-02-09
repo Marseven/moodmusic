@@ -13,7 +13,7 @@ import {Trans} from '@common/i18n/trans';
 import {TabPanel, TabPanels} from '@common/ui/tabs/tab-panels';
 import {Track} from '@app/web-player/tracks/track';
 import {TrackTable} from '@app/web-player/tracks/track-table/track-table';
-import {KeyboardArrowRightIcon} from '@common/icons/material/KeyboardArrowRight';
+import {ModernChevronRightIcon} from '@app/web-player/icons/modern-icons';
 import {ContentGrid} from '@app/web-player/playable-item/content-grid';
 import {ArtistGridItem} from '@app/web-player/artists/artist-grid-item';
 import {AlbumGridItem} from '@app/web-player/albums/album-grid-item';
@@ -348,7 +348,7 @@ function PanelTitle({children, to}: PanelTitleProps) {
       {to ? (
         <Link to={to} className="hover:text-primary flex items-center gap-2">
           {children}
-          <KeyboardArrowRightIcon className="mt-4" />
+          <ModernChevronRightIcon className="mt-4" />
         </Link>
       ) : (
         children

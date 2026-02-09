@@ -22,7 +22,7 @@ export function SocialLoginPanel({user}: Props) {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.SocialLogin}
-      title={<Trans message="Manage social login" />}
+      title={<Trans message="Gérer la connexion sociale" />}
     >
       <SocialLoginPanelRow
         icon={<EnvatoIcon viewBox="0 0 50 50" className="bg-envato" />}
@@ -45,7 +45,7 @@ export function SocialLoginPanel({user}: Props) {
         user={user}
       />
       <div className="text-muted text-sm pt-16 pb-6">
-        <Trans message="If you disable social logins, you'll still be able to log in using your email and password." />
+        <Trans message="Si vous désactivez les connexions sociales, vous pourrez toujours vous connecter en utilisant votre email et votre mot de passe." />
       </div>
     </AccountSettingsPanel>
   );
@@ -87,10 +87,10 @@ function SocialLoginPanelRow({
       })}
       <div className="mr-auto whitespace-nowrap overflow-hidden text-ellipsis">
         <div className="first-letter:capitalize text-sm font-bold overflow-hidden text-ellipsis">
-          <Trans message=":service account" values={{service}} />
+          <Trans message="Compte :service" values={{service}} />
         </div>
         <div className="text-xs mt-2">
-          {username || <Trans message="Disabled" />}
+          {username || <Trans message="Désactivé" />}
         </div>
       </div>
       <Button
@@ -106,7 +106,7 @@ function SocialLoginPanelRow({
                 onSuccess: () => {
                   queryClient.invalidateQueries(['users']);
                   toast(
-                    message('Disabled :service account', {values: {service}})
+                    message('Compte :service désactivé', {values: {service}})
                   );
                 },
               }
@@ -115,12 +115,12 @@ function SocialLoginPanelRow({
             const e = await connectSocial(service);
             if (e?.status === 'SUCCESS') {
               queryClient.invalidateQueries(['users']);
-              toast(message('Enabled :service account', {values: {service}}));
+              toast(message('Compte :service activé', {values: {service}}));
             }
           }
         }}
       >
-        {username ? <Trans message="Disable" /> : <Trans message="Enable" />}
+        {username ? <Trans message="Désactiver" /> : <Trans message="Activer" />}
       </Button>
     </div>
   );

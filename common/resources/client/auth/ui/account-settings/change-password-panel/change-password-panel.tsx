@@ -15,7 +15,7 @@ export function ChangePasswordPanel() {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.Password}
-      title={<Trans message="Update password" />}
+      title={<Trans message="Mettre à jour le mot de passe" />}
       actions={
         <Button
           type="submit"
@@ -24,7 +24,7 @@ export function ChangePasswordPanel() {
           color="primary"
           disabled={!form.formState.isValid || updatePassword.isLoading}
         >
-          <Trans message="Update password" />
+          <Trans message="Mettre à jour le mot de passe" />
         </Button>
       }
     >
@@ -42,7 +42,7 @@ export function ChangePasswordPanel() {
         <FormTextField
           className="mb-24"
           name="current_password"
-          label={<Trans message="Current password" />}
+          label={<Trans message="Mot de passe actuel" />}
           type="password"
           autoComplete="current-password"
           required
@@ -50,14 +50,14 @@ export function ChangePasswordPanel() {
         <FormTextField
           className="mb-24"
           name="password"
-          label={<Trans message="New password" />}
+          label={<Trans message="Nouveau mot de passe" />}
           type="password"
           autoComplete="new-password"
           required
         />
         <FormTextField
           name="password_confirmation"
-          label={<Trans message="Confirm password" />}
+          label={<Trans message="Confirmer le mot de passe" />}
           type="password"
           autoComplete="new-password"
           required

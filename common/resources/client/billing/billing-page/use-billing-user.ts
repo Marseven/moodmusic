@@ -6,7 +6,11 @@ export function useBillingUser() {
     with: ['subscriptions.product', 'subscriptions.price'],
   });
 
-  const subscription = query.data?.user.subscriptions?.[0];
+  const subscriptions = query.data?.user.subscriptions;
+  // Pick the best subscription: active (paid, no ends_at) first, then most recent
+  const subscription = subscriptions?.find(s => s.paid_at && !s.ends_at)
+    ?? subscriptions?.find(s => s.paid_at)
+    ?? subscriptions?.[0];
 
   return {subscription, isLoading: query.isLoading, user: query.data?.user};
 }

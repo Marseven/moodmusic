@@ -51,8 +51,14 @@ interface PlanListProps {
   selectedPeriod: UpsellBillingCycle;
 }
 function PlanList({plans, selectedPeriod}: PlanListProps) {
-  const {isLoggedIn, isSubscribed} = useAuth();
+  const {isLoggedIn, isSubscribed, user} = useAuth();
   const filteredPlans = plans.filter(plan => !plan.hidden);
+  
+  // Vérifier si l'utilisateur a un abonnement vraiment valide (pas juste incomplet)
+  const hasValidSubscription = user?.subscriptions?.some(sub => 
+    sub.gateway_id && sub.paid_at && !sub.ends_at
+  ) || false;
+  
   return (
     <Fragment>
       {filteredPlans.map((plan, index) => {
@@ -64,7 +70,8 @@ function PlanList({plans, selectedPeriod}: PlanListProps) {
         if (!isLoggedIn) {
           upgradeRoute = `/register?redirectFrom=pricing`;
         }
-        if (isSubscribed) {
+        // Utiliser hasValidSubscription au lieu de isSubscribed
+        if (hasValidSubscription) {
           upgradeRoute = `/change-plan/${plan.id}/${price?.id}/confirm`;
         }
         if (isLoggedIn && !plan.free) {
@@ -76,8 +83,8 @@ function PlanList({plans, selectedPeriod}: PlanListProps) {
             key={plan.id}
             {...opacityAnimation}
             className={clsx(
-              'px-28 rounded-lg w-full md:max-w-350 md:min-w-240 border shadow-lg bg-paper',
-              plan.recommended ? 'py-56' : 'py-28',
+              'mood-pricing-card px-28 w-full md:max-w-350 md:min-w-240',
+              plan.recommended ? 'py-56 recommended' : 'py-28',
               isFirst && 'ml-auto',
               isLast && 'mr-auto'
             )}
@@ -91,7 +98,7 @@ function PlanList({plans, selectedPeriod}: PlanListProps) {
                   !plan.recommended && 'invisible'
                 )}
               >
-                <Trans message="Most popular" />
+                <Trans message="Le plus populaire" />
               </Chip>
               <div className="text-xl font-semibold mb-12">
                 <Trans message={plan.name} />
@@ -110,14 +117,14 @@ function PlanList({plans, selectedPeriod}: PlanListProps) {
                 />
               ) : (
                 <div className="font-bold text-4xl">
-                  <Trans message="Free" />
+                  <Trans message="Gratuit" />
                 </div>
               )}
               <div className="mt-60">
                 <Button
                   variant="flat"
                   color="primary"
-                  className="w-full"
+                  className="w-full mood-cta-button"
                   size="md"
                   elementType={upgradeRoute ? Link : undefined}
                   disabled={!upgradeRoute}
@@ -146,14 +153,31 @@ interface ActionButtonTextProps {
   product: Product;
 }
 function ActionButtonText({product}: ActionButtonTextProps) {
-  const {isLoggedIn} = useAuth();
+  const {isLoggedIn, user} = useAuth();
+  
+  // Vérifier si l'utilisateur a un abonnement vraiment valide (pas juste incomplet)
+  const hasValidSubscription = user?.subscriptions?.some(sub => 
+    sub.gateway_id && sub.paid_at && !sub.ends_at
+  ) || false;
+  
+  // Vérifier s'il y a un abonnement incomplet
+  const hasIncompleteSubscription = user?.subscriptions?.some(sub => 
+    !sub.gateway_id || !sub.paid_at
+  ) || false;
+  
   if (product.free && isLoggedIn) {
-    return <Trans message="You're on :plan" values={{plan: product.name}} />;
+    return <Trans message="Vous êtes sur :plan" values={{plan: product.name}} />;
   }
   if (product.free) {
-    return <Trans message="Get started" />;
+    return <Trans message="Commencer" />;
   }
-  return <Trans message="Upgrade" />;
+  if (!product.free && hasIncompleteSubscription) {
+    return <Trans message="Essayer le Pro" />;
+  }
+  if (hasValidSubscription) {
+    return <Trans message="Mettre à niveau" />;
+  }
+  return <Trans message="Essayer le Pro" />;
 }
 
 function SkeletonLoader() {

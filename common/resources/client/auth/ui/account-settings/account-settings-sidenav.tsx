@@ -36,32 +36,32 @@ export function AccountSettingsSidenav() {
     <aside className="flex-shrink-0 sticky top-10 hidden lg:block">
       <List padding="p-0">
         <Item icon={<PersonIcon />} panel={p.AccountDetails}>
-          <Trans message="Account details" />
+          <Trans message="Détails du compte" />
         </Item>
         {socialEnabled && (
           <Item icon={<LoginIcon />} panel={p.SocialLogin}>
-            <Trans message="Social login" />
+            <Trans message="Connexion sociale" />
           </Item>
         )}
         <Item icon={<LockIcon />} panel={p.Password}>
-          <Trans message="Password" />
+          <Trans message="Mot de passe" />
         </Item>
         <Item icon={<PhonelinkLockIcon />} panel={p.TwoFactor}>
-          <Trans message="Two factor authentication" />
+          <Trans message="Authentification à deux facteurs" />
         </Item>
         <Item icon={<DevicesIcon />} panel={p.Sessions}>
-          <Trans message="Active sessions" />
+          <Trans message="Sessions actives" />
         </Item>
         <Item icon={<LanguageIcon />} panel={p.LocationAndLanguage}>
-          <Trans message="Location and language" />
+          <Trans message="Localisation et langue" />
         </Item>
         {api?.integrated && hasPermission('api.access') ? (
           <Item icon={<ApiIcon />} panel={p.Developers}>
-            <Trans message="Developers" />
+            <Trans message="Développeurs" />
           </Item>
         ) : null}
         <Item icon={<DangerousIcon />} panel={p.DeleteAccount}>
-          <Trans message="Delete account" />
+          <Trans message="Supprimer le compte" />
         </Item>
       </List>
     </aside>

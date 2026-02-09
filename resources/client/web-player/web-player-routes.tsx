@@ -20,6 +20,8 @@ import {LibraryPlaylistsPage} from '@app/web-player/library/library-playlists-pa
 import {TrackEmbed} from '@app/web-player/tracks/track-embed';
 import {AlbumEmbed} from '@app/web-player/albums/album-embed';
 import {HomepageChannelPage} from '@app/web-player/channels/homepage-channel-page';
+import {PurchasesPage} from '@app/web-player/purchases/purchases-page';
+import {PurchaseEbillingDone} from '@app/web-player/purchases/purchase-ebilling-done';
 
 const RouteConfig: RouteObject[] = [
   {
@@ -160,6 +162,23 @@ const RouteConfig: RouteObject[] = [
         element: (
           <AuthRoute>
             <LibraryHistoryPage />
+          </AuthRoute>
+        ),
+      },
+      // purchases
+      {
+        path: 'library/purchases',
+        element: (
+          <AuthRoute>
+            <PurchasesPage />
+          </AuthRoute>
+        ),
+      },
+      {
+        path: 'purchases/ebilling/done',
+        element: (
+          <AuthRoute>
+            <PurchaseEbillingDone />
           </AuthRoute>
         ),
       },

@@ -3,8 +3,7 @@ import {useRemoveItemsFromLibrary} from '@app/web-player/library/requests/use-re
 import {useLibraryStore} from '@app/web-player/library/state/likes-store';
 import {Likeable} from '@app/web-player/library/likeable';
 import {IconButton, IconButtonProps} from '@common/ui/buttons/icon-button';
-import {FavoriteIcon} from '@common/icons/material/Favorite';
-import {FavoriteBorderIcon} from '@common/icons/material/FavoriteBorder';
+import {ModernHeartFilledIcon, ModernHeartOutlineIcon} from '@app/web-player/icons/modern-icons';
 import {useAuthClickCapture} from '@app/web-player/use-auth-click-capture';
 
 interface LikeIconButtonProps
@@ -35,7 +34,7 @@ export function LikeIconButton({
           removeFromLibrary.mutate({likeables: [likeable]});
         }}
       >
-        <FavoriteIcon />
+        <ModernHeartFilledIcon />
       </IconButton>
     );
   }
@@ -50,7 +49,7 @@ export function LikeIconButton({
         addToLibrary.mutate({likeables: [likeable]});
       }}
     >
-      <FavoriteBorderIcon />
+      <ModernHeartOutlineIcon />
     </IconButton>
   );
 }

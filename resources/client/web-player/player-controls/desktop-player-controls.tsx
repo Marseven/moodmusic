@@ -1,6 +1,6 @@
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
-import {ReactNode, useContext} from 'react';
+import React, {ReactNode, useContext, useMemo} from 'react';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
 import {PlaybackControls} from '@app/web-player/player-controls/playback-controls';
@@ -11,8 +11,7 @@ import {
   playerOverlayState,
   usePlayerOverlayStore,
 } from '@app/web-player/state/player-overlay-store';
-import {KeyboardArrowDownIcon} from '@common/icons/material/KeyboardArrowDown';
-import {KeyboardArrowUpIcon} from '@common/icons/material/KeyboardArrowUp';
+import {ModernCollapseIcon, ModernExpandIcon} from '@app/web-player/icons/modern-icons';
 import {LyricsButton} from '@app/web-player/player-controls/lyrics-button';
 import {DownloadTrackButton} from '@app/web-player/player-controls/download-track-button';
 import {useSettings} from '@common/core/settings/use-settings';
@@ -25,13 +24,19 @@ import {MediaQueueListIcon} from '@common/icons/media/media-queue-list';
 import {VolumeControls} from '@common/player/ui/controls/volume-controls';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
+import {Track} from '@app/web-player/tracks/track';
+import {SparklesIcon} from '@heroicons/react/24/outline';
+import {HeartIcon} from '@heroicons/react/24/outline';
+import {FaceSmileIcon} from '@heroicons/react/24/outline';
+import {CloudIcon} from '@heroicons/react/24/outline';
+import {BoltIcon} from '@heroicons/react/24/outline';
 
 export function DesktopPlayerControls() {
   const mediaIsCued = usePlayerStore(s => s.cuedMedia != null);
   if (!mediaIsCued) return null;
 
   return (
-    <div className="h-96 px-16 flex items-center justify-between border-t bg dashboard-grid-footer z-30">
+    <div className="h-auto flex items-center justify-between border-t bg dashboard-grid-footer z-30 music-player-container mood-system-enhanced">
       <QueuedTrack />
       <PlaybackControls className="w-2/5 max-w-[722px]" />
       <SecondaryControls />
@@ -45,27 +50,28 @@ function QueuedTrack() {
 
   if (track) {
     content = (
-      <div className="flex items-center gap-14">
+      <div className="player-track-section">
+        <MoodIndicator track={track} />
         <DialogTrigger type="popover" triggerOnContextMenu placement="top">
           <Link to={getTrackLink(track)} className="flex-shrink-0">
             <TrackImage
-              className="rounded w-56 h-56 object-cover"
+              className="player-track-image w-56 h-56 object-cover"
               track={track}
             />
           </Link>
           <TrackContextDialog tracks={[track]} />
         </DialogTrigger>
-        <div className="min-w-0 overflow-hidden overflow-ellipsis">
+        <div className="player-track-info">
           <DialogTrigger type="popover" triggerOnContextMenu placement="top">
             <TrackLink
               track={track}
-              className="text-sm whitespace-nowrap min-w-0 max-w-full"
+              className="player-track-title whitespace-nowrap min-w-0 max-w-full"
             />
             <TrackContextDialog tracks={[track]} />
           </DialogTrigger>
           {track.artists?.length ? (
             <DialogTrigger type="popover" triggerOnContextMenu placement="top">
-              <div className="text-xs text-muted">
+              <div className="player-track-artist">
                 <ArtistLinks
                   artists={track.artists}
                   className="whitespace-nowrap"
@@ -82,7 +88,61 @@ function QueuedTrack() {
     content = null;
   }
 
-  return <div className="min-w-180 w-[30%]">{content}</div>;
+  return <>{content}</>;
+}
+
+// Mood Indicator - keyword-based detection from track metadata
+function MoodIndicator({ track }: { track: Track }) {
+  const moodInfo = useMemo(() => {
+    const genreName = track.genres?.[0]?.name?.toLowerCase() || '';
+    const trackName = track.name?.toLowerCase() || '';
+    const artistName = track.artists?.[0]?.name?.toLowerCase() || '';
+    const allText = `${genreName} ${trackName} ${artistName}`;
+
+    const moodKeywords: Record<string, string[]> = {
+      energetic: ['electronic', 'dance', 'edm', 'techno', 'house', 'energy', 'power', 'beat', 'bass', 'club', 'party', 'dubstep', 'drum', 'rock', 'metal', 'punk', 'hip-hop', 'rap', 'trap'],
+      chill: ['chill', 'ambient', 'relax', 'calm', 'smooth', 'soft', 'mellow', 'lounge', 'acoustic', 'jazz', 'blues', 'folk', 'indie', 'lo-fi', 'trip-hop'],
+      romantic: ['love', 'romance', 'romantic', 'heart', 'kiss', 'soul', 'baby', 'ballad', 'tender', 'sweet', 'r&b', 'rnb'],
+      happy: ['pop', 'happy', 'joy', 'fun', 'bright', 'sunshine', 'summer', 'uplifting', 'cheerful', 'afro', 'reggae', 'soca', 'kompa'],
+      focused: ['classical', 'study', 'piano', 'violin', 'orchestra', 'symphony', 'instrumental', 'cinematic', 'soundtrack', 'minimal'],
+      melancholic: ['sad', 'melancholy', 'dark', 'emotional', 'tears', 'pain', 'broken', 'lonely', 'gothic', 'grunge'],
+    };
+
+    const scores: Record<string, number> = {};
+    for (const [mood, keywords] of Object.entries(moodKeywords)) {
+      scores[mood] = 0;
+      for (const kw of keywords) {
+        if (allText.includes(kw)) {
+          scores[mood] += genreName.includes(kw) ? 3 : 1;
+        }
+      }
+    }
+
+    const best = Object.entries(scores).reduce((a, b) => a[1] >= b[1] ? a : b);
+
+    const configs: Record<string, { icon: typeof BoltIcon; label: string; cls: string }> = {
+      energetic:   { icon: BoltIcon,      label: 'Énergique',    cls: 'player-mood-energetic' },
+      chill:       { icon: CloudIcon,     label: 'Détendu',      cls: 'player-mood-chill' },
+      romantic:    { icon: HeartIcon,     label: 'Romantique',   cls: 'player-mood-romantic' },
+      happy:       { icon: FaceSmileIcon, label: 'Joyeux',       cls: 'player-mood-happy' },
+      focused:     { icon: SparklesIcon,  label: 'Concentré',    cls: 'player-mood-focused' },
+      melancholic: { icon: CloudIcon,     label: 'Mélancolique', cls: 'player-mood-melancholic' },
+    };
+
+    if (best[1] === 0) {
+      return { icon: BoltIcon, label: 'Énergique', cls: 'player-mood-energetic' };
+    }
+    return configs[best[0]];
+  }, [track.id, track.genres, track.artists, track.name]);
+
+  const MoodIcon = moodInfo.icon;
+
+  return (
+    <div className={`player-mood-indicator ${moodInfo.cls}`}>
+      <MoodIcon className="w-14 h-14 mr-6" />
+      <span className="text-xs font-medium whitespace-nowrap">{moodInfo.label}</span>
+    </div>
+  );
 }
 
 function SecondaryControls() {
@@ -90,12 +150,12 @@ function SecondaryControls() {
     DashboardLayoutContext
   );
   return (
-    <div className="flex items-center justify-end min-w-180 w-[30%]">
-      <LyricsButton />
-      <DownloadTrackButton />
+    <div className="player-secondary-controls">
+      <LyricsButton className="player-button-glass mood-transition-smooth" />
+      <DownloadTrackButton className="player-button-glass mood-transition-smooth" />
       <Tooltip label={<Trans message="Queue" />}>
         <IconButton
-          className="flex-shrink-0"
+          className="flex-shrink-0 queue-button-glass mood-transition-smooth"
           onClick={() => {
             setRightSidenavStatus(
               rightSidenavStatus === 'closed' ? 'open' : 'closed'
@@ -105,7 +165,9 @@ function SecondaryControls() {
           <MediaQueueListIcon />
         </IconButton>
       </Tooltip>
-      <VolumeControls trackColor="neutral" />
+      <div className="volume-controls-glass">
+        <VolumeControls trackColor="neutral" />
+      </div>
       <OverlayButton />
     </div>
   );
@@ -123,7 +185,7 @@ function OverlayButton() {
   return (
     <Tooltip label={<Trans message="Expand" />}>
       <IconButton
-        className="flex-shrink-0 ml-26"
+        className="flex-shrink-0 ml-26 player-button-glass mood-transition-smooth"
         color="chip"
         variant="flat"
         radius="rounded"
@@ -134,7 +196,7 @@ function OverlayButton() {
           playerOverlayState.toggle();
         }}
       >
-        {isActive ? <KeyboardArrowDownIcon /> : <KeyboardArrowUpIcon />}
+        {isActive ? <ModernCollapseIcon /> : <ModernExpandIcon />}
       </IconButton>
     </Tooltip>
   );

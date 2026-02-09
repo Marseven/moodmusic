@@ -30,7 +30,7 @@ export function AccessTokenPanel({user}: Props) {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.Developers}
-      title={<Trans message="API access tokens" />}
+      title={<Trans message="Jetons d'accès API" />}
       titleSuffix={
         <Link className={LinkStyle} to="/api-docs" target="_blank">
           <Trans message="Documentation" />
@@ -42,7 +42,7 @@ export function AccessTokenPanel({user}: Props) {
         <IllustratedMessage
           className="py-40"
           image={<SvgImage src={secureFilesSvg} />}
-          title={<Trans message="You have no personal access tokens yet" />}
+          title={<Trans message="Vous n'avez pas encore de jetons d'accès personnels" />}
         />
       ) : (
         tokens.map((token, index) => (
@@ -71,17 +71,17 @@ function TokenLine({token, isLast}: TokenLineProps) {
     >
       <div className="text-sm">
         <div className="font-semibold">
-          <Trans message="Name" />
+          <Trans message="Nom" />
         </div>
         <div>{token.name}</div>
         <div className="font-semibold mt-10">
-          <Trans message="Last used" />
+          <Trans message="Dernière utilisation" />
         </div>
         <div>
           {token.last_used_at ? (
             <FormattedDate date={token.last_used_at} />
           ) : (
-            <Trans message="Never" />
+            <Trans message="Jamais" />
           )}
         </div>
       </div>
@@ -94,7 +94,7 @@ function CreateNewTokenButton() {
   return (
     <DialogTrigger type="modal">
       <Button variant="flat" color="primary">
-        <Trans message="Create token" />
+        <Trans message="Créer un jeton" />
       </Button>
       <CreateNewTokenDialog />
     </DialogTrigger>
@@ -126,15 +126,15 @@ function DeleteTokenButton({token}: DeleteTokenButtonProps) {
         color="danger"
         className="flex-shrink-0 ml-auto"
       >
-        <Trans message="Delete" />
+        <Trans message="Supprimer" />
       </Button>
       <ConfirmationDialog
         isDanger
-        title={<Trans message="Delete token?" />}
+        title={<Trans message="Supprimer le jeton?" />}
         body={
-          <Trans message="This token will be deleted immediately and permanently. Once deleted, it can no longer be used to make API requests." />
+          <Trans message="Ce jeton sera supprimé immédiatement et définitivement. Une fois supprimé, il ne pourra plus être utilisé pour faire des requêtes API." />
         }
-        confirm={<Trans message="Delete" />}
+        confirm={<Trans message="Supprimer" />}
       />
     </DialogTrigger>
   );

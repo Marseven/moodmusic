@@ -15,7 +15,7 @@ import {useFollowUser} from '@app/web-player/users/use-follow-user';
 import {useUnfollowUser} from '@app/web-player/users/use-unfollow-user';
 import {Button} from '@common/ui/buttons/button';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
-import {EditIcon} from '@common/icons/material/Edit';
+import {ModernEditIcon} from '@app/web-player/icons/modern-icons';
 import {EditProfileDialog} from '@app/web-player/user-profile/edit-profile-dialog';
 
 interface ProfileHeaderProps {
@@ -78,7 +78,7 @@ function EditButton({user}: EditButtonProps) {
       <Button
         variant="outline"
         radius="rounded-full"
-        startIcon={<EditIcon />}
+        startIcon={<ModernEditIcon />}
         className={actionButtonClassName()}
       >
         <Trans message="Edit" />

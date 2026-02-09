@@ -4,10 +4,9 @@ import clsx from 'clsx';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {MoreHorizIcon} from '@common/icons/material/MoreHoriz';
 import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
 import {LikeIconButton} from '@app/web-player/library/like-icon-button';
-import {MoreVertIcon} from '@common/icons/material/MoreVert';
+import {ModernEllipsisIcon, ModernEllipsisVerticalIcon} from '@app/web-player/icons/modern-icons';
 
 interface Props {
   track: Track;
@@ -26,7 +25,7 @@ export function TrackOptionsColumn({track, isHovered}: Props) {
             !isMobile && !isHovered && 'invisible'
           )}
         >
-          {isMobile ? <MoreVertIcon /> : <MoreHorizIcon />}
+          {isMobile ? <ModernEllipsisVerticalIcon /> : <ModernEllipsisIcon />}
         </IconButton>
         <TrackContextDialog tracks={[track]} />
       </DialogTrigger>

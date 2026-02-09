@@ -39,10 +39,10 @@ export function SessionsPanel({user}: Props) {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.Sessions}
-      title={<Trans message="Active sessions" />}
+      title={<Trans message="Sessions actives" />}
     >
       <p className="text-sm">
-        <Trans message="If necessary, you may log out of all of your other browser sessions across all of your devices. Your recent sessions are listed below. If you feel your account has been compromised, you should also update your password." />
+        <Trans message="Si nécessaire, vous pouvez vous déconnecter de toutes vos autres sessions de navigateur sur tous vos appareils. Vos sessions récentes sont listées ci-dessous. Si vous pensez que votre compte a été compromis, vous devriez également mettre à jour votre mot de passe." />
       </p>
       <div className="my-30">
         {isLoading ? (
@@ -63,14 +63,14 @@ export function SessionsPanel({user}: Props) {
               {password: password!},
               {
                 onSuccess: () => {
-                  toast(message('Logged out other sessions.'));
+                  toast(message('Autres sessions déconnectées.'));
                 },
               }
             );
           });
         }}
       >
-        <Trans message="Logout other sessions" />
+        <Trans message="Déconnecter les autres sessions" />
       </Button>
     </AccountSettingsPanel>
   );
@@ -123,7 +123,7 @@ function LastActive({session}: LastActiveProps) {
   if (session.is_current_device) {
     return (
       <span className="text-positive">
-        <Trans message="This device" />
+        <Trans message="Cet appareil" />
       </span>
     );
   }
@@ -138,9 +138,9 @@ function IpAddress({session}: IpAddressProps) {
   if (session.ip_address) {
     return <span>{session.ip_address}</span>;
   } else if (session.token) {
-    return <Trans message="API Token" />;
+    return <Trans message="Jeton API" />;
   }
-  return <Trans message="Unknown IP" />;
+  return <Trans message="IP inconnue" />;
 }
 
 interface ValueOrUnknownProps {
@@ -150,6 +150,6 @@ function ValueOrUnknown({children}: ValueOrUnknownProps) {
   return children ? (
     <Fragment>{children}</Fragment>
   ) : (
-    <Trans message="Unknown" />
+    <Trans message="Inconnu" />
   );
 }

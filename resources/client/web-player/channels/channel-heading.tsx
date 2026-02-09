@@ -1,7 +1,7 @@
 import React from 'react';
 import {Channel} from '@app/web-player/channels/channel';
 import {Link, useParams} from 'react-router-dom';
-import {KeyboardArrowRightIcon} from '@common/icons/material/KeyboardArrowRight';
+import {ModernChevronRightIcon} from '@app/web-player/icons/modern-icons';
 import clsx from 'clsx';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
@@ -55,7 +55,7 @@ export function ChannelHeading({
   return (
     <div className={clsx('text-xl flex items-center gap-4', margin)}>
       <NestedChannelLink channel={channel} />
-      <KeyboardArrowRightIcon className="mt-4" />
+      <ModernChevronRightIcon className="mt-4" />
     </div>
   );
 }

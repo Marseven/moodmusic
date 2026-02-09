@@ -32,6 +32,9 @@ export function CheckoutLayout({children}: CheckoutLayoutProps) {
       />
       <div className="flex-auto md:flex w-full mx-auto justify-between px-20 md:px-0 md:pt-128 md:max-w-950">
         <div className="hidden md:block fixed right-0 top-0 w-1/2 h-full bg-alt shadow-[15px_0_30px_0_rgb(0_0_0_/_18%)]" />
+        <div className="mb-20 md:hidden">
+          <div className="relative z-10">{right}</div>
+        </div>
         <div className="md:w-400 overflow-hidden">
           {left}
           <CustomMenu

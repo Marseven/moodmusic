@@ -27,6 +27,9 @@ import {getAlbumLink} from '@app/web-player/albums/album-link';
 import {ShareMediaButton} from '@app/web-player/context-dialog/share-media-button';
 import {useSettings} from '@common/core/settings/use-settings';
 import {LyricsDialog} from '@app/web-player/tracks/lyrics/lyrics-dialog';
+import {PurchaseDialog} from '@app/web-player/purchases/purchase-dialog';
+import {useUserPurchases, isPurchased} from '@app/web-player/purchases/use-user-purchases';
+import {useAuth} from '@common/auth/use-auth';
 
 export interface TrackContextDialogProps {
   tracks: Track[];
@@ -44,6 +47,8 @@ export function TrackContextDialog({
   const shouldShowRadio = useShouldShowRadioButton();
   const {player} = useSettings();
   const {close} = useDialogContext();
+  const {user} = useAuth();
+  const {data: purchasesData} = useUserPurchases();
 
   const loadTracks = useCallback(() => {
     return Promise.resolve(tracks);
@@ -117,6 +122,24 @@ export function TrackContextDialog({
           {tracks.length === 1 ? (
             <ToggleRepostMenuButton item={tracks[0]} />
           ) : null}
+          {tracks.length === 1 &&
+            user &&
+            firstTrack.price != null &&
+            firstTrack.price > 0 &&
+            !isPurchased(
+              purchasesData?.purchases,
+              'track',
+              firstTrack.id,
+            ) && (
+              <ContextMenuButton
+                onClick={() => {
+                  close();
+                  openDialog(PurchaseDialog, {item: firstTrack});
+                }}
+              >
+                <Trans message="Buy" />
+              </ContextMenuButton>
+            )}
           {tracks.length === 1 && canEdit && (
             <ContextMenuButton
               type="link"

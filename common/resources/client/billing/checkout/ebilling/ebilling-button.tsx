@@ -48,9 +48,9 @@ export function EbillingButton({
       disabled={disabled || isProcessing}
     >
       {isProcessing ? (
-        <Trans message="Processing..." />
+        <Trans message="Traitement en cours..." />
       ) : (
-        <Trans message="Pay with Ebilling" />
+        <Trans message="Payer avec eBilling" />
       )}
     </Button>
   );

@@ -24,6 +24,8 @@ export interface Track {
   likes_count?: number;
   reposts_count?: number;
   comments_count?: number;
+  price?: number;
+  currency?: string;
   updated_at?: string;
   created_at?: string;
   // available in library tracks page only

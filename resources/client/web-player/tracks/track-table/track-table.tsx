@@ -4,7 +4,7 @@ import {ColumnConfig} from '@common/datatable/column-config';
 import {Trans} from '@common/i18n/trans';
 import React, {useMemo} from 'react';
 import {AlbumLink} from '@app/web-player/albums/album-link';
-import {ScheduleIcon} from '@common/icons/material/Schedule';
+import {ModernClockIcon} from '@app/web-player/icons/modern-icons';
 import {FormattedDuration} from '@common/i18n/formatted-duration';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
 import {TogglePlaybackColumn} from '@app/web-player/tracks/track-table/toggle-playback-column';
@@ -15,13 +15,14 @@ import {NameWithAvatarPlaceholder} from '@common/datatable/column-templates/name
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {RowElementProps} from '@common/ui/tables/table-row';
 import {TableTrackContextDialog} from '@app/web-player/tracks/context-dialog/table-track-context-dialog';
-import {TrendingUpIcon} from '@common/icons/material/TrendingUp';
+import {ModernTrendingUpIcon} from '@app/web-player/icons/modern-icons';
 import {FormattedRelativeTime} from '@common/i18n/formatted-relative-time';
 import {trackToMediaItem} from '@app/web-player/tracks/utils/track-to-media-item';
 import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {TrackOptionsColumn} from '@app/web-player/tracks/track-table/track-options-column';
 import {TableDataItem} from '@common/ui/tables/types/table-data-item';
+import {BuyButton} from '@app/web-player/purchases/buy-button';
 
 const columnConfig: ColumnConfig<Track>[] = [
   {
@@ -110,12 +111,25 @@ const columnConfig: ColumnConfig<Track>[] = [
     },
   },
   {
+    key: 'price',
+    maxWidth: 'max-w-128',
+    align: 'end',
+    header: () => <Trans message="Price" />,
+    hideHeader: true,
+    body: (track, row) => {
+      if (row.isPlaceholder) {
+        return null;
+      }
+      return <BuyButton item={track} size="2xs" />;
+    },
+  },
+  {
     key: 'duration',
     allowsSorting: true,
     className: 'text-muted',
     maxWidth: 'max-w-48',
     align: 'end',
-    header: () => <ScheduleIcon />,
+    header: () => <ModernClockIcon />,
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <Skeleton className="leading-3" />;
@@ -128,7 +142,7 @@ const columnConfig: ColumnConfig<Track>[] = [
     allowsSorting: true,
     className: 'text-muted',
     maxWidth: 'max-w-54',
-    header: () => <TrendingUpIcon />,
+    header: () => <ModernTrendingUpIcon />,
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <Skeleton className="leading-3" />;
@@ -152,6 +166,7 @@ export interface TrackTableProps {
   hideTrackImage?: boolean;
   hidePopularity?: boolean;
   hideAddedAtColumn?: boolean;
+  hidePriceColumn?: boolean;
   hideHeaderRow?: boolean;
   queueGroupId?: string | number;
   renderRowAs?: TableProps<Track>['renderRowAs'];
@@ -169,6 +184,7 @@ export function TrackTable({
   hideTrackImage = false,
   hidePopularity = true,
   hideAddedAtColumn = true,
+  hidePriceColumn = false,
   queueGroupId,
   renderRowAs,
   ...tableProps
@@ -191,9 +207,12 @@ export function TrackTable({
       if (col.key === 'added_at' && hideAddedAtColumn) {
         return false;
       }
+      if (col.key === 'price' && hidePriceColumn) {
+        return false;
+      }
       return true;
     });
-  }, [hideArtist, hideAlbum, hidePopularity, hideAddedAtColumn]);
+  }, [hideArtist, hideAlbum, hidePopularity, hideAddedAtColumn, hidePriceColumn]);
 
   const meta: TrackTableMeta = useMemo(() => {
     return {queueGroupId: queueGroupId, hideTrackImage};

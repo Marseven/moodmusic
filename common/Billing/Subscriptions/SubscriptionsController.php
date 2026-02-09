@@ -107,4 +107,26 @@ class SubscriptionsController extends BaseController
         $subscription->resume();
         return $this->success(['subscription' => $subscription]);
     }
+
+    public function cancelIncomplete()
+    {
+        $user = $this->request->user();
+        
+        // Supprimer tous les abonnements incomplets (sans gateway_id ou paid_at)
+        $incompleteSubscriptions = $user->subscriptions()
+            ->where(function($query) {
+                $query->whereNull('gateway_id')
+                      ->orWhereNull('paid_at');
+            })
+            ->get();
+
+        foreach ($incompleteSubscriptions as $subscription) {
+            $subscription->delete();
+        }
+
+        return $this->success([
+            'message' => 'Abonnements incomplets supprimés avec succès.',
+            'deleted_count' => $incompleteSubscriptions->count()
+        ]);
+    }
 }

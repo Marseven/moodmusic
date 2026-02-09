@@ -2,8 +2,7 @@ import {useAddItemsToLibrary} from '@app/web-player/library/requests/use-add-ite
 import {useRemoveItemsFromLibrary} from '@app/web-player/library/requests/use-remove-items-from-library';
 import {useLibraryStore} from '@app/web-player/library/state/likes-store';
 import {Likeable} from '@app/web-player/library/likeable';
-import {FavoriteIcon} from '@common/icons/material/Favorite';
-import {FavoriteBorderIcon} from '@common/icons/material/FavoriteBorder';
+import {ModernHeartFilledIcon, ModernHeartOutlineIcon} from '@app/web-player/icons/modern-icons';
 import {Button, ButtonProps} from '@common/ui/buttons/button';
 import {message} from '@common/i18n/message';
 import {Trans} from '@common/i18n/trans';
@@ -32,7 +31,7 @@ export function LikeButton({
         {...buttonProps}
         variant="outline"
         radius={radius}
-        startIcon={<FavoriteIcon className="text-primary" />}
+        startIcon={<ModernHeartFilledIcon className="text-primary" />}
         disabled={disabled || isLoading}
         onClickCapture={authHandler}
         onClick={() => {
@@ -48,7 +47,7 @@ export function LikeButton({
       {...buttonProps}
       variant="outline"
       radius={radius}
-      startIcon={<FavoriteBorderIcon />}
+      startIcon={<ModernHeartOutlineIcon />}
       disabled={disabled || isLoading}
       onClickCapture={authHandler}
       onClick={() => {

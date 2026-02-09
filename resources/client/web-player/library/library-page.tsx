@@ -1,16 +1,19 @@
 import {Trans} from '@common/i18n/trans';
-import {AudiotrackIcon} from '@common/icons/material/Audiotrack';
 import {StaticPageTitle} from '@common/seo/static-page-title';
 import React, {Fragment, ReactElement, ReactNode} from 'react';
 import {Link, Navigate} from 'react-router-dom';
-import {AlbumIcon} from '@common/icons/material/Album';
-import {MicIcon} from '@common/icons/material/Mic';
-import {PlaylistPlayIcon} from '@common/icons/material/PlaylistPlay';
-import {HistoryIcon} from '@common/icons/material/History';
 import {SvgIconProps} from '@common/icons/svg-icon';
 import {getPlaylistLink} from '@app/web-player/playlists/playlist-link';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {PlaylistAddIcon} from '@common/icons/material/PlaylistAdd';
+import {
+  ModernMusicNoteIcon,
+  ModernDiscIcon,
+  ModernMicrophoneIcon,
+  ModernQueueListIcon,
+  ModernClockIcon,
+  ModernPlusIcon,
+  ModernDownloadIcon,
+} from '@app/web-player/icons/modern-icons';
 import {CreatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/create-playlist-dialog';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
@@ -50,29 +53,32 @@ export function LibraryPage() {
           }}
         >
           <IconButton className="flex-shrink-0" onClickCapture={authHandler}>
-            <PlaylistAddIcon />
+            <ModernPlusIcon />
           </IconButton>
           <CreatePlaylistDialog />
         </DialogTrigger>
       </div>
       <div>
         <MenuItem
-          icon={<AudiotrackIcon className="text-main" />}
+          icon={<ModernMusicNoteIcon className="text-main" />}
           to="/library/songs"
         >
           <Trans message="Songs" />
         </MenuItem>
-        <MenuItem icon={<PlaylistPlayIcon />} to="/library/playlists">
+        <MenuItem icon={<ModernQueueListIcon />} to="/library/playlists">
           <Trans message="Playlists" />
         </MenuItem>
-        <MenuItem icon={<AlbumIcon />} to="/library/albums">
+        <MenuItem icon={<ModernDiscIcon />} to="/library/albums">
           <Trans message="Albums" />
         </MenuItem>
-        <MenuItem icon={<MicIcon />} to="/library/artists">
+        <MenuItem icon={<ModernMicrophoneIcon />} to="/library/artists">
           <Trans message="Artists" />
         </MenuItem>
-        <MenuItem icon={<HistoryIcon />} to="/library/history">
+        <MenuItem icon={<ModernClockIcon />} to="/library/history">
           <Trans message="Play history" />
+        </MenuItem>
+        <MenuItem icon={<ModernDownloadIcon />} to="/library/purchases">
+          <Trans message="Purchases" />
         </MenuItem>
         {query.items.map(playlist => (
           <MenuItem

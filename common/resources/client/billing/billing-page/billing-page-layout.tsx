@@ -16,7 +16,7 @@ export function BillingPageLayout() {
   return (
     <div className="flex flex-col h-full">
       <StaticPageTitle>
-        <Trans message="Billing" />
+        <Trans message="Facturation" />
       </StaticPageTitle>
       <Navbar className="flex-shrink-0" menuPosition="billing-page" />
       <div className="flex-auto overflow-auto flex flex-col">

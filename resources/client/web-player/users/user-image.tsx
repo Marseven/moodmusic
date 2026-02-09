@@ -3,7 +3,7 @@ import {message} from '@common/i18n/message';
 import {User} from '@common/auth/user';
 import clsx from 'clsx';
 import {Trans} from '@common/i18n/trans';
-import {StarIcon} from '@common/icons/material/Star';
+import {ModernStarIcon} from '@app/web-player/icons/modern-icons';
 import userDefaultImage from './user-default.svg';
 
 interface UserImageProps {
@@ -42,7 +42,7 @@ export function UserImage({
           color="positive"
         >
           <div className="bg-primary rounded-full p-1">
-            <StarIcon className="text-white" size="sm" />
+            <ModernStarIcon className="text-white" size="sm" />
           </div>
           <Trans message="PRO user" />
         </div>

@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import {useCustomMenu} from '@common/menus/use-custom-menu';
 import {Trans} from '@common/i18n/trans';
 import {NavbarAuthMenu} from '@common/ui/navigation/navbar/navbar-auth-menu';
-import {PersonIcon} from '@common/icons/material/Person';
+import {UserIcon} from '@heroicons/react/24/outline';
 import {Badge} from '@common/ui/badge/badge';
 import {useAuth} from '@common/auth/use-auth';
 import {
@@ -21,7 +21,7 @@ import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {useSettings} from '@common/core/settings/use-settings';
 import {playerOverlayState} from '@app/web-player/state/player-overlay-store';
 import {usePrimaryArtistForCurrentUser} from '@app/web-player/backstage/use-primary-artist-for-current-user';
-import {MicIcon} from '@common/icons/material/Mic';
+import {MicrophoneIcon} from '@heroicons/react/24/outline';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
 import {useCurrentTime} from '@common/player/hooks/use-current-time';
 import {PlayButton} from '@common/player/ui/controls/play-button';
@@ -31,7 +31,7 @@ import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indi
 
 export function MobilePlayerControls() {
   return (
-    <div className="fixed bottom-0 left-0 right-0 w-[calc(100%-20px)] mx-auto bg-background/95">
+    <div className="fixed bottom-0 left-0 right-0 w-[calc(100%-20px)] mx-auto music-player-container mood-system-enhanced">
       <PlayerControls />
       <MobileNavbar />
     </div>
@@ -44,7 +44,7 @@ function PlayerControls() {
 
   return (
     <div
-      className="bg-chip rounded p-6 flex items-center gap-24 justify-between shadow relative"
+      className="mood-glass-panel rounded p-6 flex items-center gap-24 justify-between shadow relative"
       onClick={() => {
         playerOverlayState.toggle();
       }}
@@ -80,13 +80,13 @@ function QueuedTrack() {
 
 function PlaybackButtons() {
   return (
-    <div className="flex items-center justify-center">
-      <PreviousButton stopPropagation />
+    <div className="flex items-center justify-center gap-2">
+      <PreviousButton stopPropagation className="player-button-glass mood-transition-smooth" />
       <div className="relative">
         <BufferingIndicator />
-        <PlayButton size="md" iconSize="lg" stopPropagation />
+        <PlayButton size="md" iconSize="lg" stopPropagation className="player-play-button-glass mood-transition-smooth mood-pulse" />
       </div>
-      <NextButton stopPropagation />
+      <NextButton stopPropagation className="player-button-glass mood-transition-smooth" />
     </div>
   );
 }
@@ -149,7 +149,7 @@ function AccountButton() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicIcon />}
+          startIcon={<MicrophoneIcon className="w-5 h-5" />}
           onSelected={() => {
             navigate(getArtistLink(primaryArtist));
           }}
@@ -163,7 +163,7 @@ function AccountButton() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicIcon />}
+          startIcon={<MicrophoneIcon className="w-5 h-5" />}
           onSelected={() => {
             navigate('/backstage/requests');
           }}
@@ -183,7 +183,7 @@ function AccountButton() {
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <PersonIcon size="md" />
+        <UserIcon className="w-6 h-6" />
       </Badge>
       <div className="text-xs">
         <Trans message="Account" />

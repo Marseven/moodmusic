@@ -1,14 +1,12 @@
 import {useAuthUserPlaylists} from '@app/web-player/playlists/requests/use-auth-user-playlists';
 import {m} from 'framer-motion';
 import {Button} from '@common/ui/buttons/button';
-import {KeyboardBackspaceIcon} from '@common/icons/material/KeyboardBackspace';
 import {Trans} from '@common/i18n/trans';
 import {
   ContextMenuButton,
   ContextMenuLayoutState,
 } from '@app/web-player/context-dialog/context-dialog-layout';
-import {AddIcon} from '@common/icons/material/Add';
-import {KeyboardArrowRightIcon} from '@common/icons/material/KeyboardArrowRight';
+import {ModernChevronLeftIcon, ModernPlusIcon, ModernChevronRightIcon} from '@app/web-player/icons/modern-icons';
 import {useContext, useMemo} from 'react';
 import {useAddTracksToPlaylist} from '@app/web-player/playlists/requests/use-add-tracks-to-playlist';
 import {toast} from '@common/ui/toast/toast';
@@ -44,7 +42,7 @@ export function PlaylistPanel() {
     >
       <div className="border-b pb-10 my-10 px-10">
         <Button
-          startIcon={<KeyboardBackspaceIcon />}
+          startIcon={<ModernChevronLeftIcon />}
           onClick={() => setPlaylistPanelIsActive(false)}
         >
           <Trans message="Back" />
@@ -52,7 +50,7 @@ export function PlaylistPanel() {
       </div>
       <ul className="overflow-y-auto overflow-x-hidden max-h-350">
         <ContextMenuButton
-          startIcon={<AddIcon />}
+          startIcon={<ModernPlusIcon />}
           onClick={async () => {
             closeMenu();
             const [playlist, tracks] = await Promise.all([
@@ -101,7 +99,7 @@ export function PlaylistPanelButton() {
   );
   return (
     <ContextMenuButton
-      endIcon={<KeyboardArrowRightIcon />}
+      endIcon={<ModernChevronRightIcon />}
       onClickCapture={authHandler}
       onClick={() => {
         setPlaylistPanelIsActive(!playlistPanelIsActive);

@@ -5,6 +5,7 @@ namespace Common\Billing;
 use App\User;
 use Carbon\Carbon;
 use Common\Billing\Gateways\Contracts\CommonSubscriptionGatewayActions;
+use Common\Billing\Gateways\Ebilling\Ebilling;
 use Common\Billing\Gateways\Paypal\Paypal;
 use Common\Billing\Gateways\Stripe\Stripe;
 use Common\Billing\Models\Price;
@@ -37,17 +38,6 @@ class Subscription extends Model
         'quantity' => 'integer',
         'amount' => 'decimal:2',
         'paid_at' => 'datetime',
-    ];
-
-    protected $fillable = [
-        'price_id',
-        'product_id',
-        'gateway_name',
-        'transaction_id',
-        'operator',
-        'amount',
-        'reference',
-        'paid_at',
     ];
 
     public function getOnGracePeriodAttribute(): bool
@@ -253,6 +243,8 @@ class Subscription extends Model
             return app(Stripe::class);
         } elseif ($this->gateway_name === 'paypal') {
             return app(Paypal::class);
+        } elseif ($this->gateway_name === 'ebilling') {
+            return app(Ebilling::class);
         }
 
         return null;

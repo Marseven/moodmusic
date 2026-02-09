@@ -35,6 +35,8 @@ class ModifyTracks extends BaseFormRequest
             'album_id'           => 'nullable|integer|min:1|exists:albums,id',
             'artists'            => 'required|array|min:1',
             'artists.*'          => ['required', 'regex:/[0-9]+|CURRENT_USER/i'],
+            'price'              => 'nullable|numeric|min:0',
+            'currency'           => 'nullable|string|size:3',
         ];
     }
 }

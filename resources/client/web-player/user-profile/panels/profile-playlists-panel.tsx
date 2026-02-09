@@ -6,7 +6,7 @@ import React from 'react';
 import {ProfileContentProps} from '@app/web-player/user-profile/user-profile-page';
 import {ContentGrid} from '@app/web-player/playable-item/content-grid';
 import {PlaylistGridItem} from '@app/web-player/playlists/playlist-grid-item';
-import {QueueMusicIcon} from '@common/icons/material/QueueMusic';
+import {ModernQueueListIcon} from '@app/web-player/icons/modern-icons';
 import {useUserPlaylists} from '@app/web-player/library/requests/use-user-playlists';
 
 export function ProfilePlaylistsPanel({user}: ProfileContentProps) {
@@ -21,7 +21,7 @@ export function ProfilePlaylistsPanel({user}: ProfileContentProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<QueueMusicIcon size="lg" className="text-muted" />}
+        image={<ModernQueueListIcon size="lg" className="text-muted" />}
         title={<Trans message="No playlists yet" />}
         description={
           <Trans

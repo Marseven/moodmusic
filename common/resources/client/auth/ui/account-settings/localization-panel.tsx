@@ -39,7 +39,7 @@ export function LocalizationPanel({user}: Props) {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.LocationAndLanguage}
-      title={<Trans message="Date, time and language" />}
+      title={<Trans message="Date, heure et langue" />}
       actions={
         <Button
           type="submit"
@@ -48,7 +48,7 @@ export function LocalizationPanel({user}: Props) {
           form={formId}
           disabled={updateDetails.isLoading || !form.formState.isValid}
         >
-          <Trans message="Save" />
+          <Trans message="Enregistrer" />
         </Button>
       }
     >
@@ -64,7 +64,7 @@ export function LocalizationPanel({user}: Props) {
           className="mb-24"
           selectionMode="single"
           name="language"
-          label={<Trans message="Language" />}
+          label={<Trans message="Langue" />}
         >
           {localizations.map(localization => (
             <Option key={localization.language} value={localization.language}>
@@ -76,9 +76,9 @@ export function LocalizationPanel({user}: Props) {
           className="mb-24"
           selectionMode="single"
           name="country"
-          label={<Trans message="Country" />}
+          label={<Trans message="Pays" />}
           showSearchField
-          searchPlaceholder={trans(message('Search countries'))}
+          searchPlaceholder={trans(message('Rechercher des pays'))}
         >
           {countries.map(country => (
             <Option key={country.code} value={country.code}>
@@ -89,9 +89,9 @@ export function LocalizationPanel({user}: Props) {
         <FormSelect
           selectionMode="single"
           name="timezone"
-          label={<Trans message="Timezone" />}
+          label={<Trans message="Fuseau horaire" />}
           showSearchField
-          searchPlaceholder={trans(message('Search timezones'))}
+          searchPlaceholder={trans(message('Rechercher des fuseaux horaires'))}
         >
           {Object.entries(timezones).map(([sectionName, sectionItems]) => (
             <OptionGroup label={sectionName} key={sectionName}>

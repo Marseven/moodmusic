@@ -8,11 +8,11 @@ import {FormattedDuration} from '@common/i18n/formatted-duration';
 import React, {Fragment} from 'react';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
 import {ImageSelector} from '@common/ui/images/image-selector';
-import {ImageIcon} from '@common/icons/material/Image';
+import {ModernImageIcon} from '@app/web-player/icons/modern-icons';
 import {useUpdatePlaylist} from '@app/web-player/playlists/requests/use-update-playlist';
 import {usePlaylistPermissions} from '@app/web-player/playlists/hooks/use-playlist-permissions';
 import {Button} from '@common/ui/buttons/button';
-import {ArrowDropDownIcon} from '@common/icons/material/ArrowDropDown';
+import {ModernChevronDownIcon} from '@app/web-player/icons/modern-icons';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {PlaylistContextDialog} from '@app/web-player/playlists/playlist-context-dialog';
 import {FollowPlaylistButton} from '@app/web-player/playlists/playlist-page/follow-playlist-button';
@@ -111,7 +111,7 @@ function EditableImage({playlist, size, className}: ImageContainerProps) {
         onChange={newValue => {
           updatePlaylist.mutate({image: newValue});
         }}
-        placeholderIcon={<ImageIcon />}
+        placeholderIcon={<ModernImageIcon />}
         stretchPreview
       />
     </FileUploadProvider>
@@ -141,7 +141,7 @@ function ActionButtons({playlist, hasTracks, queueId}: ActionButtonsProps) {
         <Button
           variant="outline"
           radius="rounded-full"
-          endIcon={<ArrowDropDownIcon />}
+          endIcon={<ModernChevronDownIcon />}
           className={actionButtonClassName()}
         >
           <Trans message="More" />

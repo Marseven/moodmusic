@@ -5,8 +5,7 @@ import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
 import {FormattedNumber} from '@common/i18n/formatted-number';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
-import {FavoriteIcon} from '@common/icons/material/Favorite';
-import {RepeatIcon} from '@common/icons/material/Repeat';
+import {ModernHeartFilledIcon, ModernRepeatIcon} from '@app/web-player/icons/modern-icons';
 import {Album} from '@app/web-player/albums/album';
 import {Artist} from '@app/web-player/artists/artist';
 
@@ -62,7 +61,7 @@ function LikesCount({item}: LikesCountProps) {
   return (
     <Tooltip label={<Trans message=":count likes" values={{count}} />}>
       <div>
-        <FavoriteIcon size="xs" className="mr-4" />
+        <ModernHeartFilledIcon size="xs" className="mr-4" />
         {count}
       </div>
     </Tooltip>
@@ -80,7 +79,7 @@ function RepostsCount({item}: RepostsCountProps) {
   return (
     <Tooltip label={<Trans message=":count reposts" values={{count}} />}>
       <div className="hidden @[566px]:block">
-        <RepeatIcon size="xs" className="mr-4" />
+        <ModernRepeatIcon size="xs" className="mr-4" />
         {count}
       </div>
     </Tooltip>

@@ -4,7 +4,7 @@ import {useSettings} from '@common/core/settings/use-settings';
 import {useToggleRepost} from '@app/web-player/reposts/use-toggle-repost';
 import {useRepostsStore} from '@app/web-player/library/state/reposts-store';
 import {Button} from '@common/ui/buttons/button';
-import {RepeatIcon} from '@common/icons/material/Repeat';
+import {ModernRepeatIcon} from '@app/web-player/icons/modern-icons';
 import clsx from 'clsx';
 import {Trans} from '@common/i18n/trans';
 import React from 'react';
@@ -37,7 +37,7 @@ export function RepostButton({
       variant="outline"
       size={size}
       radius={radius}
-      startIcon={<RepeatIcon className={clsx(isReposted && 'text-primary')} />}
+      startIcon={<ModernRepeatIcon className={clsx(isReposted && 'text-primary')} />}
       disabled={disabled || toggleRepost.isLoading}
       onClickCapture={authHandler}
       onClick={() => toggleRepost.mutate({repostable: item})}

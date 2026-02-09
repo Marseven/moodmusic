@@ -123,6 +123,11 @@ class User extends BaseUser
         return $this->hasMany(Repost::class);
     }
 
+    public function purchases(): HasMany
+    {
+        return $this->hasMany(Purchase::class);
+    }
+
     public function links(): MorphMany
     {
         return $this->morphMany(ProfileLink::class, 'linkeable');

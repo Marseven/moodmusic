@@ -87,6 +87,26 @@ export function TrackForm({
           rows={5}
           className="mb-24"
         />
+        <div className="flex gap-16 mb-24">
+          <FormTextField
+            name="price"
+            label={<Trans message="Price" />}
+            type="number"
+            min={0}
+            step={1}
+            className="flex-auto"
+            description={
+              <Trans message="Leave empty for non-purchasable tracks" />
+            }
+          />
+          <FormTextField
+            name="currency"
+            label={<Trans message="Currency" />}
+            className="w-100"
+            maxLength={3}
+            placeholder="XAF"
+          />
+        </div>
         <DurationField />
         {showExternalIdFields && <SourceField />}
         {showExternalIdFields && <SpotifyIdField />}

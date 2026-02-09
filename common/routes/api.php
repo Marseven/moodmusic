@@ -207,6 +207,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::get('billing/subscriptions', [SubscriptionsController::class, 'index']);
         Route::post('billing/subscriptions', [SubscriptionsController::class, 'store']);
         Route::post('billing/subscriptions/{subscription}/cancel', [SubscriptionsController::class, 'cancel']);
+        Route::delete('billing/subscription/cancel-incomplete', [SubscriptionsController::class, 'cancelIncomplete']);
         Route::put('billing/subscriptions/{subscription}', [SubscriptionsController::class, 'update']);
         Route::post('billing/subscriptions/{subscription}/resume', [SubscriptionsController::class, 'resume']);
         Route::post('billing/subscriptions/{subscription}/change-plan', [SubscriptionsController::class, 'changePlan']);
@@ -216,6 +217,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('billing/stripe/store-subscription-details-locally', [StripeController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/paypal/store-subscription-details-locally', [PaypalController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/ebilling/create-order', [EbillingController::class, 'createOrder']);
+        Route::post('billing/ebilling/change-plan', [EbillingController::class, 'changePlan']);
         Route::get('billing/ebilling/verify-payment/{billId}', [EbillingController::class, 'verifyPayment']);
         Route::post('billing/ebilling/store-subscription-details-locally', [EbillingController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/ebilling/webhook', [EbillingWebhookController::class, 'handleWebhook'])->name('ebilling.webhook');

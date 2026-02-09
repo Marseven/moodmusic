@@ -23,6 +23,8 @@ export interface Album {
   genres?: Genre[];
   created_at?: string;
   owner_id?: number;
+  price?: number;
+  currency?: string;
   comments_count?: number;
   tracks_count?: number;
   updated_at: string;

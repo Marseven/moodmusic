@@ -16,6 +16,8 @@ class ModifyAlbums extends BaseFormRequest
             'tracks.*.name' => 'required|string|min:1|max:190',
             'artists'            => 'required|array|min:1',
             'artists.*'          => ['required', 'regex:/[0-9]+|CURRENT_USER/i'],
+            'price'              => 'nullable|numeric|min:0',
+            'currency'           => 'nullable|string|size:3',
         ];
     }
 

@@ -6,7 +6,7 @@ import {IconButton, IconButtonProps} from '@common/ui/buttons/icon-button';
 import {FacebookIcon} from '@common/icons/social/facebook';
 import {TwitterIcon} from '@common/icons/social/twitter';
 import {TumblrIcon} from '@common/icons/social/tumblr';
-import {ShareIcon} from '@common/icons/material/Share';
+import {ModernShareIcon} from '@app/web-player/icons/modern-icons';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
 
@@ -66,7 +66,7 @@ export function ShareMediaButtons({
           }}
           className="text-muted"
         >
-          <ShareIcon />
+          <ModernShareIcon />
         </IconButton>
       )}
     </div>

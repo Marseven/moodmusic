@@ -7,7 +7,7 @@ import React from 'react';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
-import {SearchIcon} from '@common/icons/material/Search';
+import {ModernSearchIcon} from '@app/web-player/icons/modern-icons';
 import {VirtualTableBody} from '@app/web-player/playlists/virtual-table-body';
 import {PlaylistPageHeader} from '@app/web-player/playlists/playlist-page/playlist-page-header';
 import {Playlist} from '@app/web-player/playlists/playlist';
@@ -82,7 +82,7 @@ function PageContent({
         onChange={e => setSearchQuery(e.target.value)}
         className="max-w-512 mt-28 mb-44 md:mb-24"
         size="sm"
-        startAdornment={<SearchIcon />}
+        startAdornment={<ModernSearchIcon />}
         placeholder={trans(message('Search within playlist'))}
       />
       <TrackTable

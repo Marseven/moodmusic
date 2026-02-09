@@ -24,33 +24,39 @@ export function AccountSettingsPage() {
   return (
     <div className="bg-alt flex flex-col h-full">
       <StaticPageTitle>
-        <Trans message="Account Settings" />
+        <Trans message="Paramètres du compte" />
       </StaticPageTitle>
       <Navbar className="flex-shrink-0" menuPosition="account-settings-page" />
       <div className="flex-auto overflow-auto">
         <div className="container mx-auto my-24 px-24">
-          <h1 className="text-3xl">
-            <Trans message="Account settings" />
-          </h1>
-          <div className="mb-40 text-muted text-base">
-            <Trans message="View and update your account details, profile and more." />
+          <div className="mood-glass-panel p-8 mb-8">
+            <h1 className="text-3xl font-bold">
+              <Trans message="Paramètres du compte" />
+            </h1>
+            <div className="mt-4 text-muted text-base">
+              <Trans message="Consultez et mettez à jour les détails de votre compte, votre profil et plus encore." />
+            </div>
           </div>
           {isLoading || !data ? (
-            <ProgressCircle
-              className="my-80"
-              aria-label="Loading user.."
-              isIndeterminate
-            />
+            <div className="mood-glass-panel p-12 text-center">
+              <ProgressCircle
+                className="my-80"
+                aria-label="Loading user.."
+                isIndeterminate
+              />
+            </div>
           ) : (
             <div className="flex items-start gap-24">
-              <AccountSettingsSidenav />
+              <div className="mood-glass-nav rounded-lg">
+                <AccountSettingsSidenav />
+              </div>
               <main className="flex-auto">
                 <BasicInfoPanel user={data.user} />
                 <SocialLoginPanel user={data.user} />
                 <ChangePasswordPanel />
                 <AccountSettingsPanel
                   id={AccountSettingsId.TwoFactor}
-                  title={<Trans message="Two factor authentication" />}
+                  title={<Trans message="Authentification à deux facteurs" />}
                 >
                   <div className="max-w-580">
                     <TwoFactorStepper user={data.user} />

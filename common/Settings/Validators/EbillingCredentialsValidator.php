@@ -36,9 +36,9 @@ class EbillingCredentialsValidator implements SettingsValidator
         // Test authentication with a simple API call
         try {
             $testMode = $settings['billing.ebilling_test_mode'] ?? $this->settings->get('billing.ebilling_test_mode');
-            $baseUrl = $testMode 
-                ? 'https://lab.billing-easy.net/api/v1/merchant'
-                : 'https://stg.billing-easy.com/api/v1/merchant';
+            $baseUrl = $testMode
+                ? config('services.ebilling.api_url_test', 'https://lab.billing-easy.net') . '/api/v1/merchant'
+                : config('services.ebilling.api_url', 'https://stg.billing-easy.com') . '/api/v1/merchant';
 
             $username = $settings['ebilling_username'] ?? config('services.ebilling.username');
             $sharedKey = $settings['ebilling_shared_key'] ?? config('services.ebilling.sharedkey');

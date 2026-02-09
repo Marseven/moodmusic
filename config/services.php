@@ -33,4 +33,14 @@ return [
     'sparkpost' => [
         'secret' => env('SPARKPOST_SECRET'),
     ],
+
+    'ebilling' => [
+        'username' => env('EBILLING_USERNAME'),
+        'sharedkey' => env('EBILLING_SHAREDKEY'),
+        'webhook_secret' => env('EBILLING_WEBHOOK_SECRET'),
+        'api_url' => env('EBILLING_API_URL', 'https://stg.billing-easy.com'),
+        'api_url_test' => env('EBILLING_API_URL_TEST', 'https://lab.billing-easy.net'),
+        'portal_url' => env('EBILLING_PORTAL_URL', 'https://staging.billing-easy.net'),
+        'portal_url_test' => env('EBILLING_PORTAL_URL_TEST', 'https://test.billing-easy.net'),
+    ],
 ];

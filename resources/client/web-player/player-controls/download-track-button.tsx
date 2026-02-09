@@ -2,7 +2,7 @@ import {useSettings} from '@common/core/settings/use-settings';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {trackIsLocallyUploaded} from '@app/web-player/tracks/utils/track-is-locally-uploaded';
-import {DownloadIcon} from '@common/icons/material/Download';
+import {ModernDownloadIcon} from '@app/web-player/icons/modern-icons';
 import {downloadFileFromUrl} from '@common/uploads/utils/download-file-from-url';
 import {useAuth} from '@common/auth/use-auth';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
@@ -29,7 +29,7 @@ export function DownloadTrackButton() {
           downloadFileFromUrl(`${base_url}/api/v1/tracks/${track.id}/download`);
         }}
       >
-        <DownloadIcon />
+        <ModernDownloadIcon />
       </IconButton>
     </Tooltip>
   );

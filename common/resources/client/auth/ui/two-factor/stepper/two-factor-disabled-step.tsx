@@ -16,7 +16,7 @@ export function TwoFactorDisabledStep({onEnabled}: Props) {
   return (
     <TwoFactorStepperLayout
       title={
-        <Trans message="You have not enabled two factor authentication." />
+        <Trans message="Vous n'avez pas activé l'authentification à deux facteurs." />
       }
       actions={
         <Button
@@ -31,7 +31,7 @@ export function TwoFactorDisabledStep({onEnabled}: Props) {
             });
           }}
         >
-          <Trans message="Enable" />
+          <Trans message="Activer" />
         </Button>
       }
     />

@@ -1,7 +1,7 @@
 import {SortDescriptor} from '@common/ui/tables/types/sort-descriptor';
 import {Menu, MenuTrigger} from '@common/ui/navigation/menu/menu-trigger';
 import {Button} from '@common/ui/buttons/button';
-import {ArrowDropDownIcon} from '@common/icons/material/ArrowDropDown';
+import {ModernChevronDownIcon} from '@app/web-player/icons/modern-icons';
 import {Trans} from '@common/i18n/trans';
 import {Item} from '@common/ui/forms/listbox/item';
 import React from 'react';
@@ -42,7 +42,7 @@ export function LibraryPageSortDropdown({
         <Button
           variant="outline"
           className="flex-shrink-0"
-          endIcon={<ArrowDropDownIcon />}
+          endIcon={<ModernChevronDownIcon />}
         >
           <Trans {...items[selectedValue]} />
         </Button>

@@ -24,7 +24,7 @@ export function CheckoutProductSummary({
   return (
     <div>
       <h2 className="text-2xl mb-30">
-        <Trans message="Summary" />
+        <Trans message="Résumé" />
       </h2>
       {status === 'loading' ? (
         <LoadingSkeleton key="loading-skeleton" />
@@ -66,7 +66,7 @@ function ProductSummary({
       {showBillingLine && (
         <div className="flex items-center justify-between gap-24 border-t pt-24 mt-32 font-medium">
           <div>
-            <Trans message="Billed today" />
+            <Trans message="Facturé aujourd'hui" />
           </div>
           <div>
             <FormattedCurrency value={price.amount} currency={price.currency} />

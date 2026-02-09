@@ -8,7 +8,7 @@ import {AlbumImage} from '@app/web-player/albums/album-image/album-image';
 import {AlbumLink} from '@app/web-player/albums/album-link';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {Button} from '@common/ui/buttons/button';
-import {ArrowDropDownIcon} from '@common/icons/material/ArrowDropDown';
+import {ModernChevronDownIcon} from '@app/web-player/icons/modern-icons';
 import {Trans} from '@common/i18n/trans';
 import {InfiniteScrollSentinel} from '@common/ui/infinite-scroll/infinite-scroll-sentinel';
 import {NoDiscographyMessage} from '@app/web-player/artists/artist-page/discography-panel/no-discography-message';
@@ -52,7 +52,7 @@ export function ArtistAlbumsList({initialAlbums}: ArtistAlbumsListProps) {
                   variant="outline"
                   size="xs"
                   radius="rounded-full"
-                  endIcon={<ArrowDropDownIcon />}
+                  endIcon={<ModernChevronDownIcon />}
                 >
                   <Trans message="More" />
                 </Button>

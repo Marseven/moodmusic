@@ -1,5 +1,6 @@
 @import '../../common/resources/client/common.css';
 @import "web-player/playable-item/content-grid.css";
+@import "styles/mood-theme.css";
 
 @tailwind base;
 @tailwind components;

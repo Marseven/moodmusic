@@ -22,7 +22,7 @@ import {useIsFollowingPlaylist} from '@app/web-player/playlists/hooks/use-is-fol
 import {openDialog} from '@common/ui/overlays/store/dialog-store';
 import {UpdatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/update-playlist-dialog';
 import {useUpdatePlaylist} from '@app/web-player/playlists/requests/use-update-playlist';
-import {CheckIcon} from '@common/icons/material/Check';
+import {ModernCheckIcon} from '@app/web-player/icons/modern-icons';
 import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
 import {useDeletePlaylist} from '@app/web-player/playlists/requests/use-delete-playlist';
 import {useFollowPlaylist} from '@app/web-player/playlists/requests/use-follow-playlist';
@@ -166,7 +166,7 @@ function ToggleCollaborativeButton({playlist}: FollowButtonsProps) {
   return (
     <ContextMenuButton
       disabled={updatePlaylist.isLoading}
-      startIcon={playlist.collaborative ? <CheckIcon /> : undefined}
+      startIcon={playlist.collaborative ? <ModernCheckIcon /> : undefined}
       onClick={() => toggleCollaborative()}
     >
       <Trans message="Collaborative" />

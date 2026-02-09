@@ -6,7 +6,7 @@ import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import {Fragment} from 'react';
 import {FormImageSelector} from '@common/ui/images/image-selector';
-import {ImageIcon} from '@common/icons/material/Image';
+import {ModernImageIcon} from '@app/web-player/icons/modern-icons';
 
 export function CrupdatePlaylistFields() {
   const {trans} = useTrans();
@@ -20,7 +20,7 @@ export function CrupdatePlaylistFields() {
             variant="square"
             previewSize="w-160 h-160"
             className="mb-24 md:mb-0"
-            placeholderIcon={<ImageIcon />}
+            placeholderIcon={<ModernImageIcon />}
             showRemoveButton
             stretchPreview
           />

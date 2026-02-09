@@ -60,27 +60,5 @@ function Menus() {
 }
 
 function ThemeSwitcher() {
-  const {themes} = useSettings();
-  const {selectedTheme, selectTheme} = useThemeSelector();
-  if (!selectedTheme || !themes?.user_change) return null;
-
-  return (
-    <Button
-      variant="text"
-      startIcon={selectedTheme.is_dark ? <DarkModeIcon /> : <LightbulbIcon />}
-      onClick={() => {
-        if (selectedTheme.is_dark) {
-          selectTheme('light');
-        } else {
-          selectTheme('dark');
-        }
-      }}
-    >
-      {selectedTheme.is_dark ? (
-        <Trans message="Dark mode" />
-      ) : (
-        <Trans message="Light mode" />
-      )}
-    </Button>
-  );
+  return null;
 }

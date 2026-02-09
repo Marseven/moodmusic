@@ -101,28 +101,6 @@ export function NavbarAuthMenu({children, items}: Props) {
         {items?.map(item => item)}
         {isMobile && notifications?.integrated ? notifMenuItem : undefined}
         {isSubscribed && billingMenuItem}
-        {themes?.user_change && !selectedTheme.is_dark && (
-          <MenuItem
-            value="light"
-            startIcon={<DarkModeIcon />}
-            onSelected={() => {
-              selectTheme('dark');
-            }}
-          >
-            <Trans message="Dark mode" />
-          </MenuItem>
-        )}
-        {themes?.user_change && selectedTheme.is_dark && (
-          <MenuItem
-            value="dark"
-            startIcon={<LightModeIcon />}
-            onSelected={() => {
-              selectTheme('light');
-            }}
-          >
-            <Trans message="Light mode" />
-          </MenuItem>
-        )}
         <MenuItem
           value="logout"
           startIcon={<ExitToAppIcon />}

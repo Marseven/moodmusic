@@ -2,28 +2,43 @@
 
 namespace Common\Billing\Gateways\Ebilling;
 
-use Carbon\Carbon;
 use Common\Settings\Settings;
 use Illuminate\Http\Client\PendingRequest;
 use Illuminate\Support\Facades\Http;
 
 trait InteractsWithEbillingRestApi
 {
+    public function getApiBaseUrl(): string
+    {
+        $testMode = app(Settings::class)->get('billing.ebilling_test_mode', env('EBILLING_TEST_MODE', false));
+        return $testMode
+            ? config('services.ebilling.api_url_test', 'https://lab.billing-easy.net')
+            : config('services.ebilling.api_url', 'https://stg.billing-easy.com');
+    }
+
+    public function getPortalBaseUrl(): string
+    {
+        $testMode = app(Settings::class)->get('billing.ebilling_test_mode', env('EBILLING_TEST_MODE', false));
+        return $testMode
+            ? config('services.ebilling.portal_url_test', 'https://test.billing-easy.net')
+            : config('services.ebilling.portal_url', 'https://staging.billing-easy.net');
+    }
+
+    public function getEbillingCredentials(): array
+    {
+        $settings = app(Settings::class);
+        return [
+            'username' => $settings->get('billing.ebilling_username') ?? config('services.ebilling.username') ?? env('EBILLING_USERNAME'),
+            'sharedkey' => $settings->get('billing.ebilling_shared_key') ?? config('services.ebilling.sharedkey') ?? env('EBILLING_SHAREDKEY'),
+        ];
+    }
 
     public function ebilling(): PendingRequest
     {
-        $settings = app(Settings::class);
-        $baseUrl = $settings->get('billing.ebilling_test_mode')
-            ? 'https://lab.billing-easy.net'
-            : 'https://stg.billing-easy.com';
+        $credentials = $this->getEbillingCredentials();
 
-        // Configuration des identifiants
-        $username = $settings->get('billing.ebilling_username') ?? config('services.ebilling.username');
-        $sharedkey = $settings->get('billing.ebilling_shared_key') ?? config('services.ebilling.sharedkey');
-
-        // Création de la requête HTTP de base avec authentification
-        return Http::baseUrl($baseUrl)
-            ->withBasicAuth($username, $sharedkey)
+        return Http::baseUrl($this->getApiBaseUrl())
+            ->withBasicAuth($credentials['username'], $credentials['sharedkey'])
             ->withHeaders([
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json',

@@ -11,14 +11,23 @@ export function PaymentMethodPanel() {
   const {user, subscription} = useBillingUser();
   if (!user || !subscription) return null;
 
-  const isPaypal = subscription.gateway_name === 'paypal';
-  const PaymentMethod = isPaypal ? PaypalPaymentMethod : CardPaymentMethod;
+  const methodClassName = "whitespace-nowrap text-base max-w-[464px] flex items-center gap-10";
+  const linkClassName = "flex items-center gap-4 text-muted mt-18 block hover:underline";
+
+  let PaymentMethod;
+  if (subscription.gateway_name === 'ebilling') {
+    PaymentMethod = EbillingPaymentMethod;
+  } else if (subscription.gateway_name === 'paypal') {
+    PaymentMethod = PaypalPaymentMethod;
+  } else {
+    PaymentMethod = CardPaymentMethod;
+  }
 
   return (
-    <BillingPlanPanel title={<Trans message="Payment method" />}>
+    <BillingPlanPanel title={<Trans message="Méthode de paiement" />}>
       <PaymentMethod
-        methodClassName="whitespace-nowrap text-base max-w-[464px] flex items-center gap-10"
-        linkClassName="flex items-center gap-4 text-muted mt-18 block hover:underline"
+        methodClassName={methodClassName}
+        linkClassName={linkClassName}
       />
     </BillingPlanPanel>
   );
@@ -41,15 +50,25 @@ function CardPaymentMethod({
         {user.card_last_four}
         {user.card_expires && (
           <div className="ml-auto">
-            <Trans message="Expires :date" values={{date: user.card_expires}} />
+            <Trans message="Expire le :date" values={{date: user.card_expires}} />
           </div>
         )}
       </div>
       <Link className={linkClassName} to="/billing/change-payment-method">
         <EditIcon size="sm" />
-        <Trans message="Change payment method" />
+        <Trans message="Changer de méthode de paiement" />
       </Link>
     </Fragment>
+  );
+}
+
+function EbillingPaymentMethod({
+  methodClassName,
+}: PaymentMethodProps) {
+  return (
+    <div className={methodClassName}>
+      <Trans message="eBilling (Mobile Money)" />
+    </div>
   );
 }
 
@@ -70,7 +89,7 @@ function PaypalPaymentMethod({
         rel="noreferrer"
       >
         <EditIcon size="sm" />
-        <Trans message="Change payment method" />
+        <Trans message="Changer de méthode de paiement" />
       </a>
     </Fragment>
   );

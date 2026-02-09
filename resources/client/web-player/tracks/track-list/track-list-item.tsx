@@ -16,7 +16,7 @@ import React, {Fragment, memo, useContext} from 'react';
 import {AnimatePresence} from 'framer-motion';
 import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {GenreLink} from '@app/web-player/genres/genre-link';
-import {RepeatIcon} from '@common/icons/material/Repeat';
+import {ModernRepeatIcon} from '@app/web-player/icons/modern-icons';
 import {TrackLink} from '@app/web-player/tracks/track-link';
 import {useTrackPermissions} from '@app/web-player/tracks/hooks/use-track-permissions';
 import {User} from '@common/auth/user';
@@ -86,7 +86,7 @@ export const TrackListItem = memo(
                 />
                 {reposter && (
                   <Fragment>
-                    <RepeatIcon size="xs" />
+                    <ModernRepeatIcon size="xs" />
                     <UserProfileLink
                       user={reposter}
                       target={linksInNewTab ? '_blank' : undefined}

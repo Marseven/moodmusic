@@ -42,6 +42,7 @@ class Track extends Model
         'duration' => 'integer',
         'position' => 'integer',
         'added_at' => 'datetime',
+        'price' => 'decimal:2',
     ];
 
     protected $appends = ['model_type'];
@@ -124,6 +125,23 @@ class Track extends Model
     public function lyric(): HasOne
     {
         return $this->hasOne(Lyric::class);
+    }
+
+    public function purchases(): MorphMany
+    {
+        return $this->morphMany(Purchase::class, 'purchasable');
+    }
+
+    public function isPurchasedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        return Purchase::where('user_id', $user->id)
+            ->where('purchasable_type', self::class)
+            ->where('purchasable_id', $this->id)
+            ->where('status', 'completed')
+            ->exists();
     }
 
     public function srcIsLocal(): bool

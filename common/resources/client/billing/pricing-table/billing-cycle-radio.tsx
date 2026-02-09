@@ -28,7 +28,7 @@ export function BillingCycleRadio({
           onChange(e.target.value as UpsellBillingCycle);
         }}
       >
-        <Trans message="Annual" />
+        <Trans message="Annuel" />
         <UpsellLabel products={products} />
       </Radio>
       <Radio
@@ -38,7 +38,7 @@ export function BillingCycleRadio({
           onChange(e.target.value as UpsellBillingCycle);
         }}
       >
-        <Trans message="Monthly" />
+        <Trans message="Mensuel" />
       </Radio>
     </RadioGroup>
   );

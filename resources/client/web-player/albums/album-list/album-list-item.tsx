@@ -10,7 +10,7 @@ import React, {Fragment, memo} from 'react';
 import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {GenreLink} from '@app/web-player/genres/genre-link';
 import {Album} from '@app/web-player/albums/album';
-import {RepeatIcon} from '@common/icons/material/Repeat';
+import {ModernRepeatIcon} from '@app/web-player/icons/modern-icons';
 import clsx from 'clsx';
 import {User} from '@common/auth/user';
 import {UserProfileLink} from '@app/web-player/users/user-profile-link';
@@ -104,7 +104,7 @@ export const AlbumListItem = memo(
                   />
                   {reposter && (
                     <Fragment>
-                      <RepeatIcon size="xs" />
+                      <ModernRepeatIcon size="xs" />
                       <UserProfileLink
                         user={reposter}
                         target={linksInNewTab ? '_blank' : undefined}

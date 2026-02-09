@@ -28,6 +28,7 @@ class Album extends Model
         'fully_scraped' => 'boolean',
         'spotify_popularity' => 'integer',
         'owner_id' => 'integer',
+        'price' => 'decimal:2',
     ];
 
     protected $guarded = ['id', 'views'];
@@ -126,6 +127,23 @@ class Album extends Model
             'genres.name',
             'genres.id',
         );
+    }
+
+    public function purchases(): MorphMany
+    {
+        return $this->morphMany(Purchase::class, 'purchasable');
+    }
+
+    public function isPurchasedBy(?User $user): bool
+    {
+        if (!$user) {
+            return false;
+        }
+        return Purchase::where('user_id', $user->id)
+            ->where('purchasable_type', self::class)
+            ->where('purchasable_id', $this->id)
+            ->where('status', 'completed')
+            ->exists();
     }
 
     public function needsUpdating(): bool

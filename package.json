@@ -13,6 +13,7 @@
  },
  "dependencies": {
   "@floating-ui/react-dom": "^1.0.0",
+  "@heroicons/react": "^2.2.0",
   "@internationalized/date": "^3.0.1",
   "@internationalized/number": "^3.0.3",
   "@paypal/paypal-js": "^5.1.1",

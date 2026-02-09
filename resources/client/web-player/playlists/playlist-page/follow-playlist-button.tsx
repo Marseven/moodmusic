@@ -1,5 +1,4 @@
-import {FavoriteIcon} from '@common/icons/material/Favorite';
-import {FavoriteBorderIcon} from '@common/icons/material/FavoriteBorder';
+import {ModernHeartFilledIcon, ModernHeartOutlineIcon} from '@app/web-player/icons/modern-icons';
 import {Button} from '@common/ui/buttons/button';
 import {Trans} from '@common/i18n/trans';
 import {Playlist} from '@app/web-player/playlists/playlist';
@@ -45,7 +44,7 @@ export function FollowPlaylistButton({
           disabled={isLoading}
           onClick={() => unfollow.mutate()}
         >
-          <FavoriteIcon />
+          <ModernHeartFilledIcon />
         </IconButton>
       );
     }
@@ -57,7 +56,7 @@ export function FollowPlaylistButton({
         className={className}
         onClick={() => follow.mutate()}
       >
-        <FavoriteBorderIcon />
+        <ModernHeartOutlineIcon />
       </IconButton>
     );
   }
@@ -68,7 +67,7 @@ export function FollowPlaylistButton({
         size={size}
         variant="outline"
         radius={radius || 'rounded-full'}
-        startIcon={<FavoriteIcon className="text-primary" />}
+        startIcon={<ModernHeartFilledIcon className="text-primary" />}
         disabled={isLoading}
         className={className}
         onClick={() => unfollow.mutate()}
@@ -82,7 +81,7 @@ export function FollowPlaylistButton({
       size={size}
       variant="outline"
       radius={radius || 'rounded-full'}
-      startIcon={<FavoriteBorderIcon />}
+      startIcon={<ModernHeartOutlineIcon />}
       disabled={isLoading}
       className={className}
       onClick={() => follow.mutate()}

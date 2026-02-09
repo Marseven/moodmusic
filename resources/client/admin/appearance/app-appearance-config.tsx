@@ -94,6 +94,7 @@ export const AppAppearanceConfig: IAppearanceConfig = {
           '/admin/playlists',
           '/admin/backstage-requests',
           '/admin/comments',
+          '/admin/purchases',
           '/backstage/requests',
         ],
       } as MenuSectionConfig,

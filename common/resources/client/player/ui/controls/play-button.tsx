@@ -27,7 +27,7 @@ export function PlayButton({
   const label = isPlaying ? (
     <Trans message="Pause (k)" />
   ) : (
-    <Trans message="Play (k)" />
+    <Trans message="Lire (k)" />
   );
 
   return (

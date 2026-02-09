@@ -2,7 +2,7 @@ import {Genre} from '@app/web-player/genres/genre';
 import {Artist} from '@app/web-player/artists/artist';
 import {Button} from '@common/ui/buttons/button';
 import {Trans} from '@common/i18n/trans';
-import {ArrowDropDownIcon} from '@common/icons/material/ArrowDropDown';
+import {ModernChevronDownIcon} from '@app/web-player/icons/modern-icons';
 import {SmallArtistImage} from '@app/web-player/artists/artist-image/small-artist-image';
 import {queueGroupId} from '@app/web-player/queue-group-id';
 import {LikeButton} from '@app/web-player/library/like-button';
@@ -94,7 +94,7 @@ function ActionButtons({artist}: ActionButtonsProps) {
         <Button
           variant="outline"
           radius="rounded-full"
-          endIcon={<ArrowDropDownIcon />}
+          endIcon={<ModernChevronDownIcon />}
           className={actionButtonClassName()}
         >
           <Trans message="More" />

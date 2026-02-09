@@ -19,6 +19,7 @@ import {ArtistDatatablePage} from '@app/admin/artist-datatable-page/artist-datat
 import {CreateArtistPage} from '@app/admin/artist-datatable-page/create-artist-page';
 import {UpdateArtistPage} from '@app/admin/artist-datatable-page/update-artist-page';
 import {CommentsDatatablePage} from '@common/comments/comments-datatable-page/comments-datatable-page';
+import {PurchasesDatatablePage} from '@app/admin/purchases-datatable-page/purchases-datatable-page';
 import {BemusicAdminReportPage} from '@app/admin/reports/bemusic-admin-report-page';
 import {AdminInsightsReport} from '@app/admin/reports/admin-insights-report';
 import {AdminVisitorsReport} from '@app/admin/reports/admin-visitors-report';
@@ -134,5 +135,10 @@ export const AppAdminRoutes: RouteObject[] = [
   {
     path: 'comments',
     element: <CommentsDatatablePage />,
+  },
+  // Purchases
+  {
+    path: 'purchases',
+    element: <PurchasesDatatablePage />,
   },
 ];

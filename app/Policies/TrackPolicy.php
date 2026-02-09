@@ -2,6 +2,7 @@
 
 namespace App\Policies;
 
+use App\Album;
 use App\Track;
 use App\User;
 use Common\Core\Policies\BasePolicy;
@@ -115,6 +116,17 @@ class TrackPolicy extends BasePolicy
 
     public function download(?User $user, Track $track)
     {
+        // Allow download if user has purchased this track or its album
+        if ($user && $user->id > 0) {
+            if ($track->isPurchasedBy($user)) {
+                return true;
+            }
+            $album = $track->album_id ? ($track->relationLoaded('album') ? $track->album : $track->album()->first()) : null;
+            if ($album && $album->isPurchasedBy($user)) {
+                return true;
+            }
+        }
+
         return app(Settings::class)->get('player.enable_download') &&
             $this->hasPermission($user, 'music.download');
     }

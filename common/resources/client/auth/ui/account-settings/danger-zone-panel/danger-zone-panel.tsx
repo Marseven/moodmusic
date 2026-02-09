@@ -12,7 +12,7 @@ export function DangerZonePanel() {
   return (
     <AccountSettingsPanel
       id={AccountSettingsId.DeleteAccount}
-      title={<Trans message="Danger zone" />}
+      title={<Trans message="Zone dangereuse" />}
     >
       <DialogTrigger
         type="modal"
@@ -23,15 +23,15 @@ export function DangerZonePanel() {
         }}
       >
         <Button variant="flat" color="danger">
-          <Trans message="Delete account" />
+          <Trans message="Supprimer le compte" />
         </Button>
         <ConfirmationDialog
           isDanger
-          title={<Trans message="Delete account?" />}
+          title={<Trans message="Supprimer le compte?" />}
           body={
-            <Trans message="Your account will be deleted immediately and permanently. Once deleted, accounts can not be restored." />
+            <Trans message="Votre compte sera supprimé immédiatement et définitivement. Une fois supprimés, les comptes ne peuvent pas être restaurés." />
           }
-          confirm={<Trans message="Delete" />}
+          confirm={<Trans message="Supprimer" />}
         />
       </DialogTrigger>
     </AccountSettingsPanel>

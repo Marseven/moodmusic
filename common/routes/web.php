@@ -2,7 +2,6 @@
 
 use Common\Auth\Controllers\SocialAuthController;
 use Common\Auth\Controllers\TwoFactorQrCodeController;
-use Common\Billing\Gateways\Ebilling\EbillingController;
 use Common\Billing\Invoices\InvoiceController;
 use Common\Core\Controllers\HomeController;
 use Common\Core\Controllers\UpdateController;
@@ -35,8 +34,6 @@ Route::group(['middleware' => 'web'], function () {
 
     // INVOICES
     Route::get('billing/invoices/{uuid}', [InvoiceController::class, 'show']);
-
-    // Route::get('billing/ebilling/return', [EbillingController::class, 'handleReturn']); // Désactivée - conflit avec React route
 
 
     // SOCIAL AUTH

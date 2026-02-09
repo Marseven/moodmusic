@@ -40,38 +40,46 @@ export function Checkout() {
   return (
     <CheckoutLayout>
       <Fragment>
-        <h1 className="text-4xl mb-40">
-          <Trans message="Checkout" />
-        </h1>
-        {stripe.enable ? (
-          <Fragment>
-            <StripeElementsForm
-              productId={productId}
-              submitLabel={<Trans message="Upgrade" />}
-              type="subscription"
-              returnUrl={`${base_url}/checkout/${productId}/${priceId}/stripe/done`}
-            />
-            <Separator />
-          </Fragment>
-        ) : null}
+        <div className="mood-glass-panel p-28 mb-20">
+          <h1 className="text-4xl font-bold">
+            <Trans message="Commande" />
+          </h1>
+        </div>
 
-        {ebilling.enable && (
-          <Fragment>
-            <EbillingButton
-              productId={productId!}
-              priceId={priceId!}
-              className="w-full mb-20"
-            />
-            <Separator />
-          </Fragment>
-        )}
+        <div className="mood-glass-panel p-24 mb-20">
+          {stripe.enable ? (
+            <Fragment>
+              <StripeElementsForm
+                productId={productId}
+                submitLabel={<Trans message="Souscrire" />}
+                type="subscription"
+                returnUrl={`${base_url}/checkout/${productId}/${priceId}/stripe/done`}
+              />
+              <Separator />
+            </Fragment>
+          ) : null}
 
-        <div ref={paypalElementRef} />
-        <div className="text-xs text-muted mt-30">
-          <Trans message="You’ll be charged until you cancel your subscription. Previous charges won’t be refunded when you cancel unless it’s legally required. Your payment data is encrypted and secure. By subscribing your agree to our terms of service and privacy policy." />
+          {ebilling.enable && (
+            <Fragment>
+              <EbillingButton
+                productId={productId!}
+                priceId={priceId!}
+                className="w-full mood-cta-button"
+              />
+              <Separator />
+            </Fragment>
+          )}
+
+          <div ref={paypalElementRef} />
+        </div>
+
+        <div className="mood-glass-notification p-20 text-xs">
+          <Trans message="Vous serez facturé jusqu'à ce que vous annuliez votre abonnement. Les frais précédents ne seront pas remboursés lors de l'annulation sauf si la loi l'exige. Vos données de paiement sont chiffrées et sécurisées. En vous abonnant, vous acceptez nos conditions d'utilisation et notre politique de confidentialité." />
         </div>
       </Fragment>
-      <CheckoutProductSummary />
+      <div className="mood-glass-panel p-28">
+        <CheckoutProductSummary />
+      </div>
     </CheckoutLayout>
   );
 }
@@ -80,7 +88,7 @@ function Separator() {
   return (
     <div className="relative text-center my-20 before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:h-1 before:w-full before:bg-divider">
       <span className="bg relative z-10 px-10 text-sm text-muted">
-        <Trans message="or" />
+        <Trans message="ou" />
       </span>
     </div>
   );

@@ -2,15 +2,11 @@
 
 namespace Common\Billing\Gateways\Ebilling;
 
-use App\User;
-use Common\Billing\GatewayException;
-use Common\Billing\Gateways\Ebilling\Ebilling;
 use Common\Billing\Invoices\CreateInvoice;
 use Common\Billing\Notifications\PaymentFailed;
 use Common\Billing\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Log;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -18,128 +14,132 @@ class EbillingWebhookController extends Controller
 {
     use InteractsWithEbillingRestApi;
 
-    public function __construct(
-        protected Subscription $subscription,
-        protected Ebilling $ebilling,
-    ) {}
-
-    // common/Billing/Gateways/Ebilling/EbillingWebhookController.php
-
     public function handleWebhook(Request $request): Response
     {
         $payload = $request->all();
-        Log::info('Webhook eBilling reçu', $payload);
+        Log::info('Webhook eBilling reçu', ['payload' => $payload]);
 
-        // Validation de la signature (optionnel mais recommandé)
-        if (!$this->verifyWebhookSignature($request)) {
-            Log::error('Signature webhook invalide', $payload);
-            return response('Invalid signature', 403);
+        // Extract reference and bill_id from webhook payload
+        // eBilling notification params: billingid, transactionid, reference, payer_id, payer_code, amount
+        $reference = $payload['external_reference'] ?? $payload['reference'] ?? null;
+        $billId = $payload['bill_id'] ?? $payload['billingid'] ?? $payload['transaction_id'] ?? $payload['transactionid'] ?? null;
+
+        if (!$reference && !$billId) {
+            Log::warning('Webhook eBilling: missing reference and bill_id', ['payload' => $payload]);
+            return response('Missing reference or bill_id', 400);
         }
 
-        // Traitement selon le statut
-        $reference = $payload['external_reference'] ?? null;
-        $status = $payload['status'] ?? null;
-        $transactionId = $payload['transaction_id'] ?? null;
-
-        if (!$reference) {
-            return response('Missing reference', 400);
+        // Find subscription by reference or gateway_id (bill_id)
+        $subscription = null;
+        if ($reference) {
+            $subscription = Subscription::where('reference', $reference)->first();
         }
-
-        // Extraire l'ID de subscription du référence (format: sub_{product_id}_{price_id}_{uniqid})
-        $subscription = Subscription::where('reference', $reference)->first();
+        if (!$subscription && $billId) {
+            $subscription = Subscription::where('gateway_id', $billId)->first();
+        }
 
         if (!$subscription) {
-            Log::error('Subscription not found', ['reference' => $reference]);
+            Log::error('Webhook eBilling: subscription not found', [
+                'reference' => $reference,
+                'bill_id' => $billId,
+            ]);
             return response('Subscription not found', 404);
         }
 
-        switch ($status) {
-            case 'PAID':
-                $subscription->update([
-                    'status' => 'active',
-                    'gateway_id' => $transactionId,
-                    'paid_at' => now(),
-                    'ends_at' => now()->addMonths($subscription->plan->interval_count)
-                ]);
-                Log::info('eBilling payment confirmed', ['subscription_id' => $subscription->id]);
-                break;
+        // Verify the payment status directly with eBilling API
+        // instead of trusting the webhook payload
+        $verifiedStatus = $this->verifyPaymentWithEbilling($billId ?? $subscription->gateway_id);
 
-            case 'FAILED':
-                $subscription->update(['status' => 'failed']);
-                $subscription->user->notify(new PaymentFailed($subscription));
-                break;
-
-            case 'PENDING':
-                // Pas d'action nécessaire
-                break;
-
-            default:
-                Log::warning('Statut eBilling non reconnu', ['status' => $status]);
-                return response('Unhandled status', 200);
+        if ($verifiedStatus === null) {
+            Log::error('Webhook eBilling: API verification failed, rejecting webhook', [
+                'subscription_id' => $subscription->id,
+                'bill_id' => $billId,
+            ]);
+            return response('Payment verification failed', 500);
         }
+
+        $this->processVerifiedStatus($verifiedStatus, $subscription, $billId);
 
         return response('Webhook processed', 200);
     }
 
-    protected function verifyWebhookSignature(Request $request): bool
+    protected function verifyPaymentWithEbilling(?string $billId): ?string
     {
-        $signature = $request->header('X-Ebilling-Signature');
-        $sharedSecret = config('services.ebilling.webhook_secret');
-
-        $expectedSignature = hash_hmac('sha256', $request->getContent(), $sharedSecret);
-
-        return hash_equals($expectedSignature, $signature);
-    }
-
-    protected function handleInvoicePaymentFailed(array $payload): Response
-    {
-        $ebillingSubscriptionId = Arr::get(
-            $payload,
-            'resource.billing_agreement_id',
-        );
-
-        $subscription = $this->subscription
-            ->where('gateway_id', $ebillingSubscriptionId)
-            ->first();
-        $subscription?->user->notify(new PaymentFailed($subscription));
-
-        return response('Webhook handled', 200);
-    }
-
-    protected function handleSubscriptionCancelledOrExpired(
-        array $payload,
-    ): Response {
-        $ebillingSubscriptionId = $payload['resource']['id'];
-
-        $subscription = $this->subscription
-            ->where('gateway_id', $ebillingSubscriptionId)
-            ->first();
-
-        if ($subscription && !$subscription->cancelled()) {
-            $subscription->markAsCancelled();
+        if (!$billId) {
+            return null;
         }
 
-        return response('Webhook Handled', 200);
-    }
+        try {
+            $response = $this->ebilling()->get("/api/v1/merchant/e_bills/{$billId}");
 
-    protected function handleSaleCompleted(array $payload): Response
-    {
-        return response('Webhook Handled', 200);
-    }
+            if ($response->successful()) {
+                return $response->json('state');
+            }
 
-    protected function handleSubscriptionCreated(array $payload): Response
-    {
-        $ebillingSubscriptionId = Arr::get($payload, 'resource.id');
-        $ebillingUserId = Arr::get($payload, 'resource.subscriber.payer_id');
-
-        $user = User::where('ebilling_id', $ebillingUserId)->first();
-        if ($user) {
-            $this->ebilling->storeSubscriptionDetailsLocally(
-                $ebillingSubscriptionId,
-                $user,
-            );
+            Log::error('Webhook eBilling: API verification request failed', [
+                'bill_id' => $billId,
+                'status' => $response->status(),
+            ]);
+        } catch (\Exception $e) {
+            Log::error('Webhook eBilling: API verification exception', [
+                'bill_id' => $billId,
+                'error' => $e->getMessage(),
+            ]);
         }
 
-        return response('Webhook Handled', 200);
+        return null;
+    }
+
+    protected function processVerifiedStatus(string $status, Subscription $subscription, ?string $billId): void
+    {
+        $normalizedStatus = strtolower($status);
+
+        switch ($normalizedStatus) {
+            case 'paid':
+            case 'processed':
+                $updateData = [
+                    'paid_at' => now(),
+                    'ends_at' => null,
+                    'renews_at' => now()->addMonths($subscription->price?->interval_count ?? 1),
+                ];
+                if ($billId) {
+                    $updateData['gateway_id'] = $billId;
+                }
+                $subscription->update($updateData);
+
+                app(CreateInvoice::class)->execute([
+                    'subscription_id' => $subscription->id,
+                    'paid' => true,
+                ]);
+
+                Log::info('Webhook eBilling: payment confirmed (API-verified)', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                break;
+
+            case 'failed':
+            case 'cancelled':
+                $subscription->update(['ends_at' => now()]);
+                if ($subscription->user) {
+                    $subscription->user->notify(new PaymentFailed($subscription));
+                }
+                Log::info('Webhook eBilling: payment failed/cancelled (API-verified)', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                break;
+
+            case 'pending':
+            case 'ready':
+                Log::info('Webhook eBilling: payment pending (API-verified)', [
+                    'subscription_id' => $subscription->id,
+                ]);
+                break;
+
+            default:
+                Log::warning('Webhook eBilling: unrecognized status from API', [
+                    'status' => $status,
+                    'subscription_id' => $subscription->id,
+                ]);
+        }
     }
 }

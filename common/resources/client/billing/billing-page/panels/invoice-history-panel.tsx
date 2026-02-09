@@ -20,8 +20,8 @@ export function InvoiceHistoryPanel() {
   const invoices = query.data?.invoices;
 
   return (
-    <BillingPlanPanel title={<Trans message="Payment history" />}>
-      <div className="max-w-[464px]">
+    <BillingPlanPanel title={<Trans message="Historique des paiements" />}>
+      <div className="max-w-full md:max-w-[464px]">
         <AnimatePresence initial={false} mode="wait">
           {query.isLoading ? (
             <LoadingSkeleton key="loading-skeleton" />
@@ -43,12 +43,12 @@ function InvoiceList({invoices}: InvoiceListProps) {
     <m.div {...opacityAnimation}>
       {!invoices?.length ? (
         <div className="text-muted italic">
-          <Trans message="No invoices yet" />
+          <Trans message="Aucune facture pour l'instant" />
         </div>
       ) : undefined}
       {invoices?.map(invoice => (
         <div
-          className="whitespace-nowrap text-base flex items-center justify-between gap-10 mb-14"
+          className="text-sm md:text-base flex flex-wrap md:flex-nowrap items-center justify-between gap-6 md:gap-10 mb-14"
           key={invoice.id}
         >
           <a
@@ -74,9 +74,9 @@ function InvoiceList({invoices}: InvoiceListProps) {
             radius="rounded"
           >
             {invoice.paid ? (
-              <Trans message="Paid" />
+              <Trans message="Payé" />
             ) : (
-              <Trans message="Unpaid" />
+              <Trans message="Non payé" />
             )}
           </Chip>
           <div>{invoice.subscription.product?.name}</div>

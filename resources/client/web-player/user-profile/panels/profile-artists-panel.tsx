@@ -6,7 +6,7 @@ import React from 'react';
 import {ProfileContentProps} from '@app/web-player/user-profile/user-profile-page';
 import {ContentGrid} from '@app/web-player/playable-item/content-grid';
 import {useUserLikedArtists} from '@app/web-player/library/requests/use-user-liked-artists';
-import {MicIcon} from '@common/icons/material/Mic';
+import {ModernMicrophoneIcon} from '@app/web-player/icons/modern-icons';
 import {ArtistGridItem} from '@app/web-player/artists/artist-grid-item';
 
 export function ProfileArtistsPanel({user}: ProfileContentProps) {
@@ -21,7 +21,7 @@ export function ProfileArtistsPanel({user}: ProfileContentProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<MicIcon size="lg" className="text-muted" />}
+        image={<ModernMicrophoneIcon size="lg" className="text-muted" />}
         title={<Trans message="No artists yet" />}
         description={
           <Trans

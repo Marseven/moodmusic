@@ -1,6 +1,6 @@
 import {cloneElement, ReactElement, ReactNode} from 'react';
 import {IconButton, IconButtonProps} from '@common/ui/buttons/icon-button';
-import {MoreHorizIcon} from '@common/icons/material/MoreHoriz';
+import {ModernEllipsisIcon} from '@app/web-player/icons/modern-icons';
 import {PlayableModel} from '@app/web-player/playable-item/playable-model';
 import {PlaybackToggleButton} from '@app/web-player/playable-item/playback-toggle-button';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
@@ -13,6 +13,7 @@ interface PlayableGridProps {
   image: ReactElement;
   title: ReactNode;
   subtitle?: ReactNode;
+  footer?: ReactNode;
   model: PlayableModel;
   newQueue?: Track[];
   link: string;
@@ -24,6 +25,7 @@ export function PlayableGridItem({
   image,
   title,
   subtitle,
+  footer,
   model,
   newQueue,
   link,
@@ -81,7 +83,7 @@ export function PlayableGridItem({
                   className="invisible md:group-hover:visible"
                   color="white"
                 >
-                  <MoreHorizIcon />
+                  <ModernEllipsisIcon />
                 </IconButton>
                 {contextDialog}
               </DialogTrigger>
@@ -108,6 +110,7 @@ export function PlayableGridItem({
         <div className="text-muted mt-4 whitespace-nowrap overflow-hidden overflow-ellipsis">
           {subtitle}
         </div>
+        {footer && <div className="mt-6">{footer}</div>}
       </div>
     </div>
   );

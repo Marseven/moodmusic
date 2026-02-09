@@ -19,7 +19,7 @@ export function PricingPage() {
   return (
     <div className="flex flex-col h-full overflow-auto">
       <StaticPageTitle>
-        <Trans message="Pricing" />
+        <Trans message="Tarifs" />
       </StaticPageTitle>
       <Navbar
         color="bg"
@@ -30,7 +30,7 @@ export function PricingPage() {
       />
       <div className="container mx-auto px-24 flex-auto">
         <h1 className="text-3xl md:text-4xl text-center mt-30 md:mt-60 mb-30 font-normal md:font-medium">
-          <Trans message="Choose the right plan for you" />
+          <Trans message="Choisissez le plan qui vous convient" />
         </h1>
 
         <BillingCycleRadio
@@ -54,13 +54,13 @@ function ContactSection() {
     <div className="p-24 text-center my-20 md:my-80">
       <ForumIcon size="xl" className="text-muted" />
       <div className="md:text-lg my-8">
-        <Trans message="Do you have any questions about PRO accounts?" />
+        <Trans message="Avez-vous des questions sur les comptes PRO ?" />
       </div>
       <div className="mb-24 text-sm md:text-base mt-20 md:mt-0">
-        <Trans message="Our support team will be happy to assist you." />
+        <Trans message="Notre équipe de support sera ravie de vous aider." />
       </div>
       <Button variant="flat" color="primary" elementType={Link} to="/contact">
-        <Trans message="Contact us" />
+        <Trans message="Nous contacter" />
       </Button>
     </div>
   );

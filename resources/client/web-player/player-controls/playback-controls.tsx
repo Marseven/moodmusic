@@ -23,7 +23,6 @@ export function PlaybackControls({className}: Props) {
 function PlaybackButtons() {
   const isMobile = useIsMobileMediaQuery();
 
-  // need to add a gap on mobile between buttons and seekbar, otherwise seekbar will be impossible to tap
   return (
     <div
       className={clsx(
@@ -31,14 +30,14 @@ function PlaybackButtons() {
         isMobile && 'mb-20'
       )}
     >
-      <ShuffleButton iconSize={isMobile ? 'md' : 'sm'} />
-      <PreviousButton size="md" />
+      <ShuffleButton size="sm" iconSize="sm" />
+      <PreviousButton size="sm" iconSize="sm" />
       <div className="relative">
         <BufferingIndicator />
-        <PlayButton size="md" iconSize="xl" />
+        <PlayButton size="md" iconSize="lg" />
       </div>
-      <NextButton size="md" />
-      <RepeatButton iconSize={isMobile ? 'md' : 'sm'} />
+      <NextButton size="sm" iconSize="sm" />
+      <RepeatButton size="sm" iconSize="sm" />
     </div>
   );
 }

@@ -4,7 +4,7 @@ import {User} from '@common/auth/user';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
 import React from 'react';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {BookmarkBorderIcon} from '@common/icons/material/BookmarkBorder';
+import {ModernBookmarkIcon} from '@app/web-player/icons/modern-icons';
 import {InfiniteScrollSentinel} from '@common/ui/infinite-scroll/infinite-scroll-sentinel';
 import {FollowerListItem} from '@app/web-player/artists/artist-page/followers-panel/follower-list-item';
 
@@ -26,7 +26,7 @@ export function ProfileFollowersPanel({user}: Props) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<BookmarkBorderIcon size="lg" className="text-muted" />}
+        image={<ModernBookmarkIcon size="lg" className="text-muted" />}
         description={
           <Trans
             message="Seems like no one is following :name yet."

@@ -7,7 +7,7 @@ import {Trans} from '@common/i18n/trans';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {usePrimaryArtistForCurrentUser} from '@app/web-player/backstage/use-primary-artist-for-current-user';
 import {MenuItem} from '@common/ui/navigation/menu/menu-trigger';
-import {MicIcon} from '@common/icons/material/Mic';
+import {ModernMicrophoneIcon} from '@app/web-player/icons/modern-icons';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
 import {Navbar} from '@common/ui/navigation/navbar/navbar';
 import {SearchAutocomplete} from '@app/web-player/search/search-autocomplete';
@@ -22,7 +22,7 @@ export function PlayerNavbar() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicIcon />}
+          startIcon={<ModernMicrophoneIcon />}
           onSelected={() => {
             navigate(getArtistLink(primaryArtist));
           }}
@@ -36,7 +36,7 @@ export function PlayerNavbar() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicIcon />}
+          startIcon={<ModernMicrophoneIcon />}
           onSelected={() => {
             navigate('/backstage/requests');
           }}
@@ -66,24 +66,29 @@ export function PlayerNavbar() {
 
 function ActionButtons() {
   const {player, billing} = useSettings();
-  const {isLoggedIn, hasPermission, isSubscribed} = useAuth();
+  const {isLoggedIn, hasPermission, user} = useAuth();
+  
+  // Vérifier si l'utilisateur a un abonnement vraiment valide (pas juste incomplet)
+  const hasValidSubscription = user?.subscriptions?.some(sub => 
+    sub.gateway_id && sub.paid_at && !sub.ends_at
+  ) || false;
 
   const showUploadButton =
     player?.show_upload_btn && isLoggedIn && hasPermission('music.create');
   const showTryProButton =
-    billing?.enable && hasPermission('plans.view') && !isSubscribed;
+    billing?.enable && hasPermission('plans.view') && !hasValidSubscription;
 
   return (
     <Fragment>
       {showTryProButton ? (
         <Button
-          variant="outline"
+          variant="flat"
           size="xs"
           color="primary"
           elementType={Link}
           to="/pricing"
         >
-          <Trans message="Try Pro" />
+          <Trans message="Essayer le Pro" />
         </Button>
       ) : null}
       {showUploadButton ? (

@@ -6,8 +6,7 @@ import React, {
   useState,
 } from 'react';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {KeyboardArrowRightIcon} from '@common/icons/material/KeyboardArrowRight';
-import {KeyboardArrowLeftIcon} from '@common/icons/material/KeyboardArrowLeft';
+import {ModernChevronRightIcon, ModernChevronLeftIcon} from '@app/web-player/icons/modern-icons';
 import {ChannelContentProps} from '@app/web-player/channels/channel-content';
 import {ChannelContentGridItem} from '@app/web-player/channels/channel-content-grid-item';
 import {ChannelHeading} from '@app/web-player/channels/channel-heading';
@@ -72,7 +71,7 @@ export function ChannelContentCarousel(props: ChannelContentProps) {
               }
             }}
           >
-            <KeyboardArrowLeftIcon />
+            <ModernChevronLeftIcon />
           </IconButton>
           <IconButton
             disabled={!enableNext}
@@ -82,7 +81,7 @@ export function ChannelContentCarousel(props: ChannelContentProps) {
               }
             }}
           >
-            <KeyboardArrowRightIcon />
+            <ModernChevronRightIcon />
           </IconButton>
         </div>
       </div>

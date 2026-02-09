@@ -45,6 +45,11 @@ use App\Http\Controllers\UserLibrary\UserLibraryTracksController;
 use App\Http\Controllers\UserProfile\UserFollowedUsersController;
 use App\Http\Controllers\UserProfile\UserPlaylistsController;
 use App\Http\Controllers\UserProfileController;
+use App\Http\Controllers\PurchaseController;
+use App\Http\Controllers\PurchaseEbillingController;
+use App\Http\Controllers\PurchaseStripeController;
+use App\Http\Controllers\PurchasePaypalController;
+use App\Http\Controllers\Admin\PurchaseAdminController;
 use App\Http\Controllers\WaveController;
 use App\Http\Controllers\YoutubeLogController;
 
@@ -164,6 +169,26 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
 
     // LANDING
     Route::get('landing/artists', [LandingPageController::class, 'artists']);
+
+    // PURCHASES
+    Route::post('purchases/initiate', [PurchaseController::class, 'initiate']);
+    Route::get('purchases', [PurchaseController::class, 'index']);
+    Route::get('purchased-items', [PurchaseController::class, 'purchasedItems']);
+    Route::post('purchases/ebilling/create-order', [PurchaseEbillingController::class, 'createOrder']);
+    Route::get('purchases/ebilling/verify', [PurchaseEbillingController::class, 'verifyByReference']);
+    Route::post('purchases/stripe/create-checkout', [PurchaseStripeController::class, 'createCheckout']);
+    Route::post('purchases/paypal/create-order', [PurchasePaypalController::class, 'createOrder']);
+    Route::post('purchases/paypal/capture-order', [PurchasePaypalController::class, 'captureOrder']);
+
+    // ADMIN PURCHASES
+    Route::get('admin/purchases', [PurchaseAdminController::class, 'index']);
+});
+
+// Purchase webhooks (outside auth middleware)
+Route::group(['prefix' => 'v1'], function() {
+    Route::post('purchases/ebilling/webhook', [PurchaseEbillingController::class, 'webhook']);
+    Route::post('purchases/stripe/webhook', [PurchaseStripeController::class, 'webhook']);
+    Route::post('purchases/paypal/webhook', [PurchasePaypalController::class, 'webhook']);
 });
 
 

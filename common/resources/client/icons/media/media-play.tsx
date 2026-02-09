@@ -1,7 +1,7 @@
 import {createSvgIcon} from '@common/icons/create-svg-icon';
 
 export const MediaPlayIcon = createSvgIcon(
-  <path d="M10.6667 6.6548C10.6667 6.10764 11.2894 5.79346 11.7295 6.11862L24.377 15.4634C24.7377 15.7298 24.7377 16.2692 24.3771 16.5357L11.7295 25.8813C11.2895 26.2065 10.6667 25.8923 10.6667 25.3451L10.6667 6.6548Z"/>,
+  <path d="M8 5.14v13.72a1 1 0 0 0 1.5.86l11-6.86a1 1 0 0 0 0-1.72l-11-6.86A1 1 0 0 0 8 5.14Z" fill="currentColor"/>,
   'MediaPlay',
-  '0 0 32 32'
+  '0 0 24 24'
 );

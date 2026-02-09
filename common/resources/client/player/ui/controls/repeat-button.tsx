@@ -28,11 +28,11 @@ export function RepeatButton({
 
   let label: ReactElement;
   if (repeating === 'all') {
-    label = <Trans message="Enable repeat one" />;
+    label = <Trans message="Activer répétition unique" />;
   } else if (repeating === 'one') {
-    label = <Trans message="Disable repeat" />;
+    label = <Trans message="Désactiver répétition" />;
   } else {
-    label = <Trans message="Enable repeat" />;
+    label = <Trans message="Activer répétition" />;
   }
 
   return (

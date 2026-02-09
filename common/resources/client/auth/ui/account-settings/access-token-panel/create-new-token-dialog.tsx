@@ -42,7 +42,7 @@ export function CreateNewTokenDialog() {
     >
       <FormTextField
         name="tokenName"
-        label={<Trans message="Token name" />}
+        label={<Trans message="Nom du jeton" />}
         required
         autoFocus
       />
@@ -52,7 +52,7 @@ export function CreateNewTokenDialog() {
   return (
     <Dialog>
       <DialogHeader>
-        <Trans message="Create new token" />
+        <Trans message="Créer un nouveau jeton" />
       </DialogHeader>
       <DialogBody>
         {plainTextToken ? (
@@ -63,7 +63,7 @@ export function CreateNewTokenDialog() {
       </DialogBody>
       <DialogFooter>
         <Button variant="text" onClick={close}>
-          <Trans message="Done" />
+          <Trans message="Terminé" />
         </Button>
         {!plainTextToken && (
           <Button
@@ -73,7 +73,7 @@ export function CreateNewTokenDialog() {
             form={formId}
             disabled={createToken.isLoading}
           >
-            <Trans message="Create" />
+            <Trans message="Créer" />
           </Button>
         )}
       </DialogFooter>
@@ -101,13 +101,13 @@ function PlainTextPreview({plainTextToken}: PlainTextPreviewProps) {
         }}
         endAppend={
           <Button variant="flat" color="primary" onClick={copyToClipboard}>
-            {isCopied ? <Trans message="Copied!" /> : <Trans message="Copy" />}
+            {isCopied ? <Trans message="Copié!" /> : <Trans message="Copier" />}
           </Button>
         }
       />
       <div className="flex items-center gap-10 mt-14 text-sm">
         <ErrorIcon size="sm" className="text-danger" />
-        <Trans message="Make sure to store the token in a safe place. After this dialog is closed, token will not be viewable anymore." />
+        <Trans message="Assurez-vous de stocker le jeton dans un endroit sûr. Après la fermeture de cette boîte de dialogue, le jeton ne sera plus visible." />
       </div>
     </>
   );

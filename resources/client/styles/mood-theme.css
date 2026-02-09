@@ -1,0 +1,1696 @@
+/* MoodMusic - Custom Mood-Based Theme Styles */
+
+/* Fix text color for primary buttons - REMOVED OLD STYLES */
+/* Primary colors will now use transparent backgrounds */
+
+/* ===== Mood Color Variables ===== */
+:root {
+  /* Emotional Color Palette */
+  --mood-energetic: #FF6B6B;
+  --mood-energetic-light: #FF8E8E;
+  --mood-energetic-dark: #E85D5D;
+  
+  --mood-chill: #6C5CE7;
+  --mood-chill-light: #8B7EED;
+  --mood-chill-dark: #5649C9;
+  
+  --mood-melancholic: #95A3B3;
+  --mood-melancholic-light: #A8B5C5;
+  --mood-melancholic-dark: #7D8B9C;
+  
+  --mood-happy: #FFE66D;
+  --mood-happy-light: #FFEC8B;
+  --mood-happy-dark: #FFD93D;
+  
+  --mood-romantic: #FF6B9D;
+  --mood-romantic-light: #FF8BB3;
+  --mood-romantic-dark: #E85D8A;
+  
+  --mood-focused: #6C5CE7;
+  --mood-focused-light: #8B7EED;
+  --mood-focused-dark: #5649C9;
+  
+  /* Glassmorphism Effects */
+  --glass-bg: rgba(255, 255, 255, 0.1);
+  --glass-border: rgba(255, 255, 255, 0.2);
+  --glass-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+  --glass-blur: blur(10px);
+}
+
+/* ===== Mood Gradients ===== */
+.mood-gradient-energetic {
+  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+}
+
+.mood-gradient-chill {
+  background: linear-gradient(135deg, #6C5CE7 0%, #A55EEA 100%);
+}
+
+.mood-gradient-melancholic {
+  background: linear-gradient(135deg, #868F96 0%, #596164 100%);
+}
+
+.mood-gradient-happy {
+  background: linear-gradient(135deg, #FFE66D 0%, #FFA751 100%);
+}
+
+.mood-gradient-romantic {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+.mood-gradient-focused {
+  background: linear-gradient(135deg, #6C5CE7 0%, #A55EEA 100%);
+}
+
+/* Dynamic Background Gradient */
+.mood-gradient-dynamic {
+  background: linear-gradient(45deg, 
+    var(--mood-chill) 0%, 
+    var(--mood-focused) 25%, 
+    var(--mood-romantic) 50%, 
+    var(--mood-happy) 75%, 
+    var(--mood-energetic) 100%);
+  background-size: 400% 400%;
+  animation: gradientShift 20s ease infinite;
+}
+
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* ===== Glassmorphism System ===== */
+
+/* Enhanced Glass Variables */
+:root {
+  --glass-bg-light: rgba(255, 255, 255, 0.12);
+  --glass-bg-medium: rgba(255, 255, 255, 0.08);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.05);
+  --glass-border-strong: rgba(255, 255, 255, 0.25);
+  --glass-shadow-subtle: 0 4px 16px 0 rgba(0, 0, 0, 0.1);
+  --glass-shadow-elevated: 0 12px 40px 0 rgba(0, 0, 0, 0.15);
+  --glass-blur-light: blur(8px);
+  --glass-blur-medium: blur(12px);
+  --glass-blur-strong: blur(20px);
+}
+
+/* Base Glass Card */
+.mood-card {
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  background: var(--glass-bg-light);
+  border: 1px solid var(--glass-border-strong);
+  box-shadow: var(--glass-shadow-elevated);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.mood-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.45);
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Glass Panel - For larger content areas */
+.mood-glass-panel {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 16px 40px 0 rgba(31, 38, 135, 0.3);
+  border-radius: 20px;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mood-glass-panel:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.25);
+  box-shadow: 0 20px 50px 0 rgba(31, 38, 135, 0.4);
+}
+
+/* Glass Button - Interactive elements */
+.mood-glass-button {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 25px 0 rgba(31, 38, 135, 0.2);
+  border-radius: 12px;
+  transition: all 0.25s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-glass-button:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s;
+}
+
+.mood-glass-button:hover:before {
+  left: 100%;
+}
+
+.mood-glass-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.35);
+  box-shadow: 0 12px 35px 0 rgba(31, 38, 135, 0.3);
+  transform: translateY(-1px);
+}
+
+/* Glass Sidebar/Navigation */
+.mood-glass-nav {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  background: rgba(0, 0, 0, 0.15);
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 4px 0 20px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Glass Modal/Dialog */
+.mood-glass-modal {
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px 0 rgba(0, 0, 0, 0.3);
+  border-radius: 24px;
+}
+
+/* Glass Input Fields */
+.mood-glass-input {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.mood-glass-input:focus {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: var(--mood-chill);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
+}
+
+/* Glass Card Variants by Mood */
+.mood-glass-energetic {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 142, 83, 0.15) 100%);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.mood-glass-chill {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(165, 94, 234, 0.15) 100%);
+  border-color: rgba(108, 92, 231, 0.3);
+}
+
+.mood-glass-romantic {
+  background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%);
+  border-color: rgba(240, 147, 251, 0.3);
+}
+
+.mood-glass-happy {
+  background: linear-gradient(135deg, rgba(255, 230, 109, 0.15) 0%, rgba(255, 167, 81, 0.15) 100%);
+  border-color: rgba(255, 230, 109, 0.3);
+}
+
+/* Glass Floating Elements */
+.mood-glass-floating {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px 0 rgba(31, 38, 135, 0.2);
+  border-radius: 50px;
+  animation: glassFloat 6s ease-in-out infinite;
+}
+
+@keyframes glassFloat {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(1deg); }
+}
+
+/* Glass Notification/Toast */
+.mood-glass-notification {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.25);
+  border-radius: 16px;
+  animation: glassSlideIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes glassSlideIn {
+  0% { transform: translateX(100%) scale(0.8); opacity: 0; }
+  100% { transform: translateX(0) scale(1); opacity: 1; }
+}
+
+/* Glass Form Container */
+.mood-glass-form {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.2);
+  border-radius: 16px;
+  padding: 24px;
+}
+
+/* Glass Search Bar */
+.mood-glass-search {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 25px;
+  transition: all 0.3s ease;
+  padding: 12px 20px;
+}
+
+.mood-glass-search:focus {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: var(--mood-chill);
+  box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.15);
+}
+
+/* Glass Dropdown */
+.mood-glass-dropdown {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.3);
+  border-radius: 12px;
+}
+
+.mood-glass-dropdown-item {
+  padding: 12px 16px;
+  transition: all 0.2s ease;
+}
+
+.mood-glass-dropdown-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+/* Glass Badge/Chip */
+.mood-glass-badge {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 20px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Glass Progress Bar */
+.mood-glass-progress {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.mood-glass-progress-fill {
+  background: linear-gradient(90deg, var(--mood-chill) 0%, var(--mood-focused) 100%);
+  border-radius: inherit;
+  transition: width 0.3s ease;
+}
+
+/* Glass Hover Effects for Interactive Elements */
+.mood-glass-interactive {
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mood-glass-interactive:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 12px 35px 0 rgba(31, 38, 135, 0.35);
+}
+
+.mood-glass-interactive:active {
+  transform: translateY(0);
+}
+
+/* Responsive Glassmorphism */
+@media (max-width: 768px) {
+  .mood-glass-panel {
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-radius: 16px;
+    padding: 16px;
+  }
+  
+  .mood-glass-modal {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 20px;
+  }
+  
+  .mood-glass-form {
+    padding: 16px;
+    border-radius: 12px;
+  }
+  
+  .mood-glass-nav {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+  }
+}
+
+/* ===== Player Mood Enhancements ===== */
+.player-mood-indicator {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 16px;
+  border-radius: 25px;
+  font-size: 11px;
+  font-weight: 600;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 8px 25px 0 rgba(31, 38, 135, 0.2);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-mood-indicator:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: left 0.8s;
+}
+
+.player-mood-indicator:hover:before {
+  left: 100%;
+}
+
+.player-mood-indicator:hover {
+  transform: translateY(-2px) scale(1.05);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 12px 35px 0 rgba(31, 38, 135, 0.3);
+}
+
+.player-mood-energetic {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--mood-energetic);
+  border-color: rgba(255, 107, 107, 0.3);
+}
+
+.player-mood-chill {
+  background: rgba(78, 205, 196, 0.15);
+  color: var(--mood-chill);
+  border-color: rgba(78, 205, 196, 0.3);
+}
+
+.player-mood-melancholic {
+  background: rgba(149, 163, 179, 0.15);
+  color: var(--mood-melancholic);
+  border-color: rgba(149, 163, 179, 0.3);
+}
+
+.player-mood-happy {
+  background: rgba(255, 230, 109, 0.15);
+  color: var(--mood-happy-dark);
+  border-color: rgba(255, 230, 109, 0.3);
+}
+
+.player-mood-romantic {
+  background: rgba(255, 107, 157, 0.15);
+  color: var(--mood-romantic);
+  border-color: rgba(255, 107, 157, 0.3);
+}
+
+.player-mood-focused {
+  background: rgba(108, 92, 231, 0.15);
+  color: var(--mood-focused);
+  border-color: rgba(108, 92, 231, 0.3);
+}
+
+/* ===== Smooth Animations ===== */
+.mood-transition-smooth {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.mood-transition-bounce {
+  transition: all 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Pulse Animation for Now Playing */
+.mood-pulse {
+  animation: moodPulse 2s ease-in-out infinite;
+}
+
+@keyframes moodPulse {
+  0% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(1.05); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* Wave Animation for Audio Visualizer */
+.mood-wave {
+  animation: moodWave 1.5s ease-in-out infinite;
+}
+
+@keyframes moodWave {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.5); }
+}
+
+/* ===== Billing & Pricing Glassmorphism ===== */
+
+/* Pricing plan cards */
+.mood-pricing-card {
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  border-radius: 20px;
+  transition: all 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.mood-pricing-card:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 16px 48px 0 rgba(31, 38, 135, 0.25);
+  transform: translateY(-4px);
+}
+
+.mood-pricing-card.recommended {
+  border-color: rgba(108, 92, 231, 0.5);
+  box-shadow: 0 12px 40px 0 rgba(108, 92, 231, 0.2);
+}
+
+.mood-pricing-card.recommended:hover {
+  border-color: rgba(108, 92, 231, 0.7);
+  box-shadow: 0 20px 56px 0 rgba(108, 92, 231, 0.3);
+}
+
+/* CTA button inside pricing cards */
+.mood-cta-button {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.9), rgba(165, 94, 234, 0.9));
+  border: none;
+  border-radius: 12px;
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 16px rgba(108, 92, 231, 0.3);
+}
+
+.mood-cta-button:hover {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 1), rgba(165, 94, 234, 1));
+  box-shadow: 0 8px 28px rgba(108, 92, 231, 0.45);
+  transform: translateY(-2px);
+}
+
+.mood-cta-button:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(108, 92, 231, 0.3);
+}
+
+
+/* ===== Track Cards with Mood ===== */
+.track-card-mood {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.track-card-mood::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: inherit;
+  filter: blur(20px);
+  opacity: 0.5;
+  z-index: -1;
+  transform: scale(0.9);
+  transition: all 0.3s ease;
+}
+
+.track-card-mood:hover::before {
+  transform: scale(1);
+  opacity: 0.7;
+}
+
+/* ===== Scrollbar Styling ===== */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--mood-chill) 0%, var(--mood-focused) 100%);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--mood-focused) 0%, var(--mood-chill) 100%);
+}
+
+/* ===== Mood-Based Loading Animation ===== */
+.mood-loader {
+  width: 40px;
+  height: 40px;
+  position: relative;
+}
+
+.mood-loader-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: moodLoaderDot 1.5s ease-in-out infinite;
+}
+
+.mood-loader-dot:nth-child(1) {
+  background: var(--mood-energetic);
+  animation-delay: 0s;
+}
+
+.mood-loader-dot:nth-child(2) {
+  background: var(--mood-chill);
+  animation-delay: 0.2s;
+}
+
+.mood-loader-dot:nth-child(3) {
+  background: var(--mood-happy);
+  animation-delay: 0.4s;
+}
+
+.mood-loader-dot:nth-child(4) {
+  background: var(--mood-focused);
+  animation-delay: 0.6s;
+}
+
+@keyframes moodLoaderDot {
+  0%, 80%, 100% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+/* ===== Responsive Adjustments ===== */
+@media (max-width: 768px) {
+  .mood-card {
+    border-radius: 12px;
+  }
+  
+  .player-mood-indicator {
+    font-size: 11px;
+    padding: 3px 10px;
+  }
+}
+
+/* ===== Heroicons Stroke Support ===== */
+.svg-icon {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+}
+
+/* Material Icons (filled) override */
+.svg-icon[data-type="material"] {
+  fill: currentColor;
+  stroke: none;
+  stroke-width: 0;
+}
+
+/* ===== Music Player Glassmorphism ===== */
+.music-player-container {
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 40px 0 rgba(31, 38, 135, 0.25);
+  border-radius: 20px 20px 0 0;
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Player Control Buttons Glassmorphism */
+.player-button-glass {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 6px 20px 0 rgba(31, 38, 135, 0.15);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-button-glass:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 10px 30px 0 rgba(31, 38, 135, 0.25);
+  transform: translateY(-1px) scale(1.05);
+}
+
+.player-button-glass:active {
+  transform: translateY(0) scale(0.98);
+}
+
+/* Play Button Special Styling */
+.player-play-button-glass {
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(165, 94, 234, 0.2) 100%);
+  border: 2px solid rgba(108, 92, 231, 0.4);
+  box-shadow: 0 8px 25px 0 rgba(108, 92, 231, 0.3);
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-play-button-glass:hover {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.3) 0%, rgba(165, 94, 234, 0.3) 100%);
+  border-color: rgba(108, 92, 231, 0.6);
+  box-shadow: 0 12px 35px 0 rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px) scale(1.1);
+}
+
+/* iOS 16 Inspired Seekbar Design */
+.seekbar-glass {
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 8px;
+  padding: 4px;
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 
+    0 4px 20px rgba(108, 92, 231, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.seekbar-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(108, 92, 231, 0.3);
+  box-shadow: 
+    0 8px 30px rgba(108, 92, 231, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* iOS 16 Style Progress Track */
+.seekbar-glass .bg-divider {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  height: 4px !important;
+  transition: all 0.3s ease;
+}
+
+/* iOS 16 Style Progress Fill */
+.seekbar-glass .bg-primary,
+.seekbar-glass [class*="bg-primary"] {
+  background: linear-gradient(135deg, 
+    rgba(108, 92, 231, 1) 0%, 
+    rgba(165, 94, 234, 1) 100%) !important;
+  border-radius: 4px !important;
+  height: 4px !important;
+  box-shadow: 
+    0 0 12px rgba(108, 92, 231, 0.4),
+    0 2px 4px rgba(108, 92, 231, 0.3);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* iOS 16 Style Thumb */
+.seekbar-glass [role="presentation"] {
+  background: linear-gradient(135deg, 
+    rgba(108, 92, 231, 1) 0%, 
+    rgba(165, 94, 234, 1) 100%) !important;
+  border: 3px solid rgba(255, 255, 255, 0.9) !important;
+  box-shadow: 
+    0 2px 8px rgba(108, 92, 231, 0.3),
+    0 0 0 0 rgba(108, 92, 231, 0.2);
+  width: 18px !important;
+  height: 18px !important;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.seekbar-glass [role="presentation"]:hover {
+  transform: translateY(-50%) translateX(-50%) scale(1.2) !important;
+  box-shadow: 
+    0 4px 12px rgba(108, 92, 231, 0.4),
+    0 0 0 8px rgba(108, 92, 231, 0.1);
+  border-color: rgba(255, 255, 255, 1) !important;
+}
+
+.seekbar-glass [role="presentation"]:active {
+  transform: translateY(-50%) translateX(-50%) scale(1.3) !important;
+  box-shadow: 
+    0 6px 16px rgba(108, 92, 231, 0.5),
+    0 0 0 12px rgba(108, 92, 231, 0.15);
+}
+
+/* iOS 16 Style Subtle Glow */
+.track-progress-glow:after {
+  background: linear-gradient(135deg, 
+    rgba(108, 92, 231, 0.3) 0%, 
+    rgba(165, 94, 234, 0.3) 100%);
+  filter: blur(8px);
+  opacity: 0.6;
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+/* Subtle pulse for active state */
+@keyframes iosProgressPulse {
+  0%, 100% { 
+    opacity: 1;
+  }
+  50% { 
+    opacity: 0.8;
+  }
+}
+
+.seekbar-glass.playing .bg-primary {
+  animation: iosProgressPulse 3s ease-in-out infinite;
+}
+
+/* Timer Wave Animation */
+.timer-wave {
+  animation: timerWave 2.5s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes timerWave {
+  0%, 100% { 
+    transform: scaleX(1) scaleY(1);
+    opacity: 1;
+  }
+  25% { 
+    transform: scaleX(1.02) scaleY(1.08);
+    opacity: 0.9;
+  }
+  50% { 
+    transform: scaleX(1.05) scaleY(1.15);
+    opacity: 0.8;
+  }
+  75% { 
+    transform: scaleX(1.02) scaleY(1.08);
+    opacity: 0.9;
+  }
+}
+
+/* Audio Wave Visualization */
+.audio-wave-container {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  height: 20px;
+}
+
+.audio-wave-bar {
+  width: 2px;
+  background: linear-gradient(to top, var(--mood-chill), var(--mood-focused));
+  border-radius: 1px;
+  animation: audioWave 1.5s ease-in-out infinite;
+}
+
+.audio-wave-bar:nth-child(1) { animation-delay: 0s; }
+.audio-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+.audio-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+.audio-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+.audio-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+
+@keyframes audioWave {
+  0%, 100% { 
+    height: 4px;
+    opacity: 0.6;
+  }
+  50% { 
+    height: 20px;
+    opacity: 1;
+  }
+}
+
+
+/* Queue Button Glassmorphism */
+.queue-button-glass {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  transition: all 0.3s ease;
+}
+
+.queue-button-glass:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Dynamic Mood System with Audio Responsiveness */
+.mood-system-enhanced .player-mood-energetic {
+  background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 142, 83, 0.2) 100%);
+  border-color: rgba(255, 107, 107, 0.4);
+  color: #FF6B6B;
+  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
+  animation: moodEnergetic 2s ease-in-out infinite;
+}
+
+.mood-system-enhanced .player-mood-chill {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(165, 94, 234, 0.2) 100%);
+  border-color: rgba(108, 92, 231, 0.4);
+  color: #6C5CE7;
+  text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+  animation: moodChill 3s ease-in-out infinite;
+}
+
+.mood-system-enhanced .player-mood-romantic {
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(240, 147, 251, 0.2) 100%);
+  border-color: rgba(255, 107, 157, 0.4);
+  color: #FF6B9D;
+  text-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
+  animation: moodRomantic 2.5s ease-in-out infinite;
+}
+
+.mood-system-enhanced .player-mood-happy {
+  background: linear-gradient(135deg, rgba(255, 230, 109, 0.2) 0%, rgba(255, 167, 81, 0.2) 100%);
+  border-color: rgba(255, 230, 109, 0.4);
+  color: #FFD93D;
+  text-shadow: 0 0 10px rgba(255, 230, 109, 0.3);
+  animation: moodHappy 1.8s ease-in-out infinite;
+}
+
+.mood-system-enhanced .player-mood-focused {
+  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(165, 94, 234, 0.2) 100%);
+  border-color: rgba(108, 92, 231, 0.4);
+  color: #6C5CE7;
+  text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
+  animation: moodFocused 4s ease-in-out infinite;
+}
+
+.mood-system-enhanced .player-mood-melancholic {
+  background: linear-gradient(135deg, rgba(149, 163, 179, 0.2) 0%, rgba(125, 139, 156, 0.2) 100%);
+  border-color: rgba(149, 163, 179, 0.4);
+  color: #95A3B3;
+  text-shadow: 0 0 10px rgba(149, 163, 179, 0.3);
+  animation: moodMelancholic 5s ease-in-out infinite;
+}
+
+/* Dynamic Mood Animations Based on Audio Characteristics */
+@keyframes moodEnergetic {
+  0%, 100% { 
+    border-color: rgba(255, 107, 107, 0.4);
+    box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+  }
+  50% { 
+    border-color: rgba(255, 107, 107, 0.8);
+    box-shadow: 0 0 25px rgba(255, 107, 107, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+@keyframes moodChill {
+  0%, 100% { 
+    border-color: rgba(108, 92, 231, 0.4);
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
+  }
+  33% { 
+    border-color: rgba(108, 92, 231, 0.6);
+    box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
+  }
+  66% { 
+    border-color: rgba(165, 94, 234, 0.6);
+    box-shadow: 0 0 20px rgba(165, 94, 234, 0.3);
+  }
+}
+
+@keyframes moodRomantic {
+  0%, 100% { 
+    border-color: rgba(255, 107, 157, 0.4);
+    box-shadow: 0 0 15px rgba(255, 107, 157, 0.2);
+  }
+  50% { 
+    border-color: rgba(240, 147, 251, 0.6);
+    box-shadow: 0 0 20px rgba(240, 147, 251, 0.3);
+    transform: scale(1.01);
+  }
+}
+
+@keyframes moodHappy {
+  0%, 100% { 
+    border-color: rgba(255, 230, 109, 0.4);
+    box-shadow: 0 0 15px rgba(255, 230, 109, 0.2);
+  }
+  25% { 
+    border-color: rgba(255, 167, 81, 0.6);
+    box-shadow: 0 0 20px rgba(255, 167, 81, 0.3);
+    transform: scale(1.03);
+  }
+  75% { 
+    border-color: rgba(255, 230, 109, 0.7);
+    box-shadow: 0 0 25px rgba(255, 230, 109, 0.4);
+    transform: scale(1.01);
+  }
+}
+
+@keyframes moodFocused {
+  0%, 100% { 
+    border-color: rgba(108, 92, 231, 0.4);
+    box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
+  }
+  50% { 
+    border-color: rgba(165, 94, 234, 0.5);
+    box-shadow: 0 0 18px rgba(165, 94, 234, 0.25);
+  }
+}
+
+@keyframes moodMelancholic {
+  0%, 100% { 
+    border-color: rgba(149, 163, 179, 0.4);
+    box-shadow: 0 0 12px rgba(149, 163, 179, 0.2);
+  }
+  50% { 
+    border-color: rgba(125, 139, 156, 0.5);
+    box-shadow: 0 0 15px rgba(125, 139, 156, 0.25);
+  }
+}
+
+/* Audio-reactive intensity classes */
+.player-mood-indicator.low-energy {
+  animation-duration: 4s !important;
+  opacity: 0.7;
+}
+
+.player-mood-indicator.medium-energy {
+  animation-duration: 2.5s !important;
+  opacity: 0.85;
+}
+
+.player-mood-indicator.high-energy {
+  animation-duration: 1.5s !important;
+  opacity: 1;
+  transform: scale(1.05);
+}
+
+/* Bass-responsive pulsing */
+.player-mood-indicator.bass-heavy {
+  animation: bassPulse 0.8s ease-in-out infinite;
+}
+
+@keyframes bassPulse {
+  0%, 100% { 
+    transform: scale(1);
+  }
+  50% { 
+    transform: scale(1.08);
+  }
+}
+
+/* Treble-responsive shimmer */
+.player-mood-indicator.treble-rich:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  animation: trebleShimmer 2s linear infinite;
+}
+
+@keyframes trebleShimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+/* Dynamic color transitions for real-time mood changes */
+.player-mood-indicator.transitioning {
+  transition: all 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Frequency-based color intensity */
+.player-mood-indicator[data-frequency="low"] {
+  filter: saturate(0.7) brightness(0.9);
+}
+
+.player-mood-indicator[data-frequency="mid"] {
+  filter: saturate(1) brightness(1);
+}
+
+.player-mood-indicator[data-frequency="high"] {
+  filter: saturate(1.3) brightness(1.1);
+}
+
+/* ===== Enhanced Player Controls ===== */
+
+/* Music Player Container - Enhanced Spacing and Hierarchy */
+.music-player-container {
+  padding: 24px 20px;
+  background: rgba(0, 0, 0, 0.02);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  position: relative;
+}
+
+.music-player-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, 
+    transparent 0%, 
+    rgba(255, 255, 255, 0.15) 20%, 
+    rgba(255, 255, 255, 0.15) 80%, 
+    transparent 100%);
+}
+
+/* Enhanced Track Info Section */
+.player-track-section {
+  min-width: 280px;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding-right: 24px;
+}
+
+.player-track-image {
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-track-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  pointer-events: none;
+}
+
+.player-track-image:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.25);
+}
+
+.player-track-info {
+  min-width: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.player-track-title {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+  transition: color 0.2s ease;
+}
+
+.player-track-artist {
+  font-size: 12px;
+  opacity: 0.75;
+  letter-spacing: 0.01em;
+  transition: opacity 0.2s ease;
+}
+
+.player-track-artist:hover {
+  opacity: 1;
+}
+
+/* Enhanced Secondary Controls */
+.player-secondary-controls {
+  min-width: 280px;
+  width: 30%;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+  padding-left: 24px;
+}
+
+/* Glass Button Enhancements */
+.player-button-glass, .queue-button-glass {
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  padding: 10px;
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.player-button-glass::before, .queue-button-glass::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    transparent 50%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.player-button-glass:hover::before, .queue-button-glass:hover::before {
+  opacity: 1;
+}
+
+.player-button-glass:hover, .queue-button-glass:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.player-button-glass:active, .queue-button-glass:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+/* ===== Enhanced Seekbar & Progress ===== */
+
+/* Seekbar Glass Effect with Depth - Style cohérent avec volume */
+.seekbar-glass {
+  position: relative;
+  padding: 12px 16px;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 16px;
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.seekbar-glass:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+/* Track and Fill styles - iOS 16 inspired */
+.seekbar-glass [class*="bg-divider"] {
+  background: rgba(255, 255, 255, 0.2) !important;
+  border-radius: 4px !important;
+  height: 4px !important;
+}
+
+.seekbar-glass [class*="bg-primary"] {
+  background: linear-gradient(135deg, 
+    rgba(108, 92, 231, 1) 0%, 
+    rgba(165, 94, 234, 1) 100%) !important;
+  border-radius: 4px !important;
+  height: 4px !important;
+}
+
+/* Thumb styles - Solution anti-mouvement */
+.seekbar-glass [role="presentation"] {
+  background: linear-gradient(135deg, 
+    rgba(108, 92, 231, 1) 0%, 
+    rgba(165, 94, 234, 1) 100%) !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 
+    0 2px 8px rgba(108, 92, 231, 0.3),
+    0 0 0 0 rgba(108, 92, 231, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  transform: translateY(-50%) translateX(-50%) !important;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.seekbar-glass [role="presentation"]:hover {
+  transform: translateY(-50%) translateX(-50%) scale(1.2) !important;
+  box-shadow: 
+    0 4px 12px rgba(108, 92, 231, 0.4),
+    0 0 0 4px rgba(108, 92, 231, 0.1) !important;
+  border-color: rgba(255, 255, 255, 1) !important;
+}
+
+/* Enhanced Track Progress Glow */
+.track-progress-glow {
+  position: relative;
+  overflow: visible;
+}
+
+.track-progress-glow::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, 
+    rgba(108, 92, 231, 0.8) 0%,
+    rgba(165, 94, 234, 0.6) 50%,
+    rgba(255, 107, 157, 0.4) 100%);
+  border-radius: 1px;
+  transform: translateY(-50%);
+  opacity: 0.6;
+  filter: blur(1px);
+  z-index: -1;
+}
+
+/* Playback Controls Enhancement */
+.playback-controls-section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0;
+}
+
+.playback-buttons {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.main-play-button {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  backdrop-filter: var(--glass-blur-medium);
+  -webkit-backdrop-filter: var(--glass-blur-medium);
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.15) 0%, 
+    rgba(255, 255, 255, 0.08) 100%);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+}
+
+.main-play-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    transparent 50%, 
+    rgba(255, 255, 255, 0.05) 100%);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.main-play-button:hover::before {
+  opacity: 1;
+}
+
+.main-play-button:hover {
+  transform: scale(1.05);
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.2) 0%, 
+    rgba(255, 255, 255, 0.12) 100%);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 
+    0 12px 35px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+.main-play-button:active {
+  transform: scale(0.98);
+}
+
+/* Secondary Playback Buttons */
+.secondary-play-button {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  transition: all 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+}
+
+.secondary-play-button::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at center, 
+    rgba(255, 255, 255, 0.1) 0%, 
+    transparent 70%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.secondary-play-button:hover::before {
+  opacity: 1;
+}
+
+.secondary-play-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Enhanced Micro-Interactions & Animations ===== */
+
+/* Smooth transitions for all interactive elements */
+.mood-transition-smooth {
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* Enhanced Ripple Effect */
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+.mood-ripple {
+  position: relative;
+  overflow: hidden;
+}
+
+.mood-ripple::after {
+  content: '';
+  position: absolute;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.5);
+  width: 20px;
+  height: 20px;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+  transform: translate(-50%, -50%) scale(0);
+  animation: ripple 0.6s linear;
+}
+
+/* Enhanced Like Button Interaction */
+.like-button-enhanced {
+  position: relative;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.like-button-enhanced:hover {
+  transform: scale(1.1);
+}
+
+.like-button-enhanced:active {
+  transform: scale(0.95);
+}
+
+.like-button-enhanced.liked {
+  color: #FF6B9D;
+  filter: drop-shadow(0 0 8px rgba(255, 107, 157, 0.4));
+}
+
+/* Floating Hearts Animation for Like */
+@keyframes floatingHeart {
+  0% {
+    opacity: 1;
+    transform: translateY(0) scale(0.5);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(-20px) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-40px) scale(0.8);
+  }
+}
+
+.floating-heart {
+  position: absolute;
+  animation: floatingHeart 1s ease-out forwards;
+  pointer-events: none;
+}
+
+
+/* Fix Thumb Movement on Hover */
+.bg-primary.rounded-full[role="presentation"],
+.bg-primary.rounded-full[role="presentation"]:hover {
+  transform: translateY(-50%) translateX(-50%) !important;
+  transition: none !important;
+  animation: none !important;
+  background: rgb(var(--be-primary-color)) !important;
+}
+
+/* Remove Search Button Borders */
+button[aria-label="Recherche"],
+button[type="submit"][aria-label="Recherche"] {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Enhanced Hover Glow for Mood Indicators */
+.player-mood-indicator {
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+}
+
+.player-mood-indicator::before {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, 
+    var(--mood-chill) 0%, 
+    var(--mood-romantic) 50%, 
+    var(--mood-energetic) 100%);
+  opacity: 0;
+  filter: blur(8px);
+  z-index: -1;
+  transition: opacity 0.3s ease;
+}
+
+.player-mood-indicator:hover::before {
+  opacity: 0.3;
+}
+
+/* Subtle Breathing Animation for Active Elements */
+@keyframes gentleBreathing {
+  0%, 100% {
+    transform: scale(1);
+    filter: brightness(1);
+  }
+  50% {
+    transform: scale(1.02);
+    filter: brightness(1.05);
+  }
+}
+
+.now-playing-breathing {
+  animation: gentleBreathing 3s ease-in-out infinite;
+}
+
+/* Enhanced Loading States */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.02);
+  }
+}
+
+.loading-pulse {
+  animation: pulseGlow 2s ease-in-out infinite;
+}
+
+/* Smooth Scroll Behavior */
+.smooth-scroll {
+  scroll-behavior: smooth;
+}
+
+/* Enhanced Focus States */
+.focus-enhanced:focus {
+  outline: 2px solid rgba(108, 92, 231, 0.5);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 4px rgba(108, 92, 231, 0.1);
+}
+
+/* Stagger Animation for Lists */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.stagger-animation {
+  animation: slideInUp 0.5s ease-out;
+}
+
+.stagger-animation:nth-child(2) { animation-delay: 0.1s; }
+.stagger-animation:nth-child(3) { animation-delay: 0.2s; }
+.stagger-animation:nth-child(4) { animation-delay: 0.3s; }
+.stagger-animation:nth-child(5) { animation-delay: 0.4s; }
+
+/* Enhanced Tooltip Animations */
+.tooltip-enhanced {
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  backdrop-filter: var(--glass-blur-light);
+  -webkit-backdrop-filter: var(--glass-blur-light);
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.tooltip-enhanced.show {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+/* Track Progress Glow Effect */
+.track-progress-glow {
+  position: relative;
+}
+
+.track-progress-glow:after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 100%;
+  width: var(--progress, 0%);
+  background: linear-gradient(90deg, var(--mood-chill), var(--mood-focused));
+  filter: blur(4px);
+  opacity: 0.6;
+  transform: translateY(-50%);
+  pointer-events: none;
+  border-radius: inherit;
+}
+
+/* Responsive Player Glassmorphism */
+@media (max-width: 768px) {
+  .music-player-container {
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-radius: 16px 16px 0 0;
+  }
+  
+  .player-button-glass {
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+  }
+  
+  .player-mood-indicator {
+    padding: 4px 12px;
+    font-size: 10px;
+  }
+}
+
+/* ===== Wave-Style Seekbar (Spotify-inspired) ===== */
+.wave-seekbar {
+  position: relative;
+  touch-action: none;
+  display: flex;
+  align-items: center;
+}
+
+.wave-seekbar-thumb {
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: #fff;
+  transform: translate(-50%, -50%);
+  transition: width 0.15s ease, height 0.15s ease, box-shadow 0.15s ease;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+.wave-seekbar-thumb.active,
+.wave-seekbar:hover .wave-seekbar-thumb {
+  width: 12px;
+  height: 12px;
+}
+
+.wave-seekbar-thumb.active {
+  width: 14px;
+  height: 14px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+
+/* ===== Dark Mode Adjustments ===== */
+@media (prefers-color-scheme: dark) {
+  :root {
+    --glass-bg: rgba(0, 0, 0, 0.2);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  }
+  
+  .mood-card {
+    background: rgba(0, 0, 0, 0.3);
+  }
+  
+  .mood-button {
+    background: rgba(0, 0, 0, 0.4);
+  }
+  
+  .music-player-container {
+    background: rgba(0, 0, 0, 0.4);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  
+  .player-button-glass {
+    background: rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}

@@ -2,7 +2,7 @@ import {useInfiniteData} from '@common/ui/infinite-scroll/use-infinite-data';
 import {Repost} from '@app/web-player/reposts/repost';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {AudiotrackIcon} from '@common/icons/material/Audiotrack';
+import {ModernMusicNoteIcon} from '@app/web-player/icons/modern-icons';
 import {Trans} from '@common/i18n/trans';
 import {TrackListItem} from '@app/web-player/tracks/track-list/track-list-item';
 import {InfiniteScrollSentinel} from '@common/ui/infinite-scroll/infinite-scroll-sentinel';
@@ -30,7 +30,7 @@ export function ProfileRepostsPanel({user}: ProfileContentProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AudiotrackIcon size="lg" className="text-muted" />}
+        image={<ModernMusicNoteIcon size="lg" className="text-muted" />}
         title={<Trans message="No reposts yet" />}
         description={
           <Trans

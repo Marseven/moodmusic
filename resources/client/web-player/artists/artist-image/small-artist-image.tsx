@@ -3,7 +3,7 @@ import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import {Artist} from '@app/web-player/artists/artist';
 import {Trans} from '@common/i18n/trans';
-import {CheckIcon} from '@common/icons/material/Check';
+import {ModernCheckIcon} from '@app/web-player/icons/modern-icons';
 import clsx from 'clsx';
 
 interface SmallArtistImageProps {
@@ -38,7 +38,7 @@ export function SmallArtistImage({
           color="positive"
         >
           <div className="bg-primary rounded-full p-1">
-            <CheckIcon className="text-white" size="sm" />
+            <ModernCheckIcon className="text-white" size="sm" />
           </div>
           <Trans message="Verified artist" />
         </div>

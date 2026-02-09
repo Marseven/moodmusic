@@ -13,14 +13,14 @@ import {
   usePlayerOverlayStore,
 } from '@app/web-player/state/player-overlay-store';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {KeyboardArrowDownIcon} from '@common/icons/material/KeyboardArrowDown';
+import {ModernCollapseIcon} from '@app/web-player/icons/modern-icons';
 import {PlaybackControls} from '@app/web-player/player-controls/playback-controls';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
 import {LikeIconButton} from '@app/web-player/library/like-icon-button';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
-import {MoreVertIcon} from '@common/icons/material/MoreVert';
+import {ModernEllipsisVerticalIcon} from '@app/web-player/icons/modern-icons';
 import fscreen from 'fscreen';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {TrackTable} from '@app/web-player/tracks/track-table/track-table';
@@ -92,7 +92,7 @@ export function PlayerOverlay() {
             className="mr-auto"
             onClick={() => playerOverlayState.toggle()}
           >
-            <KeyboardArrowDownIcon />
+            <ModernCollapseIcon />
           </IconButton>
           {isMobile && <LyricsButton />}
           {isMobile && <DownloadTrackButton />}
@@ -190,7 +190,7 @@ function QueuedTrack() {
       </div>
       <DialogTrigger type="popover">
         <IconButton>
-          <MoreVertIcon />
+          <ModernEllipsisVerticalIcon />
         </IconButton>
         <TrackContextDialog tracks={[track]} />
       </DialogTrigger>

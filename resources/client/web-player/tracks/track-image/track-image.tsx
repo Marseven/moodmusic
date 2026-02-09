@@ -13,7 +13,7 @@ export function TrackImage({track, className, size}: TrackImageProps) {
   const {trans} = useTrans();
   return (
     <img
-      className={clsx(className, size, 'object-cover bg-fg-base/4')}
+      className={clsx(className, size, 'object-cover bg-fg-base/4 mood-transition-smooth hover:scale-105 hover:shadow-lg')}
       draggable={false}
       loading="lazy"
       src={getTrackImageSrc(track)}

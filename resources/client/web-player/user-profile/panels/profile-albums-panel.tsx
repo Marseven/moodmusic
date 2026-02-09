@@ -4,7 +4,7 @@ import {Trans} from '@common/i18n/trans';
 import React from 'react';
 import {ProfileContentProps} from '@app/web-player/user-profile/user-profile-page';
 import {useUserLikedAlbums} from '@app/web-player/library/requests/use-user-liked-albums';
-import {AlbumIcon} from '@common/icons/material/Album';
+import {ModernDiscIcon} from '@app/web-player/icons/modern-icons';
 import {AlbumList} from '@app/web-player/albums/album-list/album-list';
 
 export function ProfileAlbumsPanel({user}: ProfileContentProps) {
@@ -23,7 +23,7 @@ export function ProfileAlbumsPanel({user}: ProfileContentProps) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AlbumIcon size="lg" className="text-muted" />}
+        image={<ModernDiscIcon size="lg" className="text-muted" />}
         title={<Trans message="No albums yet" />}
         description={
           <Trans

@@ -30,13 +30,16 @@ class BaseExceptionHandler extends Handler
             }
         });
 
-        configureScope(function (Scope $scope): void {
-            if ($user = Auth::user()) {
-                $scope->setUser(['email' => $user->email, 'id' => $user->id]);
-            }
-        });
-
         $this->reportable(function (Throwable $e) {
+            configureScope(function (Scope $scope): void {
+                try {
+                    if ($user = Auth::user()) {
+                        $scope->setUser(['email' => $user->email, 'id' => $user->id]);
+                    }
+                } catch (\Throwable) {
+                    // Auth not yet available during early bootstrap
+                }
+            });
             Integration::captureUnhandledException($e);
         });
     }

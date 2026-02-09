@@ -20,7 +20,7 @@ export const UpsellLabel = memo(({products}: UpsellLabelProps) => {
         {' '}
         (
         <Trans
-          message="Save up to :percentage%"
+          message="Économisez jusqu'à :percentage%"
           values={{percentage: upsellPercentage}}
         />
         )
