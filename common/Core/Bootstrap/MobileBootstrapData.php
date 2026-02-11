@@ -13,23 +13,25 @@ class MobileBootstrapData extends BaseBootstrapData
     public function init(): self
     {
         $cssThemes = $this->getThemes()['all'];
+
+        $lightTheme = $cssThemes->where('default_light', true)->first();
+        $darkTheme = $cssThemes->where('default_dark', true)->first();
+
         $themes = [
-            'light' => $cssThemes
-                ->where('default_light', true)
-                ->first()
-                ->toArray(),
-            'dark' => $cssThemes
-                ->where('default_dark', true)
-                ->first()
-                ->toArray(),
+            'light' => $lightTheme ? $lightTheme->toArray() : ['name' => 'Light', 'colors' => []],
+            'dark' => $darkTheme ? $darkTheme->toArray() : ['name' => 'Dark', 'colors' => []],
         ];
 
-        $themes['light']['colors'] = $this->mapColorsToRgba(
-            $themes['light']['colors'],
-        );
-        $themes['dark']['colors'] = $this->mapColorsToRgba(
-            $themes['dark']['colors'],
-        );
+        if (!empty($themes['light']['colors'])) {
+            $themes['light']['colors'] = $this->mapColorsToRgba(
+                $themes['light']['colors'],
+            );
+        }
+        if (!empty($themes['dark']['colors'])) {
+            $themes['dark']['colors'] = $this->mapColorsToRgba(
+                $themes['dark']['colors'],
+            );
+        }
 
         $this->data = [
             'themes' => $themes,
