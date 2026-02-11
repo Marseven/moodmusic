@@ -120,7 +120,7 @@ function MobileNavbar() {
         className="text-xs whitespace-nowrap overflow-hidden"
         onClick={() => navigate('/')}
       >
-        <HomeIcon className="block mx-auto mb-6 w-5 h-5" />
+        <HomeIcon className="block mx-auto mb-6 icon-md" />
         <Trans message="Accueil" />
       </button>
       {menu.items.map(item => (
