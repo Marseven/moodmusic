@@ -60,7 +60,7 @@ const parseTree = node => {
 };
 
 async function run() {
-  const files = await glob(['resources/client/**/*.{tsx,ts}']);
+  const files = await glob(['resources/client/**/*.{tsx,ts}', 'common/resources/client/**/*.{tsx,ts}']);
   files.map(filename => {
     const content = fse.readFileSync(filename).toString();
     const sourceFile = ts.createSourceFile(
