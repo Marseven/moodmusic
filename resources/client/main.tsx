@@ -95,6 +95,9 @@ declare module '@common/core/settings/settings' {
       artist_bottom?: string;
       album_above?: string;
       disable?: boolean;
+      enabled?: boolean;
+      frequency?: string;
+      preview_duration?: string;
     };
   }
 }
@@ -153,6 +156,26 @@ root.render(
     <Router />
   </CommonProvider>
 );
+
+// Register service worker in production
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  const baseUri = getBootstrapData().settings.html_base_uri || '/';
+  const swUrl = `${baseUri.replace(/\/$/, '')}/sw.js`;
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register(swUrl).then(registration => {
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'activated') {
+              console.log('[SW] New service worker activated');
+            }
+          });
+        }
+      });
+    });
+  });
+}
 
 function Router() {
   const {

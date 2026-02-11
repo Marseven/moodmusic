@@ -31,6 +31,9 @@ export function PlayerSettings() {
           <Tab>
             <Trans message="Artist page" />
           </Tab>
+          <Tab>
+            <Trans message="Ads" />
+          </Tab>
         </TabList>
         <TabPanels className="pt-20">
           <TabPanel>
@@ -41,6 +44,9 @@ export function PlayerSettings() {
           </TabPanel>
           <TabPanel>
             <ArtistPagePanel />
+          </TabPanel>
+          <TabPanel>
+            <AdsPanel />
           </TabPanel>
         </TabPanels>
       </Tabs>
@@ -148,6 +154,43 @@ function GeneralPanel() {
       >
         <Trans message="Metadata matching" />
       </FormSwitch>
+    </Fragment>
+  );
+}
+
+function AdsPanel() {
+  return (
+    <Fragment>
+      <FormSwitch
+        className="mb-24"
+        name="client.ads.enabled"
+        description={
+          <Trans message="Enable audio ads between tracks for non-subscribed users." />
+        }
+      >
+        <Trans message="Enable ads" />
+      </FormSwitch>
+      <FormTextField
+        className="mb-24"
+        name="client.ads.frequency"
+        label={<Trans message="Frequency (every N tracks)" />}
+        description={
+          <Trans message="Number of tracks played between each ad. Default: 3" />
+        }
+        type="number"
+        min={1}
+        max={20}
+      />
+      <FormTextField
+        name="client.ads.preview_duration"
+        label={<Trans message="Paid track preview duration (seconds)" />}
+        description={
+          <Trans message="Duration of the free preview for paid tracks before prompting purchase. Default: 30" />
+        }
+        type="number"
+        min={10}
+        max={120}
+      />
     </Fragment>
   );
 }

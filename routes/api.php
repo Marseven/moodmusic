@@ -52,6 +52,8 @@ use App\Http\Controllers\PurchasePaypalController;
 use App\Http\Controllers\Admin\PurchaseAdminController;
 use App\Http\Controllers\WaveController;
 use App\Http\Controllers\YoutubeLogController;
+use App\Http\Controllers\Admin\AdSpotController;
+use App\Http\Controllers\AdDeliveryController;
 
 Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verified']], function() {
     // SEARCH
@@ -182,10 +184,24 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
 
     // ADMIN PURCHASES
     Route::get('admin/purchases', [PurchaseAdminController::class, 'index']);
+
+    // AD SPOTS (admin CRUD)
+    Route::get('ad-spots', [AdSpotController::class, 'index']);
+    Route::post('ad-spots', [AdSpotController::class, 'store']);
+    Route::put('ad-spots/{adSpot}', [AdSpotController::class, 'update']);
+    Route::delete('ad-spots/{ids}', [AdSpotController::class, 'destroy']);
+
+    // AD DELIVERY (public)
+    Route::get('ads/next', [AdDeliveryController::class, 'next']);
+    Route::post('ads/{ad}/click', [AdDeliveryController::class, 'click']);
 });
 
-// Purchase webhooks (outside auth middleware)
+// Public routes (outside auth middleware)
 Route::group(['prefix' => 'v1'], function() {
+    // Ad audio streaming (must be public for HTML Audio element)
+    Route::get('ads/{ad}/audio', [AdDeliveryController::class, 'audio']);
+
+    // Purchase webhooks
     Route::post('purchases/ebilling/webhook', [PurchaseEbillingController::class, 'webhook']);
     Route::post('purchases/stripe/webhook', [PurchaseStripeController::class, 'webhook']);
     Route::post('purchases/paypal/webhook', [PurchasePaypalController::class, 'webhook']);

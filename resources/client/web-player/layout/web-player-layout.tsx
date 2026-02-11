@@ -17,6 +17,9 @@ import {DesktopPlayerControls} from '@app/web-player/player-controls/desktop-pla
 import {PlayerOverlay} from '@app/web-player/overlay/player-overlay';
 import {DashboardLayoutContext} from '@common/ui/layout/dashboard-layout-context';
 import {PlayerNavbar} from '@app/web-player/layout/player-navbar';
+import {AdOverlay} from '@app/web-player/ads/ad-overlay';
+import {PurchasePromptOverlay} from '@app/web-player/purchases/purchase-prompt-overlay';
+import {usePurchaseGatingStore} from '@app/web-player/purchases/purchase-gating-store';
 
 export function WebPlayerLayout() {
   const {player} = useSettings();
@@ -41,6 +44,9 @@ export function WebPlayerLayout() {
         <PlayerControlsBar />
       </DashboardLayout>
       <PlayerOverlay />
+      <AdOverlay />
+      <PurchasePromptOverlay />
+      <PurchaseGatingInit />
     </PlayerContext>
   );
 }
@@ -73,6 +79,13 @@ function Main({className}: MainProps) {
       </div>
     </main>
   );
+}
+
+function PurchaseGatingInit() {
+  React.useEffect(() => {
+    usePurchaseGatingStore.getState().loadPurchases();
+  }, []);
+  return null;
 }
 
 function RightSidenav() {

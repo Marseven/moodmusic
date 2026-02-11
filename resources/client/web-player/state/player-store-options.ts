@@ -14,6 +14,8 @@ import {
 } from '@common/player/providers/youtube/youtube-types';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
+import {useAdStore} from '@app/web-player/ads/ad-store';
+import {usePurchaseGatingStore} from '@app/web-player/purchases/purchase-gating-store';
 
 // used to track play history for logging plays on backend (prevents logging play twice, unless track is fully played)
 const trackPlays = new Set<number>();
@@ -121,6 +123,14 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
         pause();
         return;
       }
+
+      // If an ad is playing, pause the main player immediately
+      const adStore = useAdStore.getState();
+      if (adStore.isPlayingAd) {
+        pause();
+        return;
+      }
+
       // log track play
       if (cuedMedia && !trackPlays.has(cuedMedia.meta.id)) {
         trackPlays.add(cuedMedia.meta.id);
@@ -129,10 +139,50 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
         });
       }
     },
-    playbackEnd: ({state: {cuedMedia}}) => {
+    playbackEnd: ({state: {cuedMedia, pause, play}}) => {
       // clear track play
       if (cuedMedia) {
         trackPlays.delete(cuedMedia.meta.id);
+      }
+
+      // Reset purchase gating for the track that just ended
+      usePurchaseGatingStore.getState().reset();
+
+      // Ad system: increment counter and check if ad should play
+      const adStore = useAdStore.getState();
+      adStore.incrementTrackCount();
+      if (adStore.shouldShowAd()) {
+        // The internal playbackEnd listener will call playNext().
+        // We need to pause the next track once it starts, play the ad,
+        // then resume. We do this by setting isPlayingAd before playNext runs.
+        // The play listener above will pause the player when isPlayingAd is true.
+        adStore.playAd(() => {
+          // Resume: play the currently cued (next) track
+          play();
+        });
+      }
+    },
+    progress: ({currentTime, state: {cuedMedia, pause, playNext}}) => {
+      if (!cuedMedia) return;
+      const track = cuedMedia.meta as Track;
+      const gatingStore = usePurchaseGatingStore.getState();
+
+      // Skip if already prompted for this track
+      if (gatingStore.promptedTrackId === track.id) return;
+
+      // Check if this is a paid track that hasn't been purchased
+      // price comes as string from Laravel decimal:2 cast, so use parseFloat
+      const price = parseFloat(String(track.price ?? 0));
+      if (price > 0) {
+        const settings = getBootstrapData().settings;
+        const previewDuration = parseInt(settings?.ads?.preview_duration ?? '30') || 30;
+
+        if (currentTime >= previewDuration) {
+          if (!gatingStore.isTrackPurchased(track.id)) {
+            pause();
+            gatingStore.showPrompt(track, playNext);
+          }
+        }
       }
     },
     error: async ({
@@ -177,6 +227,8 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
   },
   onDestroy: () => {
     tracksSkippedDueToError = 0;
+    useAdStore.getState().reset();
+    usePurchaseGatingStore.getState().reset();
   },
 };
 

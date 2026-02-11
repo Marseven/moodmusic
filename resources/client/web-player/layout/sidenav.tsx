@@ -14,6 +14,7 @@ import {getPlaylistLink} from '@app/web-player/playlists/playlist-link';
 import clsx from 'clsx';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {useAuthClickCapture} from '@app/web-player/use-auth-click-capture';
+import {PwaInstallButton} from '@app/web-player/pwa/pwa-install-button';
 
 const menuItemClassName = (isActive: boolean): string => {
   return clsx(
@@ -62,6 +63,7 @@ export function Sidenav({className}: Props) {
         </NavLink>
         <PlaylistSection />
       </div>
+      <PwaInstallButton />
     </div>
   );
 }
