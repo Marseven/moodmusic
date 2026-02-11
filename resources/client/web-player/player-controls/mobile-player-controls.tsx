@@ -120,7 +120,7 @@ function MobileNavbar() {
         className="text-xs whitespace-nowrap overflow-hidden"
         onClick={() => navigate('/')}
       >
-        <HomeIcon className="block mx-auto mb-6 w-7 h-7" />
+        <HomeIcon className="block mx-auto mb-6 w-6 h-6" />
         <Trans message="Accueil" />
       </button>
       {menu.items.map(item => (
@@ -191,7 +191,7 @@ function AccountButton() {
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <UserIcon className="block mx-auto w-7 h-7" />
+        <UserIcon className="block mx-auto w-6 h-6" />
       </Badge>
       <div className="text-xs">
         <Trans message="Account" />
