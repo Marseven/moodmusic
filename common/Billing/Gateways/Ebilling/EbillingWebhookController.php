@@ -17,7 +17,7 @@ class EbillingWebhookController extends Controller
     public function handleWebhook(Request $request): Response
     {
         $payload = $request->all();
-        Log::info('Webhook eBilling reçu', ['payload' => $payload]);
+        Log::channel('ebilling')->info('[webhook] Received', ['payload' => $payload]);
 
         // Extract reference and bill_id from webhook payload
         // eBilling notification params: billingid, transactionid, reference, payer_id, payer_code, amount
@@ -25,7 +25,7 @@ class EbillingWebhookController extends Controller
         $billId = $payload['bill_id'] ?? $payload['billingid'] ?? $payload['transaction_id'] ?? $payload['transactionid'] ?? null;
 
         if (!$reference && !$billId) {
-            Log::warning('Webhook eBilling: missing reference and bill_id', ['payload' => $payload]);
+            Log::channel('ebilling')->warning('[webhook] Missing reference and bill_id', ['payload' => $payload]);
             return response('Missing reference or bill_id', 400);
         }
 
@@ -39,24 +39,36 @@ class EbillingWebhookController extends Controller
         }
 
         if (!$subscription) {
-            Log::error('Webhook eBilling: subscription not found', [
+            Log::channel('ebilling')->error('[webhook] Subscription not found', [
                 'reference' => $reference,
                 'bill_id' => $billId,
             ]);
             return response('Subscription not found', 404);
         }
 
+        Log::channel('ebilling')->info('[webhook] Subscription found', [
+            'subscription_id' => $subscription->id,
+            'user_id' => $subscription->user_id,
+            'reference' => $reference,
+            'bill_id' => $billId,
+        ]);
+
         // Verify the payment status directly with eBilling API
         // instead of trusting the webhook payload
         $verifiedStatus = $this->verifyPaymentWithEbilling($billId ?? $subscription->gateway_id);
 
         if ($verifiedStatus === null) {
-            Log::error('Webhook eBilling: API verification failed, rejecting webhook', [
+            Log::channel('ebilling')->error('[webhook] API verification failed, rejecting', [
                 'subscription_id' => $subscription->id,
                 'bill_id' => $billId,
             ]);
             return response('Payment verification failed', 500);
         }
+
+        Log::channel('ebilling')->info('[webhook] API verification result', [
+            'subscription_id' => $subscription->id,
+            'verified_status' => $verifiedStatus,
+        ]);
 
         $this->processVerifiedStatus($verifiedStatus, $subscription, $billId);
 
@@ -76,14 +88,16 @@ class EbillingWebhookController extends Controller
                 return $response->json('state');
             }
 
-            Log::error('Webhook eBilling: API verification request failed', [
+            Log::channel('ebilling')->error('[webhook:verify] API request failed', [
                 'bill_id' => $billId,
-                'status' => $response->status(),
+                'http_status' => $response->status(),
+                'response_body' => $response->body(),
             ]);
         } catch (\Exception $e) {
-            Log::error('Webhook eBilling: API verification exception', [
+            Log::channel('ebilling')->error('[webhook:verify] Exception', [
                 'bill_id' => $billId,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
         }
 
@@ -112,8 +126,11 @@ class EbillingWebhookController extends Controller
                     'paid' => true,
                 ]);
 
-                Log::info('Webhook eBilling: payment confirmed (API-verified)', [
+                Log::channel('ebilling')->info('[webhook] Payment confirmed (API-verified)', [
                     'subscription_id' => $subscription->id,
+                    'user_id' => $subscription->user_id,
+                    'bill_id' => $billId,
+                    'renews_at' => $subscription->renews_at,
                 ]);
                 break;
 
@@ -123,22 +140,28 @@ class EbillingWebhookController extends Controller
                 if ($subscription->user) {
                     $subscription->user->notify(new PaymentFailed($subscription));
                 }
-                Log::info('Webhook eBilling: payment failed/cancelled (API-verified)', [
+                Log::channel('ebilling')->warning('[webhook] Payment failed/cancelled (API-verified)', [
                     'subscription_id' => $subscription->id,
+                    'user_id' => $subscription->user_id,
+                    'bill_id' => $billId,
+                    'status' => $normalizedStatus,
                 ]);
                 break;
 
             case 'pending':
             case 'ready':
-                Log::info('Webhook eBilling: payment pending (API-verified)', [
+                Log::channel('ebilling')->info('[webhook] Payment still pending (API-verified)', [
                     'subscription_id' => $subscription->id,
+                    'bill_id' => $billId,
+                    'status' => $normalizedStatus,
                 ]);
                 break;
 
             default:
-                Log::warning('Webhook eBilling: unrecognized status from API', [
+                Log::channel('ebilling')->warning('[webhook] Unrecognized status from API', [
                     'status' => $status,
                     'subscription_id' => $subscription->id,
+                    'bill_id' => $billId,
                 ]);
         }
     }

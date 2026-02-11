@@ -49,18 +49,32 @@ class PurchaseEbillingController extends BaseController
         try {
             $credentials = $this->getEbillingCredentials();
             if (!$credentials['username'] || !$credentials['sharedkey']) {
+                Log::channel('ebilling')->error('[purchase:createOrder] Credentials missing', [
+                    'has_username' => !empty($credentials['username']),
+                    'has_sharedkey' => !empty($credentials['sharedkey']),
+                    'purchase_id' => $purchase->id,
+                ]);
                 return response()->json([
                     'message' => 'Configuration eBilling incomplète.',
                 ], 500);
             }
 
+            Log::channel('ebilling')->info('[purchase:createOrder] Starting', [
+                'user_id' => $user->id,
+                'purchase_id' => $purchase->id,
+                'item' => $itemName,
+                'amount' => $purchase->amount,
+                'reference' => $purchase->reference,
+            ]);
+
             $response = $this->ebilling()->post('/api/v1/merchant/e_bills', $globalPayload);
 
             if (!$response->successful()) {
-                Log::error('Purchase eBilling API error', [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
+                Log::channel('ebilling')->error('[purchase:createOrder] API call failed', [
                     'purchase_id' => $purchase->id,
+                    'http_status' => $response->status(),
+                    'response_body' => $response->body(),
+                    'payload' => $globalPayload,
                 ]);
                 return response()->json([
                     'message' => "Erreur eBilling ({$response->status()}).",
@@ -73,13 +87,21 @@ class PurchaseEbillingController extends BaseController
             $callbackUrl = url('/purchases/ebilling/done') . '?reference=' . $purchase->reference;
             $portalUrl = $this->getPortalBaseUrl();
 
+            Log::channel('ebilling')->info('[purchase:createOrder] Success - bill created', [
+                'purchase_id' => $purchase->id,
+                'bill_id' => $billId,
+                'checkout_url' => "{$portalUrl}?invoice={$billId}&redirect_url={$callbackUrl}",
+            ]);
+
             return response()->json([
                 'bill_id' => $billId,
                 'checkout_url' => "{$portalUrl}?invoice={$billId}&redirect_url={$callbackUrl}",
             ]);
         } catch (\Throwable $e) {
-            Log::error('Purchase eBilling exception: ' . $e->getMessage(), [
+            Log::channel('ebilling')->error('[purchase:createOrder] Exception', [
                 'purchase_id' => $purchase->id,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
             return response()->json([
                 'message' => 'Erreur serveur. Veuillez réessayer.',
@@ -90,18 +112,21 @@ class PurchaseEbillingController extends BaseController
     public function webhook(Request $request)
     {
         $payload = $request->all();
-        Log::info('Purchase eBilling webhook received', ['payload' => $payload]);
+        Log::channel('ebilling')->info('[purchase:webhook] Received', ['payload' => $payload]);
 
         $reference = $payload['external_reference'] ?? $payload['reference'] ?? null;
         $billId = $payload['bill_id'] ?? $payload['billingid'] ?? $payload['transaction_id'] ?? $payload['transactionid'] ?? null;
 
         if (!$reference && !$billId) {
+            Log::channel('ebilling')->warning('[purchase:webhook] Missing reference and bill_id', ['payload' => $payload]);
             return response('Missing reference or bill_id', 400);
         }
 
         // Only handle purchase references (pur_ prefix)
         if ($reference && !str_starts_with($reference, 'pur_')) {
-            // Not a purchase webhook, skip
+            Log::channel('ebilling')->info('[purchase:webhook] Not a purchase reference, skipping', [
+                'reference' => $reference,
+            ]);
             return response('Not a purchase reference', 200);
         }
 
@@ -116,20 +141,37 @@ class PurchaseEbillingController extends BaseController
         }
 
         if (!$purchase) {
-            Log::error('Purchase eBilling webhook: purchase not found', [
+            Log::channel('ebilling')->error('[purchase:webhook] Purchase not found', [
                 'reference' => $reference,
                 'bill_id' => $billId,
             ]);
             return response('Purchase not found', 404);
         }
 
+        Log::channel('ebilling')->info('[purchase:webhook] Purchase found', [
+            'purchase_id' => $purchase->id,
+            'user_id' => $purchase->user_id,
+            'current_status' => $purchase->status,
+            'reference' => $reference,
+            'bill_id' => $billId,
+        ]);
+
         // Verify with eBilling API
         $verifyBillId = $billId ?? $purchase->gateway_id;
         $status = $this->verifyPaymentStatus($verifyBillId);
 
         if ($status === null) {
+            Log::channel('ebilling')->error('[purchase:webhook] API verification failed', [
+                'purchase_id' => $purchase->id,
+                'bill_id' => $verifyBillId,
+            ]);
             return response('Payment verification failed', 500);
         }
+
+        Log::channel('ebilling')->info('[purchase:webhook] API verification result', [
+            'purchase_id' => $purchase->id,
+            'verified_status' => $status,
+        ]);
 
         $this->processStatus($status, $purchase, $billId);
 
@@ -154,6 +196,10 @@ class PurchaseEbillingController extends BaseController
 
         // If already completed/failed, return current status
         if ($purchase->status !== 'pending') {
+            Log::channel('ebilling')->info('[purchase:verifyByReference] Already resolved', [
+                'purchase_id' => $purchase->id,
+                'status' => $purchase->status,
+            ]);
             return response()->json([
                 'status' => $purchase->status,
                 'purchase' => $purchase,
@@ -162,6 +208,10 @@ class PurchaseEbillingController extends BaseController
 
         // Verify with eBilling API if we have a gateway_id
         if ($purchase->gateway_id) {
+            Log::channel('ebilling')->info('[purchase:verifyByReference] Checking with API', [
+                'purchase_id' => $purchase->id,
+                'gateway_id' => $purchase->gateway_id,
+            ]);
             $ebillingStatus = $this->verifyPaymentStatus($purchase->gateway_id);
             if ($ebillingStatus) {
                 $this->processStatus($ebillingStatus, $purchase, $purchase->gateway_id);
@@ -186,10 +236,17 @@ class PurchaseEbillingController extends BaseController
             if ($response->successful()) {
                 return $response->json('state');
             }
+
+            Log::channel('ebilling')->error('[purchase:verify] API request failed', [
+                'bill_id' => $billId,
+                'http_status' => $response->status(),
+                'response_body' => $response->body(),
+            ]);
         } catch (\Exception $e) {
-            Log::error('Purchase eBilling verification error', [
+            Log::channel('ebilling')->error('[purchase:verify] Exception', [
                 'bill_id' => $billId,
                 'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
         }
 
@@ -211,19 +268,40 @@ class PurchaseEbillingController extends BaseController
                     $updateData['gateway_id'] = $billId;
                 }
                 $purchase->update($updateData);
-                Log::info('Purchase eBilling: payment confirmed', ['purchase_id' => $purchase->id]);
+                Log::channel('ebilling')->info('[purchase] Payment confirmed', [
+                    'purchase_id' => $purchase->id,
+                    'user_id' => $purchase->user_id,
+                    'amount' => $purchase->amount,
+                    'bill_id' => $billId,
+                ]);
                 break;
 
             case 'failed':
             case 'cancelled':
                 $purchase->update(['status' => 'failed']);
-                Log::info('Purchase eBilling: payment failed', ['purchase_id' => $purchase->id]);
+                Log::channel('ebilling')->warning('[purchase] Payment failed/cancelled', [
+                    'purchase_id' => $purchase->id,
+                    'user_id' => $purchase->user_id,
+                    'bill_id' => $billId,
+                    'status' => $normalized,
+                ]);
                 break;
 
             case 'pending':
             case 'ready':
-                Log::info('Purchase eBilling: payment pending', ['purchase_id' => $purchase->id]);
+                Log::channel('ebilling')->info('[purchase] Payment still pending', [
+                    'purchase_id' => $purchase->id,
+                    'bill_id' => $billId,
+                    'status' => $normalized,
+                ]);
                 break;
+
+            default:
+                Log::channel('ebilling')->warning('[purchase] Unrecognized status', [
+                    'purchase_id' => $purchase->id,
+                    'status' => $status,
+                    'bill_id' => $billId,
+                ]);
         }
     }
 }

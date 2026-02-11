@@ -60,12 +60,23 @@ class EbillingController extends BaseController
         try {
             $credentials = $this->getEbillingCredentials();
             if (!$credentials['username'] || !$credentials['sharedkey']) {
-                Log::error('eBilling credentials missing');
+                Log::channel('ebilling')->error('[createOrder] Credentials missing', [
+                    'has_username' => !empty($credentials['username']),
+                    'has_sharedkey' => !empty($credentials['sharedkey']),
+                ]);
                 return response()->json([
                     'message' => 'Configuration eBilling incomplète.',
                     'error_code' => 'EBILLING_CONFIG_MISSING'
                 ], 500);
             }
+
+            Log::channel('ebilling')->info('[createOrder] Starting', [
+                'user_id' => $user->id,
+                'user_email' => $eb_email,
+                'product' => $product->name,
+                'price' => $eb_amount,
+                'reference' => $eb_reference,
+            ]);
 
             // Create local subscription in "pending" state:
             // ends_at is set to expiry_period so it stays in grace period until payment confirmed.
@@ -78,14 +89,20 @@ class EbillingController extends BaseController
                 'renews_at' => null,
             ]);
 
+            Log::channel('ebilling')->info('[createOrder] Subscription created locally', [
+                'subscription_id' => $subscription->id,
+                'reference' => $eb_reference,
+            ]);
+
             $response = $this->ebilling()->post('/api/v1/merchant/e_bills', $globalPayload);
 
             if (!$response->successful()) {
                 $subscription->delete();
-                Log::error("Erreur Ebilling", [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
-                    'payload' => $globalPayload
+                Log::channel('ebilling')->error('[createOrder] API call failed', [
+                    'http_status' => $response->status(),
+                    'response_body' => $response->body(),
+                    'payload' => $globalPayload,
+                    'api_url' => $this->getApiBaseUrl(),
                 ]);
                 return response()->json([
                     'message' => "Erreur {$response->status()} : appel à Ebilling échoué."
@@ -98,6 +115,12 @@ class EbillingController extends BaseController
             $callback_url = url("/checkout/{$product->id}/{$price->id}/ebilling/done") . '?invoice=' . $bill_id;
             $portalUrl = $this->getPortalBaseUrl();
 
+            Log::channel('ebilling')->info('[createOrder] Success - bill created', [
+                'bill_id' => $bill_id,
+                'subscription_id' => $subscription->id,
+                'checkout_url' => "{$portalUrl}?invoice={$bill_id}&redirect_url={$callback_url}",
+            ]);
+
             return response()->json([
                 'bill_id' => $bill_id,
                 'checkout_url' => "{$portalUrl}?invoice={$bill_id}&redirect_url={$callback_url}",
@@ -107,11 +130,12 @@ class EbillingController extends BaseController
                 $subscription->delete();
             }
 
-            Log::error("Exception Ebilling: " . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            Log::channel('ebilling')->error('[createOrder] Exception', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
                 'user_id' => $data['user_id'],
                 'product_id' => $data['product_id'],
-                'price_id' => $data['price_id']
+                'price_id' => $data['price_id'],
             ]);
 
             return response()->json([
@@ -123,21 +147,31 @@ class EbillingController extends BaseController
 
     public function verifyPayment(string $billId): JsonResponse
     {
+        Log::channel('ebilling')->info('[verifyPayment] Starting', ['bill_id' => $billId]);
+
         try {
             $response = $this->ebilling()->get("/api/v1/merchant/e_bills/{$billId}");
 
             if (!$response->successful()) {
-                Log::error("Ebilling verification failed", [
-                    'billId' => $billId,
-                    'status' => $response->status(),
-                    'response' => $response->body()
+                Log::channel('ebilling')->error('[verifyPayment] API call failed', [
+                    'bill_id' => $billId,
+                    'http_status' => $response->status(),
+                    'response_body' => $response->body(),
                 ]);
                 return response()->json(['error' => 'Payment verification failed'], 400);
             }
 
             $data = $response->json();
-            $status = $data['state'] === 'paid' ? 'PAID' : 'PENDING';
+            $ebillingState = $data['state'] ?? 'unknown';
+            $status = $ebillingState === 'paid' ? 'PAID' : 'PENDING';
             $reference = $data['external_reference'] ?? null;
+
+            Log::channel('ebilling')->info('[verifyPayment] eBilling state received', [
+                'bill_id' => $billId,
+                'ebilling_state' => $ebillingState,
+                'resolved_status' => $status,
+                'reference' => $reference,
+            ]);
 
             $subscription = null;
             if ($reference) {
@@ -149,6 +183,14 @@ class EbillingController extends BaseController
                         'ends_at' => null,
                         'renews_at' => now()->addMonths($subscription->price?->interval_count ?? 1),
                     ]);
+                    Log::channel('ebilling')->info('[verifyPayment] Subscription activated', [
+                        'subscription_id' => $subscription->id,
+                        'renews_at' => $subscription->renews_at,
+                    ]);
+                } elseif (!$subscription) {
+                    Log::channel('ebilling')->warning('[verifyPayment] No subscription found for reference', [
+                        'reference' => $reference,
+                    ]);
                 }
             }
 
@@ -158,9 +200,10 @@ class EbillingController extends BaseController
                 'bill_data' => $data
             ]);
         } catch (\Exception $e) {
-            Log::error("Ebilling verification error: " . $e->getMessage(), [
-                'billId' => $billId,
-                'trace' => $e->getTraceAsString()
+            Log::channel('ebilling')->error('[verifyPayment] Exception', [
+                'bill_id' => $billId,
+                'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
             ]);
             return response()->json(['error' => 'Verification failed'], 500);
         }
@@ -186,17 +229,33 @@ class EbillingController extends BaseController
         try {
             $credentials = $this->getEbillingCredentials();
             if (!$credentials['username'] || !$credentials['sharedkey']) {
+                Log::channel('ebilling')->error('[changePlan] Credentials missing', [
+                    'has_username' => !empty($credentials['username']),
+                    'has_sharedkey' => !empty($credentials['sharedkey']),
+                ]);
                 return response()->json([
                     'message' => 'Configuration eBilling incomplète.',
                     'error_code' => 'EBILLING_CONFIG_MISSING',
                 ], 500);
             }
 
+            Log::channel('ebilling')->info('[changePlan] Starting', [
+                'user_id' => $user->id,
+                'old_subscription_id' => $oldSubscription->id,
+                'new_product' => $newProduct->name,
+                'new_price' => $newPrice->amount,
+            ]);
+
             // 1. Cancel old subscription with grace period
             $oldSubscription->fill([
                 'ends_at' => $oldSubscription->renews_at ?? now()->addDays(30),
                 'renews_at' => null,
             ])->save();
+
+            Log::channel('ebilling')->info('[changePlan] Old subscription cancelled with grace period', [
+                'old_subscription_id' => $oldSubscription->id,
+                'ends_at' => $oldSubscription->ends_at,
+            ]);
 
             // 2. Prepare new e-bill payload
             $eb_reference = 'sub_' . $newProduct->id . '_' . $newPrice->id . '_' . uniqid();
@@ -219,14 +278,20 @@ class EbillingController extends BaseController
                 'renews_at' => null,
             ]);
 
+            Log::channel('ebilling')->info('[changePlan] New pending subscription created', [
+                'new_subscription_id' => $newSubscription->id,
+                'reference' => $eb_reference,
+            ]);
+
             // 4. Call eBilling API
             $response = $this->ebilling()->post('/api/v1/merchant/e_bills', $globalPayload);
 
             if (!$response->successful()) {
                 $newSubscription->delete();
-                Log::error('Ebilling changePlan API error', [
-                    'status' => $response->status(),
-                    'response' => $response->body(),
+                Log::channel('ebilling')->error('[changePlan] API call failed', [
+                    'http_status' => $response->status(),
+                    'response_body' => $response->body(),
+                    'payload' => $globalPayload,
                 ]);
                 return response()->json([
                     'message' => "Erreur eBilling ({$response->status()}). Changement de plan annulé.",
@@ -242,10 +307,11 @@ class EbillingController extends BaseController
             $callback_url = url("/checkout/{$newProduct->id}/{$newPrice->id}/ebilling/done") . '?invoice=' . $bill_id;
             $portalUrl = $this->getPortalBaseUrl();
 
-            Log::info('Ebilling changePlan: new e-bill created', [
+            Log::channel('ebilling')->info('[changePlan] Success - new e-bill created', [
+                'bill_id' => $bill_id,
                 'old_subscription_id' => $oldSubscription->id,
                 'new_subscription_id' => $newSubscription->id,
-                'bill_id' => $bill_id,
+                'checkout_url' => "{$portalUrl}?invoice={$bill_id}&redirect_url={$callback_url}",
             ]);
 
             return response()->json([
@@ -255,8 +321,11 @@ class EbillingController extends BaseController
                 'new_subscription_id' => $newSubscription->id,
             ]);
         } catch (\Throwable $e) {
-            Log::error('Ebilling changePlan exception: ' . $e->getMessage(), [
-                'trace' => $e->getTraceAsString(),
+            Log::channel('ebilling')->error('[changePlan] Exception', [
+                'error' => $e->getMessage(),
+                'file' => $e->getFile() . ':' . $e->getLine(),
+                'user_id' => $user->id,
+                'old_subscription_id' => $data['subscription_id'],
             ]);
             return response()->json([
                 'message' => 'Erreur serveur. Veuillez réessayer.',

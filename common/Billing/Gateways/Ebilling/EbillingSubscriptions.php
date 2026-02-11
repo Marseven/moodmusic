@@ -26,9 +26,12 @@ class EbillingSubscriptions
             'renews_at' => null,
         ])->save();
 
-        Log::info('Ebilling changePlan: old subscription cancelled with grace period', [
+        Log::channel('ebilling')->info('[subscriptions:changePlan] Old subscription cancelled with grace period', [
             'subscription_id' => $subscription->id,
+            'user_id' => $subscription->user_id,
             'ends_at' => $subscription->ends_at,
+            'new_product' => $newProduct->name,
+            'new_price' => $newPrice->amount,
         ]);
 
         return false;
@@ -54,9 +57,11 @@ class EbillingSubscriptions
             ]);
         }
 
-        Log::info('Ebilling subscription cancelled locally', [
+        Log::channel('ebilling')->info('[subscriptions:cancel] Subscription cancelled', [
             'subscription_id' => $subscription->id,
-            'at_period_end' => $atPeriodEnd
+            'user_id' => $subscription->user_id,
+            'at_period_end' => $atPeriodEnd,
+            'ends_at' => $subscription->ends_at,
         ]);
 
         return true;
@@ -68,11 +73,16 @@ class EbillingSubscriptions
         // During grace period the user has already paid, so resuming is purely local:
         // restore renews_at from ends_at and clear ends_at.
         if (!$subscription->ends_at) {
+            Log::channel('ebilling')->warning('[subscriptions:resume] Cannot resume - no ends_at set', [
+                'subscription_id' => $subscription->id,
+                'user_id' => $subscription->user_id,
+            ]);
             return false;
         }
 
-        Log::info('Ebilling subscription resumed locally', [
+        Log::channel('ebilling')->info('[subscriptions:resume] Subscription resumed', [
             'subscription_id' => $subscription->id,
+            'user_id' => $subscription->user_id,
             'restored_renews_at' => $subscription->ends_at,
         ]);
 
@@ -83,21 +93,39 @@ class EbillingSubscriptions
     {
         if ($subscription->gateway_id) {
             try {
+                Log::channel('ebilling')->info('[subscriptions:find] Querying eBilling API', [
+                    'subscription_id' => $subscription->id,
+                    'gateway_id' => $subscription->gateway_id,
+                ]);
+
                 $response = $this->ebilling()->get("/api/v1/merchant/e_bills/{$subscription->gateway_id}");
 
                 if ($response->successful()) {
                     $data = $response->json();
                     $nextBilling = $subscription->ends_at ?? now()->addMonth();
 
+                    Log::channel('ebilling')->info('[subscriptions:find] API response received', [
+                        'subscription_id' => $subscription->id,
+                        'ebilling_state' => $data['state'] ?? 'unknown',
+                        'next_billing' => $nextBilling,
+                    ]);
+
                     return [
                         'renews_at' => $nextBilling,
                         'status' => $data['state'] ?? 'unknown'
                     ];
                 }
-            } catch (\Exception $e) {
-                Log::error('Error finding Ebilling subscription', [
+
+                Log::channel('ebilling')->error('[subscriptions:find] API request failed', [
                     'subscription_id' => $subscription->id,
-                    'error' => $e->getMessage()
+                    'http_status' => $response->status(),
+                    'response_body' => $response->body(),
+                ]);
+            } catch (\Exception $e) {
+                Log::channel('ebilling')->error('[subscriptions:find] Exception', [
+                    'subscription_id' => $subscription->id,
+                    'error' => $e->getMessage(),
+                    'file' => $e->getFile() . ':' . $e->getLine(),
                 ]);
             }
         }
