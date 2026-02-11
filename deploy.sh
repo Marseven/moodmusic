@@ -18,10 +18,4 @@ php artisan config:cache
 php artisan route:cache
 php artisan view:cache
 
-echo ">> Installation des dépendances Node..."
-npm install
-
-echo ">> Build des assets..."
-npm run build
-
 echo "=== Déploiement terminé ==="
