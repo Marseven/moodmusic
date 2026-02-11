@@ -8,7 +8,7 @@ import clsx from 'clsx';
 import {useCustomMenu} from '@common/menus/use-custom-menu';
 import {Trans} from '@common/i18n/trans';
 import {NavbarAuthMenu} from '@common/ui/navigation/navbar/navbar-auth-menu';
-import {UserIcon} from '@heroicons/react/24/outline';
+import {UserIcon, HomeIcon} from '@heroicons/react/24/outline';
 import {Badge} from '@common/ui/badge/badge';
 import {useAuth} from '@common/auth/use-auth';
 import {
@@ -111,10 +111,18 @@ function PlayerProgressBar() {
 
 function MobileNavbar() {
   const menu = useCustomMenu('mobile-bottom');
+  const navigate = useNavigate();
   if (!menu) return null;
 
   return (
     <div className="flex items-center justify-center gap-30 my-12">
+      <button
+        className="text-xs whitespace-nowrap overflow-hidden"
+        onClick={() => navigate('/')}
+      >
+        <HomeIcon className="block mx-auto mb-6 w-7 h-7" />
+        <Trans message="Accueil" />
+      </button>
       {menu.items.map(item => (
         <CustomMenuItem
           unstyled
@@ -183,7 +191,7 @@ function AccountButton() {
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <UserIcon className="w-6 h-6" />
+        <UserIcon className="block mx-auto w-7 h-7" />
       </Badge>
       <div className="text-xs">
         <Trans message="Account" />
