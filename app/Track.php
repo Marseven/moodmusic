@@ -51,7 +51,7 @@ class Track extends Model
     {
         parent::__construct($attributes);
 
-        if (!requestIsFromFrontend()) {
+        if (!requestIsFromFrontend() && !request()->bearerToken()) {
             $this->hidden[] = 'src';
             $this->hidden[] = 'spotify_popularity';
         }
