@@ -54,6 +54,8 @@ use App\Http\Controllers\WaveController;
 use App\Http\Controllers\YoutubeLogController;
 use App\Http\Controllers\Admin\AdSpotController;
 use App\Http\Controllers\AdDeliveryController;
+use App\Http\Controllers\RadioStationController;
+use App\Http\Controllers\Admin\RadioStationController as AdminRadioStationController;
 
 Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verified']], function() {
     // SEARCH
@@ -123,6 +125,10 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     // RADIO
     Route::get('radio/{type}/{id}', [RadioController::class, 'getRecommendations']);
 
+    // RADIO STATIONS (public)
+    Route::get('radio-stations', [RadioStationController::class, 'index']);
+    Route::get('radio-stations/{radioStation}', [RadioStationController::class, 'show']);
+
     // TAGS
     Route::get('tags/{tagName}/tracks', [TagMediaController::class, 'tracks']);
     Route::get('tags/{tagName}/albums', [TagMediaController::class, 'albums']);
@@ -185,6 +191,12 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
 
     // ADMIN PURCHASES
     Route::get('admin/purchases', [PurchaseAdminController::class, 'index']);
+
+    // RADIO STATIONS (admin CRUD)
+    Route::get('admin/radio-stations', [AdminRadioStationController::class, 'index']);
+    Route::post('admin/radio-stations', [AdminRadioStationController::class, 'store']);
+    Route::put('admin/radio-stations/{radioStation}', [AdminRadioStationController::class, 'update']);
+    Route::delete('admin/radio-stations/{ids}', [AdminRadioStationController::class, 'destroy']);
 
     // AD SPOTS (admin CRUD)
     Route::get('ad-spots', [AdSpotController::class, 'index']);
