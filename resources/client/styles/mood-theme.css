@@ -632,18 +632,11 @@
   }
 }
 
-/* ===== Heroicons Stroke Support ===== */
+/* ===== Lucide / Stroke Icons ===== */
 .svg-icon {
   fill: none;
   stroke: currentColor;
   stroke-width: 1.5;
-}
-
-/* Material Icons (filled) override */
-.svg-icon[data-type="material"] {
-  fill: currentColor;
-  stroke: none;
-  stroke-width: 0;
 }
 
 /* ===== Music Player Glassmorphism ===== */

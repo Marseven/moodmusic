@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {AlignJustify} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const FormatAlignJustifyIcon = createSvgIcon(
-  <path d="M3 21h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18v-2H3v2zm0-4h18V7H3v2zm0-6v2h18V3H3z" />
-, 'FormatAlignJustifyOutlined');
+export const FormatAlignJustifyIcon = createLucideIcon(AlignJustify, 'FormatAlignJustifyIcon');

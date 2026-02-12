@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {Reply} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const ReplyIcon = createSvgIcon(
-  <path d="M10 9V5l-7 7 7 7v-4.1c5 0 8.5 1.6 11 5.1-1-5-4-10-11-11z" />
-, 'ReplyOutlined');
+export const ReplyIcon = createLucideIcon(Reply, 'ReplyIcon');

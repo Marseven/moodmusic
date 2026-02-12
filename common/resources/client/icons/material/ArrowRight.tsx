@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {ArrowRight} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const ArrowRightIcon = createSvgIcon(
-  <path d="m10 17 5-5-5-5v10z" />
-, 'ArrowRightOutlined');
+export const ArrowRightIcon = createLucideIcon(ArrowRight, 'ArrowRightIcon');

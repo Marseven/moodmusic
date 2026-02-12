@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {Pause} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const PauseIcon = createSvgIcon(
-  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-, 'PauseOutlined');
+export const PauseIcon = createLucideIcon(Pause, 'PauseIcon');

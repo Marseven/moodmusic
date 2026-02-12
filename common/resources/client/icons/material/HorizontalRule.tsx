@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {Minus} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const HorizontalRuleIcon = createSvgIcon(
-  <path fillRule="evenodd" d="M4 11h16v2H4z" />
-, 'HorizontalRuleOutlined');
+export const HorizontalRuleIcon = createLucideIcon(Minus, 'HorizontalRuleIcon');

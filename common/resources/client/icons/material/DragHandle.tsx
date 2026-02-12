@@ -1,5 +1,4 @@
-import {createSvgIcon} from '../create-svg-icon';
+import {GripHorizontal} from 'lucide-react';
+import {createLucideIcon} from '../create-lucide-icon';
 
-export const DragHandleIcon = createSvgIcon(
-  <path d="M20 9H4v2h16V9zM4 15h16v-2H4v2z" />
-, 'DragHandleOutlined');
+export const DragHandleIcon = createLucideIcon(GripHorizontal, 'DragHandleIcon');
