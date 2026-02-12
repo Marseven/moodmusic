@@ -31,6 +31,8 @@ class EbillingController extends BaseController
             'product_id' => 'required|integer|exists:products,id',
             'price_id' => 'required|integer|exists:prices,id',
             'user_id' => 'required|integer|exists:users,id',
+            'phone' => 'nullable|string|size:9',
+            'operator' => 'nullable|string|in:airtelmoney,moovmoney4',
         ]);
 
         $product = Product::findOrFail($data['product_id']);
@@ -42,8 +44,13 @@ class EbillingController extends BaseController
         $eb_shortdescription = "Abonnement {$product->name}";
         $eb_name = $user->first_name . ' ' . $user->last_name;
         $eb_email = $user->email;
-        $eb_msisdn = $user->phone ?? '074000000';
+        $eb_msisdn = $data['phone'] ?? $user->phone ?? '074000000';
         $expiry_period = 60;
+
+        // Save phone to user profile if provided
+        if (!empty($data['phone']) && $user->phone !== $data['phone']) {
+            $user->update(['phone' => $data['phone']]);
+        }
 
         // Préparer la facture
         $globalPayload = [
@@ -331,6 +338,72 @@ class EbillingController extends BaseController
                 'message' => 'Erreur serveur. Veuillez réessayer.',
                 'error_code' => 'EBILLING_CHANGE_PLAN_ERROR',
             ], 500);
+        }
+    }
+
+    public function sendUssdPush(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'bill_id' => 'required|string',
+            'phone' => 'required|string|size:9',
+            'operator' => 'required|string|in:airtelmoney,moovmoney4',
+        ]);
+
+        try {
+            $credentials = $this->getEbillingCredentials();
+            if (!$credentials['username'] || !$credentials['sharedkey']) {
+                return response()->json(['message' => 'Configuration eBilling incomplète.'], 500);
+            }
+
+            Log::channel('ebilling')->info('[sendUssdPush] Starting', [
+                'bill_id' => $data['bill_id'],
+                'operator' => $data['operator'],
+                'phone' => $data['phone'],
+            ]);
+
+            $response = $this->ebilling()->post(
+                "/api/v1/merchant/e_bills/{$data['bill_id']}/ussd_push",
+                [
+                    'payer_msisdn' => $data['phone'],
+                    'payment_system_name' => $data['operator'],
+                ]
+            );
+
+            if ($response->successful()) {
+                $responseData = $response->json();
+                $message = $responseData['message'] ?? '';
+
+                Log::channel('ebilling')->info('[sendUssdPush] Response', [
+                    'bill_id' => $data['bill_id'],
+                    'response' => $responseData,
+                ]);
+
+                if (strtolower($message) === 'accepted') {
+                    return response()->json(['message' => 'Push USSD envoyé avec succès.']);
+                }
+
+                return response()->json([
+                    'message' => 'Le push USSD n\'a pas été accepté.',
+                    'details' => $responseData,
+                ], 422);
+            }
+
+            Log::channel('ebilling')->error('[sendUssdPush] API call failed', [
+                'bill_id' => $data['bill_id'],
+                'http_status' => $response->status(),
+                'response_body' => $response->body(),
+            ]);
+
+            return response()->json([
+                'message' => "Erreur eBilling ({$response->status()}).",
+            ], $response->status());
+        } catch (\Throwable $e) {
+            Log::channel('ebilling')->error('[sendUssdPush] Exception', [
+                'bill_id' => $data['bill_id'],
+                'error' => $e->getMessage(),
+            ]);
+
+            return response()->json(['message' => 'Erreur serveur.'], 500);
         }
     }
 

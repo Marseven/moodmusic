@@ -177,6 +177,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     Route::get('purchases', [PurchaseController::class, 'index']);
     Route::get('purchased-items', [PurchaseController::class, 'purchasedItems']);
     Route::post('purchases/ebilling/create-order', [PurchaseEbillingController::class, 'createOrder']);
+    Route::post('purchases/ebilling/ussd-push', [PurchaseEbillingController::class, 'sendUssdPush']);
     Route::get('purchases/ebilling/verify', [PurchaseEbillingController::class, 'verifyByReference']);
     Route::post('purchases/stripe/create-checkout', [PurchaseStripeController::class, 'createCheckout']);
     Route::post('purchases/paypal/create-order', [PurchasePaypalController::class, 'createOrder']);

@@ -217,6 +217,7 @@ Route::group(['prefix' => 'v1'], function () {
         Route::post('billing/stripe/store-subscription-details-locally', [StripeController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/paypal/store-subscription-details-locally', [PaypalController::class, 'storeSubscriptionDetailsLocally']);
         Route::post('billing/ebilling/create-order', [EbillingController::class, 'createOrder']);
+        Route::post('billing/ebilling/ussd-push', [EbillingController::class, 'sendUssdPush']);
         Route::post('billing/ebilling/change-plan', [EbillingController::class, 'changePlan']);
         Route::get('billing/ebilling/verify-payment/{billId}', [EbillingController::class, 'verifyPayment']);
         Route::post('billing/ebilling/store-subscription-details-locally', [EbillingController::class, 'storeSubscriptionDetailsLocally']);
