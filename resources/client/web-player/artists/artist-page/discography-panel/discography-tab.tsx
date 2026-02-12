@@ -8,8 +8,7 @@ import {PaginationResponse} from '@common/http/backend-response/pagination-respo
 import {Album} from '@app/web-player/albums/album';
 import {ArtistAlbumsList} from '@app/web-player/artists/artist-page/discography-panel/artist-albums-list';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {ViewAgendaIcon} from '@common/icons/material/ViewAgenda';
-import {GridViewIcon} from '@common/icons/material/GridView';
+import {List, LayoutGrid} from 'lucide-react';
 import {useLocalStorage} from '@common/utils/hooks/local-storage';
 import {ArtistAlbumsGrid} from '@app/web-player/artists/artist-page/discography-panel/artist-albums-grid';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
@@ -48,7 +47,7 @@ export function DiscographyTab({artist, initialAlbums}: DiscographyTabProps) {
               color={viewMode === 'list' ? 'primary' : undefined}
               onClick={() => setViewMode('list')}
             >
-              <ViewAgendaIcon />
+              <List />
             </IconButton>
           </Tooltip>
           <Tooltip label={<Trans message="Grid view" />}>
@@ -57,7 +56,7 @@ export function DiscographyTab({artist, initialAlbums}: DiscographyTabProps) {
               color={viewMode === 'grid' ? 'primary' : undefined}
               onClick={() => setViewMode('grid')}
             >
-              <GridViewIcon />
+              <LayoutGrid />
             </IconButton>
           </Tooltip>
         </div>

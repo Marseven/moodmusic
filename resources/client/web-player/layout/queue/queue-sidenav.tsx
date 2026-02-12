@@ -8,7 +8,7 @@ import {useTrans} from '@common/i18n/use-trans';
 import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import React, {ReactElement, useState} from 'react';
 import {message} from '@common/i18n/message';
-import {PauseIcon} from '@common/icons/material/Pause';
+import {Pause} from 'lucide-react';
 import {EqualizerImage} from '@app/web-player/tracks/equalizer-image/equalizer-image';
 import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
 import {useIsMediaPlaying} from '@common/player/hooks/use-is-media-playing';
@@ -107,7 +107,7 @@ function TogglePlaybackOverlay({media, isHover}: TogglePlaybackOverlayProps) {
         tabIndex={0}
         onClick={() => player.pause()}
       >
-        {isHover ? <PauseIcon /> : <EqualizerImage color="white" />}
+        {isHover ? <Pause /> : <EqualizerImage color="white" />}
       </button>
     );
   } else {

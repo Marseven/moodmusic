@@ -7,7 +7,7 @@ import {AdminSettingsWithFiles} from '@common/admin/settings/requests/update-adm
 import {useSortable} from '@common/ui/interactions/dnd/use-sortable';
 import {moveItemInNewArray} from '@common/utils/array/move-item-in-new-array';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {DragHandleIcon} from '@common/icons/material/DragHandle';
+import {GripVertical} from 'lucide-react';
 import {Checkbox} from '@common/ui/forms/toggle/checkbox';
 import {DragPreview} from '@common/ui/interactions/dnd/drag-preview';
 import clsx from 'clsx';
@@ -160,7 +160,7 @@ function ArtistTabListItem({title, description, id}: ArtistTabListItemProps) {
         {...sortableProps}
       >
         <IconButton ref={dragHandleRef}>
-          <DragHandleIcon />
+          <GripVertical />
         </IconButton>
         <div className="flex-auto">
           <div className="text-sm">{title}</div>

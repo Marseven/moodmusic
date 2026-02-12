@@ -3,7 +3,7 @@ import {useInfiniteData} from '@common/ui/infinite-scroll/use-infinite-data';
 import {Track} from '@app/web-player/tracks/track';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {AudiotrackIcon} from '@common/icons/material/Audiotrack';
+import {Music} from 'lucide-react';
 import {Trans} from '@common/i18n/trans';
 import React from 'react';
 import {PaginationResponse} from '@common/http/backend-response/pagination-response';
@@ -29,7 +29,7 @@ export function ArtistTracksPanel({artist, initialTracks}: Props) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AudiotrackIcon size="lg" className="text-muted" />}
+        image={<Music size="lg" className="text-muted" />}
         title={<Trans message="No tracks yet" />}
         description={
           <Trans

@@ -24,7 +24,7 @@ import {Album} from '@app/web-player/albums/album';
 import {Playlist} from '@app/web-player/playlists/playlist';
 import {User} from '@common/auth/user';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search} from 'lucide-react';
 import {useSettings} from '@common/core/settings/use-settings';
 import {UseQueryResult} from '@tanstack/react-query';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
@@ -86,7 +86,7 @@ function PageContent({query}: PageContentProps) {
     return (
       <IllustratedMessage
         className="mt-40"
-        image={<SearchIcon size="xl" />}
+        image={<Search size="xl" />}
         imageHeight="h-auto"
         imageMargin="mb-12"
         title={
@@ -144,7 +144,7 @@ function SearchResults({results}: SearchResultsProps) {
     return (
       <IllustratedMessage
         className="mt-40"
-        image={<SearchIcon size="xl" />}
+        image={<Search size="xl" />}
         imageHeight="h-auto"
         title={
           <Trans

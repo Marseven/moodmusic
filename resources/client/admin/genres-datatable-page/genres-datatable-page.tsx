@@ -12,7 +12,7 @@ import {Trans} from '@common/i18n/trans';
 import {GenreDatatablePageFilters} from '@app/admin/genres-datatable-page/genre-datatable-page-filters';
 import {NameWithAvatar} from '@common/datatable/column-templates/name-with-avatar';
 import {GenreLink} from '@app/web-player/genres/genre-link';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil} from 'lucide-react';
 import {UpdateGenreDialog} from '@app/admin/genres-datatable-page/update-genre-dialog';
 import GenreImage from './../tracks-datatable-page/music.svg';
 import {CreateGenreDialog} from '@app/admin/genres-datatable-page/create-genre-dialog';
@@ -60,7 +60,7 @@ const columnConfig: ColumnConfig<
       return (
         <DialogTrigger type="modal">
           <IconButton size="md" className="text-muted">
-            <EditIcon />
+            <Pencil />
           </IconButton>
           <UpdateGenreDialog genre={genre} />
         </DialogTrigger>

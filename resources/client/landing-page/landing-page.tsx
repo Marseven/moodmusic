@@ -16,7 +16,7 @@ import {BillingCycleRadio} from '@common/billing/pricing-table/billing-cycle-rad
 import {UpsellBillingCycle} from '@common/billing/pricing-table/find-best-price';
 import {useProducts} from '@common/billing/pricing-table/use-products';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search} from 'lucide-react';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {useLandingPageTrendingArtists} from '@app/landing-page/requests/use-landing-page-trending-artists';
 import {ContentGrid} from '@app/web-player/playable-item/content-grid';
@@ -134,7 +134,7 @@ function HeroHeader({content}: ContentProps) {
               inputRadius="rounded-full"
               size="lg"
               placeholder={trans(message(content.actions.inputText))}
-              startAdornment={<SearchIcon />}
+              startAdornment={<Search />}
               adornmentPosition="left-10"
             />
           </form>

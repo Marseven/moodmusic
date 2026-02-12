@@ -5,7 +5,7 @@ import {ReportMetric} from '@common/admin/analytics/report-metric';
 import {ChartLoadingIndicator} from '@common/charts/chart-loading-indicator';
 import {TopModelDatasetItem} from '@app/admin/reports/requests/use-insights-report';
 import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
-import {InfoIcon} from '@common/icons/material/Info';
+import {Info} from 'lucide-react';
 import {FormattedNumber} from '@common/i18n/formatted-number';
 import {Link, useLocation} from 'react-router-dom';
 import {SmallArtistImage} from '@app/web-player/artists/artist-image/small-artist-image';
@@ -64,7 +64,7 @@ export function TopModelsChartLayout({data, isLoading, ...layoutProps}: Props) {
       ))}
       {!isLoading && !dataItems.length ? (
         <div className="flex items-center gap-8 text-muted">
-          <InfoIcon size="sm" />
+          <Info size={20} />
           <Trans message="No plays in selected timeframe." />
         </div>
       ) : null}

@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
-import {FileUploadIcon} from '@common/icons/material/FileUpload';
+import {FileUp} from 'lucide-react';
 import {TrackUploadProgress} from '@app/admin/tracks-datatable-page/track-form/track-upload-progress';
 import {useFormContext} from 'react-hook-form';
 import {CreateTrackPayload} from '@app/admin/tracks-datatable-page/requests/use-create-track';
@@ -30,7 +30,7 @@ export function TrackFormUploadButton() {
         className="w-full"
         variant="flat"
         color="primary"
-        startIcon={<FileUploadIcon />}
+        startIcon={<FileUp />}
         disabled={isUploading}
         onClick={() => openFilePicker()}
       >

@@ -1,4 +1,4 @@
-import {CheckIcon} from '@common/icons/material/Check';
+import {Check} from 'lucide-react';
 import {Trans} from '@common/i18n/trans';
 import {Link, Navigate} from 'react-router-dom';
 import {Button} from '@common/ui/buttons/button';
@@ -22,7 +22,7 @@ export function BackstageRequestSubmittedPage() {
       <div className="max-w-[590px] my-40 mx-auto">
         <div>
           <div className="text-center">
-            <CheckIcon size="text-6xl" />
+            <Check size="text-6xl" />
           </div>
 
           <h1 className="text-5xl font-medium mt-24 mb-48 text-center">

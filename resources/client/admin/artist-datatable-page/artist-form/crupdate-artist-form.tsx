@@ -18,7 +18,7 @@ import {TabPanel, TabPanels} from '@common/ui/tabs/tab-panels';
 import {Tabs} from '@common/ui/tabs/tabs';
 import {useFieldArray} from 'react-hook-form';
 import {Button} from '@common/ui/buttons/button';
-import {AddIcon} from '@common/icons/material/Add';
+import {Plus} from 'lucide-react';
 import {CreateArtistPayload} from '@app/admin/artist-datatable-page/requests/use-create-artist';
 import {ProfileLinksForm} from '@app/admin/artist-datatable-page/artist-form/profile-links-form';
 
@@ -166,7 +166,7 @@ function ImagesPanel() {
       <Button
         variant="outline"
         color="primary"
-        startIcon={<AddIcon />}
+        startIcon={<Plus />}
         onClick={() => {
           append({url: ''});
         }}

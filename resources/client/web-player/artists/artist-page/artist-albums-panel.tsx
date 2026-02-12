@@ -5,7 +5,7 @@ import {IllustratedMessage} from '@common/ui/images/illustrated-message';
 import {Trans} from '@common/i18n/trans';
 import React from 'react';
 import {Album} from '@app/web-player/albums/album';
-import {AlbumIcon} from '@common/icons/material/Album';
+import {Disc3} from 'lucide-react';
 import {AlbumList} from '@app/web-player/albums/album-list/album-list';
 
 interface Props {
@@ -26,7 +26,7 @@ export function ArtistAlbumsPanel({artist}: Props) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<AlbumIcon size="lg" className="text-muted" />}
+        image={<Disc3 size="lg" className="text-muted" />}
         title={<Trans message="No albums yet" />}
         description={
           <Trans

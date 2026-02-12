@@ -6,7 +6,7 @@ import {VirtualTableBody} from '@app/web-player/playlists/virtual-table-body';
 import {queueGroupId} from '@app/web-player/queue-group-id';
 import {useAuth} from '@common/auth/use-auth';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search} from 'lucide-react';
 import {message} from '@common/i18n/message';
 import {useTrans} from '@common/i18n/use-trans';
 import {PlaybackToggleButton} from '@app/web-player/playable-item/playback-toggle-button';
@@ -59,7 +59,7 @@ export function LibraryHistoryPage() {
           onChange={e => setSearchQuery(e.target.value)}
           className="max-w-512 flex-auto"
           size="sm"
-          startAdornment={<SearchIcon />}
+          startAdornment={<Search />}
           placeholder={trans(message('Search within history'))}
         />
       </div>

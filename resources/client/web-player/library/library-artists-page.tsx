@@ -3,7 +3,7 @@ import {Trans} from '@common/i18n/trans';
 import {useLibraryStore} from '@app/web-player/library/state/likes-store';
 import React from 'react';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search} from 'lucide-react';
 import {message} from '@common/i18n/message';
 import {useTrans} from '@common/i18n/use-trans';
 import {PageErrorMessage} from '@common/errors/page-error-message';
@@ -63,7 +63,7 @@ export function LibraryArtistsPage() {
           onChange={e => setSearchQuery(e.target.value)}
           className="max-w-512 flex-auto"
           size="sm"
-          startAdornment={<SearchIcon />}
+          startAdornment={<Search />}
           placeholder={trans(message('Search within artists'))}
         />
         <LibraryPageSortDropdown

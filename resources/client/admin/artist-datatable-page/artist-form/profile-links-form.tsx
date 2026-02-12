@@ -2,9 +2,8 @@ import {useFieldArray} from 'react-hook-form';
 import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {Trans} from '@common/i18n/trans';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {CloseIcon} from '@common/icons/material/Close';
+import {X, Plus} from 'lucide-react';
 import {Button} from '@common/ui/buttons/button';
-import {AddIcon} from '@common/icons/material/Add';
 import React from 'react';
 import {UserLink} from '@app/web-player/user-profile/user-link';
 
@@ -40,7 +39,7 @@ export function ProfileLinksForm() {
                 remove(index);
               }}
             >
-              <CloseIcon />
+              <X />
             </IconButton>
           </div>
         );
@@ -48,7 +47,7 @@ export function ProfileLinksForm() {
       <Button
         variant="text"
         color="primary"
-        startIcon={<AddIcon />}
+        startIcon={<Plus />}
         size="xs"
         onClick={() => {
           append({url: '', title: ''});

@@ -14,7 +14,7 @@ import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {ImportAlbumDialog} from '@app/admin/albums-datatable-page/import-album-dialog';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
-import {PublishIcon} from '@common/icons/material/Publish';
+import {Upload} from 'lucide-react';
 
 export function AlbumsDatatablePage() {
   return (
@@ -61,7 +61,7 @@ function Actions() {
               className="flex-shrink-0"
               size="sm"
             >
-              <PublishIcon />
+              <Upload />
             </IconButton>
           </Tooltip>
           <ImportAlbumDialog />

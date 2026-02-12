@@ -20,7 +20,7 @@ import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
 import {Link} from 'react-router-dom';
 import {ArtistContextDialog} from '@app/web-player/artists/artist-context-dialog';
-import {MediaQueueListIcon} from '@common/icons/media/media-queue-list';
+import {ListMusic} from 'lucide-react';
 import {VolumeControls} from '@common/player/ui/controls/volume-controls';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
@@ -162,7 +162,7 @@ function SecondaryControls() {
             );
           }}
         >
-          <MediaQueueListIcon />
+          <ListMusic />
         </IconButton>
       </Tooltip>
       <div className="volume-controls-glass">

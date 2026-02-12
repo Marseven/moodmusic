@@ -9,7 +9,7 @@ import {ArtistLink} from '@app/web-player/artists/artist-link';
 import {SvgIconProps} from '@common/icons/svg-icon';
 import {TwitterIcon} from '@common/icons/social/twitter';
 import {FacebookIcon} from '@common/icons/social/facebook';
-import {DocumentScannerIcon} from '@common/icons/material/DocumentScanner';
+import {FileSearch} from 'lucide-react';
 import {prettyBytes} from '@common/uploads/utils/pretty-bytes';
 import {BackstageRequestViewerHeader} from '@app/admin/backstage-requests-datatable-page/viewer/backstage-request-viewer-header';
 import {LinkStyle} from '@common/ui/buttons/external-link';
@@ -135,7 +135,7 @@ function VerificationList({request}: RequestDetailsProps) {
       <div>
         {request.data.passport_scan_entry && (
           <VerificationListItem
-            icon={<DocumentScannerIcon />}
+            icon={<FileSearch />}
             title={<Trans message="Passport scan" />}
             description={`${
               request.data.passport_scan_entry.name

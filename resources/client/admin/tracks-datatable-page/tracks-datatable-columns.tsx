@@ -3,7 +3,7 @@ import {Trans} from '@common/i18n/trans';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {Link} from 'react-router-dom';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil, Captions, BarChart3} from 'lucide-react';
 import React from 'react';
 import {Track} from '@app/web-player/tracks/track';
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
@@ -15,8 +15,6 @@ import {ArtistLink} from '@app/web-player/artists/artist-link';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {UpdateLyricDialog} from '@app/admin/lyrics-datatable-page/update-lyric-dialog';
 import {CreateLyricDialog} from '@app/admin/lyrics-datatable-page/create-lyric-dialog';
-import {ClosedCaptionIcon} from '@common/icons/material/ClosedCaption';
-import {BarChartIcon} from '@common/icons/material/BarChart';
 
 export const TracksDatatableColumns: ColumnConfig<Track>[] = [
   {
@@ -89,11 +87,11 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
     body: track => (
       <div className="text-muted">
         <IconButton size="md" elementType={Link} to={`${track.id}/insights`}>
-          <BarChartIcon />
+          <BarChart3 />
         </IconButton>
         <DialogTrigger type="modal">
           <IconButton size="md">
-            <ClosedCaptionIcon />
+            <Captions />
           </IconButton>
           {track.lyric ? (
             <UpdateLyricDialog lyric={track.lyric} />
@@ -102,7 +100,7 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
           )}
         </DialogTrigger>
         <IconButton size="md" elementType={Link} to={`${track.id}/edit`}>
-          <EditIcon />
+          <Pencil />
         </IconButton>
       </div>
     ),

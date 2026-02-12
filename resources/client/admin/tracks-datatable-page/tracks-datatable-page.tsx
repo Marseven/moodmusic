@@ -14,7 +14,7 @@ import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {ImportTrackDialog} from '@app/admin/tracks-datatable-page/import-track-dialog';
-import {PublishIcon} from '@common/icons/material/Publish';
+import {Upload} from 'lucide-react';
 
 export function TracksDatatablePage() {
   return (
@@ -61,7 +61,7 @@ function Actions() {
               className="flex-shrink-0"
               size="sm"
             >
-              <PublishIcon />
+              <Upload />
             </IconButton>
           </Tooltip>
           <ImportTrackDialog />

@@ -10,7 +10,7 @@ import {AnimatePresence, m} from 'framer-motion';
 import {opacityAnimation} from '@common/ui/animation/opacity-animation';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {MediaMicrophoneIcon} from '@common/icons/media/media-microphone';
+import {Mic} from 'lucide-react';
 
 interface Props {
   track: Track;
@@ -34,7 +34,7 @@ export function LyricsDialog({track}: Props) {
   } else {
     content = (
       <IllustratedMessage
-        image={<MediaMicrophoneIcon size="xl" />}
+        image={<Mic size="xl" />}
         imageHeight="h-auto"
         title={<Trans message="We do not have lyrics for this song yet" />}
         description={<Trans message="Please try again later" />}

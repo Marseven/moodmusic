@@ -3,8 +3,7 @@ import React from 'react';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {AddIcon} from '@common/icons/material/Add';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Plus, Pencil, X} from 'lucide-react';
 import musicImage from '@app/admin/tracks-datatable-page/music.svg';
 import {SvgImage} from '@common/ui/images/svg-image/svg-image';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
@@ -20,7 +19,6 @@ import {useSortableTableData} from '@common/ui/tables/use-sortable-table-data';
 import {UpdateArtistPayload} from '@app/admin/artist-datatable-page/requests/use-update-artist';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {ConfirmationDialog} from '@common/ui/overlays/dialog/confirmation-dialog';
-import {CloseIcon} from '@common/icons/material/Close';
 import {useDeleteAlbum} from '@app/web-player/albums/requests/use-delete-album';
 import {InfoDialogTriggerIcon} from '@common/ui/overlays/dialog/info-dialog-trigger/info-dialog-trigger-icon';
 
@@ -95,7 +93,7 @@ export function ArtistAlbumsTable({albums = []}: Props) {
             color="primary"
             size="xs"
             className="ml-auto"
-            startIcon={<AddIcon />}
+            startIcon={<Plus />}
             elementType={artistId ? Link : undefined}
             to={`/admin/albums/new?artistId=${artistId}`}
             disabled={!artistId}
@@ -144,7 +142,7 @@ function RowActions({album}: RowActionsProps) {
     <div className="text-muted">
       <Link to={`../../../albums/${album.id}/edit`} relative="path">
         <IconButton size="md">
-          <EditIcon />
+          <Pencil />
         </IconButton>
       </Link>
       <DialogTrigger
@@ -156,7 +154,7 @@ function RowActions({album}: RowActionsProps) {
         }}
       >
         <IconButton size="md" disabled={deleteAlbum.isLoading}>
-          <CloseIcon />
+          <X />
         </IconButton>
         <ConfirmationDialog
           isDanger

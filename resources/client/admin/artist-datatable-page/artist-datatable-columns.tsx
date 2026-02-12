@@ -3,13 +3,12 @@ import {Trans} from '@common/i18n/trans';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {Link} from 'react-router-dom';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil, BarChart3} from 'lucide-react';
 import React from 'react';
 import {SmallArtistImage} from '@app/web-player/artists/artist-image/small-artist-image';
 import {FormattedNumber} from '@common/i18n/formatted-number';
 import {ArtistLink} from '@app/web-player/artists/artist-link';
 import {Artist} from '@app/web-player/artists/artist';
-import {BarChartIcon} from '@common/icons/material/BarChart';
 
 export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
   {
@@ -70,10 +69,10 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
     body: artist => (
       <div className="text-muted">
         <IconButton size="md" elementType={Link} to={`${artist.id}/insights`}>
-          <BarChartIcon />
+          <BarChart3 />
         </IconButton>
         <IconButton size="md" elementType={Link} to={`${artist.id}/edit`}>
-          <EditIcon />
+          <Pencil />
         </IconButton>
       </div>
     ),

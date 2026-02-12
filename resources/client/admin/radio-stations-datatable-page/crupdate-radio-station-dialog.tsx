@@ -76,7 +76,7 @@ export function CrupdateRadioStationDialog({station}: Props) {
       <DialogHeader>
         {isUpdate ? (
           <Trans
-            message="Modifier la station \u00ab :name \u00bb"
+            message="Modifier la station « :name »"
             values={{name: station.name}}
           />
         ) : (
@@ -109,7 +109,7 @@ export function CrupdateRadioStationDialog({station}: Props) {
           <div className="mb-24 flex gap-24">
             <FormTextField
               name="frequency"
-              label={<Trans message="Fr\u00e9quence" />}
+              label={<Trans message="Fréquence" />}
               description={<Trans message="Ex: 98.5 FM" />}
               className="flex-1"
             />
@@ -154,7 +154,7 @@ export function CrupdateRadioStationDialog({station}: Props) {
           {isUpdate ? (
             <Trans message="Enregistrer" />
           ) : (
-            <Trans message="Cr\u00e9er" />
+            <Trans message="Créer" />
           )}
         </Button>
       </DialogFooter>

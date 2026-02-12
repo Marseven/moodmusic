@@ -7,13 +7,9 @@ import React, {useRef} from 'react';
 import {useFileUploadStore} from '@common/uploads/uploader/file-upload-provider';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
-import {FileUploadIcon} from '@common/icons/material/FileUpload';
+import {FileUp, Plus, GripVertical, Pencil, X} from 'lucide-react';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {AddIcon} from '@common/icons/material/Add';
-import {DragHandleIcon} from '@common/icons/material/DragHandle';
-import {EditIcon} from '@common/icons/material/Edit';
-import {CloseIcon} from '@common/icons/material/Close';
 import {ProgressCircle} from '@common/ui/progress/progress-circle';
 import {TrackUploadStatusText} from '@app/admin/tracks-datatable-page/track-form/track-upload-status-text';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
@@ -85,7 +81,7 @@ export function AlbumTracksForm() {
           color="primary"
           size="xs"
           className="ml-auto"
-          startIcon={<FileUploadIcon />}
+          startIcon={<FileUp />}
           onClick={() => openFilePicker()}
         >
           <Trans message="Upload tracks" />
@@ -105,7 +101,7 @@ export function AlbumTracksForm() {
               size="xs"
               radius="rounded"
             >
-              <AddIcon />
+              <Plus />
             </IconButton>
           </Tooltip>
           <CreateTrackDialog
@@ -189,7 +185,7 @@ function TrackItem({
     >
       <div className="flex items-center text-sm">
         <IconButton className="flex-shrink-0 mr-14" disabled={isUploading}>
-          <DragHandleIcon />
+          <GripVertical />
         </IconButton>
         <div className="flex-auto whitespace-nowrap overflow-hidden overflow-ellipsis">
           {track.name}
@@ -221,7 +217,7 @@ function TrackItem({
               className="flex-shrink-0 ml-auto text-muted"
               disabled={isUploading}
             >
-              <EditIcon />
+              <Pencil />
             </IconButton>
           </Tooltip>
           <UpdateTrackDialog track={track} hideAlbumField={true} />
@@ -239,7 +235,7 @@ function TrackItem({
         >
           <Tooltip label={<Trans message="Remove track" />}>
             <IconButton className="flex-shrink-0 text-muted">
-              <CloseIcon />
+              <X />
             </IconButton>
           </Tooltip>
           <ConfirmationDialog

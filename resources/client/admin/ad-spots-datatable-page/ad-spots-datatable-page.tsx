@@ -8,7 +8,7 @@ import {DataTableAddItemButton} from '@common/datatable/data-table-add-item-butt
 import {Trans} from '@common/i18n/trans';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil} from 'lucide-react';
 import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {
   AdSpot,
@@ -90,7 +90,7 @@ const columnConfig: ColumnConfig<AdSpot>[] = [
     body: adSpot => (
       <DialogTrigger type="modal">
         <IconButton size="md" className="text-muted">
-          <EditIcon />
+          <Pencil />
         </IconButton>
         <CrupdateAdSpotDialog adSpot={adSpot} />
       </DialogTrigger>

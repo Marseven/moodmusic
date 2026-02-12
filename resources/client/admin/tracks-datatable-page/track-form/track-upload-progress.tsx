@@ -5,11 +5,8 @@ import {useFileUploadStore} from '@common/uploads/uploader/file-upload-provider'
 import {message} from '@common/i18n/message';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {MixedText} from '@common/i18n/mixed-text';
-import {ErrorIcon} from '@common/icons/material/Error';
-import {WarningIcon} from '@common/icons/material/Warning';
-import {CheckCircleIcon} from '@common/icons/material/CheckCircle';
+import {AlertCircle, AlertTriangle, CheckCircle, X} from 'lucide-react';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {CloseIcon} from '@common/icons/material/Close';
 import {AnimatePresence, m} from 'framer-motion';
 import {TrackUploadStatusText} from '@app/admin/tracks-datatable-page/track-form/track-upload-status-text';
 
@@ -65,27 +62,27 @@ function UploadStatusButton({
     statusButton = (
       <AnimatedStatus>
         <Tooltip variant="danger" label={<MixedText value={errMessage} />}>
-          <ErrorIcon className="text-danger" size="sm" />
+          <AlertCircle className="text-danger" size={20} />
         </Tooltip>
       </AnimatedStatus>
     );
   } else if (status === 'aborted') {
     statusButton = (
       <AnimatedStatus>
-        <WarningIcon className="text-warning" size="sm" />
+        <AlertTriangle className="text-warning" size={20} />
       </AnimatedStatus>
     );
   } else if (status === 'completed' || status === 'processing') {
     statusButton = (
       <AnimatedStatus>
-        <CheckCircleIcon size="sm" className="text-primary" />
+        <CheckCircle size={20} className="text-primary" />
       </AnimatedStatus>
     );
   } else if (onAbort) {
     statusButton = (
       <AnimatedStatus>
         <IconButton size="xs" onClick={() => onAbort(fileUpload.file.id)}>
-          <CloseIcon />
+          <X />
         </IconButton>
       </AnimatedStatus>
     );

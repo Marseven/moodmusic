@@ -4,7 +4,7 @@ import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {loadMediaItemTracks} from '@app/web-player/requests/load-media-item-tracks';
 import {trackToMediaItem} from '@app/web-player/tracks/utils/track-to-media-item';
-import {PauseIcon} from '@common/icons/material/Pause';
+import {Pause} from 'lucide-react';
 import {EqualizerImage} from '@app/web-player/tracks/equalizer-image/equalizer-image';
 import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
 import {
@@ -62,7 +62,7 @@ export function PlaybackToggleButton({
 
   const statusIcon = modelIsPlaying ? (
     isHover ? (
-      <PauseIcon />
+      <Pause />
     ) : (
       <EqualizerImage color={equalizerColor} />
     )

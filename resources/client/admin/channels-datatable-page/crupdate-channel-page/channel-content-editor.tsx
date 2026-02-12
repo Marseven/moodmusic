@@ -19,12 +19,10 @@ import {
 import clsx from 'clsx';
 import {mergeProps} from '@react-aria/utils';
 import {ColumnConfig} from '@common/datatable/column-config';
-import {DragHandleIcon} from '@common/icons/material/DragHandle';
+import {GripVertical, X, AlertTriangle, Search, RefreshCw} from 'lucide-react';
 import {NameWithAvatar} from '@common/datatable/column-templates/name-with-avatar';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {CloseIcon} from '@common/icons/material/Close';
 import {DragPreview} from '@common/ui/interactions/dnd/drag-preview';
-import {WarningIcon} from '@common/icons/material/Warning';
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
 import playlist from './../playlist.svg';
 import {SvgImage} from '@common/ui/images/svg-image/svg-image';
@@ -34,13 +32,11 @@ import {message} from '@common/i18n/message';
 import {Section} from '@common/ui/forms/listbox/section';
 import {Item} from '@common/ui/forms/listbox/item';
 import {useTrans} from '@common/i18n/use-trans';
-import {SearchIcon} from '@common/icons/material/Search';
 import defaultImage from '@app/web-player/albums/album-image/default-album-image.png';
 import {channelContentModels} from '@app/admin/channels-datatable-page/crupdate-channel-page/channel-content-models';
 import {useUpdateChannelContent} from '@app/admin/channels-datatable-page/requests/use-update-channel-content';
 import {useParams} from 'react-router-dom';
 import {Button} from '@common/ui/buttons/button';
-import {RefreshIcon} from '@common/icons/material/Refresh';
 
 const columnConfig: ColumnConfig<NormalizedModel>[] = [
   {
@@ -49,7 +45,7 @@ const columnConfig: ColumnConfig<NormalizedModel>[] = [
     header: () => <Trans message="Drag handle" />,
     hideHeader: true,
     body: () => (
-      <DragHandleIcon className="cursor-pointer text-muted hover:text" />
+      <GripVertical className="cursor-pointer text-muted hover:text" />
     ),
   },
   {
@@ -170,7 +166,7 @@ function SearchField({onResultSelected}: SearchFieldProps) {
       selectionMode="none"
       openMenuOnFocus
       floatingMaxHeight={670}
-      startAdornment={<SearchIcon />}
+      startAdornment={<Search />}
       hideEndAdornment
     >
       {Object.entries(data?.results || {}).map(([groupName, results]) => (
@@ -278,7 +274,7 @@ function RemoveItemColumn({index}: RemoveItemColumnProps) {
         fieldArray.remove(index);
       }}
     >
-      <CloseIcon />
+      <X />
     </IconButton>
   );
 }
@@ -293,7 +289,7 @@ function ContentNotEditableWarning() {
 
   return (
     <div className="flex items-center gap-8 mt-4 mb-20">
-      <WarningIcon size="xs" />
+      <AlertTriangle size={12} />
       <div className="text-xs text-muted">
         {contentType === 'listAll' ? (
           <Trans message="This channel is listing all available content of specified type, and can't be edited manually." />
@@ -320,7 +316,7 @@ function UpdateContentButton() {
       size="xs"
       variant="outline"
       color="primary"
-      startIcon={<RefreshIcon />}
+      startIcon={<RefreshCw />}
       onClick={() => {
         updateContent.mutate(
           {autoUpdateMethod: getValues('config.autoUpdateMethod')},

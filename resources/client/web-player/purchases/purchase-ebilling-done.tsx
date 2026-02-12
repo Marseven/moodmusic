@@ -4,8 +4,7 @@ import {apiClient} from '@common/http/query-client';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
 import {FullPageLoader} from '@common/ui/progress/full-page-loader';
-import {TaskAltIcon} from '@common/icons/material/TaskAlt';
-import {ErrorIcon} from '@common/icons/material/Error';
+import {CircleCheckBig, AlertCircle} from 'lucide-react';
 
 export function PurchaseEbillingDone() {
   const [searchParams] = useSearchParams();
@@ -54,7 +53,7 @@ export function PurchaseEbillingDone() {
     <div className="flex flex-col items-center justify-center min-h-320 p-24 text-center">
       {status === 'completed' && (
         <>
-          <TaskAltIcon className="text-positive" size="xl" />
+          <CircleCheckBig className="text-positive" size="xl" />
           <h2 className="text-2xl font-semibold mt-20">
             <Trans message="Purchase successful!" />
           </h2>
@@ -94,7 +93,7 @@ export function PurchaseEbillingDone() {
       )}
       {status === 'failed' && (
         <>
-          <ErrorIcon className="text-danger" size="xl" />
+          <AlertCircle className="text-danger" size="xl" />
           <h2 className="text-2xl font-semibold mt-20">
             <Trans message="Payment failed" />
           </h2>

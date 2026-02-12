@@ -2,7 +2,7 @@ import {StaticPageTitle} from '@common/seo/static-page-title';
 import {Trans} from '@common/i18n/trans';
 import React from 'react';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search, ListPlus} from 'lucide-react';
 import {message} from '@common/i18n/message';
 import {useTrans} from '@common/i18n/use-trans';
 import {PageErrorMessage} from '@common/errors/page-error-message';
@@ -18,7 +18,6 @@ import {PlaylistGridItem} from '@app/web-player/playlists/playlist-grid-item';
 import {useAuthUserPlaylists} from '@app/web-player/playlists/requests/use-auth-user-playlists';
 import {getPlaylistLink} from '@app/web-player/playlists/playlist-link';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {PlaylistAddIcon} from '@common/icons/material/PlaylistAdd';
 import {CreatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/create-playlist-dialog';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
@@ -79,7 +78,7 @@ export function LibraryPlaylistsPage() {
           }}
         >
           <IconButton className="flex-shrink-0" onClickCapture={authHandler}>
-            <PlaylistAddIcon />
+            <ListPlus />
           </IconButton>
           <CreatePlaylistDialog />
         </DialogTrigger>
@@ -91,7 +90,7 @@ export function LibraryPlaylistsPage() {
           onChange={e => setSearchQuery(e.target.value)}
           className="max-w-512 flex-auto"
           size="sm"
-          startAdornment={<SearchIcon />}
+          startAdornment={<Search />}
           placeholder={trans(message('Search within playlists'))}
         />
         <LibraryPageSortDropdown

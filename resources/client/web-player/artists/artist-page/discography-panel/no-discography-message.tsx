@@ -1,5 +1,5 @@
 import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {AlbumIcon} from '@common/icons/material/Album';
+import {Disc3} from 'lucide-react';
 import {Trans} from '@common/i18n/trans';
 
 export function NoDiscographyMessage() {
@@ -7,7 +7,7 @@ export function NoDiscographyMessage() {
     <IllustratedMessage
       className="my-80"
       imageHeight="h-auto"
-      image={<AlbumIcon size="xl" className="text-muted" />}
+      image={<Disc3 size="xl" className="text-muted" />}
       title={<Trans message="We do not have discography for this artist yet" />}
     />
   );

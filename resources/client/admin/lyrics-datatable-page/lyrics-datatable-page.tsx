@@ -8,7 +8,7 @@ import {FormattedDate} from '@common/i18n/formatted-date';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {DataTableAddItemButton} from '@common/datatable/data-table-add-item-button';
 import {Trans} from '@common/i18n/trans';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil} from 'lucide-react';
 import lyricImage from './source-code.svg';
 import {Lyric} from '@app/web-player/tracks/lyrics/lyric';
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
@@ -62,7 +62,7 @@ const columnConfig: ColumnConfig<Lyric>[] = [
       return (
         <DialogTrigger type="modal">
           <IconButton size="md" className="text-muted">
-            <EditIcon />
+            <Pencil />
           </IconButton>
           <UpdateLyricDialog lyric={lyric} />
         </DialogTrigger>

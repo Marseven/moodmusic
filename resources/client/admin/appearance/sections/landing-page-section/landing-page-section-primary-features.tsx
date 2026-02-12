@@ -8,7 +8,7 @@ import {useFieldArray} from 'react-hook-form';
 import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {FormImageSelector} from '@common/ui/images/image-selector';
 import {Button} from '@common/ui/buttons/button';
-import {AddIcon} from '@common/icons/material/Add';
+import {Plus} from 'lucide-react';
 import {useState} from 'react';
 
 export function LandingPageSectionPrimaryFeatures() {
@@ -59,7 +59,7 @@ export function LandingPageSectionPrimaryFeatures() {
           size="xs"
           variant="outline"
           color="primary"
-          startIcon={<AddIcon />}
+          startIcon={<Plus />}
           onClick={() => {
             append({});
             setExpandedValues([fields.length]);

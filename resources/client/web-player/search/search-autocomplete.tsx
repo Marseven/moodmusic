@@ -1,4 +1,4 @@
-import {SearchIcon} from '@common/icons/material/Search';
+import {Search} from 'lucide-react';
 import {message} from '@common/i18n/message';
 import {Item} from '@common/ui/forms/listbox/item';
 import {ComboBox} from '@common/ui/forms/combobox/combobox';

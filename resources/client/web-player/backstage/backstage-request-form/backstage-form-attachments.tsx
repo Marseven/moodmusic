@@ -8,12 +8,11 @@ import {useUser} from '@common/auth/ui/use-user';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
 import {FacebookIcon} from '@common/icons/social/facebook';
-import {DocumentScannerIcon} from '@common/icons/material/DocumentScanner';
+import {FileSearch, X} from 'lucide-react';
 import {prettyBytes} from '@common/uploads/utils/pretty-bytes';
 import React, {cloneElement, ReactElement, ReactNode} from 'react';
 import {SvgIconProps} from '@common/icons/svg-icon';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {CloseIcon} from '@common/icons/material/Close';
 import {useActiveUpload} from '@common/uploads/uploader/use-active-upload';
 import {UploadInputType} from '@common/uploads/types/upload-input-config';
 import {Disk} from '@common/uploads/types/backend-metadata';
@@ -67,7 +66,7 @@ export function BackstageFormAttachments() {
       <div className="mt-20">
         {passportScan && (
           <AttachmentLayout
-            icon={<DocumentScannerIcon />}
+            icon={<FileSearch />}
             title={<Trans message="Passport scan" />}
             description={`${passportScan.name} (${prettyBytes(
               passportScan.file_size
@@ -155,7 +154,7 @@ function AttachmentLayout({
         onClick={() => onRemove()}
         disabled={isDisabled}
       >
-        <CloseIcon />
+        <X />
       </IconButton>
     </div>
   );
@@ -185,7 +184,7 @@ function PassportScanButton() {
   return (
     <Button
       variant="outline"
-      startIcon={<DocumentScannerIcon className="text-primary" />}
+      startIcon={<FileSearch className="text-primary" />}
       onClick={() => handleUpload()}
     >
       <Trans message="Upload passport scan" />

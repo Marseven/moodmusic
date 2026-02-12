@@ -3,7 +3,7 @@ import {Trans} from '@common/i18n/trans';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {Link} from 'react-router-dom';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil} from 'lucide-react';
 import React from 'react';
 import {Channel} from '@app/web-player/channels/channel';
 
@@ -81,7 +81,7 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
     body: channel => (
       <Link to={`${channel.id}/edit`} className="text-muted">
         <IconButton size="md">
-          <EditIcon />
+          <Pencil />
         </IconButton>
       </Link>
     ),

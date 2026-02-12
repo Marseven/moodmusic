@@ -4,7 +4,7 @@ import React, {useContext, useState} from 'react';
 import {TableContext} from '@common/ui/tables/table-context';
 import {trackToMediaItem} from '@app/web-player/tracks/utils/track-to-media-item';
 import {message} from '@common/i18n/message';
-import {PauseIcon} from '@common/icons/material/Pause';
+import {Pause} from 'lucide-react';
 import {PlayArrowFilledIcon} from '@app/web-player/tracks/play-arrow-filled';
 import clsx from 'clsx';
 import {usePlayerActions} from '@common/player/hooks/use-player-actions';
@@ -72,7 +72,7 @@ function TogglePlaybackButton({
           player.pause();
         }}
       >
-        {isHover ? <PauseIcon /> : <EqualizerImage />}
+        {isHover ? <Pause /> : <EqualizerImage />}
       </button>
     );
   }

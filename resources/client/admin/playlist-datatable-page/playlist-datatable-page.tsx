@@ -9,13 +9,11 @@ import {IconButton} from '@common/ui/buttons/icon-button';
 import {DataTableAddItemButton} from '@common/datatable/data-table-add-item-button';
 import {Trans} from '@common/i18n/trans';
 import {NameWithAvatar} from '@common/datatable/column-templates/name-with-avatar';
-import {EditIcon} from '@common/icons/material/Edit';
+import {Pencil, Check, X, Upload} from 'lucide-react';
 import {Playlist} from '@app/web-player/playlists/playlist';
 import {PlaylistLink} from '@app/web-player/playlists/playlist-link';
 import {UserProfileLink} from '@app/web-player/users/user-profile-link';
 import playlistImage from './../channels-datatable-page/playlist.svg';
-import {CheckIcon} from '@common/icons/material/Check';
-import {CloseIcon} from '@common/icons/material/Close';
 import {FormattedNumber} from '@common/i18n/formatted-number';
 import {UpdatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/update-playlist-dialog';
 import {queryClient} from '@common/http/query-client';
@@ -25,7 +23,6 @@ import {PlaylistDatatablePageFilters} from '@app/admin/playlist-datatable-page/p
 import {useSettings} from '@common/core/settings/use-settings';
 import {ImportPlaylistDialog} from '@app/admin/playlist-datatable-page/import-playlist-dialog';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
-import {PublishIcon} from '@common/icons/material/Publish';
 
 const columnConfig: ColumnConfig<Playlist>[] = [
   {
@@ -61,9 +58,9 @@ const columnConfig: ColumnConfig<Playlist>[] = [
     header: () => <Trans message="Public" />,
     body: entry =>
       entry.public ? (
-        <CheckIcon className="icon-md text-positive" />
+        <Check className="icon-md text-positive" />
       ) : (
-        <CloseIcon className="icon-md text-danger" />
+        <X className="icon-md text-danger" />
       ),
   },
   {
@@ -73,9 +70,9 @@ const columnConfig: ColumnConfig<Playlist>[] = [
     header: () => <Trans message="Collaborative" />,
     body: entry =>
       entry.collaborative ? (
-        <CheckIcon className="icon-md text-positive" />
+        <Check className="icon-md text-positive" />
       ) : (
-        <CloseIcon className="icon-md text-danger" />
+        <X className="icon-md text-danger" />
       ),
   },
   {
@@ -110,7 +107,7 @@ const columnConfig: ColumnConfig<Playlist>[] = [
           }}
         >
           <IconButton size="md" className="text-muted">
-            <EditIcon />
+            <Pencil />
           </IconButton>
           <UpdatePlaylistDialog playlist={playlist} />
         </DialogTrigger>
@@ -163,7 +160,7 @@ function Actions() {
               className="flex-shrink-0"
               size="sm"
             >
-              <PublishIcon />
+              <Upload />
             </IconButton>
           </Tooltip>
           <ImportPlaylistDialog />
