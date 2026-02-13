@@ -1,7 +1,13 @@
 /* MoodMusic - Custom Mood-Based Theme Styles */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 /* Fix text color for primary buttons - REMOVED OLD STYLES */
 /* Primary colors will now use transparent backgrounds */
+
+/* ===== Inter Font ===== */
+body, html {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
 
 /* ===== Mood Color Variables ===== */
 :root {
@@ -632,12 +638,10 @@
   }
 }
 
-/* ===== Lucide / Stroke Icons ===== */
-.svg-icon {
-  fill: none;
-  stroke: currentColor;
-  stroke-width: 1.5;
-}
+/* ===== Icon Defaults ===== */
+/* Lucide icons set fill/stroke natively via inline SVG attrs.
+   SvgIcon (DB/legacy) icons get fill via the component.
+   No global fill/stroke override needed here. */
 
 /* ===== Music Player Glassmorphism ===== */
 .music-player-container {
@@ -1661,29 +1665,218 @@ button[type="submit"][aria-label="Recherche"] {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
 }
 
+/* ===== Accent Color Override — Flutter #7351EA ===== */
+:root {
+  --mood-accent: #7351EA;
+  --mood-accent-light: #9B7FF0;
+  --mood-accent-dark: #5C3DC4;
+  --mood-accent-rgb: 115, 81, 234;
+}
+
 /* ===== Dark Mode Adjustments ===== */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --glass-bg: rgba(0, 0, 0, 0.2);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
-  }
-  
-  .mood-card {
-    background: rgba(0, 0, 0, 0.3);
-  }
-  
-  .mood-button {
-    background: rgba(0, 0, 0, 0.4);
-  }
-  
-  .music-player-container {
-    background: rgba(0, 0, 0, 0.4);
-    border-color: rgba(255, 255, 255, 0.08);
-  }
-  
-  .player-button-glass {
-    background: rgba(0, 0, 0, 0.3);
-    border-color: rgba(255, 255, 255, 0.15);
-  }
+.dark {
+  --glass-bg: rgba(0, 0, 0, 0.25);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
+  --glass-bg-light: rgba(255, 255, 255, 0.06);
+  --glass-bg-medium: rgba(255, 255, 255, 0.04);
+  --glass-bg-subtle: rgba(255, 255, 255, 0.02);
+  --glass-border-strong: rgba(255, 255, 255, 0.12);
+  --glass-shadow-subtle: 0 4px 16px 0 rgba(0, 0, 0, 0.25);
+  --glass-shadow-elevated: 0 12px 40px 0 rgba(0, 0, 0, 0.35);
+}
+
+.dark .mood-card {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .mood-card:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.5);
+}
+
+.dark .mood-glass-panel {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .mood-glass-panel:hover {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+
+.dark .mood-glass-button {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .mood-glass-button:hover {
+  background: rgba(255, 255, 255, 0.12);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark .mood-glass-modal {
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark .mood-glass-input {
+  background: rgba(255, 255, 255, 0.04);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .mood-glass-input:focus,
+.dark .mood-glass-input:focus-within {
+  background: rgba(255, 255, 255, 0.07);
+  border-color: var(--mood-accent);
+  box-shadow: 0 0 0 3px rgba(var(--mood-accent-rgb), 0.15);
+}
+
+.dark .music-player-container {
+  background: rgba(0, 0, 0, 0.4);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+.dark .player-button-glass,
+.dark .queue-button-glass {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .mood-glass-notification {
+  background: rgba(30, 30, 30, 0.85);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.dark .mood-glass-dropdown {
+  background: rgba(30, 30, 30, 0.9);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+/* ===== Global Hover & Focus Enhancements ===== */
+
+/* Focus ring with accent color */
+*:focus-visible {
+  outline: 2px solid rgba(var(--mood-accent-rgb), 0.6);
+  outline-offset: 2px;
+}
+
+/* Accent glow on focus for inputs */
+.mood-glass-input:focus-within {
+  border-color: var(--mood-accent);
+  box-shadow: 0 0 0 3px rgba(var(--mood-accent-rgb), 0.15);
+}
+
+/* Interactive cards — elevation on hover */
+.mood-glass-interactive:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 40px 0 rgba(0, 0, 0, 0.2);
+}
+
+.mood-glass-interactive:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px 0 rgba(0, 0, 0, 0.15);
+}
+
+/* ===== Empty State Styling ===== */
+.mood-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px 24px;
+  text-align: center;
+}
+
+.mood-empty-state-icon {
+  width: 64px;
+  height: 64px;
+  margin-bottom: 20px;
+  opacity: 0.4;
+  color: rgb(var(--be-foreground-base));
+}
+
+.mood-empty-state-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  opacity: 0.8;
+}
+
+.mood-empty-state-description {
+  font-size: 14px;
+  opacity: 0.5;
+  max-width: 320px;
+}
+
+/* ===== Card Grid Hover Enhancements ===== */
+.playable-grid-card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  border-radius: 12px;
+}
+
+.playable-grid-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.2);
+}
+
+.playable-grid-card:active {
+  transform: translateY(-1px);
+}
+
+/* ===== Table / DataTable Glass Hover ===== */
+.dark table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.dark table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.04);
+}
+
+.dark table thead th {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
+}
+
+.dark table tbody td {
+  border-bottom-color: rgba(255, 255, 255, 0.04);
+}
+
+/* ===== Accent Color Expansion ===== */
+
+/* Tabs active indicator */
+.dark [role="tablist"] [aria-selected="true"] {
+  color: var(--mood-accent);
+}
+
+/* Links hover accent */
+.dark a:hover {
+  text-decoration-color: rgba(var(--mood-accent-rgb), 0.4);
+}
+
+/* Active sidebar/nav items accent glow */
+.dark .bg-primary\/hover {
+  background-color: rgba(var(--mood-accent-rgb), 0.12);
+}
+
+/* Chip/badge accent variant */
+.mood-accent-chip {
+  background: rgba(var(--mood-accent-rgb), 0.15);
+  color: var(--mood-accent);
+  border: 1px solid rgba(var(--mood-accent-rgb), 0.3);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+/* Scrollbar accent override */
+.dark ::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, var(--mood-accent) 0%, var(--mood-accent-light) 100%);
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, var(--mood-accent-light) 0%, var(--mood-accent) 100%);
 }

@@ -53,7 +53,7 @@ export function Listbox({
   const Overlay = isMobile ? mobileOverlay : Popover;
 
   const className = clsx(
-    'py-4 text-base sm:text-sm outline-none bg-paper shadow-xl border max-h-inherit',
+    'py-4 text-base sm:text-sm outline-none mood-glass-dropdown max-h-inherit',
 
     // tray will apply its own rounding and max width
     Overlay === Popover && 'rounded',

@@ -4,6 +4,7 @@ namespace Common\Core\Bootstrap;
 
 use App\User;
 use Common\Localizations\Localization;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Spatie\Color\Hex;
 use Spatie\Color\Rgb;
@@ -65,9 +66,36 @@ class MobileBootstrapData extends BaseBootstrapData
     {
         /* @var User $user */
         if ($user = $this->request->user()) {
-            return $this->loadFcmToken($user);
+            $this->loadFcmToken($user);
+            $this->loadLikedIds($user);
+            return $user;
         }
         return null;
+    }
+
+    private function loadLikedIds(User $user): void
+    {
+        $likes = DB::table('likes')
+            ->where('user_id', $user->id)
+            ->get(['likeable_id', 'likeable_type']);
+
+        $user->setAttribute('liked_tracks', $likes
+            ->where('likeable_type', \App\Track::class)
+            ->pluck('likeable_id')
+            ->values()
+            ->toArray());
+
+        $user->setAttribute('liked_albums', $likes
+            ->where('likeable_type', \App\Album::class)
+            ->pluck('likeable_id')
+            ->values()
+            ->toArray());
+
+        $user->setAttribute('liked_artists', $likes
+            ->where('likeable_type', \App\Artist::class)
+            ->pluck('likeable_id')
+            ->values()
+            ->toArray());
     }
 
     private function getMobileMenus(): array

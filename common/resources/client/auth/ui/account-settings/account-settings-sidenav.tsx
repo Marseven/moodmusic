@@ -33,8 +33,8 @@ export function AccountSettingsSidenav() {
     social?.envato || social?.google || social?.facebook || social?.twitter;
 
   return (
-    <aside className="flex-shrink-0 sticky top-10 hidden lg:block">
-      <List padding="p-0">
+    <aside className="flex-shrink-0 sticky top-10 hidden lg:block w-240">
+      <List padding="p-8" className="flex flex-col gap-2">
         <Item icon={<PersonIcon />} panel={p.AccountDetails}>
           <Trans message="Détails du compte" />
         </Item>
@@ -60,7 +60,7 @@ export function AccountSettingsSidenav() {
             <Trans message="Développeurs" />
           </Item>
         ) : null}
-        <Item icon={<DangerousIcon />} panel={p.DeleteAccount}>
+        <Item icon={<DangerousIcon />} panel={p.DeleteAccount} isDanger>
           <Trans message="Supprimer le compte" />
         </Item>
       </List>
@@ -72,13 +72,15 @@ interface ItemProps {
   children: ReactNode;
   icon: ReactNode;
   isLast?: boolean;
+  isDanger?: boolean;
   panel: AccountSettingsId;
 }
-function Item({children, icon, isLast, panel}: ItemProps) {
+function Item({children, icon, isDanger, panel}: ItemProps) {
   return (
     <ListItem
       startIcon={icon}
-      className={isLast ? undefined : 'mb-10'}
+      borderRadius="rounded-lg"
+      className={isDanger ? 'text-danger hover:bg-danger/10' : 'hover:bg-white/10'}
       onSelected={() => {
         const panelEl = document.querySelector(`#${panel}`);
         if (panelEl) {

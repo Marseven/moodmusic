@@ -25,11 +25,7 @@ import {VolumeControls} from '@common/player/ui/controls/volume-controls';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
 import {Track} from '@app/web-player/tracks/track';
-import {SparklesIcon} from '@heroicons/react/24/outline';
-import {HeartIcon} from '@heroicons/react/24/outline';
-import {FaceSmileIcon} from '@heroicons/react/24/outline';
-import {CloudIcon} from '@heroicons/react/24/outline';
-import {BoltIcon} from '@heroicons/react/24/outline';
+import {Sparkles, Heart, Smile, Cloud, Zap} from 'lucide-react';
 
 export function DesktopPlayerControls() {
   const mediaIsCued = usePlayerStore(s => s.cuedMedia != null);
@@ -120,17 +116,17 @@ function MoodIndicator({ track }: { track: Track }) {
 
     const best = Object.entries(scores).reduce((a, b) => a[1] >= b[1] ? a : b);
 
-    const configs: Record<string, { icon: typeof BoltIcon; label: string; cls: string }> = {
-      energetic:   { icon: BoltIcon,      label: 'Énergique',    cls: 'player-mood-energetic' },
-      chill:       { icon: CloudIcon,     label: 'Détendu',      cls: 'player-mood-chill' },
-      romantic:    { icon: HeartIcon,     label: 'Romantique',   cls: 'player-mood-romantic' },
-      happy:       { icon: FaceSmileIcon, label: 'Joyeux',       cls: 'player-mood-happy' },
-      focused:     { icon: SparklesIcon,  label: 'Concentré',    cls: 'player-mood-focused' },
-      melancholic: { icon: CloudIcon,     label: 'Mélancolique', cls: 'player-mood-melancholic' },
+    const configs: Record<string, { icon: typeof Zap; label: string; cls: string }> = {
+      energetic:   { icon: Zap,      label: 'Énergique',    cls: 'player-mood-energetic' },
+      chill:       { icon: Cloud,    label: 'Détendu',      cls: 'player-mood-chill' },
+      romantic:    { icon: Heart,    label: 'Romantique',   cls: 'player-mood-romantic' },
+      happy:       { icon: Smile,    label: 'Joyeux',       cls: 'player-mood-happy' },
+      focused:     { icon: Sparkles, label: 'Concentré',    cls: 'player-mood-focused' },
+      melancholic: { icon: Cloud,    label: 'Mélancolique', cls: 'player-mood-melancholic' },
     };
 
     if (best[1] === 0) {
-      return { icon: BoltIcon, label: 'Énergique', cls: 'player-mood-energetic' };
+      return { icon: Zap, label: 'Énergique', cls: 'player-mood-energetic' };
     }
     return configs[best[0]];
   }, [track.id, track.genres, track.artists, track.name]);

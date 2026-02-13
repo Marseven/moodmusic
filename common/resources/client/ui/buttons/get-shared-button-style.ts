@@ -38,11 +38,11 @@ export function getSharedButtonStyle(
 
   return [
     ...style,
-    shadow || (variant === 'raised' && 'shadow-md'),
+    shadow || (variant === 'raised' && 'shadow-md hover:shadow-lg'),
     whitespace,
     variant &&
-      'align-middle inline-flex flex-shrink-0 items-center transition-button duration-200',
-    'select-none appearance-none no-underline outline-none disabled:pointer-events-none disabled:cursor-default',
+      'align-middle inline-flex flex-shrink-0 items-center transition-all duration-200 ease-out hover:translate-y-[-1px] active:translate-y-0',
+    'select-none appearance-none no-underline outline-none disabled:pointer-events-none disabled:cursor-default disabled:hover:translate-y-0',
   ];
 }
 

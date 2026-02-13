@@ -1,6 +1,6 @@
 import {Trans} from '@common/i18n/trans';
-import {IllustratedMessage} from '@common/ui/images/illustrated-message';
 import React, {ReactElement} from 'react';
+import {MoodEmptyState} from '@app/web-player/mood-empty-state';
 
 interface MediaPageNoResultsMessage {
   description: ReactElement;
@@ -14,7 +14,7 @@ export function MediaPageNoResultsMessage({
 }: MediaPageNoResultsMessage) {
   if (searchQuery) {
     return (
-      <IllustratedMessage
+      <MoodEmptyState
         className={className}
         title={<Trans message="No results found" />}
         description={
@@ -24,7 +24,7 @@ export function MediaPageNoResultsMessage({
     );
   }
   return (
-    <IllustratedMessage
+    <MoodEmptyState
       className={className}
       title={<Trans message="Nothing to display" />}
       description={description}

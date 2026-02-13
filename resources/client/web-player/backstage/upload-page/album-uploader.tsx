@@ -69,7 +69,7 @@ export const AlbumUploader = forwardRef<UploaderActions, UploaderProps>(
     const createAlbum = useCreateAlbum(form);
     return isVisible ? (
       <Form
-        className="rounded border p-14 md:p-24 mb-30 bg-paper"
+        className="mood-glass-panel p-14 md:p-24 mb-30"
         form={form}
         onSubmit={newValues =>
           createAlbum.mutate(newValues, {

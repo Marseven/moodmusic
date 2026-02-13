@@ -32,6 +32,7 @@ export const SvgIcon = forwardRef<SVGSVGElement, SvgIconProps & {attr?: {}}>(
         focusable={false}
         xmlns="http://www.w3.org/2000/svg"
         viewBox={viewBox || '0 0 24 24'}
+        fill="currentColor"
         {...attr}
         {...svgProps}
         className={clsx('svg-icon', className, getSizeClassName(size))}

@@ -32,7 +32,7 @@ export const Input = React.forwardRef<HTMLDivElement, InputProps>(
           role="group"
           className={clsx(
             className,
-            'flex items-center focus-within:ring focus-within:ring-primary/focus focus-within:border-primary/60'
+            'flex items-center transition-all duration-200 focus-within:ring focus-within:ring-primary/focus focus-within:border-primary/60 mood-glass-input'
           )}
           ref={ref}
           style={style}

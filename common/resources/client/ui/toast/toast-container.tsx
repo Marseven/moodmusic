@@ -39,7 +39,7 @@ export function ToastContainer() {
               animate={toast.disableEnterAnimation ? undefined : animate}
               exit={toast.disableExitAnimation ? undefined : exit}
               className={clsx(
-                'flex items-center gap-10 min-w-288 max-w-500 shadow-lg w-min rounded-lg pl-16 pr-6 py-6 text-sm pointer-events-auto max-h-100 bg-paper text-main bg-paper border mx-auto min-h-50'
+                'flex items-center gap-10 min-w-288 max-w-500 shadow-lg w-min rounded-lg pl-16 pr-6 py-6 text-sm pointer-events-auto max-h-100 bg-paper text-main border mx-auto min-h-50 mood-glass-notification'
               )}
               onPointerEnter={() => toast.timer?.pause()}
               onPointerLeave={() => toast.timer?.resume()}

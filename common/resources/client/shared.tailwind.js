@@ -282,7 +282,7 @@ module.exports = {
         });
         addComponents({
           '.svg-icon': {
-            '@apply select-none inline-block fill-current flex-shrink-0 transition-icon':
+            '@apply select-none inline-block flex-shrink-0 transition-icon':
               {},
           },
         });

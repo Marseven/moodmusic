@@ -65,8 +65,8 @@ function TokenLine({token, isLast}: TokenLineProps) {
   return (
     <div
       className={clsx(
-        'flex items-center gap-24',
-        !isLast && 'mb-12 pb-12 border-b'
+        'flex items-center gap-24 p-12 rounded-xl bg-white/5 border border-white/8 transition-colors hover:bg-white/8',
+        !isLast && 'mb-10'
       )}
     >
       <div className="text-sm">

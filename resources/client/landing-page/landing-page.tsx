@@ -196,7 +196,7 @@ function PrimaryFeatures({content}: ContentProps) {
         {content.primaryFeatures.map((feature, index) => (
           <div
             key={index}
-            className="flex-1 px-24 py-36 rounded-2xl mb-14 md:mb-0 shadow-[0_10px_30px_rgba(0,0,0,0.08)] text-center dark:bg-alt"
+            className="flex-1 px-24 py-36 rounded-2xl mb-14 md:mb-0 text-center mood-glass-panel mood-glass-interactive"
             data-testid={`primary-root-${index}`}
           >
             <MixedImage
@@ -246,7 +246,7 @@ function SecondaryFeatures({content}: ContentProps) {
             >
               <img
                 src={feature.image}
-                className="rounded-lg max-w-full mr-auto shadow-[0_10px_30px_rgba(0,0,0,0.08)] w-580"
+                className="rounded-2xl max-w-full mr-auto shadow-[0_16px_40px_rgba(0,0,0,0.12)] w-580 transition-transform duration-300 hover:scale-[1.02]"
                 data-testid={`secondary-image-${index}`}
                 alt=""
               />

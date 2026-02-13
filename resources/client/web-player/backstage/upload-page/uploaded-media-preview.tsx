@@ -25,7 +25,7 @@ export function UploadedMediaPreview({media}: UploadedMediaPreviewProps) {
     : getTrackLink(media, {absolute: true});
 
   return (
-    <div className="flex items-center gap-28 border rounded bg-paper p-20 my-20 mx-auto w-780 max-w-full">
+    <div className="flex items-center gap-28 mood-glass-panel p-20 my-20 mx-auto w-780 max-w-full">
       <div className={clsx(isAlbum && 'relative isolate my-14 mx-18')}>
         {isAlbum ? (
           <AlbumImage

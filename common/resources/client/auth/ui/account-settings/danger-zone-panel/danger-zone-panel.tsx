@@ -13,6 +13,7 @@ export function DangerZonePanel() {
     <AccountSettingsPanel
       id={AccountSettingsId.DeleteAccount}
       title={<Trans message="Zone dangereuse" />}
+      variant="danger"
     >
       <DialogTrigger
         type="modal"

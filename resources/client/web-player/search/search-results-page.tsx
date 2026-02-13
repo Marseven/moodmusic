@@ -23,8 +23,8 @@ import {Artist} from '@app/web-player/artists/artist';
 import {Album} from '@app/web-player/albums/album';
 import {Playlist} from '@app/web-player/playlists/playlist';
 import {User} from '@common/auth/user';
-import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {Search} from 'lucide-react';
+import {MoodEmptyState} from '@app/web-player/mood-empty-state';
+import {SearchIcon} from '@common/icons/material/Search';
 import {useSettings} from '@common/core/settings/use-settings';
 import {UseQueryResult} from '@tanstack/react-query';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
@@ -84,11 +84,9 @@ function PageContent({query}: PageContentProps) {
 
   if (query.fetchStatus === 'idle') {
     return (
-      <IllustratedMessage
+      <MoodEmptyState
         className="mt-40"
-        image={<Search size="xl" />}
-        imageHeight="h-auto"
-        imageMargin="mb-12"
+        icon={SearchIcon}
         title={
           <Trans
             message="Search :siteName"
@@ -142,13 +140,12 @@ function SearchResults({results}: SearchResultsProps) {
 
   if (!haveResults) {
     return (
-      <IllustratedMessage
+      <MoodEmptyState
         className="mt-40"
-        image={<Search size="xl" />}
-        imageHeight="h-auto"
+        icon={SearchIcon}
         title={
           <Trans
-            message="Not results for “:query“"
+            message={`Not results for \u201c:query\u201d`}
             values={{query: searchQuery}}
           />
         }
@@ -253,7 +250,7 @@ interface TracksPanelProps {
 }
 function TrackResults({tracks, showMore}: TracksPanelProps) {
   return (
-    <div className="py-24">
+    <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'tracks' : undefined}>
         <Trans message="Tracks" />
       </PanelTitle>
@@ -268,7 +265,7 @@ interface ArtistResultsProps {
 }
 function ArtistResults({artists, showMore}: ArtistResultsProps) {
   return (
-    <div className="py-24">
+    <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'artists' : undefined}>
         <Trans message="Artists" />
       </PanelTitle>
@@ -287,7 +284,7 @@ interface AlbumResultsProps {
 }
 function AlbumResults({albums, showMore}: AlbumResultsProps) {
   return (
-    <div className="py-24">
+    <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'albums' : undefined}>
         <Trans message="Albums" />
       </PanelTitle>
@@ -306,7 +303,7 @@ interface PlaylistResultsProps {
 }
 function PlaylistResults({playlists, showMore}: PlaylistResultsProps) {
   return (
-    <div className="py-24">
+    <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'playlists' : undefined}>
         <Trans message="Playlists" />
       </PanelTitle>
@@ -325,7 +322,7 @@ interface ProfileResultsProps {
 }
 function ProfileResults({users, showMore}: ProfileResultsProps) {
   return (
-    <div className="py-24">
+    <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'users' : undefined}>
         <Trans message="Profiles" />
       </PanelTitle>

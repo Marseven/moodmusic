@@ -57,7 +57,7 @@ export function Dialog(props: DialogProps) {
 
   const isTrayOrFullScreen = size === 'fullscreenTakeover' || type === 'tray';
   const mergedClassName = clsx(
-    'mx-auto pointer-events-auto outline-none flex flex-col overflow-hidden',
+    'mx-auto pointer-events-auto outline-none flex flex-col overflow-hidden mood-glass-modal',
     background || 'bg-paper',
     type !== 'tray' && sizeStyle(size),
     type === 'tray' && 'rounded-t',

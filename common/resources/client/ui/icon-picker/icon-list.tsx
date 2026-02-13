@@ -1,5 +1,5 @@
 import React, {ComponentType, Fragment} from 'react';
-import * as Icons from '../../icons/material/all-icons';
+import {allIcons as Icons} from '../../icons/material/all-icons';
 import {ButtonBase} from '../buttons/button-base';
 import {SvgIconProps} from '../../icons/svg-icon';
 import {elementToTree, IconTree} from '../../icons/create-svg-icon';

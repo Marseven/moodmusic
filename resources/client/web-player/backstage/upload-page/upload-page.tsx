@@ -114,7 +114,7 @@ function UploadPanel({
   const {data} = useUserMinutesLimit();
   return (
     <div className="pt-40">
-      <div className="border rounded p-20 md:p-48 flex flex-col items-center max-w-580 mx-auto bg-paper">
+      <div className="mood-glass-panel p-20 md:p-48 flex flex-col items-center max-w-580 mx-auto">
         <h1 className="text-base md:text-[22px] md:font-light">
           <Trans message="Drag and drop your tracks, videos & albums here." />
         </h1>

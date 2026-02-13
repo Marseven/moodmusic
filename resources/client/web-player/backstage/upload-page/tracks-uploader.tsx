@@ -129,7 +129,7 @@ const TrackUploadItem = memo(
             onSuccess: response => onCreate(response.track),
           });
         }}
-        className="rounded border p-14 md:p-24 mb-30 bg-paper"
+        className="mood-glass-panel p-14 md:p-24 mb-30"
       >
         <TrackForm uploadButton={uploadProgress} showExternalIdFields={false} />
         <Button variant="text" onClick={() => onRemove()} className="mr-10">

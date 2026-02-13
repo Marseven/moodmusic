@@ -81,19 +81,19 @@ interface SessionItemProps {
 }
 function SessionItem({session}: SessionItemProps) {
   return (
-    <div className="flex items-start gap-14 text-sm mb-14">
-      <div className="flex-shrink-0 text-muted">
+    <div className="flex items-start gap-14 text-sm mb-10 p-12 rounded-xl bg-white/5 border border-white/8 transition-colors hover:bg-white/8">
+      <div className="flex-shrink-0 text-muted mt-2">
         <DeviceIcon device={session.device_type} size="lg" />
       </div>
       <div className="flex-auto">
-        <div>
+        <div className="font-medium">
           <ValueOrUnknown>{session.platform}</ValueOrUnknown> -{' '}
           <ValueOrUnknown>{session.browser}</ValueOrUnknown>
         </div>
-        <div className="text-xs my-4">
+        <div className="text-xs text-muted my-4">
           {session.city}, {session.country}
         </div>
-        <div className="text-xs">
+        <div className="text-xs text-muted">
           <IpAddress session={session} /> - <LastActive session={session} />
         </div>
       </div>

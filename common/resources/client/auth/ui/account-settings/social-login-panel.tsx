@@ -44,7 +44,7 @@ export function SocialLoginPanel({user}: Props) {
         service="twitter"
         user={user}
       />
-      <div className="text-muted text-sm pt-16 pb-6">
+      <div className="text-muted text-xs pt-16 pb-6 opacity-70">
         <Trans message="Si vous désactivez les connexions sociales, vous pourrez toujours vous connecter en utilisant votre email et votre mot de passe." />
       </div>
     </AccountSettingsPanel>
@@ -77,13 +77,13 @@ function SocialLoginPanelRow({
   return (
     <div
       className={clsx(
-        'flex items-center gap-14 px-10 py-20 border-b',
+        'flex items-center gap-14 px-14 py-16 mb-8 rounded-xl bg-white/5 border border-white/8 transition-colors hover:bg-white/8',
         className
       )}
     >
       {cloneElement(icon, {
         size: 'xl',
-        className: clsx(icon.props.className, 'border p-8 rounded'),
+        className: clsx(icon.props.className, 'border border-white/15 p-8 rounded-lg'),
       })}
       <div className="mr-auto whitespace-nowrap overflow-hidden text-ellipsis">
         <div className="first-letter:capitalize text-sm font-bold overflow-hidden text-ellipsis">

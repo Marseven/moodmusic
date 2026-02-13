@@ -27,15 +27,15 @@ export function AccountSettingsPage() {
         <Trans message="Paramètres du compte" />
       </StaticPageTitle>
       <Navbar className="flex-shrink-0" menuPosition="account-settings-page" />
-      <div className="flex-auto overflow-auto">
-        <div className="container mx-auto my-24 px-24">
-          <div className="mood-glass-panel p-8 mb-8">
-            <h1 className="text-3xl font-bold">
+      <div className="flex-auto overflow-auto scroll-smooth">
+        <div className="container mx-auto my-24 md:my-40 px-24">
+          <div className="mb-32">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
               <Trans message="Paramètres du compte" />
             </h1>
-            <div className="mt-4 text-muted text-base">
+            <p className="mt-8 text-muted text-base">
               <Trans message="Consultez et mettez à jour les détails de votre compte, votre profil et plus encore." />
-            </div>
+            </p>
           </div>
           {isLoading || !data ? (
             <div className="mood-glass-panel p-12 text-center">
@@ -46,11 +46,11 @@ export function AccountSettingsPage() {
               />
             </div>
           ) : (
-            <div className="flex items-start gap-24">
-              <div className="mood-glass-nav rounded-lg">
+            <div className="flex items-start gap-30">
+              <div className="mood-glass-nav rounded-2xl">
                 <AccountSettingsSidenav />
               </div>
-              <main className="flex-auto">
+              <main className="flex-auto min-w-0">
                 <BasicInfoPanel user={data.user} />
                 <SocialLoginPanel user={data.user} />
                 <ChangePasswordPanel />

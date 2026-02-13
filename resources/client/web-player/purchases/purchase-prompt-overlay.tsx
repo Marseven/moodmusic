@@ -26,7 +26,7 @@ export function PurchasePromptOverlay() {
             initial={{scale: 0.95, opacity: 0}}
             animate={{scale: 1, opacity: 1}}
             exit={{scale: 0.95, opacity: 0}}
-            className="mx-16 w-full max-w-400 rounded-xl bg-paper p-24 shadow-xl"
+            className="mx-16 w-full max-w-400 mood-glass-modal p-24"
           >
             {/* Track info */}
             <div className="mb-20 text-center">

@@ -24,7 +24,7 @@ export function MediaPageHeaderLayout({
   return (
     <header
       className={clsx(
-        'flex flex-col md:flex-row gap-24 md:gap-34',
+        'flex flex-col md:flex-row gap-24 md:gap-34 mood-glass-panel p-24 md:p-34',
         centerItems && 'items-center',
         className
       )}

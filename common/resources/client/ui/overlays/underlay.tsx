@@ -25,7 +25,7 @@ export function Underlay({
       {...domProps}
       className={clsx(
         className,
-        !isTransparent && 'bg-black/30',
+        !isTransparent && 'bg-black/40 backdrop-blur-sm',
         'w-full h-full inset-0 z-10',
         position
       )}

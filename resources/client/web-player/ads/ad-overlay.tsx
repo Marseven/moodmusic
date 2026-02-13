@@ -40,7 +40,7 @@ export function AdOverlay() {
           className="fixed inset-x-0 bottom-0 z-50 flex items-end justify-center"
           style={{bottom: 'var(--player-controls-height, 96px)'}}
         >
-          <div className="mx-auto mb-8 w-full max-w-780 overflow-hidden rounded-lg border bg-paper shadow-lg">
+          <div className="mx-auto mb-8 w-full max-w-780 overflow-hidden mood-glass-panel">
             {/* Banner image (full width) */}
             {currentAd.image_url && (
               <button

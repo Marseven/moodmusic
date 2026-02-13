@@ -8,7 +8,7 @@ import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {FormattedPrice} from '@common/i18n/formatted-price';
 import {Button} from '@common/ui/buttons/button';
 import {Link} from 'react-router-dom';
-import {ExclamationTriangleIcon} from '@heroicons/react/24/outline';
+import {AlertTriangle as ExclamationTriangleIcon} from 'lucide-react';
 import {useEbilling} from '../checkout/ebilling/use-ebilling';
 
 export function BillingPage() {

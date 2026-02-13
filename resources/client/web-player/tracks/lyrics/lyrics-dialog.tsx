@@ -9,8 +9,8 @@ import {Skeleton} from '@common/ui/skeleton/skeleton';
 import {AnimatePresence, m} from 'framer-motion';
 import {opacityAnimation} from '@common/ui/animation/opacity-animation';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
-import {IllustratedMessage} from '@common/ui/images/illustrated-message';
-import {Mic} from 'lucide-react';
+import {MoodEmptyState} from '@app/web-player/mood-empty-state';
+import {MediaMicrophoneIcon} from '@common/icons/media/media-microphone';
 
 interface Props {
   track: Track;
@@ -33,9 +33,8 @@ export function LyricsDialog({track}: Props) {
     content = <LyricSkeleton />;
   } else {
     content = (
-      <IllustratedMessage
-        image={<Mic size="xl" />}
-        imageHeight="h-auto"
+      <MoodEmptyState
+        icon={MediaMicrophoneIcon}
         title={<Trans message="We do not have lyrics for this song yet" />}
         description={<Trans message="Please try again later" />}
       />

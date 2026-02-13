@@ -8,7 +8,8 @@ import clsx from 'clsx';
 import {useCustomMenu} from '@common/menus/use-custom-menu';
 import {Trans} from '@common/i18n/trans';
 import {NavbarAuthMenu} from '@common/ui/navigation/navbar/navbar-auth-menu';
-import {UserIcon, HomeIcon} from '@heroicons/react/24/outline';
+import {PersonIcon} from '@common/icons/material/Person';
+import {MediaHomeIcon} from '@common/icons/media/media-home';
 import {Badge} from '@common/ui/badge/badge';
 import {useAuth} from '@common/auth/use-auth';
 import {
@@ -21,7 +22,7 @@ import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {useSettings} from '@common/core/settings/use-settings';
 import {playerOverlayState} from '@app/web-player/state/player-overlay-store';
 import {usePrimaryArtistForCurrentUser} from '@app/web-player/backstage/use-primary-artist-for-current-user';
-import {MicrophoneIcon} from '@heroicons/react/24/outline';
+import {MediaMicrophoneIcon} from '@common/icons/media/media-microphone';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
 import {useCurrentTime} from '@common/player/hooks/use-current-time';
 import {PlayButton} from '@common/player/ui/controls/play-button';
@@ -120,7 +121,7 @@ function MobileNavbar() {
         className="text-xs whitespace-nowrap overflow-hidden"
         onClick={() => navigate('/')}
       >
-        <HomeIcon className="block mx-auto mb-6 icon-md" />
+        <MediaHomeIcon className="block mx-auto mb-6" size="md" />
         <Trans message="Accueil" />
       </button>
       {menu.items.map(item => (
@@ -157,7 +158,7 @@ function AccountButton() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicrophoneIcon className="w-5 h-5" />}
+          startIcon={<MediaMicrophoneIcon size="sm" />}
           onSelected={() => {
             navigate(getArtistLink(primaryArtist));
           }}
@@ -171,7 +172,7 @@ function AccountButton() {
         <MenuItem
           value="author"
           key="author"
-          startIcon={<MicrophoneIcon className="w-5 h-5" />}
+          startIcon={<MediaMicrophoneIcon size="sm" />}
           onSelected={() => {
             navigate('/backstage/requests');
           }}
@@ -191,7 +192,7 @@ function AccountButton() {
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <UserIcon className="block mx-auto icon-md" />
+        <PersonIcon className="block mx-auto" size="md" />
       </Badge>
       <div className="text-xs">
         <Trans message="Account" />

@@ -2,12 +2,16 @@
 
 namespace App\Http\Controllers;
 
+use App\Album;
+use App\Artist;
+use App\Track;
 use App\User;
 use App\UserProfile;
 use Auth;
 use Common\Auth\Events\UserAvatarChanged;
 use Common\Core\BaseController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class UserProfileController extends BaseController
 {
@@ -36,6 +40,29 @@ class UserProfileController extends BaseController
                 $user->two_factor_recovery_codes = $user->recoveryCodes();
                 $user->syncOriginal();
             }
+
+            // Load liked IDs for current user (mobile app needs these)
+            $likes = DB::table('likes')
+                ->where('user_id', $user->id)
+                ->get(['likeable_id', 'likeable_type']);
+
+            $user->setAttribute('liked_tracks', $likes
+                ->where('likeable_type', Track::class)
+                ->pluck('likeable_id')
+                ->values()
+                ->toArray());
+
+            $user->setAttribute('liked_albums', $likes
+                ->where('likeable_type', Album::class)
+                ->pluck('likeable_id')
+                ->values()
+                ->toArray());
+
+            $user->setAttribute('liked_artists', $likes
+                ->where('likeable_type', Artist::class)
+                ->pluck('likeable_id')
+                ->values()
+                ->toArray());
         }
 
         $user

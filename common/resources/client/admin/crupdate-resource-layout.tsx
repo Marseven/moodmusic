@@ -43,7 +43,7 @@ export function CrupdateResourceLayout<T extends FieldValues>({
       <div
         className={clsx(
           'sticky top-0 my-12 md:my-24 z-10 transition-shadow',
-          isSticky && 'bg-paper shadow'
+          isSticky && 'mood-glass-panel shadow'
         )}
       >
         <div
@@ -73,7 +73,7 @@ export function CrupdateResourceLayout<T extends FieldValues>({
           wrapInContainer ? 'container mx-auto px-24 pb-24' : undefined
         }
       >
-        <div className="rounded">{children}</div>
+        <div className="rounded mood-glass-panel p-24">{children}</div>
       </div>
     </Form>
   );

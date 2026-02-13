@@ -35,7 +35,7 @@ export function PlayableGridItem({
 }: PlayableGridProps) {
   const navigate = useNavigate();
   return (
-    <div className="snap-start snap-normal">
+    <div className="snap-start snap-normal playable-grid-card">
       <DialogTrigger
         type="popover"
         placement="bottom-start"
@@ -43,7 +43,7 @@ export function PlayableGridItem({
       >
         <div className="w-full relative isolate group">
           <div
-            className="w-full aspect-square this"
+            className="w-full aspect-square"
             onClick={() => navigate(link)}
           >
             {cloneElement(image, {
@@ -53,7 +53,7 @@ export function PlayableGridItem({
           </div>
           <div
             key="bg-overlay"
-            className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent to-black/75 ${radius} z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
+            className={`absolute top-0 left-0 w-full h-full bg-gradient-to-b from-transparent via-transparent to-black/80 ${radius} z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none`}
           />
           <div
             className={clsx(
