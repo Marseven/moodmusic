@@ -44,6 +44,11 @@ class TrackPolicy extends BasePolicy
             return false;
         }
 
+        // original content requires specific permission (admins always pass)
+        if (request()->input('is_original_content') && !$this->hasPermission($user, 'music.upload_original_content') && !$this->hasPermission($user, 'admin')) {
+            return $this->deny(__('You do not have permission to publish original content.'));
+        }
+
         // user is admin, can ignore count restriction
         if ($this->hasPermission($user, 'admin')) {
             return true;

@@ -56,6 +56,8 @@ use App\Http\Controllers\Admin\AdSpotController;
 use App\Http\Controllers\AdDeliveryController;
 use App\Http\Controllers\RadioStationController;
 use App\Http\Controllers\Admin\RadioStationController as AdminRadioStationController;
+use App\Http\Controllers\OriginalContentController;
+use App\Http\Controllers\Admin\OriginalContentCategoryController;
 
 Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verified']], function() {
     // SEARCH
@@ -207,6 +209,16 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     // AD DELIVERY (public)
     Route::get('ads/next', [AdDeliveryController::class, 'next']);
     Route::post('ads/{ad}/click', [AdDeliveryController::class, 'click']);
+
+    // ORIGINAL CONTENT
+    Route::get('original-content/categories', [OriginalContentController::class, 'categories']);
+    Route::get('original-content/{type}', [OriginalContentController::class, 'index']);
+
+    // ORIGINAL CONTENT CATEGORIES (admin CRUD)
+    Route::get('admin/original-content-categories', [OriginalContentCategoryController::class, 'index']);
+    Route::post('admin/original-content-categories', [OriginalContentCategoryController::class, 'store']);
+    Route::put('admin/original-content-categories/{originalContentCategory}', [OriginalContentCategoryController::class, 'update']);
+    Route::delete('admin/original-content-categories/{ids}', [OriginalContentCategoryController::class, 'destroy']);
 });
 
 // Public routes (outside auth middleware)

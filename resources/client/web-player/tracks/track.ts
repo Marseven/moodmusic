@@ -26,6 +26,10 @@ export interface Track {
   comments_count?: number;
   price?: number;
   currency?: string;
+  is_original_content?: boolean;
+  original_content_category_id?: number;
+  is_live?: boolean;
+  preview_path?: string;
   updated_at?: string;
   created_at?: string;
   // available in library tracks page only

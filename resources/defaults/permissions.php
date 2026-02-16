@@ -103,6 +103,12 @@ return [
                 'description' =>
                     'Allows deleting any media item on the site, even if user did not create them initially. User can delete their own media without this permission.',
             ],
+            [
+                'name' => 'music.upload_original_content',
+                'description' =>
+                    'Allows publishing original content (mixes, beats).',
+                'advanced' => true,
+            ],
         ],
 
         'playlists' => [

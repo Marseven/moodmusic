@@ -16,6 +16,9 @@ import {FormattedDuration} from '@common/i18n/formatted-duration';
 import {useSettings} from '@common/core/settings/use-settings';
 import {TrackFormUploadButton} from '@app/admin/tracks-datatable-page/track-form/track-form-upload-button';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
+import {FormSwitch} from '@common/ui/forms/toggle/switch';
+import {FormSelect, Option} from '@common/ui/forms/select/select';
+import {useOriginalContentCategories} from '@app/web-player/original-content/use-original-content';
 
 interface TrackFormProps {
   showExternalIdFields?: boolean;
@@ -107,11 +110,60 @@ export function TrackForm({
             placeholder="XAF"
           />
         </div>
+        <OriginalContentFields />
         <DurationField />
         {showExternalIdFields && <SourceField />}
         {showExternalIdFields && <SpotifyIdField />}
       </div>
     </div>
+  );
+}
+
+function OriginalContentFields() {
+  const {watch} = useFormContext<CreateTrackPayload>();
+  const {data} = useOriginalContentCategories();
+  const isOriginal = watch('is_original_content');
+  const selectedCategoryId = watch('original_content_category_id');
+
+  // Find if the selected category is a 'mix' type (for showing is_live toggle)
+  const selectedCategory = data?.categories?.find(
+    c => c.id === Number(selectedCategoryId),
+  );
+  const isMixType = selectedCategory?.name === 'mix';
+
+  return (
+    <>
+      <FormSwitch
+        name="is_original_content"
+        className="mb-24"
+      >
+        <Trans message="Création originale" />
+      </FormSwitch>
+      {isOriginal && (
+        <>
+          <FormSelect
+            name="original_content_category_id"
+            label={<Trans message="Catégorie" />}
+            className="mb-24"
+            selectionMode="single"
+          >
+            {data?.categories?.map(category => (
+              <Option key={category.id} value={category.id}>
+                {category.display_name}
+              </Option>
+            ))}
+          </FormSelect>
+          {isMixType && (
+            <FormSwitch
+              name="is_live"
+              className="mb-24"
+            >
+              <Trans message="Enregistrement Live" />
+            </FormSwitch>
+          )}
+        </>
+      )}
+    </>
   );
 }
 

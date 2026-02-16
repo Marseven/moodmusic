@@ -7,7 +7,7 @@ import {Trans} from '@common/i18n/trans';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {usePrimaryArtistForCurrentUser} from '@app/web-player/backstage/use-primary-artist-for-current-user';
 import {MenuItem} from '@common/ui/navigation/menu/menu-trigger';
-import {ModernMicrophoneIcon} from '@app/web-player/icons/modern-icons';
+import {ModernMicrophoneIcon, ModernSmartphoneIcon} from '@app/web-player/icons/modern-icons';
 import {getArtistLink} from '@app/web-player/artists/artist-link';
 import {Navbar} from '@common/ui/navigation/navbar/navbar';
 import {SearchAutocomplete} from '@app/web-player/search/search-autocomplete';
@@ -102,6 +102,15 @@ function ActionButtons() {
           <Trans message="Upload" />
         </Button>
       ) : null}
+      <Button
+        variant="outline"
+        size="xs"
+        elementType="a"
+        href="/storage/downloads/moodmusic.apk"
+        startIcon={<ModernSmartphoneIcon />}
+      >
+        <Trans message="Télécharger l'App" />
+      </Button>
     </Fragment>
   );
 }

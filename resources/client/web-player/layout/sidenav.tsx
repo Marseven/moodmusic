@@ -5,8 +5,9 @@ import {useIsDarkMode} from '@common/ui/themes/use-is-dark-mode';
 import {CustomMenu} from '@common/menus/custom-menu';
 import {Trans} from '@common/i18n/trans';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {ModernPlusIcon, ModernDownloadIcon} from '@app/web-player/icons/modern-icons';
-import {ReactNode} from 'react';
+import {ModernPlusIcon, ModernDownloadIcon, ModernDiscIcon, ModernAudioLinesIcon, ModernMusicNoteIcon} from '@app/web-player/icons/modern-icons';
+import {useOriginalContentCategories} from '@app/web-player/original-content/use-original-content';
+import React, {ReactNode} from 'react';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {CreatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/create-playlist-dialog';
 import {useAuthUserPlaylists} from '@app/web-player/playlists/requests/use-auth-user-playlists';
@@ -61,6 +62,7 @@ export function Sidenav({className}: Props) {
           <ModernDownloadIcon className="text-muted" size="sm" />
           <Trans message="Mes achats" />
         </NavLink>
+        <OriginalContentSection />
         <PlaylistSection />
       </div>
       <PwaInstallButton />
@@ -97,6 +99,38 @@ function Logo() {
         alt={trans({message: 'Site logo'})}
       />
     </Link>
+  );
+}
+
+const categoryIconMap: Record<string, React.ReactElement> = {
+  'disc-3': <ModernDiscIcon className="text-muted" size="sm" />,
+  'audio-lines': <ModernAudioLinesIcon className="text-muted" size="sm" />,
+};
+
+function OriginalContentSection() {
+  const {data} = useOriginalContentCategories();
+  const categories = data?.categories;
+
+  if (!categories?.length) return null;
+
+  return (
+    <div className="mt-40">
+      <SectionTitle>
+        <Trans message="Création Originale" />
+      </SectionTitle>
+      {categories.map(category => (
+        <NavLink
+          key={category.id}
+          to={`/original/${category.name}`}
+          className={({isActive}) =>
+            clsx(menuItemClassName(isActive), 'flex items-center gap-8 text-sm')
+          }
+        >
+          {categoryIconMap[category.icon || ''] || <ModernMusicNoteIcon className="text-muted" size="sm" />}
+          {category.display_name}
+        </NavLink>
+      ))}
+    </div>
   );
 }
 

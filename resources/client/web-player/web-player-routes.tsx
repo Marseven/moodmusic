@@ -22,6 +22,8 @@ import {AlbumEmbed} from '@app/web-player/albums/album-embed';
 import {HomepageChannelPage} from '@app/web-player/channels/homepage-channel-page';
 import {PurchasesPage} from '@app/web-player/purchases/purchases-page';
 import {PurchaseEbillingDone} from '@app/web-player/purchases/purchase-ebilling-done';
+import {OriginalContentCategoriesPage} from '@app/web-player/original-content/original-content-categories-page';
+import {OriginalContentPage} from '@app/web-player/original-content/original-content-page';
 
 const RouteConfig: RouteObject[] = [
   {
@@ -164,6 +166,15 @@ const RouteConfig: RouteObject[] = [
             <LibraryHistoryPage />
           </AuthRoute>
         ),
+      },
+      // original content
+      {
+        path: 'original',
+        element: <OriginalContentCategoriesPage />,
+      },
+      {
+        path: 'original/:categoryName',
+        element: <OriginalContentPage />,
       },
       // purchases
       {

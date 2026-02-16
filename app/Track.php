@@ -43,6 +43,9 @@ class Track extends Model
         'position' => 'integer',
         'added_at' => 'datetime',
         'price' => 'decimal:2',
+        'is_original_content' => 'boolean',
+        'is_live' => 'boolean',
+        'original_content_category_id' => 'integer',
     ];
 
     protected $appends = ['model_type'];
@@ -125,6 +128,11 @@ class Track extends Model
     public function lyric(): HasOne
     {
         return $this->hasOne(Lyric::class);
+    }
+
+    public function originalContentCategory(): BelongsTo
+    {
+        return $this->belongsTo(OriginalContentCategory::class, 'original_content_category_id');
     }
 
     public function purchases(): MorphMany

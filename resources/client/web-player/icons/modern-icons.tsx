@@ -32,6 +32,8 @@ import {
   Image,
   Pencil,
   Check,
+  AudioLines,
+  Smartphone,
 } from 'lucide-react';
 
 // ── Music / Audio ──
@@ -90,3 +92,8 @@ export const ModernStarIcon = createLucideIcon(Star, 'ModernStarIcon');
 export const ModernImageIcon = createLucideIcon(Image, 'ModernImageIcon');
 export const ModernEditIcon = createLucideIcon(Pencil, 'ModernEditIcon');
 export const ModernCheckIcon = createLucideIcon(Check, 'ModernCheckIcon');
+
+// ── Original Content / App ──
+
+export const ModernAudioLinesIcon = createLucideIcon(AudioLines, 'ModernAudioLinesIcon');
+export const ModernSmartphoneIcon = createLucideIcon(Smartphone, 'ModernSmartphoneIcon');
