@@ -26,6 +26,7 @@ import {PlayableMediaGridSkeleton} from '@app/web-player/playable-item/player-me
 import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import {useLightThemeVariables} from '@common/ui/themes/use-light-theme-variables';
+import {ModernSmartphoneIcon} from '@app/web-player/icons/modern-icons';
 
 interface ContentProps {
   content: LandingPageContent;
@@ -138,7 +139,7 @@ function HeroHeader({content}: ContentProps) {
               adornmentPosition="left-10"
             />
           </form>
-          <div className="flex gap-20 pt-70 md:pt-90 pb-30 md:pb-50 min-h-50 empty:min-h-0">
+          <div className="flex flex-wrap justify-center gap-20 pt-70 md:pt-90 pb-30 md:pb-50 min-h-50 empty:min-h-0">
             <CtaButton
               item={actions.cta1}
               variant="raised"
@@ -156,6 +157,17 @@ function HeroHeader({content}: ContentProps) {
               radius="rounded-full"
               data-testid="cta2"
             />
+            <Button
+              elementType="a"
+              href="/storage/downloads/moodmusic_app.apk"
+              variant="outline"
+              color="white"
+              size="lg"
+              radius="rounded-full"
+              startIcon={<ModernSmartphoneIcon />}
+            >
+              <Trans message="Télécharger l'App" />
+            </Button>
           </div>
         </div>
       </div>

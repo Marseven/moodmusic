@@ -106,7 +106,7 @@ function ActionButtons() {
         variant="outline"
         size="xs"
         elementType="a"
-        href="/storage/downloads/moodmusic.apk"
+        href="/storage/downloads/moodmusic_app.apk"
         startIcon={<ModernSmartphoneIcon />}
       >
         <Trans message="Télécharger l'App" />
