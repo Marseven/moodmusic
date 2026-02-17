@@ -46,7 +46,14 @@ export function FormArtistPicker({name, className, artistType}: FormArtistPicker
             ) : undefined
           }
         >
-          {result.name}
+          <span className="flex items-center gap-6">
+            {result.name}
+            {(result as any).artist_type && (
+              <span className="text-[10px] text-muted bg-chip rounded px-4 py-1 uppercase">
+                {(result as any).artist_type}
+              </span>
+            )}
+          </span>
         </Item>
       ))}
     </FormChipField>

@@ -36,12 +36,14 @@ class ArtistSearchSuggestionsController extends BaseController
 
         $builder = $shouldListAll ? Artist::query() : $user->artists();
 
+        $builder->where('name', 'like', $query . '%');
+
+        // If artist_type is specified, show matching type first, then the rest
         if ($artistType = request('artist_type')) {
-            $builder->where('artist_type', $artistType);
+            $builder->orderByRaw("CASE WHEN artist_type = ? THEN 0 ELSE 1 END", [$artistType]);
         }
 
         $artists = $builder
-            ->where('name', 'like', $query . '%')
             ->limit($limit)
             ->get();
 

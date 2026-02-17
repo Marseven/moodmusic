@@ -128,6 +128,7 @@ class Artist extends Model
             'id' => $this->id,
             'name' => $this->name,
             'image' => $this->image_small,
+            'artist_type' => $this->artist_type,
             'model_type' => self::MODEL_TYPE,
         ];
     }
