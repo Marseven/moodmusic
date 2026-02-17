@@ -31,4 +31,14 @@ class AdSpot extends Model
                 $q->whereNull('end_date')->orWhere('end_date', '>=', now()->toDateString());
             });
     }
+
+    public function scopeBanner(Builder $query): Builder
+    {
+        return $query->where('type', 'banner');
+    }
+
+    public function scopeAudio(Builder $query): Builder
+    {
+        return $query->where('type', 'audio');
+    }
 }

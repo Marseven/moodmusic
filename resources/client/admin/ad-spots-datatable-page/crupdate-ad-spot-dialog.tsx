@@ -10,6 +10,7 @@ import {Button} from '@common/ui/buttons/button';
 import {Form} from '@common/ui/forms/form';
 import {FormTextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {FormSwitch} from '@common/ui/forms/toggle/switch';
+import {FormSelect, Option} from '@common/ui/forms/select/select';
 import {FormFileEntryField} from '@common/ui/forms/input-field/file-entry-field';
 import {FormImageSelector} from '@common/ui/images/image-selector';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
@@ -25,10 +26,11 @@ import {
 export interface AdSpot {
   id: number;
   name: string;
-  audio_url: string;
+  type: 'audio' | 'banner';
+  audio_url?: string;
   image_url?: string;
   click_url?: string;
-  duration: number;
+  duration?: number;
   active: boolean;
   priority: number;
   impressions: number;
@@ -65,6 +67,7 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
     defaultValues: {
       id: adSpot?.id,
       name: adSpot?.name || '',
+      type: adSpot?.type || 'audio',
       audio_url: adSpot?.audio_url || '',
       image_url: adSpot?.image_url || '',
       click_url: adSpot?.click_url || '',
@@ -90,6 +93,7 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
   };
 
   const isLoading = createAdSpot.isLoading || updateAdSpot.isLoading;
+  const selectedType = form.watch('type');
 
   const handleAudioModeChange = (mode: InputMode) => {
     form.setValue('audio_url', '');
@@ -123,7 +127,22 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
             autoFocus
           />
 
-          {/* Audio: Upload or URL */}
+          <FormSelect
+            name="type"
+            label={<Trans message="Type" />}
+            className="mb-24"
+            selectionMode="single"
+          >
+            <Option value="audio">
+              <Trans message="Audio" />
+            </Option>
+            <Option value="banner">
+              <Trans message="Bannière" />
+            </Option>
+          </FormSelect>
+
+          {/* Audio: Upload or URL (only for audio type) */}
+          {selectedType === 'audio' && (
           <div className="mb-24">
             <div className="mb-8 flex items-center justify-between">
               <label className="block text-sm font-medium">
@@ -152,6 +171,7 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
               />
             )}
           </div>
+          )}
 
           {/* Image: Upload or URL */}
           <div className="mb-24">
@@ -190,6 +210,7 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
               className="mb-24"
             />
             <div className="mb-24 flex gap-24">
+              {selectedType === 'audio' && (
               <FormTextField
                 name="duration"
                 label={<Trans message="Duration (seconds)" />}
@@ -198,6 +219,7 @@ export function CrupdateAdSpotDialog({adSpot}: Props) {
                 className="flex-1"
                 required
               />
+              )}
               <FormTextField
                 name="priority"
                 label={<Trans message="Priority" />}

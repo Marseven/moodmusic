@@ -8,6 +8,7 @@ class ModifyArtists extends BaseFormRequest
     {
         $rules = [
             'name' => ['required', 'string', 'min:1', 'max:255'],
+            'artist_type' => 'nullable|in:singer,musician,dj,beatmaker',
             'country' => 'nullable|string|min:2|max:100',
             'city' => 'nullable|string|min:2|max:100',
             'spotify_popularity' => 'integer|min:1|max:100|nullable',

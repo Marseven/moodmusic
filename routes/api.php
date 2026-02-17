@@ -208,6 +208,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
 
     // AD DELIVERY (public)
     Route::get('ads/next', [AdDeliveryController::class, 'next']);
+    Route::get('ads/banners', [AdDeliveryController::class, 'banners']);
     Route::post('ads/{ad}/click', [AdDeliveryController::class, 'click']);
 
     // ORIGINAL CONTENT

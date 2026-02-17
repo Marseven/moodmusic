@@ -3,6 +3,7 @@ import {Trans} from '@common/i18n/trans';
 import {FormattedDate} from '@common/i18n/formatted-date';
 import {Link} from 'react-router-dom';
 import {IconButton} from '@common/ui/buttons/icon-button';
+import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
 import {Pencil, BarChart3} from 'lucide-react';
 import React from 'react';
 import {SmallArtistImage} from '@app/web-player/artists/artist-image/small-artist-image';
@@ -27,6 +28,25 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
         <ArtistLink artist={artist} target="_blank" />
       </div>
     ),
+  },
+  {
+    key: 'artist_type',
+    allowsSorting: true,
+    header: () => <Trans message="Type" />,
+    width: 'w-100',
+    body: artist => {
+      const labels: Record<string, string> = {
+        singer: 'Chanteur',
+        musician: 'Musicien',
+        dj: 'DJ',
+        beatmaker: 'Beatmaker',
+      };
+      return artist.artist_type ? (
+        <Chip size="xs">{labels[artist.artist_type] ?? artist.artist_type}</Chip>
+      ) : (
+        '—'
+      );
+    },
   },
   {
     key: 'albums_count',

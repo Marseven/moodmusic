@@ -23,6 +23,7 @@ class CrupdateArtist
         $artist
             ->fill([
                 'name' => $data['name'],
+                'artist_type' => Arr::get($data, 'artist_type'),
                 'verified' => $data['verified'] ?? false,
                 'image_small' => Arr::get($data, 'image_small'),
                 'spotify_id' =>

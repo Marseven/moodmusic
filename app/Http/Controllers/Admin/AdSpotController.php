@@ -30,10 +30,11 @@ class AdSpotController extends BaseController
     {
         $data = $this->request->validate([
             'name' => 'required|string|max:100',
-            'audio_url' => 'required|string|max:500',
+            'type' => 'required|in:audio,banner',
+            'audio_url' => 'required_if:type,audio|nullable|string|max:500',
             'image_url' => 'nullable|string|max:500',
             'click_url' => 'nullable|string|max:500',
-            'duration' => 'required|integer|min:1',
+            'duration' => 'required_if:type,audio|nullable|integer|min:1',
             'active' => 'boolean',
             'priority' => 'integer|min:0',
             'start_date' => 'nullable|date',
@@ -49,10 +50,11 @@ class AdSpotController extends BaseController
     {
         $data = $this->request->validate([
             'name' => 'string|max:100',
-            'audio_url' => 'string|max:500',
+            'type' => 'in:audio,banner',
+            'audio_url' => 'required_if:type,audio|nullable|string|max:500',
             'image_url' => 'nullable|string|max:500',
             'click_url' => 'nullable|string|max:500',
-            'duration' => 'integer|min:1',
+            'duration' => 'required_if:type,audio|nullable|integer|min:1',
             'active' => 'boolean',
             'priority' => 'integer|min:0',
             'start_date' => 'nullable|date',

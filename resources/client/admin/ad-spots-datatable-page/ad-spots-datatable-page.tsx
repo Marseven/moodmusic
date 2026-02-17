@@ -26,11 +26,22 @@ const columnConfig: ColumnConfig<AdSpot>[] = [
     body: adSpot => adSpot.name,
   },
   {
+    key: 'type',
+    allowsSorting: true,
+    header: () => <Trans message="Type" />,
+    width: 'w-90',
+    body: adSpot => (
+      <Chip size="xs" color={adSpot.type === 'banner' ? 'primary' : 'chip'}>
+        {adSpot.type === 'banner' ? 'Bannière' : 'Audio'}
+      </Chip>
+    ),
+  },
+  {
     key: 'duration',
     allowsSorting: true,
     header: () => <Trans message="Duration" />,
     width: 'w-80',
-    body: adSpot => `${adSpot.duration}s`,
+    body: adSpot => adSpot.duration ? `${adSpot.duration}s` : '—',
   },
   {
     key: 'priority',

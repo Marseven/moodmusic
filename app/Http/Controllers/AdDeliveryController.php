@@ -10,9 +10,23 @@ use Illuminate\Support\Collection;
 
 class AdDeliveryController extends BaseController
 {
+    public function banners()
+    {
+        $banners = AdSpot::active()->banner()->orderBy('priority', 'desc')->get();
+
+        return $this->success([
+            'banners' => $banners->map(fn(AdSpot $ad) => [
+                'id' => $ad->id,
+                'name' => $ad->name,
+                'image_url' => $ad->image_url,
+                'click_url' => $ad->click_url,
+            ])->values(),
+        ]);
+    }
+
     public function next()
     {
-        $ads = AdSpot::active()->get();
+        $ads = AdSpot::active()->audio()->get();
 
         if ($ads->isEmpty()) {
             return $this->success(['ad' => null]);

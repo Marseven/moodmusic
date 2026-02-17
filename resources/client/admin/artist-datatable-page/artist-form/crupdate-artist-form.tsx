@@ -4,6 +4,7 @@ import {Trans} from '@common/i18n/trans';
 import {FormImageSelector} from '@common/ui/images/image-selector';
 import {FileUploadProvider} from '@common/uploads/uploader/file-upload-provider';
 import {FormNormalizedModelChipField} from '@common/tags/form-normalized-model-chip-field';
+import {FormSelect, Option} from '@common/ui/forms/select/select';
 import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import {GENRE_MODEL} from '@app/web-player/genres/genre';
@@ -99,6 +100,28 @@ function DetailsPanel({showExternalFields}: DetailsPanelProps) {
         autoFocus
         disabled={!showExternalFields}
       />
+      <FormSelect
+        name="artist_type"
+        label={<Trans message="Type d'artiste" />}
+        className="mb-24"
+        selectionMode="single"
+      >
+        <Option value="">
+          <Trans message="Non défini" />
+        </Option>
+        <Option value="singer">
+          <Trans message="Chanteur" />
+        </Option>
+        <Option value="musician">
+          <Trans message="Musicien" />
+        </Option>
+        <Option value="dj">
+          <Trans message="DJ" />
+        </Option>
+        <Option value="beatmaker">
+          <Trans message="Beatmaker" />
+        </Option>
+      </FormSelect>
       <FormNormalizedModelChipField
         label={<Trans message="Genres" />}
         placeholder={trans(message('+Add genre'))}
