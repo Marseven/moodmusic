@@ -59,7 +59,7 @@ const columnConfig: ColumnConfig<
     body: genre => {
       return (
         <DialogTrigger type="modal">
-          <IconButton size="md" className="text-muted">
+          <IconButton size={null} className="text-muted h-20 w-20">
             <Pencil />
           </IconButton>
           <UpdateGenreDialog genre={genre} />

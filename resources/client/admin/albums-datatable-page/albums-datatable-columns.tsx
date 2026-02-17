@@ -92,10 +92,10 @@ export const AlbumsDatatableColumns: ColumnConfig<Album>[] = [
     width: 'w-84 flex-shrink-0',
     body: album => (
       <div className="text-muted">
-        <IconButton size="md" elementType={Link} to={`${album.id}/insights`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${album.id}/insights`}>
           <BarChart3 />
         </IconButton>
-        <IconButton size="md" elementType={Link} to={`${album.id}/edit`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${album.id}/edit`}>
           <Pencil />
         </IconButton>
       </div>

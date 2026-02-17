@@ -97,6 +97,7 @@ export const AppAppearanceConfig: IAppearanceConfig = {
           '/admin/purchases',
           '/admin/ad-spots',
           '/admin/radio-stations',
+          '/admin/original-content-categories',
           '/backstage/requests',
         ],
       } as MenuSectionConfig,

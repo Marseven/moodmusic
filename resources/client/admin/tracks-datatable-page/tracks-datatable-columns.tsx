@@ -86,11 +86,11 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
     width: 'w-128 flex-shrink-0',
     body: track => (
       <div className="text-muted">
-        <IconButton size="md" elementType={Link} to={`${track.id}/insights`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${track.id}/insights`}>
           <BarChart3 />
         </IconButton>
         <DialogTrigger type="modal">
-          <IconButton size="md">
+          <IconButton size={null} className="h-20 w-20">
             <Captions />
           </IconButton>
           {track.lyric ? (
@@ -99,7 +99,7 @@ export const TracksDatatableColumns: ColumnConfig<Track>[] = [
             <CreateLyricDialog trackId={track.id} />
           )}
         </DialogTrigger>
-        <IconButton size="md" elementType={Link} to={`${track.id}/edit`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${track.id}/edit`}>
           <Pencil />
         </IconButton>
       </div>

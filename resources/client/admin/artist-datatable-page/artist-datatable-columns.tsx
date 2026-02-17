@@ -68,10 +68,10 @@ export const ArtistDatatableColumns: ColumnConfig<Artist>[] = [
     width: 'w-84 flex-shrink-0',
     body: artist => (
       <div className="text-muted">
-        <IconButton size="md" elementType={Link} to={`${artist.id}/insights`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${artist.id}/insights`}>
           <BarChart3 />
         </IconButton>
-        <IconButton size="md" elementType={Link} to={`${artist.id}/edit`}>
+        <IconButton size={null} className="h-20 w-20" elementType={Link} to={`${artist.id}/edit`}>
           <Pencil />
         </IconButton>
       </div>

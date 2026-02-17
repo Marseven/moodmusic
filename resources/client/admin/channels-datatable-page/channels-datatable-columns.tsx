@@ -80,7 +80,7 @@ export const ChannelsDatatableColumns: ColumnConfig<Channel>[] = [
     width: 'w-42 flex-shrink-0',
     body: channel => (
       <Link to={`${channel.id}/edit`} className="text-muted">
-        <IconButton size="md">
+        <IconButton size={null} className="h-20 w-20">
           <Pencil />
         </IconButton>
       </Link>

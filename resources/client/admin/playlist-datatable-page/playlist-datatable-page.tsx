@@ -106,7 +106,7 @@ const columnConfig: ColumnConfig<Playlist>[] = [
             }
           }}
         >
-          <IconButton size="md" className="text-muted">
+          <IconButton size={null} className="text-muted h-20 w-20">
             <Pencil />
           </IconButton>
           <UpdatePlaylistDialog playlist={playlist} />

@@ -22,6 +22,7 @@ import {CommentsDatatablePage} from '@common/comments/comments-datatable-page/co
 import {PurchasesDatatablePage} from '@app/admin/purchases-datatable-page/purchases-datatable-page';
 import {AdSpotsDatatablePage} from '@app/admin/ad-spots-datatable-page/ad-spots-datatable-page';
 import {RadioStationsDatatablePage} from '@app/admin/radio-stations-datatable-page/radio-stations-datatable-page';
+import {OriginalContentCategoriesDatatablePage} from '@app/admin/original-content-categories-datatable-page/original-content-categories-datatable-page';
 import {BemusicAdminReportPage} from '@app/admin/reports/bemusic-admin-report-page';
 import {AdminInsightsReport} from '@app/admin/reports/admin-insights-report';
 import {AdminVisitorsReport} from '@app/admin/reports/admin-visitors-report';
@@ -152,5 +153,10 @@ export const AppAdminRoutes: RouteObject[] = [
   {
     path: 'radio-stations',
     element: <RadioStationsDatatablePage />,
+  },
+  // Original Content Categories
+  {
+    path: 'original-content-categories',
+    element: <OriginalContentCategoriesDatatablePage />,
   },
 ];

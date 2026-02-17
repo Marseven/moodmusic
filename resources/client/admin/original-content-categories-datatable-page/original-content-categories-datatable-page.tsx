@@ -8,74 +8,52 @@ import {DataTableAddItemButton} from '@common/datatable/data-table-add-item-butt
 import {Trans} from '@common/i18n/trans';
 import {IconButton} from '@common/ui/buttons/icon-button';
 import {Chip} from '@common/ui/forms/input-field/chip-field/chip';
-import {Pencil, Radio, Antenna} from 'lucide-react';
+import {Pencil, Sparkles} from 'lucide-react';
 import {
-  RadioStation,
-  CrupdateRadioStationDialog,
-} from './crupdate-radio-station-dialog';
+  OriginalContentCategory,
+  CrupdateOriginalContentCategoryDialog,
+} from './crupdate-original-content-category-dialog';
 import musicSvg from './../tracks-datatable-page/music.svg';
 
-const columnConfig: ColumnConfig<RadioStation>[] = [
+const columnConfig: ColumnConfig<OriginalContentCategory>[] = [
   {
-    key: 'name',
+    key: 'display_name',
     allowsSorting: true,
     visibleInMode: 'all',
     width: 'flex-3 min-w-200',
     header: () => <Trans message="Nom" />,
-    body: station => (
-      <div className="flex items-center gap-10">
-        {station.image ? (
-          <img
-            src={station.image}
-            alt={station.name}
-            className="h-36 w-36 rounded object-cover"
-          />
-        ) : (
-          <div className="flex h-36 w-36 items-center justify-center rounded bg-chip">
-            <Radio size={18} className="text-muted" />
-          </div>
-        )}
-        <span>{station.name}</span>
-      </div>
+    body: category => category.display_name,
+  },
+  {
+    key: 'name',
+    allowsSorting: true,
+    width: 'w-120',
+    header: () => <Trans message="Slug" />,
+    body: category => (
+      <span className="text-xs text-muted">{category.name}</span>
     ),
   },
   {
-    key: 'stream_url',
-    header: () => <Trans message="URL du flux" />,
-    width: 'flex-2 min-w-200',
-    body: station => (
-      <span className="text-xs text-muted truncate">{station.stream_url}</span>
-    ),
-  },
-  {
-    key: 'frequency',
-    allowsSorting: true,
-    header: () => <Trans message="Fréquence" />,
+    key: 'icon',
     width: 'w-100',
-    body: station => station.frequency || '—',
+    header: () => <Trans message="Icône" />,
+    body: category => category.icon || '—',
   },
   {
-    key: 'genre',
+    key: 'position',
     allowsSorting: true,
-    header: () => <Trans message="Genre" />,
-    width: 'w-100',
-    body: station => station.genre || '—',
-  },
-  {
-    key: 'sort_order',
-    allowsSorting: true,
-    header: () => <Trans message="Ordre" />,
     width: 'w-80',
-    body: station => station.sort_order,
+    header: () => <Trans message="Position" />,
+    body: category => category.position,
   },
   {
     key: 'is_active',
     allowsSorting: true,
-    header: () => <Trans message="Statut" />,
     width: 'w-80',
-    body: station => (
-      <Chip size="xs" color={station.is_active ? 'positive' : 'chip'}>
-        {station.is_active ? 'Active' : 'Inactive'}
+    header: () => <Trans message="Statut" />,
+    body: category => (
+      <Chip size="xs" color={category.is_active ? 'positive' : 'chip'}>
+        {category.is_active ? 'Active' : 'Inactive'}
       </Chip>
     ),
   },
@@ -86,25 +64,25 @@ const columnConfig: ColumnConfig<RadioStation>[] = [
     align: 'end',
     visibleInMode: 'all',
     width: 'w-42 flex-shrink-0',
-    body: station => (
+    body: category => (
       <DialogTrigger type="modal">
         <IconButton size={null} className="text-muted h-20 w-20">
           <Pencil size={20} />
         </IconButton>
-        <CrupdateRadioStationDialog station={station} />
+        <CrupdateOriginalContentCategoryDialog category={category} />
       </DialogTrigger>
     ),
   },
 ];
 
-export function RadioStationsDatatablePage() {
+export function OriginalContentCategoriesDatatablePage() {
   return (
     <DataTablePage
-      endpoint="admin/radio-stations"
+      endpoint="admin/original-content-categories"
       title={
         <span className="flex items-center gap-8">
-          <Antenna size={22} />
-          <Trans message="Stations Radio" />
+          <Sparkles size={22} />
+          <Trans message="Création Originale — Catégories" />
         </span>
       }
       columns={columnConfig}
@@ -115,10 +93,10 @@ export function RadioStationsDatatablePage() {
         <DataTableEmptyStateMessage
           image={musicSvg}
           title={
-            <Trans message="Aucune station radio n'a été créée" />
+            <Trans message="Aucune catégorie de création originale" />
           }
           filteringTitle={
-            <Trans message="Aucune station correspondante" />
+            <Trans message="Aucune catégorie correspondante" />
           }
         />
       }
@@ -131,9 +109,9 @@ function Actions() {
     <Fragment>
       <DialogTrigger type="modal">
         <DataTableAddItemButton>
-          <Trans message="Ajouter une station" />
+          <Trans message="Ajouter une catégorie" />
         </DataTableAddItemButton>
-        <CrupdateRadioStationDialog />
+        <CrupdateOriginalContentCategoryDialog />
       </DialogTrigger>
     </Fragment>
   );

@@ -8,10 +8,13 @@ use Illuminate\Http\Request;
 
 class OriginalContentCategoryController extends BaseController
 {
+    public function __construct()
+    {
+        $this->middleware('auth');
+    }
+
     public function index(Request $request)
     {
-        $this->authorize('admin');
-
         $categories = OriginalContentCategory::orderBy('position')
             ->paginate($request->input('perPage', 15));
 
@@ -20,8 +23,6 @@ class OriginalContentCategoryController extends BaseController
 
     public function store(Request $request)
     {
-        $this->authorize('admin');
-
         $data = $request->validate([
             'name' => 'required|string|max:100|unique:original_content_categories,name',
             'display_name' => 'required|string|max:100',
@@ -38,8 +39,6 @@ class OriginalContentCategoryController extends BaseController
 
     public function update(Request $request, OriginalContentCategory $originalContentCategory)
     {
-        $this->authorize('admin');
-
         $data = $request->validate([
             'name' => 'string|max:100|unique:original_content_categories,name,' . $originalContentCategory->id,
             'display_name' => 'string|max:100',
@@ -56,8 +55,6 @@ class OriginalContentCategoryController extends BaseController
 
     public function destroy(string $ids)
     {
-        $this->authorize('admin');
-
         $ids = explode(',', $ids);
         OriginalContentCategory::whereIn('id', $ids)->delete();
 

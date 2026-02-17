@@ -89,7 +89,7 @@ const columnConfig: ColumnConfig<AdSpot>[] = [
     width: 'w-42 flex-shrink-0',
     body: adSpot => (
       <DialogTrigger type="modal">
-        <IconButton size="md" className="text-muted">
+        <IconButton size={null} className="text-muted h-20 w-20">
           <Pencil />
         </IconButton>
         <CrupdateAdSpotDialog adSpot={adSpot} />
