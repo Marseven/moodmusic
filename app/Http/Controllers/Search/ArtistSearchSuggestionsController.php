@@ -36,6 +36,10 @@ class ArtistSearchSuggestionsController extends BaseController
 
         $builder = $shouldListAll ? Artist::query() : $user->artists();
 
+        if ($artistType = request('artist_type')) {
+            $builder->where('artist_type', $artistType);
+        }
+
         $artists = $builder
             ->where('name', 'like', $query . '%')
             ->limit($limit)

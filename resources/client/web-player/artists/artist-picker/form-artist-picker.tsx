@@ -9,11 +9,15 @@ import {Item} from '@common/ui/forms/listbox/item';
 interface FormArtistPickerProps {
   name: string;
   className?: string;
+  artistType?: string;
 }
-export function FormArtistPicker({name, className}: FormArtistPickerProps) {
+export function FormArtistPicker({name, className, artistType}: FormArtistPickerProps) {
   const {trans} = useTrans();
   const [inputValue, setInputValue] = useState('');
-  const {data, isLoading} = useArtistPickerSuggestions({query: inputValue});
+  const {data, isLoading} = useArtistPickerSuggestions({
+    query: inputValue,
+    artist_type: artistType,
+  });
 
   return (
     <FormChipField

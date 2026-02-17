@@ -10,6 +10,7 @@ interface Response extends BackendResponse {
 interface Params {
   query?: string;
   perPage?: number;
+  artist_type?: string;
 }
 
 export function useArtistPickerSuggestions(queryParams: Params) {

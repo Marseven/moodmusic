@@ -33,6 +33,20 @@ export function TrackForm({
   const {trans} = useTrans();
   const isMobile = useIsMobileMediaQuery();
 
+  const {watch} = useFormContext<CreateTrackPayload>();
+  const isOriginal = watch('is_original_content');
+  const selectedCategoryId = watch('original_content_category_id');
+  const {data: categoriesData} = useOriginalContentCategories();
+
+  // Map original content category to artist_type filter
+  const categoryToArtistType: Record<string, string> = {mix: 'dj', beat: 'beatmaker'};
+  const selectedCat = categoriesData?.categories?.find(
+    c => c.id === Number(selectedCategoryId),
+  );
+  const artistTypeFilter = isOriginal && selectedCat
+    ? categoryToArtistType[selectedCat.name]
+    : undefined;
+
   return (
     <div className="md:flex gap-24">
       <div className="flex-shrink-0">
@@ -66,7 +80,7 @@ export function TrackForm({
             customEndpoint="search/suggestions"
           />
         )}
-        <FormArtistPicker name="artists" className="mb-24" />
+        <FormArtistPicker name="artists" className="mb-24" artistType={artistTypeFilter} />
         <FormNormalizedModelChipField
           label={<Trans message="Genres" />}
           placeholder={trans(message('+Add genre'))}
