@@ -55,14 +55,26 @@ type InlineIconProps = {
   position: 'start' | 'end';
   size?: IconSize | null;
 };
+
+const iconSizeMap: Record<string, string> = {
+  '2xs': 'icon-2xs',
+  xs: 'icon-xs',
+  sm: 'icon-sm',
+  md: 'icon-md',
+  lg: 'icon-lg',
+  xl: 'icon-xl',
+};
+
 function InlineIcon({icon, position, size}: InlineIconProps): ReactElement {
+  const sizeClass = size ? iconSizeMap[size] : undefined;
   const className = clsx(
     'm-auto',
+    sizeClass,
     {
       '-ml-4 mr-8': position === 'start',
       '-mr-4 ml-8': position === 'end',
     },
     icon.props.className
   );
-  return React.cloneElement(icon, {className, size});
+  return React.cloneElement(icon, {className});
 }
