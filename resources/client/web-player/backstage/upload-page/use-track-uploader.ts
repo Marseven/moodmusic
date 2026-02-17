@@ -17,7 +17,7 @@ import {CreateTrackPayload} from '@app/admin/tracks-datatable-page/requests/use-
 import {validateUpload} from '@common/uploads/uploader/validate-upload';
 import {message} from '@common/i18n/message';
 
-const FiftyMB = 50 * 1024 * 1024;
+const TwoHundredMB = 200 * 1024 * 1024;
 
 export interface TrackUploadMeta {
   isGeneratingWave?: boolean;
@@ -39,7 +39,7 @@ export function useTrackUploader(options: Options) {
   const restrictions = useMemo(
     () => ({
       allowedFileTypes: [UploadInputType.audio, UploadInputType.video],
-      maxFileSize: uploads.max_size || FiftyMB,
+      maxFileSize: Math.max(uploads.max_size || 0, TwoHundredMB),
     }),
     [uploads.max_size]
   );
