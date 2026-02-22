@@ -26,12 +26,15 @@ import {User} from '@common/auth/user';
 import {MoodEmptyState} from '@app/web-player/mood-empty-state';
 import {SearchIcon} from '@common/icons/material/Search';
 import {useSettings} from '@common/core/settings/use-settings';
-import {UseQueryResult} from '@tanstack/react-query';
+import {UseQueryResult, useQuery} from '@tanstack/react-query';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
 import {useTrans} from '@common/i18n/use-trans';
 import {message} from '@common/i18n/message';
 import {useNavigate} from '@common/utils/hooks/use-navigate';
+import {apiClient} from '@common/http/query-client';
+import {GenreGridItem} from '@app/web-player/genres/genre-grid-item';
+import {Genre} from '@app/web-player/genres/genre';
 
 export function SearchResultsPage() {
   const {searchQuery} = useParams();
@@ -83,21 +86,7 @@ function PageContent({query}: PageContentProps) {
   }
 
   if (query.fetchStatus === 'idle') {
-    return (
-      <MoodEmptyState
-        className="mt-40"
-        icon={SearchIcon}
-        title={
-          <Trans
-            message="Search :siteName"
-            values={{siteName: branding.site_name}}
-          />
-        }
-        description={
-          <Trans message="Find songs, artists, albums, playlists and more." />
-        }
-      />
-    );
+    return <BrowseView />;
   }
 
   return <PageStatus query={query} loaderClassName="absolute inset-0 m-auto" />;
@@ -351,5 +340,91 @@ function PanelTitle({children, to}: PanelTitleProps) {
         children
       )}
     </h2>
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Browse View — Vibes & Mouvement + Genre grid (when no search query)
+// ---------------------------------------------------------------------------
+
+interface Vibe {
+  id: number;
+  name: string;
+  display_name: string;
+  emoji?: string;
+  color: string;
+  genre_id?: number;
+  channel_id?: number;
+  genre?: {id: number; name: string; display_name: string};
+}
+
+function useVibes() {
+  return useQuery({
+    queryKey: ['vibes'],
+    queryFn: () => apiClient.get('vibes').then(r => r.data.vibes as Vibe[]),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+function useGenres() {
+  return useQuery({
+    queryKey: ['genres'],
+    queryFn: () => apiClient.get('genres').then(r => {
+      const data = r.data;
+      if (data.pagination) return data.pagination.data as Genre[];
+      return (data.genres ?? data) as Genre[];
+    }),
+    staleTime: 1000 * 60 * 10,
+  });
+}
+
+function BrowseView() {
+  const {data: vibes} = useVibes();
+  const {data: genres} = useGenres();
+  const navigate = useNavigate();
+
+  return (
+    <div className="pb-24">
+      {/* Vibe & Mouvement */}
+      {vibes && vibes.length > 0 && (
+        <div className="mb-40">
+          <h2 className="text-2xl font-semibold mb-20">Vibe & Mouvement</h2>
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-16">
+            {vibes.map(vibe => (
+              <button
+                key={vibe.id}
+                type="button"
+                onClick={() => {
+                  if (vibe.genre?.name) {
+                    navigate(`/channel/genre/${vibe.genre.name}`);
+                  } else if (vibe.channel_id) {
+                    navigate(`/channel/${vibe.channel_id}`);
+                  }
+                }}
+                className="relative overflow-hidden rounded-xl p-20 text-left transition-transform hover:scale-[1.02]"
+                style={{
+                  background: `linear-gradient(135deg, ${vibe.color}, ${vibe.color}99)`,
+                }}
+              >
+                <span className="text-3xl block mb-8">{vibe.emoji}</span>
+                <span className="text-white font-bold text-sm">{vibe.display_name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Par Styles Musicaux */}
+      {genres && genres.length > 0 && (
+        <div>
+          <h2 className="text-2xl font-semibold mb-20">Par Styles Musicaux</h2>
+          <ContentGrid>
+            {genres.map(genre => (
+              <GenreGridItem key={genre.id} genre={genre} />
+            ))}
+          </ContentGrid>
+        </div>
+      )}
+    </div>
   );
 }

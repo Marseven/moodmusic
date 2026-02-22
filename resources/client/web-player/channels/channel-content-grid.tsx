@@ -20,7 +20,7 @@ export function ChannelContentGrid(props: ChannelContentProps) {
   );
 }
 
-function SimpleGrid({channel}: ChannelContentProps) {
+function SimpleGrid({channel, isNested}: ChannelContentProps) {
   const content = (channel.content?.data || []) as Exclude<
     ChannelContentItem,
     Channel
@@ -32,6 +32,7 @@ function SimpleGrid({channel}: ChannelContentProps) {
           key={`${item.id}-${item.model_type}`}
           item={item}
           items={content}
+          isNested={isNested}
         />
       ))}
     </ContentGrid>

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {Dialog} from '@common/ui/overlays/dialog/dialog';
 import {DialogHeader} from '@common/ui/overlays/dialog/dialog-header';
 import {DialogBody} from '@common/ui/overlays/dialog/dialog-body';
@@ -16,7 +16,7 @@ import {
 } from './use-initiate-purchase';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
-import {queryClient} from '@common/http/query-client';
+import {apiClient, queryClient} from '@common/http/query-client';
 import {useSettings} from '@common/core/settings/use-settings';
 
 type Gateway = 'ebilling' | 'stripe' | 'paypal';
@@ -37,6 +37,18 @@ export function PurchaseDialog({item}: Props) {
   const createEbillingOrder = useCreateEbillingOrder();
   const createStripeCheckout = useCreateStripeCheckout();
   const createPaypalOrder = useCreatePaypalOrder();
+
+  const [forcesCount, setForcesCount] = useState<number>(0);
+  const [forcesArtistName, setForcesArtistName] = useState<string | null>(null);
+
+  useEffect(() => {
+    apiClient.get('purchases/forces-count', {
+      params: {purchasable_type: item.model_type, purchasable_id: item.id},
+    }).then(res => {
+      setForcesCount(res.data.forces_count || 0);
+      setForcesArtistName(res.data.artist_name || null);
+    }).catch(() => {});
+  }, [item.id, item.model_type]);
 
   const price = item.price ?? 0;
   const currency = item.currency ?? 'XAF';
@@ -129,6 +141,11 @@ export function PurchaseDialog({item}: Props) {
           <div className="mt-8 text-2xl font-bold text-primary">
             {formatPrice(price, currency)}
           </div>
+          {forcesCount > 0 && (
+            <div className="mt-8 text-xs text-muted">
+              Déjà {forcesCount} force{forcesCount > 1 ? 's' : ''} donnée{forcesCount > 1 ? 's' : ''} à {forcesArtistName || artistName || 'cet artiste'}
+            </div>
+          )}
         </div>
 
         <div className="mb-8 text-sm font-medium">
@@ -175,7 +192,7 @@ export function PurchaseDialog({item}: Props) {
             <Trans message="Processing..." />
           ) : (
             <Trans
-              message="Pay :price"
+              message="Donner la force - :price"
               values={{price: formatPrice(price, currency)}}
             />
           )}

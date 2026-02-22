@@ -94,6 +94,7 @@ export function ChannelContentCarousel(props: ChannelContentProps) {
             key={`${item.id}-${item.model_type}`}
             item={item}
             items={channel.content?.data}
+            isNested={props.isNested}
           />
         ))}
       </div>

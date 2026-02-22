@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Album;
+use App\Artist;
 use App\Http\Requests\PurchaseRequest;
 use App\Purchase;
 use App\Services\Purchase\CreatePurchase;
@@ -59,5 +60,36 @@ class PurchaseController extends BaseController
             ->get(['purchasable_type', 'purchasable_id']);
 
         return $this->success(['purchases' => $purchases]);
+    }
+
+    public function forcesCount(Request $request)
+    {
+        $type = $request->input('purchasable_type');
+        $id = $request->input('purchasable_id');
+
+        $artist = null;
+        if ($type === 'track') {
+            $track = Track::find($id);
+            if ($track) {
+                $artist = $track->artists()->first();
+            }
+        } elseif ($type === 'album') {
+            $album = Album::find($id);
+            if ($album) {
+                $artist = $album->artists()->first();
+            }
+        }
+
+        $count = 0;
+        $artistName = null;
+        if ($artist) {
+            $count = $artist->forces_count;
+            $artistName = $artist->name;
+        }
+
+        return $this->success([
+            'forces_count' => $count,
+            'artist_name' => $artistName,
+        ]);
     }
 }

@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
+use Illuminate\Support\Facades\DB;
 
 class Artist extends Model
 {
@@ -120,6 +121,14 @@ class Artist extends Model
             'likeable',
             'likes',
         )->withTimestamps();
+    }
+
+    public function getForcesCountAttribute(): int
+    {
+        return Purchase::where('status', 'completed')
+            ->where('purchasable_type', Track::class)
+            ->whereIn('purchasable_id', $this->tracks()->pluck('tracks.id'))
+            ->count();
     }
 
     public function toNormalizedArray(): array

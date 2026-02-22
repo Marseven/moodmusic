@@ -36,6 +36,9 @@ class LoadArtist
 
         $artist->loadCount($loadCount);
 
+        // Always include forces count (completed purchases for this artist's tracks)
+        $artist->setAttribute('forces_count', $artist->forces_count);
+
         $response = ['artist' => $artist];
 
         foreach ($load as $relation) {

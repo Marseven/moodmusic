@@ -9,10 +9,11 @@ import {BuyButton} from '@app/web-player/purchases/buy-button';
 
 interface AlbumGridItemProps {
   album: Album;
+  hidePrice?: boolean;
 }
-export function AlbumGridItem({album}: AlbumGridItemProps) {
+export function AlbumGridItem({album, hidePrice}: AlbumGridItemProps) {
   const priceFooter =
-    album.price && album.price > 0 ? (
+    !hidePrice && album.price && album.price > 0 ? (
       <BuyButton item={album} size="2xs" />
     ) : null;
 

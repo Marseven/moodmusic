@@ -55,10 +55,10 @@ export function PurchaseEbillingDone() {
         <>
           <CircleCheckBig className="text-positive" size="xl" />
           <h2 className="text-2xl font-semibold mt-20">
-            <Trans message="Purchase successful!" />
+            <Trans message="Félicitation ! Tu viens de donner la force. Le 241 te remercie." />
           </h2>
           <p className="text-muted mt-8">
-            <Trans message="Your purchase has been confirmed." />
+            <Trans message="Ta force a bien été transmise." />
           </p>
           <Button
             variant="flat"

@@ -76,7 +76,7 @@ export function BuyButton({item, size = 'xs', radius = 'rounded', className}: Pr
         className={className}
       >
         <Trans
-          message="Buy - :price"
+          message="Donner la force - :price"
           values={{price: formatPrice(price, currency)}}
         />
       </Button>

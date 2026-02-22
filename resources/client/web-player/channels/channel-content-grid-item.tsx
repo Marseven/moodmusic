@@ -16,13 +16,14 @@ import {UserGridItem} from '@app/web-player/users/user-grid-item';
 interface Props {
   item: ChannelContentItem;
   items?: ChannelContentItem[];
+  isNested?: boolean;
 }
-export function ChannelContentGridItem({item, items}: Props) {
+export function ChannelContentGridItem({item, items, isNested}: Props) {
   switch (item.model_type) {
     case ARTIST_MODEL:
       return <ArtistGridItem artist={item} />;
     case ALBUM_MODEL:
-      return <AlbumGridItem album={item} />;
+      return <AlbumGridItem album={item} hidePrice={isNested} />;
     case GENRE_MODEL:
       return <GenreGridItem genre={item} />;
     case TRACK_MODEL:

@@ -58,6 +58,7 @@ use App\Http\Controllers\RadioStationController;
 use App\Http\Controllers\Admin\RadioStationController as AdminRadioStationController;
 use App\Http\Controllers\OriginalContentController;
 use App\Http\Controllers\Admin\OriginalContentCategoryController;
+use App\Http\Controllers\VibeController;
 
 Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verified']], function() {
     // SEARCH
@@ -184,6 +185,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     Route::post('purchases/initiate', [PurchaseController::class, 'initiate']);
     Route::get('purchases', [PurchaseController::class, 'index']);
     Route::get('purchased-items', [PurchaseController::class, 'purchasedItems']);
+    Route::get('purchases/forces-count', [PurchaseController::class, 'forcesCount']);
     Route::post('purchases/ebilling/create-order', [PurchaseEbillingController::class, 'createOrder']);
     Route::post('purchases/ebilling/ussd-push', [PurchaseEbillingController::class, 'sendUssdPush']);
     Route::get('purchases/ebilling/verify', [PurchaseEbillingController::class, 'verifyByReference']);
@@ -210,6 +212,9 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     Route::get('ads/next', [AdDeliveryController::class, 'next']);
     Route::get('ads/banners', [AdDeliveryController::class, 'banners']);
     Route::post('ads/{ad}/click', [AdDeliveryController::class, 'click']);
+
+    // VIBES
+    Route::get('vibes', [VibeController::class, 'index']);
 
     // ORIGINAL CONTENT
     Route::get('original-content/categories', [OriginalContentController::class, 'categories']);
