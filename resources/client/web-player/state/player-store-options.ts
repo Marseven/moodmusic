@@ -131,8 +131,8 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
         return;
       }
 
-      // log track play
-      if (cuedMedia && !trackPlays.has(cuedMedia.meta.id)) {
+      // log track play (skip for non-track media like radio stations)
+      if (cuedMedia && cuedMedia.meta?.model_type !== 'radioStation' && !trackPlays.has(cuedMedia.meta.id)) {
         trackPlays.add(cuedMedia.meta.id);
         apiClient.post(`tracks/plays/${cuedMedia.meta.id}/log`, {
           queueId: cuedMedia.groupId,
@@ -164,6 +164,7 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
     },
     progress: ({currentTime, state: {cuedMedia, pause, playNext}}) => {
       if (!cuedMedia) return;
+      if (cuedMedia.meta?.model_type === 'radioStation') return;
       const track = cuedMedia.meta as Track;
       const gatingStore = usePurchaseGatingStore.getState();
 
