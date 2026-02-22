@@ -8,7 +8,7 @@ import React from 'react';
 import {MessageDescriptor} from '@common/i18n/message-descriptor';
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {ArrowUpDown} from 'lucide-react';
+import {ModernArrowUpDownIcon} from '@app/web-player/icons/modern-icons';
 
 interface Props {
   items: Record<string, MessageDescriptor>;
@@ -36,7 +36,7 @@ export function LibraryPageSortDropdown({
     >
       {isMobile ? (
         <IconButton>
-          <ArrowUpDown />
+          <ModernArrowUpDownIcon />
         </IconButton>
       ) : (
         <Button

@@ -8,7 +8,8 @@ import {useUser} from '@common/auth/ui/use-user';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
 import {FacebookIcon} from '@common/icons/social/facebook';
-import {FileSearch, X} from 'lucide-react';
+import {FileSearch} from 'lucide-react';
+import {ModernXIcon} from '@app/web-player/icons/modern-icons';
 import {prettyBytes} from '@common/uploads/utils/pretty-bytes';
 import React, {cloneElement, ReactElement, ReactNode} from 'react';
 import {SvgIconProps} from '@common/icons/svg-icon';
@@ -154,7 +155,7 @@ function AttachmentLayout({
         onClick={() => onRemove()}
         disabled={isDisabled}
       >
-        <X />
+        <ModernXIcon />
       </IconButton>
     </div>
   );

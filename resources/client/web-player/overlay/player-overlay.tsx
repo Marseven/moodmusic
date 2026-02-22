@@ -13,7 +13,7 @@ import {
   usePlayerOverlayStore,
 } from '@app/web-player/state/player-overlay-store';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {ModernCollapseIcon} from '@app/web-player/icons/modern-icons';
+import {ModernCollapseIcon, ModernQueueListIcon, ModernMaximizeIcon} from '@app/web-player/icons/modern-icons';
 import {PlaybackControls} from '@app/web-player/player-controls/playback-controls';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
@@ -32,7 +32,6 @@ import {useLocation} from 'react-router-dom';
 import {usePrevious} from '@common/utils/hooks/use-previous';
 import {PlayerOutlet} from '@common/player/ui/player-outlet';
 import {PlayerPoster} from '@common/player/ui/controls/player-poster';
-import {Maximize, ListMusic} from 'lucide-react';
 import {useMiniPlayerIsHidden} from '@app/web-player/overlay/use-mini-player-is-hidden';
 import {usePlayerClickHandler} from '@common/player/hooks/use-player-click-handler';
 import {QueueTrackContextDialog} from '@app/web-player/layout/queue/queue-track-context-dialog';
@@ -99,7 +98,7 @@ export function PlayerOverlay() {
             onClick={() => playerOverlayState.toggleQueue()}
             color={isQueueOpen ? 'primary' : undefined}
           >
-            <ListMusic />
+            <ModernQueueListIcon />
           </IconButton>
           <FullscreenButton overlayRef={overlayRef} />
         </div>
@@ -158,7 +157,7 @@ function FullscreenButton({overlayRef}: FullscreenButtonProps) {
         }
       }}
     >
-      <Maximize />
+      <ModernMaximizeIcon />
     </IconButton>
   );
 }

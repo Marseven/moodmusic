@@ -7,7 +7,7 @@ export function NoDiscographyMessage() {
     <IllustratedMessage
       className="my-80"
       imageHeight="h-auto"
-      image={<Disc3 size="xl" className="text-muted" />}
+      image={<Disc3 size={64} className="text-muted" />}
       title={<Trans message="We do not have discography for this artist yet" />}
     />
   );

@@ -34,6 +34,13 @@ import {
   Check,
   AudioLines,
   Smartphone,
+  Maximize,
+  Pause,
+  ArrowUpDown,
+  ListPlus,
+  List,
+  LayoutGrid,
+  X,
 } from 'lucide-react';
 
 // ── Music / Audio ──
@@ -97,3 +104,10 @@ export const ModernCheckIcon = createLucideIcon(Check, 'ModernCheckIcon');
 
 export const ModernAudioLinesIcon = createLucideIcon(AudioLines, 'ModernAudioLinesIcon');
 export const ModernSmartphoneIcon = createLucideIcon(Smartphone, 'ModernSmartphoneIcon');
+export const ModernMaximizeIcon = createLucideIcon(Maximize, 'ModernMaximizeIcon');
+export const ModernPauseIcon = createLucideIcon(Pause, 'ModernPauseIcon');
+export const ModernArrowUpDownIcon = createLucideIcon(ArrowUpDown, 'ModernArrowUpDownIcon');
+export const ModernListPlusIcon = createLucideIcon(ListPlus, 'ModernListPlusIcon');
+export const ModernListIcon = createLucideIcon(List, 'ModernListIcon');
+export const ModernLayoutGridIcon = createLucideIcon(LayoutGrid, 'ModernLayoutGridIcon');
+export const ModernXIcon = createLucideIcon(X, 'ModernXIcon');

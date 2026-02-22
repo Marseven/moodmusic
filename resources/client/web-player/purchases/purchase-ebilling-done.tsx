@@ -53,7 +53,7 @@ export function PurchaseEbillingDone() {
     <div className="flex flex-col items-center justify-center min-h-320 p-24 text-center">
       {status === 'completed' && (
         <>
-          <CircleCheckBig className="text-positive" size="xl" />
+          <CircleCheckBig className="text-positive" size={48} />
           <h2 className="text-2xl font-semibold mt-20">
             <Trans message="Félicitation ! Tu viens de donner la force. Le 241 te remercie." />
           </h2>
@@ -93,7 +93,7 @@ export function PurchaseEbillingDone() {
       )}
       {status === 'failed' && (
         <>
-          <AlertCircle className="text-danger" size="xl" />
+          <AlertCircle className="text-danger" size={48} />
           <h2 className="text-2xl font-semibold mt-20">
             <Trans message="Payment failed" />
           </h2>

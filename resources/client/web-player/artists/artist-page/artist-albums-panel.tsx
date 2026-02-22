@@ -26,7 +26,7 @@ export function ArtistAlbumsPanel({artist}: Props) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<Disc3 size="lg" className="text-muted" />}
+        image={<Disc3 size={48} className="text-muted" />}
         title={<Trans message="No albums yet" />}
         description={
           <Trans

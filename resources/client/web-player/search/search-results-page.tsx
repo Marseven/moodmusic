@@ -35,6 +35,7 @@ import {useNavigate} from '@common/utils/hooks/use-navigate';
 import {apiClient} from '@common/http/query-client';
 import {GenreGridItem} from '@app/web-player/genres/genre-grid-item';
 import {Genre} from '@app/web-player/genres/genre';
+import {icons, type LucideIcon} from 'lucide-react';
 
 export function SearchResultsPage() {
   const {searchQuery} = useParams();
@@ -351,11 +352,20 @@ interface Vibe {
   id: number;
   name: string;
   display_name: string;
-  emoji?: string;
+  icon?: string;
   color: string;
   genre_id?: number;
   channel_id?: number;
   genre?: {id: number; name: string; display_name: string};
+}
+
+function getVibeIcon(iconName?: string): LucideIcon | null {
+  if (!iconName) return null;
+  const pascalCase = iconName
+    .split('-')
+    .map(s => s.charAt(0).toUpperCase() + s.slice(1))
+    .join('');
+  return (icons as Record<string, LucideIcon>)[pascalCase] ?? null;
 }
 
 function useVibes() {
@@ -406,7 +416,14 @@ function BrowseView() {
                   background: `linear-gradient(135deg, ${vibe.color}, ${vibe.color}99)`,
                 }}
               >
-                <span className="text-3xl block mb-8">{vibe.emoji}</span>
+                {(() => {
+                  const Icon = getVibeIcon(vibe.icon);
+                  return Icon ? (
+                    <Icon size={28} className="text-white/90 block mb-8" />
+                  ) : (
+                    <span className="text-3xl block mb-8" />
+                  );
+                })()}
                 <span className="text-white font-bold text-sm">{vibe.display_name}</span>
               </button>
             ))}

@@ -29,7 +29,7 @@ export function ArtistTracksPanel({artist, initialTracks}: Props) {
       <IllustratedMessage
         imageHeight="h-auto"
         imageMargin="mb-14"
-        image={<Music size="lg" className="text-muted" />}
+        image={<Music size={48} className="text-muted" />}
         title={<Trans message="No tracks yet" />}
         description={
           <Trans

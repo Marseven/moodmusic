@@ -11,7 +11,7 @@ import {
   playerOverlayState,
   usePlayerOverlayStore,
 } from '@app/web-player/state/player-overlay-store';
-import {ModernCollapseIcon, ModernExpandIcon} from '@app/web-player/icons/modern-icons';
+import {ModernCollapseIcon, ModernExpandIcon, ModernQueueListIcon} from '@app/web-player/icons/modern-icons';
 import {LyricsButton} from '@app/web-player/player-controls/lyrics-button';
 import {DownloadTrackButton} from '@app/web-player/player-controls/download-track-button';
 import {useSettings} from '@common/core/settings/use-settings';
@@ -20,7 +20,6 @@ import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {TrackContextDialog} from '@app/web-player/tracks/context-dialog/track-context-dialog';
 import {Link} from 'react-router-dom';
 import {ArtistContextDialog} from '@app/web-player/artists/artist-context-dialog';
-import {ListMusic} from 'lucide-react';
 import {VolumeControls} from '@common/player/ui/controls/volume-controls';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
@@ -151,6 +150,7 @@ function SecondaryControls() {
       <DownloadTrackButton className="player-button-glass mood-transition-smooth" />
       <Tooltip label={<Trans message="Queue" />}>
         <IconButton
+          size="xs"
           className="flex-shrink-0 queue-button-glass mood-transition-smooth"
           onClick={() => {
             setRightSidenavStatus(
@@ -158,7 +158,7 @@ function SecondaryControls() {
             );
           }}
         >
-          <ListMusic />
+          <ModernQueueListIcon />
         </IconButton>
       </Tooltip>
       <div className="volume-controls-glass">

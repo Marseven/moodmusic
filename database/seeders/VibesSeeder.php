@@ -14,7 +14,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'ambiance-snack',
                 'display_name' => 'Ambiance au Snack',
-                'emoji' => "\u{1F389}",
+                'icon' => 'party-popper',
                 'color' => '#E13300',
                 'genre_slug' => 'afro-beat',
                 'position' => 1,
@@ -22,7 +22,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'embouteillage',
                 'display_name' => 'Akanda / Owendo',
-                'emoji' => "\u{1F697}",
+                'icon' => 'car',
                 'color' => '#1E3264',
                 'genre_slug' => 'hip-hop',
                 'position' => 2,
@@ -30,7 +30,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'douceur-bae',
                 'display_name' => 'Douceur pour Bae',
-                'emoji' => "\u{2764}\u{FE0F}",
+                'icon' => 'heart',
                 'color' => '#E8115B',
                 'genre_slug' => 'r-b',
                 'position' => 3,
@@ -38,7 +38,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'sport',
                 'display_name' => 'Force pour le Sport',
-                'emoji' => "\u{1F3C3}",
+                'icon' => 'dumbbell',
                 'color' => '#1DB954',
                 'genre_slug' => 'hip-hop',
                 'position' => 4,
@@ -46,7 +46,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'eglise',
                 'display_name' => "Direction l'Église",
-                'emoji' => "\u{271D}\u{FE0F}",
+                'icon' => 'church',
                 'color' => '#477D95',
                 'genre_slug' => 'gospel',
                 'position' => 5,
@@ -54,7 +54,7 @@ class VibesSeeder extends Seeder
             [
                 'name' => 'clashs',
                 'display_name' => 'Le Coin des Clashs',
-                'emoji' => "\u{1F525}",
+                'icon' => 'flame',
                 'color' => '#AF2896',
                 'genre_slug' => 'rap',
                 'position' => 6,

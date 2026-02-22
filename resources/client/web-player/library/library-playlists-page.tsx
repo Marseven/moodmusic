@@ -2,7 +2,8 @@ import {StaticPageTitle} from '@common/seo/static-page-title';
 import {Trans} from '@common/i18n/trans';
 import React from 'react';
 import {TextField} from '@common/ui/forms/input-field/text-field/text-field';
-import {Search, ListPlus} from 'lucide-react';
+import {Search} from 'lucide-react';
+import {ModernListPlusIcon} from '@app/web-player/icons/modern-icons';
 import {message} from '@common/i18n/message';
 import {useTrans} from '@common/i18n/use-trans';
 import {PageErrorMessage} from '@common/errors/page-error-message';
@@ -78,7 +79,7 @@ export function LibraryPlaylistsPage() {
           }}
         >
           <IconButton className="flex-shrink-0" onClickCapture={authHandler}>
-            <ListPlus />
+            <ModernListPlusIcon />
           </IconButton>
           <CreatePlaylistDialog />
         </DialogTrigger>
