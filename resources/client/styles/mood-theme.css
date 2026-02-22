@@ -9,36 +9,35 @@ body, html {
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
-/* ===== Mood Color Variables ===== */
+/* ===== Mood Color Variables (25 moods) ===== */
 :root {
-  /* Emotional Color Palette */
-  --mood-energetic: #FF6B6B;
-  --mood-energetic-light: #FF8E8E;
-  --mood-energetic-dark: #E85D5D;
-  
-  --mood-chill: #6C5CE7;
-  --mood-chill-light: #8B7EED;
-  --mood-chill-dark: #5649C9;
-  
-  --mood-melancholic: #95A3B3;
-  --mood-melancholic-light: #A8B5C5;
-  --mood-melancholic-dark: #7D8B9C;
-  
-  --mood-happy: #FFE66D;
-  --mood-happy-light: #FFEC8B;
-  --mood-happy-dark: #FFD93D;
-  
-  --mood-romantic: #FF6B9D;
-  --mood-romantic-light: #FF8BB3;
-  --mood-romantic-dark: #E85D8A;
-  
-  --mood-focused: #6C5CE7;
-  --mood-focused-light: #8B7EED;
-  --mood-focused-dark: #5649C9;
-
-  --mood-spiritual: #779ECB;
-  --mood-spiritual-light: #92B3D7;
-  --mood-spiritual-dark: #6088B5;
+  /* Gabonese Cultural Moods */
+  --mood-boma: #FF4500;
+  --mood-bangando: #FF6B35;
+  --mood-niamatos: #FFD93D;
+  --mood-reglage: #E040FB;
+  --mood-bwiti: #9C27B0;
+  --mood-baka: #4CAF50;
+  --mood-mvett: #C9A84C;
+  --mood-nia-ku-rondi: #FF6B9D;
+  --mood-fatigue: #78909C;
+  --mood-mbolo: #FF8A65;
+  --mood-coupe-coupe: #D4A373;
+  --mood-olo: #8D6E63;
+  /* Universal Moods */
+  --mood-amusement: #FFB300;
+  --mood-joy: #FFC107;
+  --mood-eroticism: #E91E63;
+  --mood-beauty: #AB47BC;
+  --mood-relaxation: #4ECDC4;
+  --mood-sadness: #95A3B3;
+  --mood-dreaminess: #7C8CF8;
+  --mood-triumph: #FFD700;
+  --mood-anxiety: #FF9800;
+  --mood-scariness: #5D4037;
+  --mood-annoyance: #EF5350;
+  --mood-defiance: #B71C1C;
+  --mood-pumped-up: #00E676;
 
   /* Glassmorphism Effects */
   --glass-bg: rgba(255, 255, 255, 0.1);
@@ -48,38 +47,34 @@ body, html {
 }
 
 /* ===== Mood Gradients ===== */
-.mood-gradient-energetic {
-  background: linear-gradient(135deg, #FF6B6B 0%, #FF8E53 100%);
+.mood-gradient-boma {
+  background: linear-gradient(135deg, #FF4500 0%, #FF6B35 100%);
 }
 
-.mood-gradient-chill {
-  background: linear-gradient(135deg, #6C5CE7 0%, #A55EEA 100%);
+.mood-gradient-bwiti {
+  background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%);
 }
 
-.mood-gradient-melancholic {
-  background: linear-gradient(135deg, #868F96 0%, #596164 100%);
+.mood-gradient-nia-ku-rondi {
+  background: linear-gradient(135deg, #FF6B9D 0%, #f093fb 100%);
 }
 
-.mood-gradient-happy {
-  background: linear-gradient(135deg, #FFE66D 0%, #FFA751 100%);
+.mood-gradient-triumph {
+  background: linear-gradient(135deg, #FFD700 0%, #FFA000 100%);
 }
 
-.mood-gradient-romantic {
-  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-}
-
-.mood-gradient-focused {
-  background: linear-gradient(135deg, #6C5CE7 0%, #A55EEA 100%);
+.mood-gradient-pumped-up {
+  background: linear-gradient(135deg, #00E676 0%, #00C853 100%);
 }
 
 /* Dynamic Background Gradient */
 .mood-gradient-dynamic {
-  background: linear-gradient(45deg, 
-    var(--mood-chill) 0%, 
-    var(--mood-focused) 25%, 
-    var(--mood-romantic) 50%, 
-    var(--mood-happy) 75%, 
-    var(--mood-energetic) 100%);
+  background: linear-gradient(45deg,
+    var(--mood-boma) 0%,
+    var(--mood-bwiti) 25%,
+    var(--mood-nia-ku-rondi) 50%,
+    var(--mood-joy) 75%,
+    var(--mood-pumped-up) 100%);
   background-size: 400% 400%;
   animation: gradientShift 20s ease infinite;
 }
@@ -205,29 +200,29 @@ body, html {
 
 .mood-glass-input:focus {
   background: rgba(255, 255, 255, 0.1);
-  border-color: var(--mood-chill);
+  border-color: var(--mood-relaxation);
   box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.2);
 }
 
 /* Glass Card Variants by Mood */
-.mood-glass-energetic {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.15) 0%, rgba(255, 142, 83, 0.15) 100%);
-  border-color: rgba(255, 107, 107, 0.3);
+.mood-glass-boma {
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.15) 0%, rgba(255, 107, 53, 0.15) 100%);
+  border-color: rgba(255, 69, 0, 0.3);
 }
 
-.mood-glass-chill {
-  background: linear-gradient(135deg, rgba(108, 92, 231, 0.15) 0%, rgba(165, 94, 234, 0.15) 100%);
-  border-color: rgba(108, 92, 231, 0.3);
+.mood-glass-bwiti {
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.15) 0%, rgba(123, 31, 162, 0.15) 100%);
+  border-color: rgba(156, 39, 176, 0.3);
 }
 
-.mood-glass-romantic {
-  background: linear-gradient(135deg, rgba(240, 147, 251, 0.15) 0%, rgba(245, 87, 108, 0.15) 100%);
-  border-color: rgba(240, 147, 251, 0.3);
+.mood-glass-nia-ku-rondi {
+  background: linear-gradient(135deg, rgba(255, 107, 157, 0.15) 0%, rgba(240, 147, 251, 0.15) 100%);
+  border-color: rgba(255, 107, 157, 0.3);
 }
 
-.mood-glass-happy {
-  background: linear-gradient(135deg, rgba(255, 230, 109, 0.15) 0%, rgba(255, 167, 81, 0.15) 100%);
-  border-color: rgba(255, 230, 109, 0.3);
+.mood-glass-joy {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 160, 0, 0.15) 100%);
+  border-color: rgba(255, 193, 7, 0.3);
 }
 
 /* Glass Floating Elements */
@@ -286,7 +281,7 @@ body, html {
 
 .mood-glass-search:focus {
   background: rgba(255, 255, 255, 0.12);
-  border-color: var(--mood-chill);
+  border-color: var(--mood-relaxation);
   box-shadow: 0 0 0 3px rgba(78, 205, 196, 0.15);
 }
 
@@ -331,7 +326,7 @@ body, html {
 }
 
 .mood-glass-progress-fill {
-  background: linear-gradient(90deg, var(--mood-chill) 0%, var(--mood-focused) 100%);
+  background: linear-gradient(90deg, var(--mood-bwiti) 0%, var(--mood-reglage) 100%);
   border-radius: inherit;
   transition: width 0.3s ease;
 }
@@ -416,46 +411,156 @@ body, html {
   box-shadow: 0 12px 35px 0 rgba(31, 38, 135, 0.3);
 }
 
-.player-mood-energetic {
-  background: rgba(255, 107, 107, 0.15);
-  color: var(--mood-energetic);
-  border-color: rgba(255, 107, 107, 0.3);
+/* Gabonese cultural moods */
+.player-mood-boma {
+  background: rgba(255, 69, 0, 0.15);
+  color: var(--mood-boma);
+  border-color: rgba(255, 69, 0, 0.3);
 }
 
-.player-mood-chill {
-  background: rgba(78, 205, 196, 0.15);
-  color: var(--mood-chill);
-  border-color: rgba(78, 205, 196, 0.3);
+.player-mood-bangando {
+  background: rgba(255, 107, 53, 0.15);
+  color: var(--mood-bangando);
+  border-color: rgba(255, 107, 53, 0.3);
 }
 
-.player-mood-melancholic {
-  background: rgba(149, 163, 179, 0.15);
-  color: var(--mood-melancholic);
-  border-color: rgba(149, 163, 179, 0.3);
+.player-mood-niamatos {
+  background: rgba(255, 217, 61, 0.15);
+  color: #B8960C;
+  border-color: rgba(255, 217, 61, 0.3);
 }
 
-.player-mood-happy {
-  background: rgba(255, 230, 109, 0.15);
-  color: var(--mood-happy-dark);
-  border-color: rgba(255, 230, 109, 0.3);
+.player-mood-reglage {
+  background: rgba(224, 64, 251, 0.15);
+  color: var(--mood-reglage);
+  border-color: rgba(224, 64, 251, 0.3);
 }
 
-.player-mood-romantic {
+.player-mood-bwiti {
+  background: rgba(156, 39, 176, 0.15);
+  color: var(--mood-bwiti);
+  border-color: rgba(156, 39, 176, 0.3);
+}
+
+.player-mood-baka {
+  background: rgba(76, 175, 80, 0.15);
+  color: var(--mood-baka);
+  border-color: rgba(76, 175, 80, 0.3);
+}
+
+.player-mood-mvett {
+  background: rgba(201, 168, 76, 0.15);
+  color: var(--mood-mvett);
+  border-color: rgba(201, 168, 76, 0.3);
+}
+
+.player-mood-nia-ku-rondi {
   background: rgba(255, 107, 157, 0.15);
-  color: var(--mood-romantic);
+  color: var(--mood-nia-ku-rondi);
   border-color: rgba(255, 107, 157, 0.3);
 }
 
-.player-mood-focused {
-  background: rgba(108, 92, 231, 0.15);
-  color: var(--mood-focused);
-  border-color: rgba(108, 92, 231, 0.3);
+.player-mood-fatigue {
+  background: rgba(120, 144, 156, 0.15);
+  color: var(--mood-fatigue);
+  border-color: rgba(120, 144, 156, 0.3);
 }
 
-.player-mood-spiritual {
-  background: rgba(119, 158, 203, 0.15);
-  color: var(--mood-spiritual);
-  border-color: rgba(119, 158, 203, 0.3);
+.player-mood-mbolo {
+  background: rgba(255, 138, 101, 0.15);
+  color: var(--mood-mbolo);
+  border-color: rgba(255, 138, 101, 0.3);
+}
+
+.player-mood-coupe-coupe {
+  background: rgba(212, 163, 115, 0.15);
+  color: var(--mood-coupe-coupe);
+  border-color: rgba(212, 163, 115, 0.3);
+}
+
+.player-mood-olo {
+  background: rgba(141, 110, 99, 0.15);
+  color: var(--mood-olo);
+  border-color: rgba(141, 110, 99, 0.3);
+}
+
+/* Universal moods */
+.player-mood-amusement {
+  background: rgba(255, 179, 0, 0.15);
+  color: var(--mood-amusement);
+  border-color: rgba(255, 179, 0, 0.3);
+}
+
+.player-mood-joy {
+  background: rgba(255, 193, 7, 0.15);
+  color: #B8960C;
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.player-mood-eroticism {
+  background: rgba(233, 30, 99, 0.15);
+  color: var(--mood-eroticism);
+  border-color: rgba(233, 30, 99, 0.3);
+}
+
+.player-mood-beauty {
+  background: rgba(171, 71, 188, 0.15);
+  color: var(--mood-beauty);
+  border-color: rgba(171, 71, 188, 0.3);
+}
+
+.player-mood-relaxation {
+  background: rgba(78, 205, 196, 0.15);
+  color: var(--mood-relaxation);
+  border-color: rgba(78, 205, 196, 0.3);
+}
+
+.player-mood-sadness {
+  background: rgba(149, 163, 179, 0.15);
+  color: var(--mood-sadness);
+  border-color: rgba(149, 163, 179, 0.3);
+}
+
+.player-mood-dreaminess {
+  background: rgba(124, 140, 248, 0.15);
+  color: var(--mood-dreaminess);
+  border-color: rgba(124, 140, 248, 0.3);
+}
+
+.player-mood-triumph {
+  background: rgba(255, 215, 0, 0.15);
+  color: #B8960C;
+  border-color: rgba(255, 215, 0, 0.3);
+}
+
+.player-mood-anxiety {
+  background: rgba(255, 152, 0, 0.15);
+  color: var(--mood-anxiety);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
+.player-mood-scariness {
+  background: rgba(93, 64, 55, 0.15);
+  color: var(--mood-scariness);
+  border-color: rgba(93, 64, 55, 0.3);
+}
+
+.player-mood-annoyance {
+  background: rgba(239, 83, 80, 0.15);
+  color: var(--mood-annoyance);
+  border-color: rgba(239, 83, 80, 0.3);
+}
+
+.player-mood-defiance {
+  background: rgba(183, 28, 28, 0.15);
+  color: var(--mood-defiance);
+  border-color: rgba(183, 28, 28, 0.3);
+}
+
+.player-mood-pumped-up {
+  background: rgba(0, 230, 118, 0.15);
+  color: var(--mood-pumped-up);
+  border-color: rgba(0, 230, 118, 0.3);
 }
 
 /* ===== Smooth Animations ===== */
@@ -582,12 +687,12 @@ body, html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, var(--mood-chill) 0%, var(--mood-focused) 100%);
+  background: linear-gradient(135deg, var(--mood-bwiti) 0%, var(--mood-reglage) 100%);
   border-radius: 10px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, var(--mood-focused) 0%, var(--mood-chill) 100%);
+  background: linear-gradient(135deg, var(--mood-reglage) 0%, var(--mood-bwiti) 100%);
 }
 
 /* ===== Mood-Based Loading Animation ===== */
@@ -606,22 +711,22 @@ body, html {
 }
 
 .mood-loader-dot:nth-child(1) {
-  background: var(--mood-energetic);
+  background: var(--mood-boma);
   animation-delay: 0s;
 }
 
 .mood-loader-dot:nth-child(2) {
-  background: var(--mood-chill);
+  background: var(--mood-bwiti);
   animation-delay: 0.2s;
 }
 
 .mood-loader-dot:nth-child(3) {
-  background: var(--mood-happy);
+  background: var(--mood-joy);
   animation-delay: 0.4s;
 }
 
 .mood-loader-dot:nth-child(4) {
-  background: var(--mood-focused);
+  background: var(--mood-pumped-up);
   animation-delay: 0.6s;
 }
 
@@ -844,7 +949,7 @@ body, html {
 
 .audio-wave-bar {
   width: 2px;
-  background: linear-gradient(to top, var(--mood-chill), var(--mood-focused));
+  background: linear-gradient(to top, var(--mood-bwiti), var(--mood-reglage));
   border-radius: 1px;
   animation: audioWave 1.5s ease-in-out infinite;
 }
@@ -884,149 +989,122 @@ body, html {
 }
 
 /* Dynamic Mood System with Audio Responsiveness */
-.mood-system-enhanced .player-mood-energetic {
-  background: linear-gradient(135deg, rgba(255, 107, 107, 0.2) 0%, rgba(255, 142, 83, 0.2) 100%);
-  border-color: rgba(255, 107, 107, 0.4);
-  color: #FF6B6B;
-  text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
-  animation: moodEnergetic 2s ease-in-out infinite;
+.mood-system-enhanced .player-mood-boma {
+  background: linear-gradient(135deg, rgba(255, 69, 0, 0.2) 0%, rgba(255, 107, 53, 0.2) 100%);
+  border-color: rgba(255, 69, 0, 0.4);
+  color: #FF4500;
+  text-shadow: 0 0 10px rgba(255, 69, 0, 0.3);
+  animation: moodBoma 2s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-chill {
-  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(165, 94, 234, 0.2) 100%);
-  border-color: rgba(108, 92, 231, 0.4);
-  color: #6C5CE7;
-  text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
-  animation: moodChill 3s ease-in-out infinite;
+.mood-system-enhanced .player-mood-bwiti {
+  background: linear-gradient(135deg, rgba(156, 39, 176, 0.2) 0%, rgba(123, 31, 162, 0.2) 100%);
+  border-color: rgba(156, 39, 176, 0.4);
+  color: #9C27B0;
+  text-shadow: 0 0 10px rgba(156, 39, 176, 0.3);
+  animation: moodBwiti 4s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-romantic {
+.mood-system-enhanced .player-mood-nia-ku-rondi {
   background: linear-gradient(135deg, rgba(255, 107, 157, 0.2) 0%, rgba(240, 147, 251, 0.2) 100%);
   border-color: rgba(255, 107, 157, 0.4);
   color: #FF6B9D;
   text-shadow: 0 0 10px rgba(255, 107, 157, 0.3);
-  animation: moodRomantic 2.5s ease-in-out infinite;
+  animation: moodNiaKuRondi 2.5s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-happy {
-  background: linear-gradient(135deg, rgba(255, 230, 109, 0.2) 0%, rgba(255, 167, 81, 0.2) 100%);
-  border-color: rgba(255, 230, 109, 0.4);
-  color: #FFD93D;
-  text-shadow: 0 0 10px rgba(255, 230, 109, 0.3);
-  animation: moodHappy 1.8s ease-in-out infinite;
+.mood-system-enhanced .player-mood-joy {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.2) 0%, rgba(255, 160, 0, 0.2) 100%);
+  border-color: rgba(255, 193, 7, 0.4);
+  color: #FFC107;
+  text-shadow: 0 0 10px rgba(255, 193, 7, 0.3);
+  animation: moodJoy 1.8s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-focused {
-  background: linear-gradient(135deg, rgba(108, 92, 231, 0.2) 0%, rgba(165, 94, 234, 0.2) 100%);
-  border-color: rgba(108, 92, 231, 0.4);
-  color: #6C5CE7;
-  text-shadow: 0 0 10px rgba(108, 92, 231, 0.3);
-  animation: moodFocused 4s ease-in-out infinite;
+.mood-system-enhanced .player-mood-fatigue {
+  background: linear-gradient(135deg, rgba(120, 144, 156, 0.2) 0%, rgba(96, 125, 139, 0.2) 100%);
+  border-color: rgba(120, 144, 156, 0.4);
+  color: #78909C;
+  text-shadow: 0 0 10px rgba(120, 144, 156, 0.3);
+  animation: moodFatigue 5s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-melancholic {
-  background: linear-gradient(135deg, rgba(149, 163, 179, 0.2) 0%, rgba(125, 139, 156, 0.2) 100%);
-  border-color: rgba(149, 163, 179, 0.4);
-  color: #95A3B3;
-  text-shadow: 0 0 10px rgba(149, 163, 179, 0.3);
-  animation: moodMelancholic 5s ease-in-out infinite;
+.mood-system-enhanced .player-mood-pumped-up {
+  background: linear-gradient(135deg, rgba(0, 230, 118, 0.2) 0%, rgba(0, 200, 83, 0.2) 100%);
+  border-color: rgba(0, 230, 118, 0.4);
+  color: #00E676;
+  text-shadow: 0 0 10px rgba(0, 230, 118, 0.3);
+  animation: moodPumpedUp 1.5s ease-in-out infinite;
 }
 
-.mood-system-enhanced .player-mood-spiritual {
-  background: linear-gradient(135deg, rgba(119, 158, 203, 0.2) 0%, rgba(146, 179, 215, 0.2) 100%);
-  border-color: rgba(119, 158, 203, 0.4);
-  color: #779ECB;
-  text-shadow: 0 0 10px rgba(119, 158, 203, 0.3);
-  animation: moodSpiritual 4s ease-in-out infinite;
-}
-
-/* Dynamic Mood Animations Based on Audio Characteristics */
-@keyframes moodEnergetic {
-  0%, 100% { 
-    border-color: rgba(255, 107, 107, 0.4);
-    box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+/* Dynamic Mood Animations */
+@keyframes moodBoma {
+  0%, 100% {
+    border-color: rgba(255, 69, 0, 0.4);
+    box-shadow: 0 0 15px rgba(255, 69, 0, 0.2);
   }
-  50% { 
-    border-color: rgba(255, 107, 107, 0.8);
-    box-shadow: 0 0 25px rgba(255, 107, 107, 0.4);
+  50% {
+    border-color: rgba(255, 69, 0, 0.8);
+    box-shadow: 0 0 25px rgba(255, 69, 0, 0.4);
     transform: scale(1.02);
   }
 }
 
-@keyframes moodChill {
-  0%, 100% { 
-    border-color: rgba(108, 92, 231, 0.4);
-    box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
+@keyframes moodBwiti {
+  0%, 100% {
+    border-color: rgba(156, 39, 176, 0.4);
+    box-shadow: 0 0 15px rgba(156, 39, 176, 0.2);
   }
-  33% { 
-    border-color: rgba(108, 92, 231, 0.6);
-    box-shadow: 0 0 20px rgba(108, 92, 231, 0.3);
-  }
-  66% { 
-    border-color: rgba(165, 94, 234, 0.6);
-    box-shadow: 0 0 20px rgba(165, 94, 234, 0.3);
+  50% {
+    border-color: rgba(156, 39, 176, 0.6);
+    box-shadow: 0 0 20px rgba(156, 39, 176, 0.3);
   }
 }
 
-@keyframes moodRomantic {
-  0%, 100% { 
+@keyframes moodNiaKuRondi {
+  0%, 100% {
     border-color: rgba(255, 107, 157, 0.4);
     box-shadow: 0 0 15px rgba(255, 107, 157, 0.2);
   }
-  50% { 
+  50% {
     border-color: rgba(240, 147, 251, 0.6);
     box-shadow: 0 0 20px rgba(240, 147, 251, 0.3);
     transform: scale(1.01);
   }
 }
 
-@keyframes moodHappy {
-  0%, 100% { 
-    border-color: rgba(255, 230, 109, 0.4);
-    box-shadow: 0 0 15px rgba(255, 230, 109, 0.2);
+@keyframes moodJoy {
+  0%, 100% {
+    border-color: rgba(255, 193, 7, 0.4);
+    box-shadow: 0 0 15px rgba(255, 193, 7, 0.2);
   }
-  25% { 
-    border-color: rgba(255, 167, 81, 0.6);
-    box-shadow: 0 0 20px rgba(255, 167, 81, 0.3);
+  25% {
+    border-color: rgba(255, 160, 0, 0.6);
+    box-shadow: 0 0 20px rgba(255, 160, 0, 0.3);
     transform: scale(1.03);
   }
-  75% { 
-    border-color: rgba(255, 230, 109, 0.7);
-    box-shadow: 0 0 25px rgba(255, 230, 109, 0.4);
-    transform: scale(1.01);
-  }
 }
 
-@keyframes moodFocused {
-  0%, 100% { 
-    border-color: rgba(108, 92, 231, 0.4);
-    box-shadow: 0 0 15px rgba(108, 92, 231, 0.2);
-  }
-  50% { 
-    border-color: rgba(165, 94, 234, 0.5);
-    box-shadow: 0 0 18px rgba(165, 94, 234, 0.25);
-  }
-}
-
-@keyframes moodMelancholic {
+@keyframes moodFatigue {
   0%, 100% {
-    border-color: rgba(149, 163, 179, 0.4);
-    box-shadow: 0 0 12px rgba(149, 163, 179, 0.2);
+    border-color: rgba(120, 144, 156, 0.4);
+    box-shadow: 0 0 12px rgba(120, 144, 156, 0.2);
   }
   50% {
-    border-color: rgba(125, 139, 156, 0.5);
-    box-shadow: 0 0 15px rgba(125, 139, 156, 0.25);
+    border-color: rgba(96, 125, 139, 0.5);
+    box-shadow: 0 0 15px rgba(96, 125, 139, 0.25);
   }
 }
 
-@keyframes moodSpiritual {
+@keyframes moodPumpedUp {
   0%, 100% {
-    border-color: rgba(119, 158, 203, 0.4);
-    box-shadow: 0 0 12px rgba(119, 158, 203, 0.2);
+    border-color: rgba(0, 230, 118, 0.4);
+    box-shadow: 0 0 15px rgba(0, 230, 118, 0.2);
   }
   50% {
-    border-color: rgba(146, 179, 215, 0.5);
-    box-shadow: 0 0 18px rgba(146, 179, 215, 0.3);
+    border-color: rgba(0, 230, 118, 0.8);
+    box-shadow: 0 0 25px rgba(0, 230, 118, 0.4);
+    transform: scale(1.02);
   }
 }
 
@@ -1526,10 +1604,10 @@ button[type="submit"][aria-label="Recherche"] {
   position: absolute;
   inset: -4px;
   border-radius: 12px;
-  background: linear-gradient(135deg, 
-    var(--mood-chill) 0%, 
-    var(--mood-romantic) 50%, 
-    var(--mood-energetic) 100%);
+  background: linear-gradient(135deg,
+    var(--mood-bwiti) 0%,
+    var(--mood-nia-ku-rondi) 50%,
+    var(--mood-boma) 100%);
   opacity: 0;
   filter: blur(8px);
   z-index: -1;
@@ -1633,7 +1711,7 @@ button[type="submit"][aria-label="Recherche"] {
   left: 0;
   height: 100%;
   width: var(--progress, 0%);
-  background: linear-gradient(90deg, var(--mood-chill), var(--mood-focused));
+  background: linear-gradient(90deg, var(--mood-bwiti), var(--mood-reglage));
   filter: blur(4px);
   opacity: 0.6;
   transform: translateY(-50%);
