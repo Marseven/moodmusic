@@ -29,6 +29,8 @@ import {PlayButton} from '@common/player/ui/controls/play-button';
 import {PreviousButton} from '@common/player/ui/controls/previous-button';
 import {NextButton} from '@common/player/ui/controls/next-button';
 import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indicator';
+import {MenuIcon} from '@common/icons/material/Menu';
+import {DashboardLayoutContext} from '@common/ui/layout/dashboard-layout-context';
 
 export function MobilePlayerControls() {
   return (
@@ -113,28 +115,27 @@ function PlayerProgressBar() {
 function MobileNavbar() {
   const menu = useCustomMenu('mobile-bottom');
   const navigate = useNavigate();
+  const {setLeftSidenavStatus} = React.useContext(DashboardLayoutContext);
   if (!menu) return null;
 
   return (
     <div className="flex items-center justify-around px-8 py-10">
       <button
-        className="flex flex-col items-center gap-2 min-w-0"
+        className="flex items-center justify-center"
         onClick={() => navigate('/')}
       >
-        <MediaHomeIcon size="sm" />
-        <span className="text-[10px] leading-tight truncate max-w-[56px]">
-          <Trans message="Accueil" />
-        </span>
+        <MediaHomeIcon size="md" />
       </button>
       {menu.items.map(item => (
         <CustomMenuItem
           unstyled
+          onlyShowIcon
           iconClassName="block mx-auto"
-          iconSize="sm"
+          iconSize="md"
           className={({isActive}) =>
             clsx(
-              'flex flex-col items-center gap-2 min-w-0 text-[10px] leading-tight',
-              isActive && 'font-bold text-primary'
+              'flex items-center justify-center',
+              isActive && 'text-primary'
             )
           }
           key={item.id}
@@ -142,6 +143,12 @@ function MobileNavbar() {
         />
       ))}
       <AccountButton />
+      <button
+        className="flex items-center justify-center"
+        onClick={() => setLeftSidenavStatus('open')}
+      >
+        <MenuIcon size="md" />
+      </button>
     </div>
   );
 }
@@ -188,16 +195,13 @@ function AccountButton() {
   }, [primaryArtist, navigate, player?.show_become_artist_btn]);
 
   const button = (
-    <button className="flex flex-col items-center gap-2 min-w-0">
+    <button className="flex items-center justify-center">
       <Badge
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <PersonIcon size="sm" />
+        <PersonIcon size="md" />
       </Badge>
-      <span className="text-[10px] leading-tight truncate max-w-[56px]">
-        <Trans message="Compte" />
-      </span>
     </button>
   );
 

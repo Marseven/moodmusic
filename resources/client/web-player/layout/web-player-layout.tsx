@@ -32,11 +32,9 @@ export function WebPlayerLayout() {
         initialRightSidenavStatus={player?.hide_queue ? 'closed' : 'open'}
       >
         {!isMobile && <PlayerNavbar />}
-        {!isMobile && (
-          <DashboardSidenav position="left" display="block">
-            <Sidenav />
-          </DashboardSidenav>
-        )}
+        <DashboardSidenav position="left" display="block">
+          <Sidenav />
+        </DashboardSidenav>
         <DashboardContent>
           <Main />
         </DashboardContent>
