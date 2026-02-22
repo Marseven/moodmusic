@@ -41,6 +41,7 @@ import {trackIsLocallyUploaded} from '@app/web-player/tracks/utils/track-is-loca
 import {useIsMobileMediaQuery} from '@common/utils/hooks/is-mobile-media-query';
 import {AdHost} from '@common/admin/ads/ad-host';
 import {useCommentPermissions} from '@app/web-player/tracks/hooks/use-comment-permissions';
+import {MOOD_CONFIG} from '@app/web-player/player-controls/mood-config';
 
 export function TrackPage() {
   const {canView: showComments, canCreate: allowCommenting} =
@@ -154,6 +155,8 @@ function TrackPageHeader({track}: TrackPageHeaderProps) {
     player?.seekbar_type === 'waveform' &&
     trackIsLocallyUploaded(track);
 
+  const moodConfig = track.mood ? MOOD_CONFIG[track.mood] : null;
+
   return (
     <Fragment>
       <MediaPageHeaderLayout
@@ -174,19 +177,24 @@ function TrackPageHeader({track}: TrackPageHeaderProps) {
           </AvatarGroup>
         }
         description={
-          <BulletSeparatedItems className="text-sm text-muted">
-            {track.duration ? (
-              <FormattedDuration ms={track.duration} verbose />
-            ) : null}
-            {releaseDate && <FormattedDate date={releaseDate} />}
-            {genre && <GenreLink genre={genre} />}
-            {track.plays && !player?.enable_repost ? (
-              <Trans
-                message=":count plays"
-                values={{count: <FormattedNumber value={track.plays} />}}
-              />
-            ) : null}
-          </BulletSeparatedItems>
+          <div className="flex flex-col gap-12">
+            <BulletSeparatedItems className="text-sm text-muted">
+              {track.duration ? (
+                <FormattedDuration ms={track.duration} verbose />
+              ) : null}
+              {releaseDate && <FormattedDate date={releaseDate} />}
+              {genre && <GenreLink genre={genre} />}
+              {track.plays && !player?.enable_repost ? (
+                <Trans
+                  message=":count plays"
+                  values={{count: <FormattedNumber value={track.plays} />}}
+                />
+              ) : null}
+            </BulletSeparatedItems>
+            {moodConfig && (
+              <TrackMoodBadge mood={track.mood!} config={moodConfig} />
+            )}
+          </div>
         }
         actionButtons={
           <TrackActionsBar
@@ -211,5 +219,21 @@ function TrackPageHeader({track}: TrackPageHeaderProps) {
         footer={showWave ? <Waveform track={track} /> : undefined}
       />
     </Fragment>
+  );
+}
+
+interface TrackMoodBadgeProps {
+  mood: string;
+  config: {icon: React.ComponentType<{className?: string}>; label: string; cls: string};
+}
+function TrackMoodBadge({mood, config}: TrackMoodBadgeProps) {
+  const MoodIcon = config.icon;
+  return (
+    <div className={`player-mood-indicator ${config.cls}`}>
+      <MoodIcon className="w-14 h-14 mr-6" />
+      <span className="text-xs font-medium whitespace-nowrap">
+        {config.label}
+      </span>
+    </div>
   );
 }
