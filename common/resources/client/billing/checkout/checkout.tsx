@@ -19,7 +19,7 @@ export function Checkout() {
   });
   const {
     base_url,
-    billing: {stripe, ebilling},
+    billing: {stripe, ebilling, paypal},
   } = useSettings();
 
   if (productQuery.isLoading) {
@@ -47,7 +47,7 @@ export function Checkout() {
         </div>
 
         <div className="mood-glass-panel p-24 mb-20">
-          {stripe.enable ? (
+          {stripe?.enable ? (
             <Fragment>
               <StripeElementsForm
                 productId={productId}
@@ -55,22 +55,22 @@ export function Checkout() {
                 type="subscription"
                 returnUrl={`${base_url}/checkout/${productId}/${priceId}/stripe/done`}
               />
-              <Separator />
+              {(ebilling?.enable || paypal?.enable) && <Separator />}
             </Fragment>
           ) : null}
 
-          {ebilling.enable && (
+          {ebilling?.enable && (
             <Fragment>
               <EbillingButton
                 productId={productId!}
                 priceId={priceId!}
                 className="w-full mood-cta-button"
               />
-              <Separator />
+              {paypal?.enable && <Separator />}
             </Fragment>
           )}
 
-          <div ref={paypalElementRef} />
+          {paypal?.enable && <div ref={paypalElementRef} />}
         </div>
 
         <div className="mood-glass-notification p-20 text-xs">
