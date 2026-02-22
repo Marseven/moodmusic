@@ -39,6 +39,7 @@ import {RowElementProps} from '@common/ui/tables/table-row';
 import {Track} from '@app/web-player/tracks/track';
 import {TableContext} from '@common/ui/tables/table-context';
 import {MediaItem} from '@common/player/media-item';
+import {MOOD_CONFIG} from '@app/web-player/player-controls/mood-config';
 
 export function PlayerOverlay() {
   const isMobile = useMediaQuery('(max-width: 1024px)');
@@ -195,6 +196,7 @@ function QueuedTrack() {
             <ArtistLinks artists={track.artists} />
           )}
         </div>
+        {!isRadio && <OverlayMoodBadge mood={track.mood} />}
       </div>
       {!isRadio && (
         <DialogTrigger type="popover">
@@ -241,5 +243,20 @@ function PlayerQueueRow({item, children, ...domProps}: RowElementProps<Track>) {
       {row}
       <QueueTrackContextDialog queueItems={queueItems} />
     </DialogTrigger>
+  );
+}
+
+function OverlayMoodBadge({mood}: {mood?: string}) {
+  if (!mood) return null;
+  const config = MOOD_CONFIG[mood];
+  if (!config) return null;
+  const MoodIcon = config.icon;
+  return (
+    <div className={`player-mood-indicator mt-8 mx-auto ${config.cls}`}>
+      <MoodIcon className="w-14 h-14 mr-6" />
+      <span className="text-xs font-medium whitespace-nowrap">
+        {config.label}
+      </span>
+    </div>
   );
 }

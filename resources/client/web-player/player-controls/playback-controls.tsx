@@ -7,19 +7,20 @@ import {PreviousButton} from '@common/player/ui/controls/previous-button';
 import {ShuffleButton} from '@common/player/ui/controls/shuffle-button';
 import {RepeatButton} from '@common/player/ui/controls/repeat-button';
 import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indicator';
-import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
+import {usePlayerStore} from '@common/player/hooks/use-player-store';
 import {Trans} from '@common/i18n/trans';
 
 interface Props {
   className?: string;
 }
 export function PlaybackControls({className}: Props) {
-  const track = useCuedTrack();
-  const isRadio = track && track.model_type === 'radioStation';
+  const isRadio = usePlayerStore(
+    s => s.cuedMedia?.meta?.model_type === 'radioStation'
+  );
 
   return (
     <div className={className}>
-      <PlaybackButtons isRadio={!!isRadio} />
+      <PlaybackButtons isRadio={isRadio} />
       {isRadio ? <LiveIndicator /> : <MainSeekbar />}
     </div>
   );

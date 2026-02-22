@@ -1,4 +1,4 @@
-import {Fragment, useCallback, useEffect, useMemo, useRef, useState} from 'react';
+import {useCallback, useMemo, useRef, useState} from 'react';
 import {FormattedCurrentTime} from '@common/player/ui/controls/formatted-current-time';
 import {FormattedPlayerDuration} from '@common/player/ui/controls/formatted-player-duration';
 import {useBaseSeekbar} from './use-base-seekbar';
@@ -93,73 +93,84 @@ export function MainSeekbar() {
   const totalWidth = BAR_COUNT * (BAR_WIDTH + BAR_GAP);
 
   return (
-    <Fragment>
-      <div className="flex items-center gap-12">
-        <div className="text-xs text-muted flex-shrink-0 min-w-40 text-right tabular-nums">
-          <FormattedCurrentTime />
-        </div>
-        <div
-          ref={trackRef}
-          className="wave-seekbar group relative flex-auto cursor-pointer"
-          style={{height: `${CANVAS_HEIGHT + 8}px`}}
-          role="presentation"
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerUp}
-          onMouseEnter={() => setIsHovering(true)}
-          onMouseLeave={() => setIsHovering(false)}
-        >
-          <svg
-            className="absolute inset-0 w-full"
-            viewBox={`0 0 ${totalWidth} ${CANVAS_HEIGHT}`}
-            preserveAspectRatio="none"
-            style={{height: `${CANVAS_HEIGHT + 8}px`}}
-          >
-            {waveform.map((val, i) => {
-              const barHeight =
-                BAR_HEIGHT_MIN + val * (BAR_HEIGHT_MAX - BAR_HEIGHT_MIN);
-              const x = i * (BAR_WIDTH + BAR_GAP);
-              const y = (CANVAS_HEIGHT - barHeight) / 2;
-              const barProgress =
-                (i / BAR_COUNT) * 100;
-              const isPlayed = barProgress < progressPercentage;
-              return (
-                <rect
-                  key={i}
-                  x={x}
-                  y={y}
-                  width={BAR_WIDTH}
-                  height={barHeight}
-                  rx={1.5}
-                  fill={isPlayed ? 'rgb(var(--be-primary))' : 'rgba(255,255,255,0.2)'}
-                  className="transition-colors duration-100"
-                />
-              );
-            })}
-          </svg>
-          {/* Thumb */}
-          <div
-            className={`wave-seekbar-thumb ${thumbActive ? 'active' : ''}`}
-            style={{left: `${progressPercentage}%`}}
-          />
-          <input
-            tabIndex={playerReady ? 0 : -1}
-            min={0}
-            max={duration || 0}
-            step={1}
-            aria-orientation="horizontal"
-            aria-valuetext={`${Math.floor(currentTime)}`}
-            type="range"
-            className="sr-only"
-            value={currentTime}
-            disabled={!playerReady}
-            onChange={e => handleChange(parseFloat(e.target.value))}
-          />
-        </div>
-        <div className="text-xs text-muted flex-shrink-0 min-w-40 tabular-nums">
-          <FormattedPlayerDuration />
-        </div>
+    <div className="flex items-center gap-12">
+      <div className="text-xs text-muted flex-shrink-0 min-w-40 text-right tabular-nums">
+        <FormattedCurrentTime />
       </div>
-    </Fragment>
+      <div
+        ref={trackRef}
+        className="wave-seekbar group relative flex-auto cursor-pointer"
+        style={{height: `${CANVAS_HEIGHT + 8}px`}}
+        role="presentation"
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onMouseEnter={() => setIsHovering(true)}
+        onMouseLeave={() => setIsHovering(false)}
+      >
+        {/* Fallback thin progress track */}
+        <div
+          className="absolute left-0 top-1/2 -translate-y-1/2 w-full h-2 rounded-full"
+          style={{background: 'rgba(255,255,255,0.1)'}}
+        >
+          <div
+            className="h-full rounded-full"
+            style={{
+              width: `${progressPercentage}%`,
+              background: 'rgb(var(--be-primary))',
+            }}
+          />
+        </div>
+        {/* SVG Waveform bars */}
+        <svg
+          className="absolute top-0 left-0 w-full"
+          viewBox={`0 0 ${totalWidth} ${CANVAS_HEIGHT}`}
+          preserveAspectRatio="none"
+          style={{height: `${CANVAS_HEIGHT + 8}px`}}
+        >
+          {waveform.map((val, i) => {
+            const barHeight =
+              BAR_HEIGHT_MIN + val * (BAR_HEIGHT_MAX - BAR_HEIGHT_MIN);
+            const x = i * (BAR_WIDTH + BAR_GAP);
+            const y = (CANVAS_HEIGHT - barHeight) / 2;
+            const barProgress =
+              (i / BAR_COUNT) * 100;
+            const isPlayed = barProgress < progressPercentage;
+            return (
+              <rect
+                key={i}
+                x={x}
+                y={y}
+                width={BAR_WIDTH}
+                height={barHeight}
+                rx={1.5}
+                style={{fill: isPlayed ? 'rgb(var(--be-primary))' : 'rgba(255,255,255,0.25)'}}
+              />
+            );
+          })}
+        </svg>
+        {/* Thumb */}
+        <div
+          className={`wave-seekbar-thumb ${thumbActive ? 'active' : ''}`}
+          style={{left: `${progressPercentage}%`}}
+        />
+        <input
+          tabIndex={playerReady ? 0 : -1}
+          min={0}
+          max={duration || 0}
+          step={1}
+          aria-orientation="horizontal"
+          aria-valuetext={`${Math.floor(currentTime)}`}
+          type="range"
+          className="sr-only"
+          value={currentTime}
+          disabled={!playerReady}
+          onChange={e => handleChange(parseFloat(e.target.value))}
+        />
+      </div>
+      <div className="text-xs text-muted flex-shrink-0 min-w-40 tabular-nums">
+        <FormattedPlayerDuration />
+      </div>
+    </div>
   );
 }
