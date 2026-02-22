@@ -25,7 +25,8 @@ export function createCountableStore(key: 'likes' | 'reposts') {
       has: item => {
         const items = Array.isArray(item) ? item : [item];
         return items.every(item => {
-          return get()[item.model_type][item.id];
+          const store = get()[item.model_type];
+          return store ? store[item.id] : false;
         });
       },
       add: items => {

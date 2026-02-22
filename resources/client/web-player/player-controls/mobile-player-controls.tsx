@@ -32,6 +32,7 @@ import {NextButton} from '@common/player/ui/controls/next-button';
 import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indicator';
 import {MenuIcon} from '@common/icons/material/Menu';
 import {DashboardLayoutContext} from '@common/ui/layout/dashboard-layout-context';
+import {ModernRadioIcon} from '@app/web-player/icons/modern-icons';
 
 export function MobilePlayerControls() {
   return (
@@ -44,6 +45,8 @@ export function MobilePlayerControls() {
 
 function PlayerControls() {
   const mediaIsCued = usePlayerStore(s => s.cuedMedia != null);
+  const track = useCuedTrack();
+  const isRadio = track && track.model_type === 'radioStation';
   if (!mediaIsCued) return null;
 
   return (
@@ -54,17 +57,46 @@ function PlayerControls() {
       }}
     >
       <QueuedTrack />
-      <PlaybackButtons />
-      <PlayerProgressBar />
+      <PlaybackButtons isRadio={!!isRadio} />
+      {!isRadio && <PlayerProgressBar />}
     </div>
   );
 }
 
 function QueuedTrack() {
   const track = useCuedTrack();
+  const cuedMedia = usePlayerStore(s => s.cuedMedia);
+  const isRadio = track && track.model_type === 'radioStation';
 
   if (!track) {
     return null;
+  }
+
+  if (isRadio) {
+    return (
+      <div className="flex items-center gap-10 min-w-0 flex-auto">
+        {cuedMedia?.poster ? (
+          <img src={cuedMedia.poster} className="rounded w-36 h-36 object-cover" alt={track.name} />
+        ) : (
+          <div className="rounded w-36 h-36 bg-fg-base/4 flex items-center justify-center text-muted">
+            <ModernRadioIcon size="xs" />
+          </div>
+        )}
+        <div className="flex-auto whitespace-nowrap overflow-hidden">
+          <div className="text-sm font-medium overflow-hidden overflow-ellipsis">
+            {track.name}
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="inline-flex items-center bg-primary text-white text-[9px] font-bold px-4 py-1 rounded-full animate-pulse">
+              LIVE
+            </span>
+            <span className="text-xs text-muted">
+              <Trans message="Radio en direct" />
+            </span>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -83,15 +115,15 @@ function QueuedTrack() {
   );
 }
 
-function PlaybackButtons() {
+function PlaybackButtons({isRadio}: {isRadio?: boolean}) {
   return (
     <div className="flex items-center justify-center gap-2">
-      <PreviousButton stopPropagation className="player-button-glass mood-transition-smooth" />
+      {!isRadio && <PreviousButton stopPropagation className="player-button-glass mood-transition-smooth" />}
       <div className="relative">
         <BufferingIndicator />
         <PlayButton size="md" iconSize="lg" stopPropagation className="player-play-button-glass mood-transition-smooth mood-pulse" />
       </div>
-      <NextButton stopPropagation className="player-button-glass mood-transition-smooth" />
+      {!isRadio && <NextButton stopPropagation className="player-button-glass mood-transition-smooth" />}
     </div>
   );
 }

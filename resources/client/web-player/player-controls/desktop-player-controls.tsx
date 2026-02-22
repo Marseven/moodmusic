@@ -11,7 +11,7 @@ import {
   playerOverlayState,
   usePlayerOverlayStore,
 } from '@app/web-player/state/player-overlay-store';
-import {ModernCollapseIcon, ModernExpandIcon, ModernQueueListIcon} from '@app/web-player/icons/modern-icons';
+import {ModernCollapseIcon, ModernExpandIcon, ModernQueueListIcon, ModernRadioIcon} from '@app/web-player/icons/modern-icons';
 import {LyricsButton} from '@app/web-player/player-controls/lyrics-button';
 import {DownloadTrackButton} from '@app/web-player/player-controls/download-track-button';
 import {useSettings} from '@common/core/settings/use-settings';
@@ -41,49 +41,77 @@ export function DesktopPlayerControls() {
 
 function QueuedTrack() {
   const track = useCuedTrack();
-  let content: ReactNode;
+  const cuedMedia = usePlayerStore(s => s.cuedMedia);
+  const isTrack = track && track.model_type !== 'radioStation';
 
-  if (track) {
-    content = (
+  if (!track) return null;
+
+  if (!isTrack) {
+    return (
       <div className="player-track-section">
-        <MoodIndicator track={track} />
-        <DialogTrigger type="popover" triggerOnContextMenu placement="top">
-          <Link to={getTrackLink(track)} className="flex-shrink-0">
-            <TrackImage
-              className="player-track-image w-56 h-56 object-cover"
-              track={track}
-            />
-          </Link>
-          <TrackContextDialog tracks={[track]} />
-        </DialogTrigger>
+        {cuedMedia?.poster ? (
+          <img
+            src={cuedMedia.poster}
+            className="player-track-image w-56 h-56 object-cover rounded-lg flex-shrink-0"
+            alt={track.name}
+          />
+        ) : (
+          <div className="player-track-image w-56 h-56 rounded-lg flex-shrink-0 bg-fg-base/4 flex items-center justify-center text-muted">
+            <ModernRadioIcon size="md" />
+          </div>
+        )}
         <div className="player-track-info">
-          <DialogTrigger type="popover" triggerOnContextMenu placement="top">
-            <TrackLink
-              track={track}
-              className="player-track-title whitespace-nowrap min-w-0 max-w-full"
-            />
-            <TrackContextDialog tracks={[track]} />
-          </DialogTrigger>
-          {track.artists?.length ? (
-            <DialogTrigger type="popover" triggerOnContextMenu placement="top">
-              <div className="player-track-artist">
-                <ArtistLinks
-                  artists={track.artists}
-                  className="whitespace-nowrap"
-                />
-              </div>
-              <ArtistContextDialog artist={track.artists[0]} />
-            </DialogTrigger>
-          ) : null}
+          <span className="player-track-title whitespace-nowrap min-w-0 max-w-full text-sm font-medium">
+            {track.name}
+          </span>
+          <div className="player-track-artist flex items-center gap-6">
+            <span className="inline-flex items-center bg-primary text-white text-[9px] font-bold px-6 py-1 rounded-full animate-pulse">
+              LIVE
+            </span>
+            <span className="text-xs text-muted">
+              <Trans message="Radio en direct" />
+            </span>
+          </div>
         </div>
-        <LikeIconButton likeable={track} />
       </div>
     );
-  } else {
-    content = null;
   }
 
-  return <>{content}</>;
+  return (
+    <div className="player-track-section">
+      <MoodIndicator track={track} />
+      <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+        <Link to={getTrackLink(track)} className="flex-shrink-0">
+          <TrackImage
+            className="player-track-image w-56 h-56 object-cover"
+            track={track}
+          />
+        </Link>
+        <TrackContextDialog tracks={[track]} />
+      </DialogTrigger>
+      <div className="player-track-info">
+        <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+          <TrackLink
+            track={track}
+            className="player-track-title whitespace-nowrap min-w-0 max-w-full"
+          />
+          <TrackContextDialog tracks={[track]} />
+        </DialogTrigger>
+        {track.artists?.length ? (
+          <DialogTrigger type="popover" triggerOnContextMenu placement="top">
+            <div className="player-track-artist">
+              <ArtistLinks
+                artists={track.artists}
+                className="whitespace-nowrap"
+              />
+            </div>
+            <ArtistContextDialog artist={track.artists[0]} />
+          </DialogTrigger>
+        ) : null}
+      </div>
+      <LikeIconButton likeable={track} />
+    </div>
+  );
 }
 
 // Mood Indicator - reads pre-computed mood from backend

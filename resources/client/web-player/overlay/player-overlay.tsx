@@ -165,6 +165,7 @@ function FullscreenButton({overlayRef}: FullscreenButtonProps) {
 function QueuedTrack() {
   const track = useCuedTrack();
   const isMobile = useIsMobileMediaQuery();
+  const isRadio = track && track.model_type === 'radioStation';
 
   if (!track) {
     return null;
@@ -177,21 +178,32 @@ function QueuedTrack() {
         isMobile ? 'my-40' : 'my-60'
       )}
     >
-      <LikeIconButton likeable={track} />
+      {!isRadio && <LikeIconButton likeable={track} />}
       <div className="text-center min-w-0">
         <div className="text-base whitespace-nowrap overflow-hidden overflow-ellipsis">
-          <TrackLink track={track} />
+          {isRadio ? track.name : <TrackLink track={track} />}
         </div>
         <div className="text-sm text-muted">
-          <ArtistLinks artists={track.artists} />
+          {isRadio ? (
+            <span className="inline-flex items-center gap-6">
+              <span className="bg-primary text-white text-[10px] font-bold px-6 py-1 rounded-full animate-pulse">
+                LIVE
+              </span>
+              Radio en direct
+            </span>
+          ) : (
+            <ArtistLinks artists={track.artists} />
+          )}
         </div>
       </div>
-      <DialogTrigger type="popover">
-        <IconButton>
-          <ModernEllipsisVerticalIcon />
-        </IconButton>
-        <TrackContextDialog tracks={[track]} />
-      </DialogTrigger>
+      {!isRadio && (
+        <DialogTrigger type="popover">
+          <IconButton>
+            <ModernEllipsisVerticalIcon />
+          </IconButton>
+          <TrackContextDialog tracks={[track]} />
+        </DialogTrigger>
+      )}
     </div>
   );
 }

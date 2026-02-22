@@ -7,20 +7,38 @@ import {PreviousButton} from '@common/player/ui/controls/previous-button';
 import {ShuffleButton} from '@common/player/ui/controls/shuffle-button';
 import {RepeatButton} from '@common/player/ui/controls/repeat-button';
 import {BufferingIndicator} from '@app/web-player/player-controls/buffering-indicator';
+import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
+import {Trans} from '@common/i18n/trans';
 
 interface Props {
   className?: string;
 }
 export function PlaybackControls({className}: Props) {
+  const track = useCuedTrack();
+  const isRadio = track && track.model_type === 'radioStation';
+
   return (
     <div className={className}>
-      <PlaybackButtons />
-      <MainSeekbar />
+      <PlaybackButtons isRadio={!!isRadio} />
+      {isRadio ? <LiveIndicator /> : <MainSeekbar />}
     </div>
   );
 }
 
-function PlaybackButtons() {
+function LiveIndicator() {
+  return (
+    <div className="flex items-center justify-center gap-8 h-20">
+      <span className="inline-flex items-center bg-primary text-white text-[10px] font-bold px-8 py-2 rounded-full animate-pulse">
+        LIVE
+      </span>
+      <span className="text-xs text-muted">
+        <Trans message="Radio en direct" />
+      </span>
+    </div>
+  );
+}
+
+function PlaybackButtons({isRadio}: {isRadio?: boolean}) {
   const isMobile = useIsMobileMediaQuery();
 
   return (
@@ -30,14 +48,14 @@ function PlaybackButtons() {
         isMobile && 'mb-20'
       )}
     >
-      <ShuffleButton size="sm" iconSize="sm" />
-      <PreviousButton size="sm" iconSize="sm" />
+      {!isRadio && <ShuffleButton size="sm" iconSize="sm" />}
+      {!isRadio && <PreviousButton size="sm" iconSize="sm" />}
       <div className="relative">
         <BufferingIndicator />
         <PlayButton size="md" iconSize="lg" />
       </div>
-      <NextButton size="sm" iconSize="sm" />
-      <RepeatButton size="sm" iconSize="sm" />
+      {!isRadio && <NextButton size="sm" iconSize="sm" />}
+      {!isRadio && <RepeatButton size="sm" iconSize="sm" />}
     </div>
   );
 }
