@@ -116,23 +116,25 @@ function MobileNavbar() {
   if (!menu) return null;
 
   return (
-    <div className="flex items-center justify-center gap-30 my-12">
+    <div className="flex items-center justify-around px-8 py-10">
       <button
-        className="text-xs whitespace-nowrap overflow-hidden"
+        className="flex flex-col items-center gap-2 min-w-0"
         onClick={() => navigate('/')}
       >
-        <MediaHomeIcon className="block mx-auto mb-6" size="md" />
-        <Trans message="Accueil" />
+        <MediaHomeIcon size="sm" />
+        <span className="text-[10px] leading-tight truncate max-w-[56px]">
+          <Trans message="Accueil" />
+        </span>
       </button>
       {menu.items.map(item => (
         <CustomMenuItem
           unstyled
-          iconClassName="block mx-auto mb-6"
-          iconSize="md"
+          iconClassName="block mx-auto"
+          iconSize="sm"
           className={({isActive}) =>
             clsx(
-              'text-xs whitespace-nowrap overflow-hidden',
-              isActive && 'font-bold'
+              'flex flex-col items-center gap-2 min-w-0 text-[10px] leading-tight',
+              isActive && 'font-bold text-primary'
             )
           }
           key={item.id}
@@ -186,17 +188,16 @@ function AccountButton() {
   }, [primaryArtist, navigate, player?.show_become_artist_btn]);
 
   const button = (
-    <button className="text-xs whitespace-nowrap overflow-hidden">
+    <button className="flex flex-col items-center gap-2 min-w-0">
       <Badge
-        badgeClassName="mb-6"
         badgeLabel={user?.unread_notifications_count}
         badgeIsVisible={hasUnreadNotif}
       >
-        <PersonIcon className="block mx-auto" size="md" />
+        <PersonIcon size="sm" />
       </Badge>
-      <div className="text-xs">
-        <Trans message="Account" />
-      </div>
+      <span className="text-[10px] leading-tight truncate max-w-[56px]">
+        <Trans message="Compte" />
+      </span>
     </button>
   );
 

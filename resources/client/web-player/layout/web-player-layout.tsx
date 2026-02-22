@@ -71,7 +71,7 @@ function Main({className}: MainProps) {
         className,
         // mobile player controls are fixed to bottom of screen,
         // make sure we can scroll to the bottom of the page
-        isMobile && 'pb-124'
+        isMobile && 'pb-154'
       )}
     >
       <div className="web-player-container @container min-h-full mx-auto p-16 md:p-30">
