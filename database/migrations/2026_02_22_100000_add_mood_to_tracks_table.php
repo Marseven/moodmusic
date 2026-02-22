@@ -9,7 +9,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('tracks', function (Blueprint $table) {
-            $table->string('mood', 20)->nullable()->after('position');
+            $table->string('mood', 20)->nullable()->after('preview_path');
         });
     }
 
