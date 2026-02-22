@@ -101,6 +101,10 @@ class CrupdateTrack
         $genreIds = $this->genre->insertOrRetrieve($genres)->pluck('id');
         $track->genres()->sync($genreIds);
 
+        // Compute mood based on genres and metadata
+        $track->mood = app(MoodDetector::class)->detect($track);
+        $track->save();
+
         if ($loadRelations) {
             $track->load('artists', 'tags', 'genres');
         }

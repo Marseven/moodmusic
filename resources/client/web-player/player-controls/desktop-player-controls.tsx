@@ -1,6 +1,6 @@
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
 import {ArtistLinks} from '@app/web-player/artists/artist-links';
-import React, {ReactNode, useContext, useMemo} from 'react';
+import React, {ReactNode, useContext} from 'react';
 import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
 import {PlaybackControls} from '@app/web-player/player-controls/playback-controls';
@@ -24,7 +24,7 @@ import {VolumeControls} from '@common/player/ui/controls/volume-controls';
 import {Tooltip} from '@common/ui/tooltip/tooltip';
 import {Trans} from '@common/i18n/trans';
 import {Track} from '@app/web-player/tracks/track';
-import {Sparkles, Heart, Smile, Cloud, Zap} from 'lucide-react';
+import {MOOD_CONFIG} from '@app/web-player/player-controls/mood-config';
 
 export function DesktopPlayerControls() {
   const mediaIsCued = usePlayerStore(s => s.cuedMedia != null);
@@ -86,56 +86,21 @@ function QueuedTrack() {
   return <>{content}</>;
 }
 
-// Mood Indicator - keyword-based detection from track metadata
-function MoodIndicator({ track }: { track: Track }) {
-  const moodInfo = useMemo(() => {
-    const genreName = track.genres?.[0]?.name?.toLowerCase() || '';
-    const trackName = track.name?.toLowerCase() || '';
-    const artistName = track.artists?.[0]?.name?.toLowerCase() || '';
-    const allText = `${genreName} ${trackName} ${artistName}`;
+// Mood Indicator - reads pre-computed mood from backend
+function MoodIndicator({track}: {track: Track}) {
+  if (!track.mood) return null;
 
-    const moodKeywords: Record<string, string[]> = {
-      energetic: ['electronic', 'dance', 'edm', 'techno', 'house', 'energy', 'power', 'beat', 'bass', 'club', 'party', 'dubstep', 'drum', 'rock', 'metal', 'punk', 'hip-hop', 'rap', 'trap'],
-      chill: ['chill', 'ambient', 'relax', 'calm', 'smooth', 'soft', 'mellow', 'lounge', 'acoustic', 'jazz', 'blues', 'folk', 'indie', 'lo-fi', 'trip-hop'],
-      romantic: ['love', 'romance', 'romantic', 'heart', 'kiss', 'soul', 'baby', 'ballad', 'tender', 'sweet', 'r&b', 'rnb'],
-      happy: ['pop', 'happy', 'joy', 'fun', 'bright', 'sunshine', 'summer', 'uplifting', 'cheerful', 'afro', 'reggae', 'soca', 'kompa'],
-      focused: ['classical', 'study', 'piano', 'violin', 'orchestra', 'symphony', 'instrumental', 'cinematic', 'soundtrack', 'minimal'],
-      melancholic: ['sad', 'melancholy', 'dark', 'emotional', 'tears', 'pain', 'broken', 'lonely', 'gothic', 'grunge'],
-    };
+  const config = MOOD_CONFIG[track.mood];
+  if (!config) return null;
 
-    const scores: Record<string, number> = {};
-    for (const [mood, keywords] of Object.entries(moodKeywords)) {
-      scores[mood] = 0;
-      for (const kw of keywords) {
-        if (allText.includes(kw)) {
-          scores[mood] += genreName.includes(kw) ? 3 : 1;
-        }
-      }
-    }
-
-    const best = Object.entries(scores).reduce((a, b) => a[1] >= b[1] ? a : b);
-
-    const configs: Record<string, { icon: typeof Zap; label: string; cls: string }> = {
-      energetic:   { icon: Zap,      label: 'Énergique',    cls: 'player-mood-energetic' },
-      chill:       { icon: Cloud,    label: 'Détendu',      cls: 'player-mood-chill' },
-      romantic:    { icon: Heart,    label: 'Romantique',   cls: 'player-mood-romantic' },
-      happy:       { icon: Smile,    label: 'Joyeux',       cls: 'player-mood-happy' },
-      focused:     { icon: Sparkles, label: 'Concentré',    cls: 'player-mood-focused' },
-      melancholic: { icon: Cloud,    label: 'Mélancolique', cls: 'player-mood-melancholic' },
-    };
-
-    if (best[1] === 0) {
-      return { icon: Zap, label: 'Énergique', cls: 'player-mood-energetic' };
-    }
-    return configs[best[0]];
-  }, [track.id, track.genres, track.artists, track.name]);
-
-  const MoodIcon = moodInfo.icon;
+  const MoodIcon = config.icon;
 
   return (
-    <div className={`player-mood-indicator ${moodInfo.cls}`}>
+    <div className={`player-mood-indicator ${config.cls}`}>
       <MoodIcon className="w-14 h-14 mr-6" />
-      <span className="text-xs font-medium whitespace-nowrap">{moodInfo.label}</span>
+      <span className="text-xs font-medium whitespace-nowrap">
+        {config.label}
+      </span>
     </div>
   );
 }

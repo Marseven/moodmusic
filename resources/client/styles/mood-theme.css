@@ -35,7 +35,11 @@ body, html {
   --mood-focused: #6C5CE7;
   --mood-focused-light: #8B7EED;
   --mood-focused-dark: #5649C9;
-  
+
+  --mood-spiritual: #779ECB;
+  --mood-spiritual-light: #92B3D7;
+  --mood-spiritual-dark: #6088B5;
+
   /* Glassmorphism Effects */
   --glass-bg: rgba(255, 255, 255, 0.1);
   --glass-border: rgba(255, 255, 255, 0.2);
@@ -446,6 +450,12 @@ body, html {
   background: rgba(108, 92, 231, 0.15);
   color: var(--mood-focused);
   border-color: rgba(108, 92, 231, 0.3);
+}
+
+.player-mood-spiritual {
+  background: rgba(119, 158, 203, 0.15);
+  color: var(--mood-spiritual);
+  border-color: rgba(119, 158, 203, 0.3);
 }
 
 /* ===== Smooth Animations ===== */
@@ -922,6 +932,14 @@ body, html {
   animation: moodMelancholic 5s ease-in-out infinite;
 }
 
+.mood-system-enhanced .player-mood-spiritual {
+  background: linear-gradient(135deg, rgba(119, 158, 203, 0.2) 0%, rgba(146, 179, 215, 0.2) 100%);
+  border-color: rgba(119, 158, 203, 0.4);
+  color: #779ECB;
+  text-shadow: 0 0 10px rgba(119, 158, 203, 0.3);
+  animation: moodSpiritual 4s ease-in-out infinite;
+}
+
 /* Dynamic Mood Animations Based on Audio Characteristics */
 @keyframes moodEnergetic {
   0%, 100% { 
@@ -991,13 +1009,24 @@ body, html {
 }
 
 @keyframes moodMelancholic {
-  0%, 100% { 
+  0%, 100% {
     border-color: rgba(149, 163, 179, 0.4);
     box-shadow: 0 0 12px rgba(149, 163, 179, 0.2);
   }
-  50% { 
+  50% {
     border-color: rgba(125, 139, 156, 0.5);
     box-shadow: 0 0 15px rgba(125, 139, 156, 0.25);
+  }
+}
+
+@keyframes moodSpiritual {
+  0%, 100% {
+    border-color: rgba(119, 158, 203, 0.4);
+    box-shadow: 0 0 12px rgba(119, 158, 203, 0.2);
+  }
+  50% {
+    border-color: rgba(146, 179, 215, 0.5);
+    box-shadow: 0 0 18px rgba(146, 179, 215, 0.3);
   }
 }
 

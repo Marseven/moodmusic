@@ -2,6 +2,7 @@ import {useCuedTrack} from '@app/web-player/player-controls/use-cued-track';
 import {TrackImage} from '@app/web-player/tracks/track-image/track-image';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
 import React, {useMemo} from 'react';
+import {MOOD_CONFIG} from '@app/web-player/player-controls/mood-config';
 import {ProgressBar} from '@common/ui/progress/progress-bar';
 import {CustomMenuItem} from '@common/menus/custom-menu';
 import clsx from 'clsx';
@@ -76,6 +77,7 @@ function QueuedTrack() {
         <div className="text-xs text-muted overflow-hidden overflow-ellipsis">
           {track.artists?.map(a => a.name).join(', ')}
         </div>
+        <MobileMoodBadge mood={track.mood} />
       </div>
     </div>
   );
@@ -149,6 +151,21 @@ function MobileNavbar() {
       >
         <MenuIcon size="md" />
       </button>
+    </div>
+  );
+}
+
+function MobileMoodBadge({mood}: {mood?: string}) {
+  if (!mood) return null;
+  const config = MOOD_CONFIG[mood];
+  if (!config) return null;
+  const MoodIcon = config.icon;
+  return (
+    <div className="flex items-center gap-4 mt-2">
+      <MoodIcon className="w-10 h-10" style={{color: 'currentColor'}} />
+      <span className="text-[10px] font-medium" style={{opacity: 0.8}}>
+        {config.label}
+      </span>
     </div>
   );
 }
