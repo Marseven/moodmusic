@@ -5,8 +5,9 @@ import {useIsDarkMode} from '@common/ui/themes/use-is-dark-mode';
 import {CustomMenu} from '@common/menus/custom-menu';
 import {Trans} from '@common/i18n/trans';
 import {IconButton} from '@common/ui/buttons/icon-button';
-import {ModernPlusIcon, ModernDownloadIcon, ModernDiscIcon, ModernAudioLinesIcon, ModernMusicNoteIcon} from '@app/web-player/icons/modern-icons';
+import {ModernPlusIcon, ModernDownloadIcon, ModernDiscIcon, ModernAudioLinesIcon, ModernMusicNoteIcon, ModernRadioIcon} from '@app/web-player/icons/modern-icons';
 import {useOriginalContentCategories} from '@app/web-player/original-content/use-original-content';
+import {useRadioStations} from '@app/web-player/radio-stations/use-radio-stations';
 import React, {ReactNode} from 'react';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {CreatePlaylistDialog} from '@app/web-player/playlists/crupdate-dialog/create-playlist-dialog';
@@ -63,6 +64,7 @@ export function Sidenav({className}: Props) {
           <Trans message="Mes achats" />
         </NavLink>
         <OriginalContentSection />
+        <RadioStationsSection />
         <PlaylistSection />
       </div>
       <PwaInstallButton />
@@ -130,6 +132,30 @@ function OriginalContentSection() {
           {category.display_name}
         </NavLink>
       ))}
+    </div>
+  );
+}
+
+function RadioStationsSection() {
+  const {data} = useRadioStations();
+  const stations = data?.stations;
+
+  if (!stations?.length) return null;
+
+  return (
+    <div className="mt-40">
+      <SectionTitle>
+        <Trans message="Stations Radio" />
+      </SectionTitle>
+      <NavLink
+        to="/radio-stations"
+        className={({isActive}) =>
+          clsx(menuItemClassName(isActive), 'flex items-center gap-8 text-sm')
+        }
+      >
+        <ModernRadioIcon className="text-muted" size="sm" />
+        <Trans message="Stations Radio" />
+      </NavLink>
     </div>
   );
 }

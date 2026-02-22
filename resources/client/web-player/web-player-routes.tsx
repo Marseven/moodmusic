@@ -24,6 +24,7 @@ import {PurchasesPage} from '@app/web-player/purchases/purchases-page';
 import {PurchaseEbillingDone} from '@app/web-player/purchases/purchase-ebilling-done';
 import {OriginalContentCategoriesPage} from '@app/web-player/original-content/original-content-categories-page';
 import {OriginalContentPage} from '@app/web-player/original-content/original-content-page';
+import {RadioStationsPage} from '@app/web-player/radio-stations/radio-stations-page';
 
 const RouteConfig: RouteObject[] = [
   {
@@ -175,6 +176,11 @@ const RouteConfig: RouteObject[] = [
       {
         path: 'original/:categoryName',
         element: <OriginalContentPage />,
+      },
+      // radio stations
+      {
+        path: 'radio-stations',
+        element: <RadioStationsPage />,
       },
       // purchases
       {
