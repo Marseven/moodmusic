@@ -1,11 +1,50 @@
 import {RadioStation} from './use-radio-stations';
 import {ModernRadioIcon} from '@app/web-player/icons/modern-icons';
-import {Trans} from '@common/i18n/trans';
+import {usePlayerActions} from '@common/player/hooks/use-player-actions';
+import {usePlayerStore} from '@common/player/hooks/use-player-store';
+import {guessPlayerProvider} from '@common/player/utils/guess-player-provider';
+import {MediaItem} from '@common/player/media-item';
+import {Pause, Play} from 'lucide-react';
+
+function radioStationToMediaItem(station: RadioStation): MediaItem {
+  const provider = guessPlayerProvider(station.stream_url);
+  return {
+    id: `radio-station-${station.id}`,
+    src: station.stream_url,
+    provider,
+    poster: station.image || undefined,
+    groupId: 'radio-stations',
+    meta: {
+      id: station.id,
+      name: station.name,
+      model_type: 'radioStation',
+      image: station.image,
+    },
+  } as MediaItem;
+}
 
 interface RadioStationGridItemProps {
   station: RadioStation;
 }
 export function RadioStationGridItem({station}: RadioStationGridItemProps) {
+  const player = usePlayerActions();
+  const mediaId = `radio-station-${station.id}`;
+  const isPlaying = usePlayerStore(
+    s => s.isPlaying && s.cuedMedia?.id === mediaId
+  );
+  const isCued = usePlayerStore(s => s.cuedMedia?.id === mediaId);
+
+  const handlePlay = async () => {
+    if (isPlaying) {
+      player.pause();
+    } else if (isCued) {
+      await player.play();
+    } else {
+      const mediaItem = radioStationToMediaItem(station);
+      await player.overrideQueueAndPlay([mediaItem], 0);
+    }
+  };
+
   return (
     <div className="mood-glass-panel mood-glass-interactive playable-grid-card rounded-xl overflow-hidden group">
       <div className="relative w-full aspect-square bg-fg-base/4">
@@ -21,19 +60,22 @@ export function RadioStationGridItem({station}: RadioStationGridItemProps) {
           </div>
         )}
         <button
-          onClick={() => window.open(station.stream_url, '_blank')}
+          onClick={handlePlay}
           className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
         >
           <div className="w-48 h-48 rounded-full bg-primary flex items-center justify-center shadow-lg">
-            <svg
-              viewBox="0 0 24 24"
-              fill="white"
-              className="w-24 h-24 ml-2"
-            >
-              <path d="M8 5v14l11-7z" />
-            </svg>
+            {isPlaying ? (
+              <Pause className="w-24 h-24" fill="white" stroke="white" />
+            ) : (
+              <Play className="w-24 h-24 ml-2" fill="white" stroke="white" />
+            )}
           </div>
         </button>
+        {isPlaying && (
+          <div className="absolute top-8 right-8 bg-primary text-white text-[10px] font-bold px-6 py-2 rounded-full animate-pulse">
+            LIVE
+          </div>
+        )}
       </div>
       <div className="p-12">
         <div className="font-medium text-sm truncate">{station.name}</div>
