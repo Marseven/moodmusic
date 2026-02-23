@@ -42,18 +42,18 @@ export function LibraryTracksPage() {
   return (
     <div>
       <StaticPageTitle>
-        <Trans message="Your tracks" />
+        <Trans message="Tes titres" />
       </StaticPageTitle>
       <AdHost slot="general_top" className="mb-34" />
       <div className="flex flex-wrap items-center gap-24 justify-between mb-34">
         <h1 className="text-2xl font-semibold w-max md:w-full whitespace-nowrap">
           {trackCount ? (
             <Trans
-              message="[one 1 liked song|other :count liked songs]"
+              message="[one 1 titre aimé|other :count titres aimés]"
               values={{count: trackCount}}
             />
           ) : (
-            <Trans message="My songs" />
+            <Trans message="Mes titres" />
           )}
         </h1>
         <PlaybackToggleButton
@@ -67,7 +67,7 @@ export function LibraryTracksPage() {
           className="max-w-512 flex-auto"
           size="sm"
           startAdornment={<Search />}
-          placeholder={trans(message('Search within tracks'))}
+          placeholder={trans(message('Rechercher dans les titres'))}
         />
       </div>
       <TrackTable
@@ -83,7 +83,7 @@ export function LibraryTracksPage() {
           className="mt-34"
           searchQuery={searchQuery}
           description={
-            <Trans message="You have not added any songs to your library yet." />
+            <Trans message="Tu n'as pas encore ajouté de titres à ta bibliothèque." />
           }
         />
       )}

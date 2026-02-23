@@ -65,7 +65,7 @@ export function BuyButton({item, size = 'xs', radius = 'rounded', className, com
             downloadFileFromUrl(`${base_url}/api/v1/tracks/${item.id}/download`);
           }}
         >
-          <Trans message="Download" />
+          <Trans message="Télécharger" />
         </Button>
       );
     }

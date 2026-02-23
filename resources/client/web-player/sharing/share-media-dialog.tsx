@@ -35,7 +35,7 @@ export function ShareMediaDialog({item}: Props) {
   return (
     <Dialog size="xl">
       <DialogHeader>
-        <Trans message="Share :name" values={{name: item.name}} />
+        <Trans message="Partager :name" values={{name: item.name}} />
       </DialogHeader>
       <DialogBody>
         {item.model_type === 'artist' || item.model_type === 'playlist' ? (
@@ -44,10 +44,10 @@ export function ShareMediaDialog({item}: Props) {
           <Tabs>
             <TabList>
               <Tab>
-                <Trans message="Share" />
+                <Trans message="Partager" />
               </Tab>
               <Tab>
-                <Trans message="Embed" />
+                <Trans message="Intégrer" />
               </Tab>
             </TabList>
             <TabPanels className="pt-20">
@@ -63,7 +63,7 @@ export function ShareMediaDialog({item}: Props) {
       </DialogBody>
       <DialogFooter>
         <Button onClick={() => close()}>
-          <Trans message="Close" />
+          <Trans message="Fermer" />
         </Button>
       </DialogFooter>
     </Dialog>
@@ -134,7 +134,7 @@ function SharePanel({item}: Props) {
                 copyLink();
               }}
             >
-              {copied ? <Trans message="Copied!" /> : <Trans message="Copy" />}
+              {copied ? <Trans message="Copié !" /> : <Trans message="Copier" />}
             </Button>
           }
         />

@@ -21,7 +21,7 @@ export function CreatePlaylistDialog() {
   return (
     <Dialog size="xl">
       <DialogHeader>
-        <Trans message="New playlist" />
+        <Trans message="Nouvelle playlist" />
       </DialogHeader>
       <DialogBody>
         <Form
@@ -40,7 +40,7 @@ export function CreatePlaylistDialog() {
       </DialogBody>
       <DialogFooter>
         <Button onClick={() => close()}>
-          <Trans message="Cancel" />
+          <Trans message="Annuler" />
         </Button>
         <Button
           form={formId}
@@ -49,7 +49,7 @@ export function CreatePlaylistDialog() {
           color="primary"
           disabled={createPlaylist.isLoading}
         >
-          <Trans message="Create" />
+          <Trans message="Créer" />
         </Button>
       </DialogFooter>
     </Dialog>

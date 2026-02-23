@@ -42,7 +42,7 @@ export function ProfileHeader({user, tabLink}: ProfileHeaderProps) {
           {user.followers_count && user.followers_count > 0 ? (
             <Link to={tabLink('followers')} className="hover:underline">
               <Trans
-                message=":count followers"
+                message=":count abonnés"
                 values={{count: user.followers_count}}
               />
             </Link>
@@ -50,7 +50,7 @@ export function ProfileHeader({user, tabLink}: ProfileHeaderProps) {
           {user.followed_users_count && user.followed_users_count > 0 ? (
             <Link to={tabLink('following')} className="hover:underline">
               <Trans
-                message="Following :count"
+                message=":count abonnements"
                 values={{count: user.followed_users_count}}
               />
             </Link>
@@ -81,7 +81,7 @@ function EditButton({user}: EditButtonProps) {
         startIcon={<ModernEditIcon />}
         className={actionButtonClassName()}
       >
-        <Trans message="Edit" />
+        <Trans message="Modifier" />
       </Button>
       <EditProfileDialog user={user} />
     </DialogTrigger>
@@ -104,7 +104,7 @@ function FollowButton({user}: EditButtonProps) {
         onClick={() => unfollowUser.mutate({user})}
         disabled={currentUser?.id === user.id || unfollowUser.isLoading}
       >
-        <Trans message="Unfollow" />
+        <Trans message="Ne plus suivre" />
       </Button>
     );
   }
@@ -118,7 +118,7 @@ function FollowButton({user}: EditButtonProps) {
       onClick={() => followUser.mutate({user})}
       disabled={currentUser?.id === user.id || followUser.isLoading}
     >
-      <Trans message="Follow" />
+      <Trans message="Suivre" />
     </Button>
   );
 }

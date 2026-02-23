@@ -87,7 +87,7 @@ export function PurchaseDialog({item}: Props) {
       if (gatewayResult?.checkout_url) {
         window.location.href = gatewayResult.checkout_url;
       } else {
-        toast.danger(message('Could not redirect to payment'));
+        toast.danger(message('Impossible de rediriger vers le paiement'));
         setIsProcessing(false);
       }
     } catch {
@@ -130,7 +130,7 @@ export function PurchaseDialog({item}: Props) {
   return (
     <Dialog size="sm">
       <DialogHeader>
-        <Trans message="Purchase" />
+        <Trans message="Achat" />
       </DialogHeader>
       <DialogBody>
         <div className="mb-20 rounded-lg border p-16">
@@ -149,7 +149,7 @@ export function PurchaseDialog({item}: Props) {
         </div>
 
         <div className="mb-8 text-sm font-medium">
-          <Trans message="Payment method" />
+          <Trans message="Moyen de paiement" />
         </div>
         <div className="flex flex-col gap-8">
           {gateways.map(gw => (
@@ -180,7 +180,7 @@ export function PurchaseDialog({item}: Props) {
       </DialogBody>
       <DialogFooter>
         <Button onClick={() => close()} disabled={isProcessing}>
-          <Trans message="Cancel" />
+          <Trans message="Annuler" />
         </Button>
         <Button
           variant="flat"
@@ -189,7 +189,7 @@ export function PurchaseDialog({item}: Props) {
           disabled={isProcessing}
         >
           {isProcessing ? (
-            <Trans message="Processing..." />
+            <Trans message="Traitement en cours..." />
           ) : (
             <Trans
               message="Donner la force - :price"

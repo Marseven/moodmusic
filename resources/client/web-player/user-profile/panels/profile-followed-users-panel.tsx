@@ -29,7 +29,7 @@ export function ProfileFollowedUsersPanel({user}: Props) {
         image={<ModernBookmarkIcon size="lg" className="text-muted" />}
         description={
           <Trans
-            message="Seems like :name is not following anyone yet."
+            message="Il semble que :name ne suit personne pour l'instant."
             values={{name: user.display_name}}
           />
         }

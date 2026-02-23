@@ -29,7 +29,7 @@ export function BackstageFormAttachments() {
   return (
     <div className="py-20">
       <div className="mb-14 text-sm">
-        <Trans message="Speed up the process by connecting artist social media accounts or uploading your passport scan." />
+        <Trans message="Accélère le processus en connectant les réseaux sociaux de l'artiste ou en uploadant ton passeport." />
       </div>
       {social?.twitter?.enable && (
         <Button
@@ -40,11 +40,11 @@ export function BackstageFormAttachments() {
             const e = await connectSocial('twitter');
             if (e?.status === 'SUCCESS') {
               queryClient.invalidateQueries(['users']);
-              toast(message('Connected twitter account'));
+              toast(message('Compte Twitter connecté'));
             }
           }}
         >
-          <Trans message="Connect to twitter" />
+          <Trans message="Connecter Twitter" />
         </Button>
       )}
       {social?.facebook?.enable && (
@@ -56,11 +56,11 @@ export function BackstageFormAttachments() {
             const e = await connectSocial('facebook');
             if (e?.status === 'SUCCESS') {
               queryClient.invalidateQueries(['users']);
-              toast(message('Connected facebook account'));
+              toast(message('Compte Facebook connecté'));
             }
           }}
         >
-          <Trans message="Connect to facebook" />
+          <Trans message="Connecter Facebook" />
         </Button>
       )}
       <PassportScanButton />
@@ -68,7 +68,7 @@ export function BackstageFormAttachments() {
         {passportScan && (
           <AttachmentLayout
             icon={<FileSearch />}
-            title={<Trans message="Passport scan" />}
+            title={<Trans message="Scan du passeport" />}
             description={`${passportScan.name} (${prettyBytes(
               passportScan.file_size
             )})`}
@@ -108,7 +108,7 @@ function SocialServiceAttachment({service}: SocialServiceAttachmentProps) {
       }
       title={
         <span className="capitalize">
-          <Trans message=":service account" values={{service}} />
+          <Trans message="Compte :service" values={{service}} />
         </span>
       }
       description={account.username}
@@ -188,7 +188,7 @@ function PassportScanButton() {
       startIcon={<FileSearch className="text-primary" />}
       onClick={() => handleUpload()}
     >
-      <Trans message="Upload passport scan" />
+      <Trans message="Uploader un scan de passeport" />
     </Button>
   );
 }

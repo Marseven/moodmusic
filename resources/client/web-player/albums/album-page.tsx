@@ -111,9 +111,9 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
       {!album.tracks?.length ? (
         <IllustratedMessage
           className="mt-34"
-          title={<Trans message="Nothing to display" />}
+          title={<Trans message="Rien à afficher" />}
           description={
-            <Trans message="This album does not have any tracks yet" />
+            <Trans message="Cet album ne contient aucun titre pour le moment" />
           }
         />
       ) : null}
@@ -153,7 +153,7 @@ function AlbumPageHeader({album}: PlaylistPageHeaderProps) {
           <BulletSeparatedItems className="text-sm text-muted">
             {album.tracks?.length ? (
               <Trans
-                message="[one 1 track|other :count tracks]"
+                message="[one 1 titre|other :count titres]"
                 values={{count: album.tracks.length}}
               />
             ) : null}

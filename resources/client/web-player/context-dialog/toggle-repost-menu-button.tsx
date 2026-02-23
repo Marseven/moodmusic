@@ -27,7 +27,7 @@ export function ToggleRepostMenuButton({item}: Props) {
         toggleRepost.mutate({repostable: item});
       }}
     >
-      {isReposted ? <Trans message="Reposted" /> : <Trans message="Repost" />}
+      {isReposted ? <Trans message="Reposté" /> : <Trans message="Reposter" />}
     </ContextMenuButton>
   );
 }

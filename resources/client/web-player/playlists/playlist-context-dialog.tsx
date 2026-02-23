@@ -60,10 +60,10 @@ export function PlaylistContextDialog({playlist}: PlaylistContextDialogProps) {
         onClick={() => {
           copyAlbumLink();
           closeMenu();
-          toast(message('Copied link to clipboard'));
+          toast(message('Lien copié'));
         }}
       >
-        <Trans message="Copy playlist link" />
+        <Trans message="Copier le lien de la playlist" />
       </ContextMenuButton>
       {playlist.public && <ShareMediaButton item={playlist} />}
       {canEdit && (
@@ -73,7 +73,7 @@ export function PlaylistContextDialog({playlist}: PlaylistContextDialogProps) {
             openDialog(UpdatePlaylistDialog, {playlist});
           }}
         >
-          <Trans message="Edit" />
+          <Trans message="Modifier" />
         </ContextMenuButton>
       )}
       <DeleteButton playlist={playlist} />
@@ -105,7 +105,7 @@ function FollowButtons({playlist}: FollowButtonsProps) {
             followPlaylist.mutate();
           }}
         >
-          <Trans message="Follow" />
+          <Trans message="Suivre" />
         </ContextMenuButton>
       ) : (
         <ContextMenuButton
@@ -114,7 +114,7 @@ function FollowButtons({playlist}: FollowButtonsProps) {
             unFollowPlaylist.mutate();
           }}
         >
-          <Trans message="Unfollow" />
+          <Trans message="Ne plus suivre" />
         </ContextMenuButton>
       )}
     </Fragment>
@@ -141,9 +141,9 @@ function TogglePublicButton({playlist}: FollowButtonsProps) {
       onClick={() => togglePublic()}
     >
       {playlist.public ? (
-        <Trans message="Make private" />
+        <Trans message="Rendre privée" />
       ) : (
-        <Trans message="Make public" />
+        <Trans message="Rendre publique" />
       )}
     </ContextMenuButton>
   );
@@ -190,18 +190,18 @@ function DeleteButton({playlist}: FollowButtonsProps) {
         closeMenu();
         openDialog(ConfirmationDialog, {
           isDanger: true,
-          title: <Trans message="Delete playlist" />,
+          title: <Trans message="Supprimer la playlist" />,
           body: (
-            <Trans message="Are you sure you want to delete this playlist?" />
+            <Trans message="Es-tu sûr de vouloir supprimer cette playlist ?" />
           ),
-          confirm: <Trans message="Delete" />,
+          confirm: <Trans message="Supprimer" />,
           onConfirm: () => {
             deletePlaylist.mutate();
           },
         });
       }}
     >
-      <Trans message="Delete" />
+      <Trans message="Supprimer" />
     </ContextMenuButton>
   );
 }
@@ -211,7 +211,7 @@ async function loadPlaylistTracks(playlist: Playlist): Promise<Track[]> {
   if (typeof playlist.tracks === 'undefined') {
     const tracks = await loadMediaItemTracks(queueGroupId(playlist));
     if (!tracks.length) {
-      toast(message('This playlist has no tracks yet.'));
+      toast(message('Cette playlist ne contient aucun titre.'));
     }
     return tracks;
   }

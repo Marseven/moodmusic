@@ -19,9 +19,9 @@ import {useUserLikedAlbums} from '@app/web-player/library/requests/use-user-like
 import {AdHost} from '@common/admin/ads/ad-host';
 
 const sortItems = {
-  'likes.created_at:desc': message('Recently added'),
+  'likes.created_at:desc': message('Récemment ajoutés'),
   'name:asc': message('A-Z'),
-  'release_date:desc': message('Release date'),
+  'release_date:desc': message('Date de sortie'),
 };
 
 export function LibraryAlbumsPage() {
@@ -45,17 +45,17 @@ export function LibraryAlbumsPage() {
   return (
     <div>
       <StaticPageTitle>
-        <Trans message="Your albums" />
+        <Trans message="Tes albums" />
       </StaticPageTitle>
       <AdHost slot="general_top" className="mb-34" />
       <h1 className="text-2xl font-semibold mb-20">
         {totalItems ? (
           <Trans
-            message="[one 1 liked album|other :count liked albums]"
+            message="[one 1 album aimé|other :count albums aimés]"
             values={{count: totalItems}}
           />
         ) : (
-          <Trans message="My albums" />
+          <Trans message="Mes albums" />
         )}
       </h1>
       <div className="flex items-center gap-24 justify-between">
@@ -65,7 +65,7 @@ export function LibraryAlbumsPage() {
           className="max-w-512 flex-auto"
           size="sm"
           startAdornment={<Search />}
-          placeholder={trans(message('Search within albums'))}
+          placeholder={trans(message('Rechercher dans les albums'))}
         />
         <LibraryPageSortDropdown
           items={sortItems}
@@ -94,7 +94,7 @@ export function LibraryAlbumsPage() {
           className="mt-34"
           searchQuery={searchQuery}
           description={
-            <Trans message="You have not added any albums to your library yet." />
+            <Trans message="Tu n'as pas encore ajouté d'albums à ta bibliothèque." />
           }
         />
       )}

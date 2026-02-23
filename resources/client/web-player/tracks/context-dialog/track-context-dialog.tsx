@@ -75,7 +75,7 @@ export function TrackContextDialog({
         <Fragment>
           {shouldShowRadio && (
             <ContextMenuButton type="link" to={getRadioLink(firstTrack)}>
-              <Trans message="Go to song radio" />
+              <Trans message="Aller à la radio du titre" />
             </ContextMenuButton>
           )}
           {isMobile && (
@@ -85,7 +85,7 @@ export function TrackContextDialog({
                   type="link"
                   to={getArtistLink(firstTrack.artists[0])}
                 >
-                  <Trans message="Go to artist" />
+                  <Trans message="Voir l'artiste" />
                 </ContextMenuButton>
               )}
               {firstTrack.album && (
@@ -93,11 +93,11 @@ export function TrackContextDialog({
                   type="link"
                   to={getAlbumLink(firstTrack.album)}
                 >
-                  <Trans message="Go to album" />
+                  <Trans message="Voir l'album" />
                 </ContextMenuButton>
               )}
               <ContextMenuButton type="link" to={getTrackLink(firstTrack)}>
-                <Trans message="Go to track" />
+                <Trans message="Voir le titre" />
               </ContextMenuButton>
             </Fragment>
           )}
@@ -108,14 +108,14 @@ export function TrackContextDialog({
                 openDialog(LyricsDialog, {track: firstTrack});
               }}
             >
-              <Trans message="View lyrics" />
+              <Trans message="Voir les paroles" />
             </ContextMenuButton>
           )}
           {!isMobile && (
             <CopyLinkMenuButton
               link={getTrackLink(firstTrack, {absolute: true})}
             >
-              <Trans message="Copy song link" />
+              <Trans message="Copier le lien du titre" />
             </CopyLinkMenuButton>
           )}
           {tracks.length === 1 && <ShareMediaButton item={firstTrack} />}
@@ -137,7 +137,7 @@ export function TrackContextDialog({
                   openDialog(PurchaseDialog, {item: firstTrack});
                 }}
               >
-                <Trans message="Buy" />
+                <Trans message="Donner la force" />
               </ContextMenuButton>
             )}
           {tracks.length === 1 && canEdit && (
@@ -145,7 +145,7 @@ export function TrackContextDialog({
               type="link"
               to={`/backstage/tracks/${firstTrack.id}/insights`}
             >
-              <Trans message="Insights" />
+              <Trans message="Statistiques" />
             </ContextMenuButton>
           )}
           {tracks.length === 1 && canEdit && (
@@ -153,7 +153,7 @@ export function TrackContextDialog({
               type="link"
               to={`/backstage/tracks/${firstTrack.id}/edit`}
             >
-              <Trans message="Edit" />
+              <Trans message="Modifier" />
             </ContextMenuButton>
           )}
         </Fragment>
@@ -179,18 +179,18 @@ function DeleteButton({tracks}: TrackContextDialogProps) {
         closeMenu();
         openDialog(ConfirmationDialog, {
           isDanger: true,
-          title: <Trans message="Delete tracks" />,
+          title: <Trans message="Supprimer les titres" />,
           body: (
-            <Trans message="Are you sure you want to delete selected tracks?" />
+            <Trans message="Es-tu sûr de vouloir supprimer les titres sélectionnés ?" />
           ),
-          confirm: <Trans message="Delete" />,
+          confirm: <Trans message="Supprimer" />,
           onConfirm: () => {
             deleteTracks.mutate({trackIds: tracks.map(t => t.id)});
           },
         });
       }}
     >
-      <Trans message="Delete" />
+      <Trans message="Supprimer" />
     </ContextMenuButton>
   );
 }

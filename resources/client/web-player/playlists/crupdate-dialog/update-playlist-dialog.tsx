@@ -31,7 +31,7 @@ export function UpdatePlaylistDialog({playlist}: UpdatePlaylistDialogProps) {
   return (
     <Dialog size="xl">
       <DialogHeader>
-        <Trans message="Update playlist" />
+        <Trans message="Modifier la playlist" />
       </DialogHeader>
       <DialogBody>
         <Form
@@ -50,7 +50,7 @@ export function UpdatePlaylistDialog({playlist}: UpdatePlaylistDialogProps) {
       </DialogBody>
       <DialogFooter>
         <Button onClick={() => close()}>
-          <Trans message="Cancel" />
+          <Trans message="Annuler" />
         </Button>
         <Button
           form={formId}
@@ -59,7 +59,7 @@ export function UpdatePlaylistDialog({playlist}: UpdatePlaylistDialogProps) {
           color="primary"
           disabled={updatePlaylist.isLoading}
         >
-          <Trans message="Update" />
+          <Trans message="Mettre à jour" />
         </Button>
       </DialogFooter>
     </Dialog>

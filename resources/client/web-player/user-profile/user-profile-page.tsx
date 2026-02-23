@@ -65,10 +65,10 @@ function PageContent({user}: ProfileContentProps) {
       <Tabs className="mt-48" isLazy selectedTab={selectedTab}>
         <TabList>
           <Tab elementType={Link} to={tabLink('tracks')}>
-            <Trans message="Liked tracks" />
+            <Trans message="Titres aimés" />
           </Tab>
           <Tab elementType={Link} to={tabLink('playlists')}>
-            <Trans message="Public playlists" />
+            <Trans message="Playlists publiques" />
           </Tab>
           {player?.enable_repost && (
             <Tab elementType={Link} to={tabLink('reposts')}>
@@ -76,16 +76,16 @@ function PageContent({user}: ProfileContentProps) {
             </Tab>
           )}
           <Tab elementType={Link} to={tabLink('albums')}>
-            <Trans message="Liked albums" />
+            <Trans message="Albums aimés" />
           </Tab>
           <Tab elementType={Link} to={tabLink('artists')}>
-            <Trans message="Liked artists" />
+            <Trans message="Artistes aimés" />
           </Tab>
           <Tab elementType={Link} to={tabLink('followers')}>
-            <Trans message="Followers" />
+            <Trans message="Abonnés" />
           </Tab>
           <Tab elementType={Link} to={tabLink('following')}>
-            <Trans message="Following" />
+            <Trans message="Abonnements" />
           </Tab>
         </TabList>
         <TabPanels className="mt-24">

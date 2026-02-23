@@ -45,7 +45,7 @@ export function PlaylistPanel() {
           startIcon={<ModernChevronLeftIcon />}
           onClick={() => setPlaylistPanelIsActive(false)}
         >
-          <Trans message="Back" />
+          <Trans message="Retour" />
         </Button>
       </div>
       <ul className="overflow-y-auto overflow-x-hidden max-h-350">
@@ -66,7 +66,7 @@ export function PlaylistPanel() {
           }}
           className="text-primary"
         >
-          <Trans message="New playlist" />
+          <Trans message="Nouvelle playlist" />
         </ContextMenuButton>
         {playlists.map(playlist => (
           <ContextMenuButton
@@ -80,7 +80,7 @@ export function PlaylistPanel() {
                   tracks,
                 });
               } else {
-                toast(message('This item does not have tracks yet'));
+                toast(message('Cet élément ne contient aucun titre'));
               }
             }}
           >
@@ -105,7 +105,7 @@ export function PlaylistPanelButton() {
         setPlaylistPanelIsActive(!playlistPanelIsActive);
       }}
     >
-      <Trans message="Add to playlist" />
+      <Trans message="Ajouter à une playlist" />
     </ContextMenuButton>
   );
 }

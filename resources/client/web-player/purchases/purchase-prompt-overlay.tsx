@@ -79,9 +79,9 @@ export function PurchasePromptOverlay() {
             {/* Message */}
             <p className="mb-20 text-center text-sm text-muted">
               {purchaseItem.model_type === 'album' ? (
-                <Trans message="This preview has ended. Purchase this album to listen in full." />
+                <Trans message="Cet aperçu est terminé. Donne la force pour écouter l'album en entier." />
               ) : (
-                <Trans message="This preview has ended. Purchase this track to listen in full." />
+                <Trans message="Cet aperçu est terminé. Donne la force pour écouter ce titre en entier." />
               )}
             </p>
 

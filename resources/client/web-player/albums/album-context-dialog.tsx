@@ -50,12 +50,12 @@ export function AlbumContextDialog({album}: AlbumContextMenuProps) {
       <ToggleInLibraryMenuButton items={[album]} />
       {isMobile && album.artists?.[0] && (
         <ContextMenuButton type="link" to={getArtistLink(album.artists[0])}>
-          <Trans message="Go to artist" />
+          <Trans message="Voir l'artiste" />
         </ContextMenuButton>
       )}
       {!isMobile && (
         <CopyLinkMenuButton link={getAlbumLink(album, {absolute: true})}>
-          <Trans message="Copy album link" />
+          <Trans message="Copier le lien de l'album" />
         </CopyLinkMenuButton>
       )}
       <ShareMediaButton item={album} />
@@ -65,7 +65,7 @@ export function AlbumContextDialog({album}: AlbumContextMenuProps) {
           type="link"
           to={`/backstage/albums/${album.id}/insights`}
         >
-          <Trans message="Insights" />
+          <Trans message="Statistiques" />
         </ContextMenuButton>
       )}
       {canEdit && (
@@ -73,7 +73,7 @@ export function AlbumContextDialog({album}: AlbumContextMenuProps) {
           type="link"
           to={`/backstage/albums/${album.id}/edit`}
         >
-          <Trans message="Edit" />
+          <Trans message="Modifier" />
         </ContextMenuButton>
       )}
       <DeleteButton album={album} />
@@ -97,16 +97,16 @@ function DeleteButton({album}: AlbumContextMenuProps) {
         closeMenu();
         openDialog(ConfirmationDialog, {
           isDanger: true,
-          title: <Trans message="Delete album" />,
-          body: <Trans message="Are you sure you want to delete this album?" />,
-          confirm: <Trans message="Delete" />,
+          title: <Trans message="Supprimer l'album" />,
+          body: <Trans message="Es-tu sûr de vouloir supprimer cet album ?" />,
+          confirm: <Trans message="Supprimer" />,
           onConfirm: () => {
             deleteAlbum.mutate({albumId: album.id});
           },
         });
       }}
     >
-      <Trans message="Delete" />
+      <Trans message="Supprimer" />
     </ContextMenuButton>
   );
 }
@@ -116,7 +116,7 @@ async function loadAlbumTracks(album: Album): Promise<Track[]> {
   if (typeof album.tracks === 'undefined') {
     const tracks = await loadMediaItemTracks(queueGroupId(album));
     if (!tracks.length) {
-      toast(message('This album has no tracks yet.'));
+      toast(message('Cet album ne contient aucun titre.'));
     }
     return tracks;
   }

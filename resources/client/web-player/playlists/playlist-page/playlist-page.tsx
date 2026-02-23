@@ -83,7 +83,7 @@ function PageContent({
         className="max-w-512 mt-28 mb-44 md:mb-24"
         size="sm"
         startAdornment={<ModernSearchIcon />}
-        placeholder={trans(message('Search within playlist'))}
+        placeholder={trans(message('Rechercher dans la playlist'))}
       />
       <TrackTable
         queueGroupId={queueId}
@@ -98,7 +98,7 @@ function PageContent({
           className="mt-34"
           searchQuery={searchQuery}
           description={
-            <Trans message="This playlist does not have any tracks yet" />
+            <Trans message="Cette playlist ne contient aucun titre pour le moment" />
           }
         />
       )}

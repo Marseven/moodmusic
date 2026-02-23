@@ -2102,6 +2102,7 @@ return array(
     'Database\\Seeders\\DatabaseSeeder' => $baseDir . '/database/seeders/DatabaseSeeder.php',
     'Database\\Seeders\\DefaultChannelsSeeder' => $baseDir . '/database/seeders/DefaultChannelsSeeder.php',
     'Database\\Seeders\\MoodIdentitySeeder' => $baseDir . '/database/seeders/MoodIdentitySeeder.php',
+    'Database\\Seeders\\PopularPlaylistsChannelSeeder' => $baseDir . '/database/seeders/PopularPlaylistsChannelSeeder.php',
     'Database\\Seeders\\VibesSeeder' => $baseDir . '/database/seeders/VibesSeeder.php',
     'DateError' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
     'DateException' => $vendorDir . '/symfony/polyfill-php83/Resources/stubs/DateException.php',

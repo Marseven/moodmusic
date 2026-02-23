@@ -20,7 +20,7 @@ export function CopyLinkMenuButton({link, children}: CopyLinkMenuButtonProps) {
       onClick={() => {
         copyLink();
         closeMenu();
-        toast(message('Copied link to clipboard'));
+        toast(message('Lien copié'));
       }}
     >
       {children}

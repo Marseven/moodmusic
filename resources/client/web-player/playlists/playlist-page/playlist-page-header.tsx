@@ -60,7 +60,7 @@ export function PlaylistPageHeader({
             {playlist.tracks_count ? (
               <BulletSeparatedItems className="mt-14 text-sm text-muted">
                 <Trans
-                  message="[one 1 track|other :count tracks]"
+                  message="[one 1 titre|other :count titres]"
                   values={{count: playlist.tracks_count}}
                 />
                 <FormattedDuration ms={totalDuration} verbose />
@@ -144,7 +144,7 @@ function ActionButtons({playlist, hasTracks, queueId}: ActionButtonsProps) {
           endIcon={<ModernChevronDownIcon />}
           className={actionButtonClassName()}
         >
-          <Trans message="More" />
+          <Trans message="Plus" />
         </Button>
         <PlaylistContextDialog playlist={playlist} />
       </DialogTrigger>

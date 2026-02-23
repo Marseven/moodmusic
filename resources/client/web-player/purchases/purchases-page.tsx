@@ -36,7 +36,7 @@ export function PurchasesPage() {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center p-40">
-        <Trans message="Loading..." />
+        <Trans message="Chargement..." />
       </div>
     );
   }
@@ -47,9 +47,9 @@ export function PurchasesPage() {
     return (
       <IllustratedMessage
         className="mt-40"
-        title={<Trans message="No purchases yet" />}
+        title={<Trans message="Aucune force donnée" />}
         description={
-          <Trans message="Your purchased tracks and albums will appear here" />
+          <Trans message="Tes titres et albums achetés apparaîtront ici" />
         }
       />
     );
@@ -65,7 +65,7 @@ export function PurchasesPage() {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-24">
-        <Trans message="My Purchases" />
+        <Trans message="Mes forces données" />
       </h1>
       <div className="flex flex-col gap-8">
         {purchases.map(purchase => {
@@ -124,7 +124,7 @@ export function PurchasesPage() {
                   elementType="a"
                   href={downloadUrl}
                 >
-                  <Trans message="Download" />
+                  <Trans message="Télécharger" />
                 </Button>
               )}
             </div>

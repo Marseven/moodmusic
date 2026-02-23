@@ -24,10 +24,10 @@ export function ProfileAlbumsPanel({user}: ProfileContentProps) {
         imageHeight="h-auto"
         imageMargin="mb-14"
         image={<ModernDiscIcon size="lg" className="text-muted" />}
-        title={<Trans message="No albums yet" />}
+        title={<Trans message="Pas encore d'albums" />}
         description={
           <Trans
-            message="Follow :user for updates on albums they like in the future."
+            message="Suis :user pour voir les albums qu'il aimera à l'avenir."
             values={{user: user.display_name}}
           />
         }

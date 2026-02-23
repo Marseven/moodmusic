@@ -20,10 +20,10 @@ export function ProfileTracksPanel({user}: ProfileContentProps) {
         imageHeight="h-auto"
         imageMargin="mb-14"
         image={<ModernMusicNoteIcon size="lg" className="text-muted" />}
-        title={<Trans message="No tracks yet" />}
+        title={<Trans message="Pas encore de titres" />}
         description={
           <Trans
-            message="Follow :user for updates on tracks they like in the future."
+            message="Suis :user pour voir les titres qu'il aimera à l'avenir."
             values={{user: user.display_name}}
           />
         }

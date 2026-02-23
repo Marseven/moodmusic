@@ -27,7 +27,7 @@ export function BackstageRequestFormPage() {
     <BackstageLayout>
       <div className="max-w-780 my-40 mx-auto">
         <h1 className="text-3xl md:text-5xl text-center font-medium">
-          <Trans message="Tell us about yourself" />
+          <Trans message="Parle-nous de toi" />
         </h1>
         <ClaimForm requestType={requestType} />
       </div>
@@ -69,7 +69,7 @@ function ClaimForm({requestType}: ClaimFormProps) {
         {requestType !== 'become-artist' && (
           <FormNormalizedModelField
             className="mb-24"
-            label={<Trans message="Select artist" />}
+            label={<Trans message="Sélectionner l'artiste" />}
             name="artist_id"
             modelType={ARTIST_MODEL}
             openMenuOnFocus
@@ -85,7 +85,7 @@ function ClaimForm({requestType}: ClaimFormProps) {
           <FormTextField
             required
             name="artist_name"
-            label={<Trans message="Your artist name" />}
+            label={<Trans message="Ton nom d'artiste" />}
             className="mb-24"
           />
         )}
@@ -93,20 +93,20 @@ function ClaimForm({requestType}: ClaimFormProps) {
           <FormTextField
             required
             name="first_name"
-            label={<Trans message="First name" />}
+            label={<Trans message="Prénom" />}
             className="flex-auto mb-24 md:mb-0"
           />
           <FormTextField
             required
             name="last_name"
-            label={<Trans message="Last name" />}
+            label={<Trans message="Nom" />}
             className="flex-auto"
           />
         </div>
         {requestType === 'claim-artist' && <BackstageRoleSelect />}
         <FormTextField
           name="company"
-          label={<Trans message="Company (optional)" />}
+          label={<Trans message="Entreprise (optionnel)" />}
           className="mb-24"
         />
         <BackstageFormAttachments />
@@ -120,7 +120,7 @@ function ClaimForm({requestType}: ClaimFormProps) {
             className="min-w-140"
             radius="rounded-full"
           >
-            <Trans message="Go back" />
+            <Trans message="Retour" />
           </Button>
           <Button
             variant="raised"
@@ -130,7 +130,7 @@ function ClaimForm({requestType}: ClaimFormProps) {
             radius="rounded-full"
             disabled={submitRequest.isLoading}
           >
-            <Trans message="Submit request" />
+            <Trans message="Envoyer la demande" />
           </Button>
         </div>
       </Form>

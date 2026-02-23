@@ -23,7 +23,7 @@ export function ShareMediaButton({item}: Props) {
         });
       }}
     >
-      <Trans message="Share" />
+      <Trans message="Partager" />
     </ContextMenuButton>
   );
 }

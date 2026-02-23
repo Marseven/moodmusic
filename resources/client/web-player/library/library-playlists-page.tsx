@@ -26,10 +26,10 @@ import {useAuthClickCapture} from '@app/web-player/use-auth-click-capture';
 import {AdHost} from '@common/admin/ads/ad-host';
 
 const sortItems = {
-  'updated_at:desc': message('Recently updated'),
+  'updated_at:desc': message('Récemment mises à jour'),
   'name:asc': message('A-Z'),
-  'views:desc': message('Most viewed'),
-  'plays:desc': message('Most played'),
+  'views:desc': message('Les plus vues'),
+  'plays:desc': message('Les plus écoutées'),
 };
 
 export function LibraryPlaylistsPage() {
@@ -56,7 +56,7 @@ export function LibraryPlaylistsPage() {
   return (
     <div>
       <StaticPageTitle>
-        <Trans message="Your playlists" />
+        <Trans message="Tes playlists" />
       </StaticPageTitle>
       <AdHost slot="general_top" className="mb-34" />
       <div className="flex items-center justify-between gap-24 mb-20">
@@ -67,7 +67,7 @@ export function LibraryPlaylistsPage() {
               values={{count: totalItems}}
             />
           ) : (
-            <Trans message="My playlists" />
+            <Trans message="Mes playlists" />
           )}
         </h1>
         <DialogTrigger
@@ -92,7 +92,7 @@ export function LibraryPlaylistsPage() {
           className="max-w-512 flex-auto"
           size="sm"
           startAdornment={<Search />}
-          placeholder={trans(message('Search within playlists'))}
+          placeholder={trans(message('Rechercher dans les playlists'))}
         />
         <LibraryPageSortDropdown
           items={sortItems}
@@ -121,7 +121,7 @@ export function LibraryPlaylistsPage() {
           className="mt-34"
           searchQuery={searchQuery}
           description={
-            <Trans message="You have not added any playlists to your library yet." />
+            <Trans message="Tu n'as pas encore ajouté de playlists à ta bibliothèque." />
           }
         />
       )}

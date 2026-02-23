@@ -28,7 +28,7 @@ export function ToggleInLibraryMenuButton({
           removeFromLibrary.mutate({likeables: items});
         }}
       >
-        <Trans message="Remove from your music" />
+        <Trans message="Retirer de ta musique" />
       </ContextMenuButton>
     );
   }
@@ -41,7 +41,7 @@ export function ToggleInLibraryMenuButton({
         addToLibrary.mutate({likeables: items});
       }}
     >
-      <Trans message="Add to your music" />
+      <Trans message="Ajouter à ta musique" />
     </ContextMenuButton>
   );
 }

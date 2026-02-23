@@ -113,7 +113,7 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
         />
         <div className="flex-auto">
           <div className="text-sm">
-            <Trans message="From the album" />
+            <Trans message="De l'album" />
           </div>
           <div className="font-semibold text-sm">{album.name}</div>
         </div>
@@ -131,9 +131,9 @@ function AlbumTrackTable({album}: AlbumTrackTableProps) {
       {!album.tracks?.length ? (
         <IllustratedMessage
           className="mt-34"
-          title={<Trans message="Nothing to display" />}
+          title={<Trans message="Rien à afficher" />}
           description={
-            <Trans message="This album does not have any tracks yet" />
+            <Trans message="Cet album ne contient aucun titre pour le moment" />
           }
         />
       ) : null}
@@ -186,7 +186,7 @@ function TrackPageHeader({track}: TrackPageHeaderProps) {
               {genre && <GenreLink genre={genre} />}
               {track.plays && !player?.enable_repost ? (
                 <Trans
-                  message=":count plays"
+                  message=":count écoutes"
                   values={{count: <FormattedNumber value={track.plays} />}}
                 />
               ) : null}

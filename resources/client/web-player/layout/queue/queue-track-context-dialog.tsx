@@ -36,7 +36,7 @@ function RemoveFromQueueContextButton({
         player.removeFromQueue(queueItems);
       }}
     >
-      <Trans message="Remove from queue" />
+      <Trans message="Retirer de la file d'attente" />
     </ContextMenuButton>
   );
 }

@@ -46,7 +46,7 @@ export function EditProfileDialog({user}: Props) {
   return (
     <Dialog size="xl">
       <DialogHeader>
-        <Trans message="Edit your profile" />
+        <Trans message="Modifier ton profil" />
       </DialogHeader>
       <DialogBody>
         <Form
@@ -69,32 +69,32 @@ export function EditProfileDialog({user}: Props) {
               <div className="flex-auto">
                 <FormTextField
                   name="user.username"
-                  label={<Trans message="Username" />}
+                  label={<Trans message="Nom d'utilisateur" />}
                   className="mb-24"
                 />
                 <div className="flex items-center gap-24">
                   <FormTextField
                     name="user.first_name"
-                    label={<Trans message="First name" />}
+                    label={<Trans message="Prénom" />}
                     className="flex-1 mb-24"
                   />
                   <FormTextField
                     name="user.last_name"
-                    label={<Trans message="Last name" />}
+                    label={<Trans message="Nom" />}
                     className="flex-1 mb-24"
                   />
                 </div>
                 <div className="flex items-center gap-24">
                   <FormTextField
                     name="profile.city"
-                    label={<Trans message="City" />}
+                    label={<Trans message="Ville" />}
                     className="flex-1 mb-24"
                   />
                   <FormComboBox
                     className="flex-1 mb-24"
                     selectionMode="single"
                     name="profile.country"
-                    label={<Trans message="Country" />}
+                    label={<Trans message="Pays" />}
                   >
                     {data?.countries?.map(country => (
                       <Option key={country.code} value={country.name}>
@@ -113,7 +113,7 @@ export function EditProfileDialog({user}: Props) {
             </div>
             <div className="mt-24">
               <div className="mb-16 pb-16 border-b">
-                <Trans message="Your links" />
+                <Trans message="Tes liens" />
               </div>
               <ProfileLinksForm />
             </div>
@@ -127,7 +127,7 @@ export function EditProfileDialog({user}: Props) {
             close();
           }}
         >
-          <Trans message="Cancel" />
+          <Trans message="Annuler" />
         </Button>
         <Button
           form={formId}
@@ -136,7 +136,7 @@ export function EditProfileDialog({user}: Props) {
           color="primary"
           disabled={updateProfile.isLoading}
         >
-          <Trans message="Save" />
+          <Trans message="Enregistrer" />
         </Button>
       </DialogFooter>
     </Dialog>

@@ -22,10 +22,10 @@ export function ProfileArtistsPanel({user}: ProfileContentProps) {
         imageHeight="h-auto"
         imageMargin="mb-14"
         image={<ModernMicrophoneIcon size="lg" className="text-muted" />}
-        title={<Trans message="No artists yet" />}
+        title={<Trans message="Pas encore d'artistes" />}
         description={
           <Trans
-            message="Follow :user for updates on artists they like in the future."
+            message="Suis :user pour voir les artistes qu'il aimera à l'avenir."
             values={{user: user.display_name}}
           />
         }

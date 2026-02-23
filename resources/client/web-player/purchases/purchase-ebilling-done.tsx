@@ -67,7 +67,7 @@ export function PurchaseEbillingDone() {
             elementType={Link}
             to="/library/purchases"
           >
-            <Trans message="View my purchases" />
+            <Trans message="Voir mes forces données" />
           </Button>
         </>
       )}
@@ -75,10 +75,10 @@ export function PurchaseEbillingDone() {
         <>
           <div className="text-warning text-6xl">&#9203;</div>
           <h2 className="text-2xl font-semibold mt-20">
-            <Trans message="Payment is being processed" />
+            <Trans message="Paiement en cours de traitement" />
           </h2>
           <p className="text-muted mt-8">
-            <Trans message="Your payment is still being verified. Please check back shortly." />
+            <Trans message="Ton paiement est encore en cours de vérification. Reviens dans un instant." />
           </p>
           <Button
             variant="flat"
@@ -87,7 +87,7 @@ export function PurchaseEbillingDone() {
             elementType={Link}
             to="/library/purchases"
           >
-            <Trans message="View my purchases" />
+            <Trans message="Voir mes forces données" />
           </Button>
         </>
       )}
@@ -95,10 +95,10 @@ export function PurchaseEbillingDone() {
         <>
           <AlertCircle className="text-danger" size={48} />
           <h2 className="text-2xl font-semibold mt-20">
-            <Trans message="Payment failed" />
+            <Trans message="Échec du paiement" />
           </h2>
           <p className="text-muted mt-8">
-            <Trans message="The payment was not completed. Please try again." />
+            <Trans message="Le paiement n'a pas été finalisé. Réessaie." />
           </p>
           <Button
             variant="flat"
@@ -107,7 +107,7 @@ export function PurchaseEbillingDone() {
             elementType={Link}
             to="/"
           >
-            <Trans message="Return to site" />
+            <Trans message="Retour à l'accueil" />
           </Button>
         </>
       )}

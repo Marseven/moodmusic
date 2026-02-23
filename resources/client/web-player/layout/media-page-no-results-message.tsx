@@ -16,9 +16,9 @@ export function MediaPageNoResultsMessage({
     return (
       <MoodEmptyState
         className={className}
-        title={<Trans message="No results found" />}
+        title={<Trans message="Aucun résultat trouvé" />}
         description={
-          <Trans message="Try another search query or different filters" />
+          <Trans message="Essaie une autre recherche ou d'autres filtres" />
         }
       />
     );
@@ -26,7 +26,7 @@ export function MediaPageNoResultsMessage({
   return (
     <MoodEmptyState
       className={className}
-      title={<Trans message="Nothing to display" />}
+      title={<Trans message="Rien à afficher" />}
       description={description}
     />
   );

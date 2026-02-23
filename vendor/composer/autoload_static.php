@@ -3138,6 +3138,7 @@ class ComposerStaticIniteda465161c615846e60ec04dad5772f3
         'Database\\Seeders\\DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeders/DatabaseSeeder.php',
         'Database\\Seeders\\DefaultChannelsSeeder' => __DIR__ . '/../..' . '/database/seeders/DefaultChannelsSeeder.php',
         'Database\\Seeders\\MoodIdentitySeeder' => __DIR__ . '/../..' . '/database/seeders/MoodIdentitySeeder.php',
+        'Database\\Seeders\\PopularPlaylistsChannelSeeder' => __DIR__ . '/../..' . '/database/seeders/PopularPlaylistsChannelSeeder.php',
         'Database\\Seeders\\VibesSeeder' => __DIR__ . '/../..' . '/database/seeders/VibesSeeder.php',
         'DateError' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateError.php',
         'DateException' => __DIR__ . '/..' . '/symfony/polyfill-php83/Resources/stubs/DateException.php',

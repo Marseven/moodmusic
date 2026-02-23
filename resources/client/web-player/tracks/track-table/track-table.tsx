@@ -48,7 +48,7 @@ const columnConfig: ColumnConfig<Track>[] = [
     allowsSorting: true,
     width: 'flex-3 min-w-224',
     visibleInMode: 'all',
-    header: () => <Trans message="Title" />,
+    header: () => <Trans message="Titre" />,
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <NameWithAvatarPlaceholder showDescription={false} />;
@@ -58,7 +58,7 @@ const columnConfig: ColumnConfig<Track>[] = [
   },
   {
     key: 'artist',
-    header: () => <Trans message="Artist" />,
+    header: () => <Trans message="Artiste" />,
     width: 'flex-2',
     body: (track, row) => {
       if (row.isPlaceholder) {
@@ -84,7 +84,7 @@ const columnConfig: ColumnConfig<Track>[] = [
     sortingKey: 'likes.created_at',
     allowsSorting: true,
     maxWidth: 'max-w-112',
-    header: () => <Trans message="Date added" />,
+    header: () => <Trans message="Date d'ajout" />,
     body: (track, row) => {
       if (row.isPlaceholder) {
         return <Skeleton className="leading-3 max-w-4/5" />;
@@ -114,7 +114,7 @@ const columnConfig: ColumnConfig<Track>[] = [
     key: 'price',
     maxWidth: 'max-w-128',
     align: 'end',
-    header: () => <Trans message="Price" />,
+    header: () => <Trans message="Prix" />,
     hideHeader: true,
     body: (track, row) => {
       if (row.isPlaceholder) {

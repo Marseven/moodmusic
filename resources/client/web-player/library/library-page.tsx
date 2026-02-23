@@ -37,12 +37,12 @@ export function LibraryPage() {
   return (
     <Fragment>
       <StaticPageTitle>
-        <Trans message="Your tracks" />
+        <Trans message="Tes titres" />
       </StaticPageTitle>
       <AdHost slot="general_top" className="mb-34" />
       <div className="flex items-center justify-between gap-24 mb-20">
         <h1 className="text-2xl font-semibold whitespace-nowrap">
-          <Trans message="Your library" />
+          <Trans message="Ta bibliothèque" />
         </h1>
         <DialogTrigger
           type="modal"
@@ -63,7 +63,7 @@ export function LibraryPage() {
           icon={<ModernMusicNoteIcon className="text-main" />}
           to="/library/songs"
         >
-          <Trans message="Songs" />
+          <Trans message="Titres" />
         </MenuItem>
         <MenuItem icon={<ModernQueueListIcon />} to="/library/playlists">
           <Trans message="Playlists" />
@@ -72,13 +72,13 @@ export function LibraryPage() {
           <Trans message="Albums" />
         </MenuItem>
         <MenuItem icon={<ModernMicrophoneIcon />} to="/library/artists">
-          <Trans message="Artists" />
+          <Trans message="Artistes" />
         </MenuItem>
         <MenuItem icon={<ModernClockIcon />} to="/library/history">
-          <Trans message="Play history" />
+          <Trans message="Historique d'écoute" />
         </MenuItem>
         <MenuItem icon={<ModernDownloadIcon />} to="/library/purchases">
-          <Trans message="Purchases" />
+          <Trans message="Mes forces données" />
         </MenuItem>
         {query.items.map(playlist => (
           <MenuItem

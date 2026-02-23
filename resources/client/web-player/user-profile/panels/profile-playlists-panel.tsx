@@ -22,10 +22,10 @@ export function ProfilePlaylistsPanel({user}: ProfileContentProps) {
         imageHeight="h-auto"
         imageMargin="mb-14"
         image={<ModernQueueListIcon size="lg" className="text-muted" />}
-        title={<Trans message="No playlists yet" />}
+        title={<Trans message="Pas encore de playlists" />}
         description={
           <Trans
-            message="Follow :user for updates on playlists they create in the future."
+            message="Suis :user pour voir les playlists qu'il créera à l'avenir."
             values={{user: user.display_name}}
           />
         }

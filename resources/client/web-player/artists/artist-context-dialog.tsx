@@ -38,11 +38,11 @@ export function ArtistContextDialog({artist}: ArtistContextDialogProps) {
       <ToggleInLibraryMenuButton items={[artist]} />
       {showRadioButton && (
         <ContextMenuButton type="link" to={getRadioLink(artist)}>
-          <Trans message="Go to artist radio" />
+          <Trans message="Aller à la radio de l'artiste" />
         </ContextMenuButton>
       )}
       <CopyLinkMenuButton link={getArtistLink(artist, {absolute: true})}>
-        <Trans message="Copy artist link" />
+        <Trans message="Copier le lien de l'artiste" />
       </CopyLinkMenuButton>
       <ShareMediaButton item={artist} />
       {canEdit && (
@@ -50,7 +50,7 @@ export function ArtistContextDialog({artist}: ArtistContextDialogProps) {
           type="link"
           to={`/backstage/artists/${artist.id}/insights`}
         >
-          <Trans message="Insights" />
+          <Trans message="Statistiques" />
         </ContextMenuButton>
       )}
       {canEdit && (
@@ -58,7 +58,7 @@ export function ArtistContextDialog({artist}: ArtistContextDialogProps) {
           type="link"
           to={`/backstage/artists/${artist.id}/edit`}
         >
-          <Trans message="Edit" />
+          <Trans message="Modifier" />
         </ContextMenuButton>
       )}
       <DeleteButton artist={artist} />
@@ -82,18 +82,18 @@ function DeleteButton({artist}: ArtistContextDialogProps) {
         closeMenu();
         openDialog(ConfirmationDialog, {
           isDanger: true,
-          title: <Trans message="Delete artist" />,
+          title: <Trans message="Supprimer l'artiste" />,
           body: (
-            <Trans message="Are you sure you want to delete this artist?" />
+            <Trans message="Es-tu sûr de vouloir supprimer cet artiste ?" />
           ),
-          confirm: <Trans message="Delete" />,
+          confirm: <Trans message="Supprimer" />,
           onConfirm: () => {
             deleteArtist.mutate();
           },
         });
       }}
     >
-      <Trans message="Delete" />
+      <Trans message="Supprimer" />
     </ContextMenuButton>
   );
 }

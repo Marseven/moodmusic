@@ -32,7 +32,7 @@ export function AddToQueueButton({item, loadTracks}: AddToQueueButtonProps) {
         );
       }}
     >
-      <Trans message="Add to queue" />
+      <Trans message="Ajouter à la file d'attente" />
     </ContextMenuButton>
   );
 }

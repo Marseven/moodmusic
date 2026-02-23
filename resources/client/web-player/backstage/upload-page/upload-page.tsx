@@ -116,7 +116,7 @@ function UploadPanel({
     <div className="pt-40">
       <div className="mood-glass-panel p-20 md:p-48 flex flex-col items-center max-w-580 mx-auto">
         <h1 className="text-base md:text-[22px] md:font-light">
-          <Trans message="Drag and drop your tracks, videos & albums here." />
+          <Trans message="Glisse et dépose tes titres, vidéos et albums ici." />
         </h1>
         <Button
           variant="flat"
@@ -124,7 +124,7 @@ function UploadPanel({
           className="mt-20 w-min"
           onClick={() => onUpload()}
         >
-          <Trans message="Or choose files to upload" />
+          <Trans message="Ou choisis des fichiers à uploader" />
         </Button>
         <div className="border-t pt-20 mt-20">
           <Switch
@@ -133,14 +133,14 @@ function UploadPanel({
               onUploadModeChange(e.target.checked ? 'album' : 'tracks')
             }
           >
-            <Trans message="Make an album when multiple files are selected" />
+            <Trans message="Créer un album quand plusieurs fichiers sont sélectionnés" />
           </Switch>
         </div>
       </div>
       <div className="text-muted mt-20 text-sm text-center min-h-20">
         {data?.minutesLeft != null && (
           <Trans
-            message="You have :count minutes left. Try <a>Pro accounts</a> to get more time and access to advanced features."
+            message="Il te reste :count minutes. Essaie les <a>comptes Pro</a> pour plus de temps et accès aux fonctionnalités avancées."
             values={{
               count: data.minutesLeft,
               a: parts => (

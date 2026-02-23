@@ -72,7 +72,7 @@ export function FollowPlaylistButton({
         className={className}
         onClick={() => unfollow.mutate()}
       >
-        <Trans message="Following" />
+        <Trans message="Suivi" />
       </Button>
     );
   }
@@ -86,7 +86,7 @@ export function FollowPlaylistButton({
       className={className}
       onClick={() => follow.mutate()}
     >
-      <Trans message="Follow" />
+      <Trans message="Suivre" />
     </Button>
   );
 }

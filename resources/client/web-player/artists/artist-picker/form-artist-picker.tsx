@@ -23,12 +23,12 @@ export function FormArtistPicker({name, className, artistType}: FormArtistPicker
     <FormChipField
       className={className}
       name={name}
-      label={<Trans message="Artists" />}
+      label={<Trans message="Artistes" />}
       isAsync
       inputValue={inputValue}
       onInputValueChange={setInputValue}
       suggestions={data?.results}
-      placeholder={trans(message('+Add artist'))}
+      placeholder={trans(message('+Ajouter un artiste'))}
       isLoading={isLoading}
       allowCustomValue={false}
     >

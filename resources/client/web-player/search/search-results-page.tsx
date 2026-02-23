@@ -71,7 +71,7 @@ function MobileSearchBar() {
       autoFocus
       className="w-full"
       size="lg"
-      placeholder={trans(message('Search...'))}
+      placeholder={trans(message('Rechercher...'))}
     />
   );
 }
@@ -135,11 +135,11 @@ function SearchResults({results}: SearchResultsProps) {
         icon={SearchIcon}
         title={
           <Trans
-            message={`Not results for \u201c:query\u201d`}
+            message={`Aucun résultat pour \u201c:query\u201d`}
             values={{query: searchQuery}}
           />
         }
-        description={<Trans message="Please try a different search query" />}
+        description={<Trans message="Essaie avec une autre recherche" />}
       />
     );
   }
@@ -148,16 +148,16 @@ function SearchResults({results}: SearchResultsProps) {
     <Tabs selectedTab={selectedTab} onTabChange={setSelectedTab}>
       <TabList>
         <Tab elementType={Link} to={tabLink()}>
-          <Trans message="Top results" />
+          <Trans message="Meilleurs résultats" />
         </Tab>
         {results.tracks?.length ? (
           <Tab elementType={Link} to={tabLink('tracks')}>
-            <Trans message="Tracks" />
+            <Trans message="Titres" />
           </Tab>
         ) : null}
         {results.artists?.length ? (
           <Tab elementType={Link} to={tabLink('artists')}>
-            <Trans message="Artists" />
+            <Trans message="Artistes" />
           </Tab>
         ) : null}
         {results.albums?.length ? (
@@ -172,7 +172,7 @@ function SearchResults({results}: SearchResultsProps) {
         ) : null}
         {results.users?.length ? (
           <Tab elementType={Link} to={tabLink('users')}>
-            <Trans message="Profiles" />
+            <Trans message="Profils" />
           </Tab>
         ) : null}
       </TabList>
@@ -242,7 +242,7 @@ function TrackResults({tracks, showMore}: TracksPanelProps) {
   return (
     <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'tracks' : undefined}>
-        <Trans message="Tracks" />
+        <Trans message="Titres" />
       </PanelTitle>
       <TrackTable tracks={tracks} />
     </div>
@@ -257,7 +257,7 @@ function ArtistResults({artists, showMore}: ArtistResultsProps) {
   return (
     <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'artists' : undefined}>
-        <Trans message="Artists" />
+        <Trans message="Artistes" />
       </PanelTitle>
       <ContentGrid>
         {artists.map(artist => (
@@ -314,7 +314,7 @@ function ProfileResults({users, showMore}: ProfileResultsProps) {
   return (
     <div className="py-24 mood-glass-panel p-20 mb-16">
       <PanelTitle to={showMore ? 'users' : undefined}>
-        <Trans message="Profiles" />
+        <Trans message="Profils" />
       </PanelTitle>
       <ContentGrid>
         {users.map(user => (

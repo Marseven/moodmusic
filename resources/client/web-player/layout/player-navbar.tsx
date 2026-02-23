@@ -27,7 +27,7 @@ export function PlayerNavbar() {
             navigate(getArtistLink(primaryArtist));
           }}
         >
-          <Trans message="Artist profile" />
+          <Trans message="Profil d'artiste" />
         </MenuItem>,
       ];
     }
@@ -41,7 +41,7 @@ export function PlayerNavbar() {
             navigate('/backstage/requests');
           }}
         >
-          <Trans message="Become an author" />
+          <Trans message="Devenir auteur" />
         </MenuItem>,
       ];
     }
@@ -99,7 +99,7 @@ function ActionButtons() {
           elementType={Link}
           to="/backstage/upload"
         >
-          <Trans message="Upload" />
+          <Trans message="Uploader" />
         </Button>
       ) : null}
       <Button

@@ -31,7 +31,7 @@ export function PlaylistTrackContextDialog({
               }
             }}
           >
-            <Trans message="Remove from this playlist" />
+            <Trans message="Retirer de cette playlist" />
           </ContextMenuButton>
         ) : null;
       }}

@@ -42,12 +42,12 @@ export function LibraryHistoryPage() {
   return (
     <div>
       <StaticPageTitle>
-        <Trans message="Listening history" />
+        <Trans message="Historique d'écoute" />
       </StaticPageTitle>
       <AdHost slot="general_top" className="mb-34" />
       <div className="flex flex-wrap items-center gap-24 justify-between mb-34">
         <h1 className="text-2xl font-semibold w-max md:w-full whitespace-nowrap">
-          <Trans message="Listening history" />
+          <Trans message="Historique d'écoute" />
         </h1>
         <PlaybackToggleButton
           queueId={queueId}
@@ -60,7 +60,7 @@ export function LibraryHistoryPage() {
           className="max-w-512 flex-auto"
           size="sm"
           startAdornment={<Search />}
-          placeholder={trans(message('Search within history'))}
+          placeholder={trans(message('Rechercher dans l\'historique'))}
         />
       </div>
       <TrackTable
@@ -74,7 +74,7 @@ export function LibraryHistoryPage() {
         <MediaPageNoResultsMessage
           className="mt-34"
           searchQuery={searchQuery}
-          description={<Trans message="You have not played any songs yet." />}
+          description={<Trans message="Tu n'as pas encore écouté de titres." />}
         />
       )}
       <AdHost slot="general_bottom" className="mt-34" />
