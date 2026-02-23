@@ -17,6 +17,7 @@ export interface CreatePlaylistPayload {
   collaborative: boolean;
   image: string;
   description: string;
+  editorial?: boolean;
 }
 
 export function useCreatePlaylist(form: UseFormReturn<CreatePlaylistPayload>) {

@@ -29,21 +29,21 @@ export function CrupdatePlaylistFields() {
           <FormTextField
             autoFocus
             name="name"
-            label={<Trans message="Name" />}
+            label={<Trans message="Nom" />}
             className="mb-24"
           />
           <FormSwitch
             name="collaborative"
-            description={<Trans message="Invite other users to add tracks." />}
+            description={<Trans message="Invite d'autres utilisateurs à ajouter des titres." />}
             className="mb-24"
           >
             <Trans message="Collaborative" />
           </FormSwitch>
           <FormSwitch
             name="public"
-            description={<Trans message="Everyone can see public playlists." />}
+            description={<Trans message="Tout le monde peut voir les playlists publiques." />}
           >
-            <Trans message="Public" />
+            <Trans message="Publique" />
           </FormSwitch>
         </div>
       </div>
@@ -52,7 +52,7 @@ export function CrupdatePlaylistFields() {
         label={<Trans message="Description" />}
         inputElementType="textarea"
         rows={4}
-        placeholder={trans(message('Give your playlist a catchy description.'))}
+        placeholder={trans(message('Donne une description accrocheuse à ta playlist.'))}
       />
     </Fragment>
   );

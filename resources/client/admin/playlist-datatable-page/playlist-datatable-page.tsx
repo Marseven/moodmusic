@@ -177,7 +177,7 @@ function Actions() {
         <DataTableAddItemButton>
           <Trans message="Add new playlist" />
         </DataTableAddItemButton>
-        <CreatePlaylistDialog />
+        <CreatePlaylistDialog defaultValues={{public: true, editorial: true}} />
       </DialogTrigger>
     </Fragment>
   );

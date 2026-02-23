@@ -62,11 +62,19 @@ class PlaylistController extends BaseController
 
         $params = $this->request->all();
         $params['owner_id'] = Auth::id();
+        $user = $this->request->user();
+
+        $editorial = (bool) ($params['editorial'] ?? false);
+        unset($params['editorial']);
+
         Playlist::unguard();
-        $newPlaylist = $this->request
-            ->user()
-            ->playlists()
-            ->create($params, ['editor' => true]);
+
+        // Editorial playlists (admin-created): public, not in any user's personal library
+        if ($editorial && $user->hasPermission('admin')) {
+            $newPlaylist = Playlist::create($params);
+        } else {
+            $newPlaylist = $user->playlists()->create($params, ['editor' => true]);
+        }
 
         $newPlaylist->load('editors');
 

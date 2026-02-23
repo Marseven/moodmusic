@@ -13,9 +13,12 @@ import {
 import {useForm} from 'react-hook-form';
 import {Form} from '@common/ui/forms/form';
 
-export function CreatePlaylistDialog() {
+interface CreatePlaylistDialogProps {
+  defaultValues?: Partial<CreatePlaylistPayload>;
+}
+export function CreatePlaylistDialog({defaultValues}: CreatePlaylistDialogProps = {}) {
   const {close, formId} = useDialogContext();
-  const form = useForm<CreatePlaylistPayload>();
+  const form = useForm<CreatePlaylistPayload>({defaultValues});
   const createPlaylist = useCreatePlaylist(form);
 
   return (
