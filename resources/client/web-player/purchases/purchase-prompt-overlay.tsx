@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useMemo} from 'react';
 import {AnimatePresence, m} from 'framer-motion';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
@@ -14,9 +14,26 @@ export function PurchasePromptOverlay() {
   const track = usePurchaseGatingStore(s => s.gatedTrack);
   const hidePrompt = usePurchaseGatingStore(s => s.hidePrompt);
 
+  // Determine if gating comes from album price (track has no own price but album does)
+  const purchaseItem = useMemo(() => {
+    if (!track) return null;
+    const trackPrice = parseFloat(String(track.price ?? 0));
+    if (trackPrice > 0) return track;
+    const albumPrice = parseFloat(String(track.album?.price ?? 0));
+    if (albumPrice > 0 && track.album) return track.album;
+    return track;
+  }, [track]);
+
+  const displayPrice = useMemo(() => {
+    if (!purchaseItem) return 0;
+    return parseFloat(String(purchaseItem.price ?? 0));
+  }, [purchaseItem]);
+
+  const displayCurrency = purchaseItem?.currency ?? 'XAF';
+
   return (
     <AnimatePresence>
-      {isVisible && track && (
+      {isVisible && track && purchaseItem && (
         <m.div
           initial={{opacity: 0}}
           animate={{opacity: 1}}
@@ -41,7 +58,7 @@ export function PurchasePromptOverlay() {
 
             {/* Track info */}
             <div className="mb-20 text-center">
-              {track.image && (
+              {(track.image || track.album?.image) && (
                 <img
                   src={track.image || track.album?.image}
                   alt={track.name}
@@ -52,17 +69,26 @@ export function PurchasePromptOverlay() {
               {track.artists?.[0] && (
                 <p className="text-sm text-muted">{track.artists[0].name}</p>
               )}
+              {purchaseItem.model_type === 'album' && (
+                <p className="mt-4 text-xs text-muted">
+                  Album : {purchaseItem.name}
+                </p>
+              )}
             </div>
 
             {/* Message */}
             <p className="mb-20 text-center text-sm text-muted">
-              <Trans message="This preview has ended. Purchase this track to listen in full." />
+              {purchaseItem.model_type === 'album' ? (
+                <Trans message="This preview has ended. Purchase this album to listen in full." />
+              ) : (
+                <Trans message="This preview has ended. Purchase this track to listen in full." />
+              )}
             </p>
 
             {/* Price */}
-            {track.price != null && track.price > 0 && (
+            {displayPrice > 0 && (
               <div className="mb-20 text-center text-xl font-bold text-primary">
-                {formatPrice(track.price, track.currency ?? 'XAF')}
+                {formatPrice(displayPrice, displayCurrency)}
               </div>
             )}
 
@@ -80,7 +106,7 @@ export function PurchasePromptOverlay() {
               >
                 <Trans message="Donner la force" />
               </Button>
-              <PurchaseDialog item={track} />
+              <PurchaseDialog item={purchaseItem} />
             </DialogTrigger>
           </m.div>
         </m.div>

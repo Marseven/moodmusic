@@ -5,7 +5,7 @@ import {apiClient} from '@common/http/query-client';
 import {Track} from '@app/web-player/tracks/track';
 import {playerOverlayState} from '@app/web-player/state/player-overlay-store';
 import {loadMediaItemTracks} from '@app/web-player/requests/load-media-item-tracks';
-import {tracksToMediaItems, PAID_TRACK_START_OFFSET} from '@app/web-player/tracks/utils/track-to-media-item';
+import {tracksToMediaItems, PAID_TRACK_START_OFFSET, getTrackEffectivePrice} from '@app/web-player/tracks/utils/track-to-media-item';
 import {PlayerStoreOptions} from '@common/player/state/player-store-options';
 import {
   YouTubePlayerState,
@@ -171,15 +171,14 @@ export const playerStoreOptions: Partial<PlayerStoreOptions> = {
       // Skip if already prompted for this track
       if (gatingStore.promptedTrackId === track.id) return;
 
-      // Check if this is a paid track that hasn't been purchased
-      // price comes as string from Laravel decimal:2 cast, so use parseFloat
-      const price = parseFloat(String(track.price ?? 0));
+      // Check if this is a paid track (own price or album price) that hasn't been purchased
+      const price = getTrackEffectivePrice(track);
       if (price > 0) {
         const settings = getBootstrapData().settings;
         const previewDuration = parseInt(settings?.ads?.preview_duration ?? '30') || 30;
 
         if (currentTime >= PAID_TRACK_START_OFFSET + previewDuration) {
-          if (!gatingStore.isTrackPurchased(track.id)) {
+          if (!gatingStore.isTrackOrAlbumPurchased(track)) {
             pause();
             gatingStore.showPrompt(track, playNext);
           }
