@@ -2,16 +2,16 @@ import {RadioStation} from './use-radio-stations';
 import {ModernRadioIcon} from '@app/web-player/icons/modern-icons';
 import {usePlayerActions} from '@common/player/hooks/use-player-actions';
 import {usePlayerStore} from '@common/player/hooks/use-player-store';
-import {guessPlayerProvider} from '@common/player/utils/guess-player-provider';
 import {MediaItem} from '@common/player/media-item';
 import {Pause, Play} from 'lucide-react';
+import {toast} from '@common/ui/toast/toast';
+import {message} from '@common/i18n/message';
 
 function radioStationToMediaItem(station: RadioStation): MediaItem {
-  const provider = guessPlayerProvider(station.stream_url);
   return {
     id: `radio-station-${station.id}`,
     src: station.stream_url,
-    provider,
+    provider: 'htmlAudio',
     poster: station.image || undefined,
     groupId: 'radio-stations',
     meta: {
@@ -35,13 +35,19 @@ export function RadioStationGridItem({station}: RadioStationGridItemProps) {
   const isCued = usePlayerStore(s => s.cuedMedia?.id === mediaId);
 
   const handlePlay = async () => {
-    if (isPlaying) {
-      player.pause();
-    } else if (isCued) {
-      await player.play();
-    } else {
-      const mediaItem = radioStationToMediaItem(station);
-      await player.overrideQueueAndPlay([mediaItem], 0);
+    try {
+      if (isPlaying) {
+        player.pause();
+      } else if (isCued) {
+        await player.play();
+      } else {
+        const mediaItem = radioStationToMediaItem(station);
+        await player.overrideQueueAndPlay([mediaItem], 0);
+      }
+    } catch {
+      toast.danger(
+        message('Impossible de lire cette station. Vérifiez votre connexion.')
+      );
     }
   };
 
