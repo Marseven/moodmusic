@@ -372,38 +372,44 @@ function PlaylistShowcase() {
     {
       title: 'Ambiance Boma',
       subtitle: 'Les sons qui font vibrer Libreville',
-      gradient: 'linear-gradient(135deg, #FF4500, #FF6B35)',
+      gradient: 'linear-gradient(135deg, rgba(255,69,0,0.75), rgba(255,107,53,0.88))',
       icon: Flame,
+      image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=600&h=450&fit=crop',
     },
     {
       title: 'Chill Gaboma',
       subtitle: 'Pour les moments de détente',
-      gradient: 'linear-gradient(135deg, #4ECDC4, #2C9E8F)',
+      gradient: 'linear-gradient(135deg, rgba(78,205,196,0.75), rgba(44,158,143,0.88))',
       icon: Waves,
+      image: 'https://images.unsplash.com/photo-1459749411175-04bf5292ceea?w=600&h=450&fit=crop',
     },
     {
       title: 'Vibes Nocturnes',
       subtitle: "L'énergie de la nuit",
-      gradient: 'linear-gradient(135deg, #7351EA, #9B7FF0)',
+      gradient: 'linear-gradient(135deg, rgba(115,81,234,0.75), rgba(155,127,240,0.88))',
       icon: Moon,
+      image: 'https://images.unsplash.com/photo-1514525253161-7a46d19cd819?w=600&h=450&fit=crop',
     },
     {
       title: 'Fiers d\'être Gaboma',
       subtitle: 'Les nouveautés du 241',
-      gradient: 'linear-gradient(135deg, #00E676, #00C853)',
+      gradient: 'linear-gradient(135deg, rgba(0,230,118,0.75), rgba(0,200,83,0.88))',
       icon: Flag,
+      image: 'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?w=600&h=450&fit=crop',
     },
     {
       title: 'Mood Romantique',
       subtitle: 'Pour les cœurs qui battent',
-      gradient: 'linear-gradient(135deg, #FF6B9D, #f093fb)',
+      gradient: 'linear-gradient(135deg, rgba(255,107,157,0.75), rgba(240,147,251,0.88))',
       icon: Heart,
+      image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?w=600&h=450&fit=crop',
     },
     {
       title: 'Ça chauffe',
       subtitle: 'Les titres du moment',
-      gradient: 'linear-gradient(135deg, #FFD700, #FFA000)',
+      gradient: 'linear-gradient(135deg, rgba(255,215,0,0.75), rgba(255,160,0,0.88))',
       icon: TrendingUp,
+      image: 'https://images.unsplash.com/photo-1501612780327-45045538702b?w=600&h=450&fit=crop',
     },
   ];
 
@@ -437,11 +443,18 @@ function PlaylistShowcase() {
                 to="/register"
                 className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
               >
+                {/* Background image */}
+                <img
+                  src={pl.image}
+                  alt=""
+                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  loading="lazy"
+                />
+                {/* Color overlay */}
                 <div
-                  className="absolute inset-0 transition-transform duration-500 group-hover:scale-110"
+                  className="absolute inset-0"
                   style={{background: pl.gradient}}
                 />
-                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
                 <div className="relative h-full flex flex-col justify-between p-20 md:p-24">
                   <div className="w-40 h-40 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
                     <Icon size={22} className="text-white" />
