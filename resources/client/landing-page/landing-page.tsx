@@ -214,7 +214,7 @@ function HeroSection({content}: ContentProps) {
       />
 
       {/* Hero content — centered */}
-      <div className="flex-auto flex flex-col items-center justify-center text-white relative z-20 px-16 md:px-24">
+      <div className="flex-auto flex flex-col items-center justify-center text-white relative z-20 px-16 md:px-24 pb-64">
         <div className="max-w-850 mx-auto text-center flex flex-col items-center">
           {/* Badge */}
           <div
@@ -321,15 +321,15 @@ function HeroSection({content}: ContentProps) {
             </Button>
           </div>
         </div>
+      </div>
 
-        {/* Scroll indicator */}
-        <div className="mt-auto pb-32" style={{animation: 'fadeSlideUp 0.8s 0.9s ease-out both'}}>
-          <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center">
-            <div
-              className="w-1.5 h-3 bg-[#7351EA] rounded-full mt-1"
-              style={{animation: 'scrollBounce 2s ease-in-out infinite'}}
-            />
-          </div>
+      {/* Scroll indicator — pinned at bottom */}
+      <div className="absolute bottom-24 left-1/2 -translate-x-1/2 z-20" style={{animation: 'fadeSlideUp 0.8s 0.9s ease-out both'}}>
+        <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center">
+          <div
+            className="w-1.5 h-3 bg-[#7351EA] rounded-full mt-1"
+            style={{animation: 'scrollBounce 2s ease-in-out infinite'}}
+          />
         </div>
       </div>
     </header>
