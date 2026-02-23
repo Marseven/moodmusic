@@ -2,15 +2,17 @@ import React from 'react';
 import {AnimatePresence, m} from 'framer-motion';
 import {Trans} from '@common/i18n/trans';
 import {Button} from '@common/ui/buttons/button';
+import {IconButton} from '@common/ui/buttons/icon-button';
 import {DialogTrigger} from '@common/ui/overlays/dialog/dialog-trigger';
 import {usePurchaseGatingStore} from './purchase-gating-store';
 import {PurchaseDialog} from './purchase-dialog';
 import {formatPrice} from './buy-button';
+import {ModernXIcon} from '@app/web-player/icons/modern-icons';
 
 export function PurchasePromptOverlay() {
   const isVisible = usePurchaseGatingStore(s => s.isPromptVisible);
   const track = usePurchaseGatingStore(s => s.gatedTrack);
-  const skipTrack = usePurchaseGatingStore(s => s.skipTrack);
+  const hidePrompt = usePurchaseGatingStore(s => s.hidePrompt);
 
   return (
     <AnimatePresence>
@@ -26,8 +28,17 @@ export function PurchasePromptOverlay() {
             initial={{scale: 0.95, opacity: 0}}
             animate={{scale: 1, opacity: 1}}
             exit={{scale: 0.95, opacity: 0}}
-            className="mx-16 w-full max-w-400 mood-glass-modal p-24"
+            className="relative mx-16 w-full max-w-400 mood-glass-modal p-24"
           >
+            {/* Close button */}
+            <IconButton
+              className="absolute right-8 top-8 text-muted"
+              size="sm"
+              onClick={hidePrompt}
+            >
+              <ModernXIcon />
+            </IconButton>
+
             {/* Track info */}
             <div className="mb-20 text-center">
               {track.image && (
@@ -55,32 +66,22 @@ export function PurchasePromptOverlay() {
               </div>
             )}
 
-            {/* Actions */}
-            <div className="flex gap-12">
+            {/* Action */}
+            <DialogTrigger
+              type="modal"
+              onClose={() => {
+                usePurchaseGatingStore.getState().hidePrompt();
+              }}
+            >
               <Button
-                className="flex-1"
-                variant="outline"
-                onClick={skipTrack}
+                className="w-full"
+                variant="flat"
+                color="primary"
               >
-                <Trans message="Skip" />
+                <Trans message="Donner la force" />
               </Button>
-              <DialogTrigger
-                type="modal"
-                onClose={() => {
-                  // After purchase dialog closes, hide the prompt
-                  usePurchaseGatingStore.getState().hidePrompt();
-                }}
-              >
-                <Button
-                  className="flex-1"
-                  variant="flat"
-                  color="primary"
-                >
-                  <Trans message="Buy" />
-                </Button>
-                <PurchaseDialog item={track} />
-              </DialogTrigger>
-            </div>
+              <PurchaseDialog item={track} />
+            </DialogTrigger>
           </m.div>
         </m.div>
       )}

@@ -10,6 +10,7 @@ import {useAuth} from '@common/auth/use-auth';
 import {ButtonSize} from '@common/ui/buttons/button-size';
 import {useSettings} from '@common/core/settings/use-settings';
 import {downloadFileFromUrl} from '@common/uploads/utils/download-file-from-url';
+import {trackIsLocallyUploaded} from '@app/web-player/tracks/utils/track-is-locally-uploaded';
 
 export function formatPrice(amount: number, curr: string): string {
   if (curr === 'XOF' || curr === 'XAF') {
@@ -23,12 +24,13 @@ interface Props {
   size?: ButtonSize;
   radius?: string;
   className?: string;
+  compact?: boolean;
 }
 
-export function BuyButton({item, size = 'xs', radius = 'rounded', className}: Props) {
-  const {user} = useAuth();
+export function BuyButton({item, size = 'xs', radius = 'rounded', className, compact}: Props) {
+  const {user, hasPermission} = useAuth();
   const {data} = useUserPurchases();
-  const {base_url} = useSettings();
+  const {base_url, player} = useSettings();
 
   const price = item.price;
   const currency = item.currency ?? 'XAF';
@@ -45,20 +47,33 @@ export function BuyButton({item, size = 'xs', radius = 'rounded', className}: Pr
 
   if (alreadyPurchased) {
     const isTrack = item.model_type === 'track';
+    const canDownload =
+      isTrack &&
+      !!player?.enable_download &&
+      hasPermission('music.download') &&
+      trackIsLocallyUploaded(item as Track);
+
+    if (canDownload) {
+      return (
+        <Button
+          size={size}
+          variant="flat"
+          color="positive"
+          radius={radius}
+          className={className}
+          onClick={() => {
+            downloadFileFromUrl(`${base_url}/api/v1/tracks/${item.id}/download`);
+          }}
+        >
+          <Trans message="Download" />
+        </Button>
+      );
+    }
+
     return (
-      <Button
-        size={size}
-        variant="flat"
-        color="positive"
-        radius={radius}
-        className={className}
-        onClick={isTrack ? () => {
-          downloadFileFromUrl(`${base_url}/api/v1/tracks/${item.id}/download`);
-        } : undefined}
-        disabled={!isTrack}
-      >
-        <Trans message={isTrack ? 'Download' : 'Purchased'} />
-      </Button>
+      <span className="inline-flex items-center bg-positive/10 text-positive text-xs font-medium px-8 py-2 rounded-full whitespace-nowrap">
+        <Trans message="Force donnée" />
+      </span>
     );
   }
 
@@ -75,10 +90,14 @@ export function BuyButton({item, size = 'xs', radius = 'rounded', className}: Pr
         radius={radius}
         className={className}
       >
-        <Trans
-          message="Donner la force - :price"
-          values={{price: formatPrice(price, currency)}}
-        />
+        {compact ? (
+          formatPrice(price, currency)
+        ) : (
+          <Trans
+            message="Donner la force - :price"
+            values={{price: formatPrice(price, currency)}}
+          />
+        )}
       </Button>
       <PurchaseDialog item={item} />
     </DialogTrigger>

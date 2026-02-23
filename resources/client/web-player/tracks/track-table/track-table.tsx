@@ -120,7 +120,7 @@ const columnConfig: ColumnConfig<Track>[] = [
       if (row.isPlaceholder) {
         return null;
       }
-      return <BuyButton item={track} size="2xs" />;
+      return <BuyButton item={track} size="2xs" compact />;
     },
   },
   {
