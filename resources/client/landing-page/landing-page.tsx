@@ -43,6 +43,13 @@ import {
   Shield,
   Mic,
   Radio,
+  Flame,
+  Waves,
+  Moon,
+  Flag,
+  Heart,
+  TrendingUp,
+  Share2,
 } from 'lucide-react';
 
 interface ContentProps {
@@ -61,11 +68,42 @@ export function LandingPage() {
       <div className="h-full overflow-y-auto scroll-smooth bg-[#0a0a0f]">
         <HeroSection content={appearance} />
         <StatsBar />
-        <PlaylistShowcase content={appearance} />
+        {/* Transition divider */}
+        <div className="landing-container">
+          <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(115,81,234,0.3), transparent)'}} />
+        </div>
+        <PlaylistShowcase />
+        <div className="landing-container">
+          <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(255,107,157,0.3), transparent)'}} />
+        </div>
         <PlayerPreview />
-        {showTrending && <ArtistSpotlight />}
-        <FeaturesGrid content={appearance} />
-        {showPricing && <PricingSection content={appearance} />}
+        <div className="landing-container">
+          <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(78,205,196,0.3), transparent)'}} />
+        </div>
+        {showTrending && (
+          <Fragment>
+            <ArtistSpotlight />
+            <div className="landing-container">
+              <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(255,215,0,0.3), transparent)'}} />
+            </div>
+          </Fragment>
+        )}
+        <ShareSection content={appearance} />
+        <div className="landing-container">
+          <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(115,81,234,0.2), transparent)'}} />
+        </div>
+        <FeaturesGrid />
+        {showPricing && (
+          <Fragment>
+            <div className="landing-container">
+              <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(115,81,234,0.3), transparent)'}} />
+            </div>
+            <PricingSection content={appearance} />
+          </Fragment>
+        )}
+        <div className="landing-container">
+          <div className="h-[1px]" style={{background: 'linear-gradient(90deg, transparent, rgba(115,81,234,0.3), transparent)'}} />
+        </div>
         <DownloadCta content={appearance} />
         <Footer className="landing-container" />
       </div>
@@ -80,53 +118,90 @@ function HeroSection({content}: ContentProps) {
   const {
     headerTitle,
     headerSubtitle,
+    headerImage,
+    headerImageOpacity,
     actions,
   } = content;
 
   return (
     <header className="relative min-h-[100vh] overflow-hidden flex flex-col">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 bg-[#0a0a0f]">
-        {/* Orb 1 - violet */}
+      {/* Deep violet gradient background */}
+      <div className="absolute inset-0">
         <div
-          className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full opacity-30"
+          className="absolute inset-0"
           style={{
-            background: 'radial-gradient(circle, #7351EA 0%, transparent 70%)',
-            animation: 'heroOrb1 12s ease-in-out infinite',
+            background: 'radial-gradient(ellipse 120% 80% at 50% 20%, #2d1b69 0%, #170d35 40%, #0a0a0f 70%)',
           }}
         />
-        {/* Orb 2 - pink */}
+
+        {/* Background image from admin (if set) */}
+        {headerImage && (
+          <img
+            src={headerImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            style={{opacity: headerImageOpacity ?? 0.08, mixBlendMode: 'luminosity'}}
+          />
+        )}
+
+        {/* Animated orbs */}
         <div
-          className="absolute bottom-[-10%] right-[-10%] w-[500px] h-[500px] rounded-full opacity-25"
+          className="absolute top-[-10%] left-[10%] w-[700px] h-[700px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #FF6B9D 0%, transparent 70%)',
-            animation: 'heroOrb2 15s ease-in-out infinite',
+            background: 'radial-gradient(circle, rgba(115,81,234,0.35) 0%, transparent 60%)',
+            animation: 'heroOrb1 14s ease-in-out infinite',
           }}
         />
-        {/* Orb 3 - teal */}
         <div
-          className="absolute top-[40%] right-[20%] w-[400px] h-[400px] rounded-full opacity-20"
+          className="absolute top-[20%] right-[-5%] w-[500px] h-[500px] rounded-full"
           style={{
-            background: 'radial-gradient(circle, #4ECDC4 0%, transparent 70%)',
-            animation: 'heroOrb3 10s ease-in-out infinite',
+            background: 'radial-gradient(circle, rgba(156,39,176,0.2) 0%, transparent 60%)',
+            animation: 'heroOrb2 18s ease-in-out infinite',
           }}
         />
+        <div
+          className="absolute bottom-[-5%] left-[30%] w-[600px] h-[600px] rounded-full"
+          style={{
+            background: 'radial-gradient(circle, rgba(115,81,234,0.15) 0%, transparent 60%)',
+            animation: 'heroOrb3 12s ease-in-out infinite',
+          }}
+        />
+
+        {/* Floating music notes */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[
+            {x: '12%', delay: '0s', dur: '20s', size: 18},
+            {x: '28%', delay: '3s', dur: '25s', size: 14},
+            {x: '55%', delay: '7s', dur: '22s', size: 20},
+            {x: '72%', delay: '1s', dur: '18s', size: 16},
+            {x: '88%', delay: '5s', dur: '24s', size: 12},
+            {x: '40%', delay: '10s', dur: '21s', size: 15},
+          ].map((n, i) => (
+            <div
+              key={i}
+              className="absolute bottom-0"
+              style={{
+                left: n.x,
+                animation: `floatUp ${n.dur} ${n.delay} ease-in-out infinite`,
+              }}
+            >
+              <Music size={n.size} className="text-white/[0.04]" />
+            </div>
+          ))}
+        </div>
+
         {/* Grid overlay */}
         <div
-          className="absolute inset-0 opacity-[0.03]"
+          className="absolute inset-0 opacity-[0.025]"
           style={{
             backgroundImage:
-              'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
-            backgroundSize: '60px 60px',
+              'linear-gradient(rgba(115,81,234,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(115,81,234,0.2) 1px, transparent 1px)',
+            backgroundSize: '80px 80px',
           }}
         />
-        {/* Noise texture */}
-        <div
-          className="absolute inset-0 opacity-[0.015]"
-          style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='1'/%3E%3C/svg%3E")`,
-          }}
-        />
+
+        {/* Bottom gradient fade to main bg */}
+        <div className="absolute bottom-0 left-0 right-0 h-[200px]" style={{background: 'linear-gradient(to bottom, transparent, #0a0a0f)'}} />
       </div>
 
       {/* Navbar */}
@@ -138,26 +213,34 @@ function HeroSection({content}: ContentProps) {
         primaryButtonColor="white"
       />
 
-      {/* Hero content */}
+      {/* Hero content — centered */}
       <div className="flex-auto flex flex-col items-center justify-center text-white relative z-20 px-16 md:px-24">
-        <div className="max-w-850 mx-auto text-center">
+        <div className="max-w-850 mx-auto text-center flex flex-col items-center">
           {/* Badge */}
-          <div className="inline-flex items-center gap-8 px-16 py-6 rounded-full border border-white/10 bg-white/5 backdrop-blur-sm text-xs font-medium text-white/70 mb-32">
+          <div
+            className="inline-flex items-center gap-8 px-16 py-8 rounded-full border border-[#7351EA]/30 bg-[#7351EA]/10 backdrop-blur-sm text-xs font-medium text-[#c4b5fd] mb-32"
+            style={{animation: 'fadeSlideUp 0.8s ease-out both'}}
+          >
             <Zap size={14} className="text-[#7351EA]" />
             <span>La plateforme musicale gabonaise</span>
           </div>
 
           {headerTitle && (
-            <h1 className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.1]">
+            <h1
+              className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight leading-[1.08]"
+              style={{animation: 'fadeSlideUp 0.8s 0.15s ease-out both'}}
+            >
               <span className="block text-white">
                 <Trans message={headerTitle} />
               </span>
               <span
                 className="block mt-8"
                 style={{
-                  background: 'linear-gradient(135deg, #7351EA 0%, #FF6B9D 50%, #4ECDC4 100%)',
+                  background: 'linear-gradient(135deg, #a78bfa 0%, #c084fc 40%, #e879f9 70%, #a78bfa 100%)',
+                  backgroundSize: '200% auto',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
+                  animation: 'shimmerText 4s linear infinite',
                 }}
               >
                 Ta musique, ton mood.
@@ -166,7 +249,10 @@ function HeroSection({content}: ContentProps) {
           )}
 
           {headerSubtitle && (
-            <p className="mt-24 text-lg md:text-xl text-white/60 max-w-600 mx-auto leading-relaxed">
+            <p
+              className="mt-24 text-lg md:text-xl text-white/60 max-w-600 mx-auto leading-relaxed"
+              style={{animation: 'fadeSlideUp 0.8s 0.3s ease-out both'}}
+            >
               <Trans message={headerSubtitle} />
             </p>
           )}
@@ -174,6 +260,7 @@ function HeroSection({content}: ContentProps) {
           {/* Search bar */}
           <form
             className="w-full max-w-560 mx-auto mt-40"
+            style={{animation: 'fadeSlideUp 0.8s 0.45s ease-out both'}}
             onSubmit={e => {
               e.preventDefault();
               navigate(
@@ -182,8 +269,8 @@ function HeroSection({content}: ContentProps) {
             }}
           >
             <div className="relative group">
-              <div className="absolute -inset-[1px] rounded-full bg-gradient-to-r from-[#7351EA] via-[#FF6B9D] to-[#4ECDC4] opacity-50 group-hover:opacity-80 blur-sm transition-opacity duration-500" />
-              <div className="relative flex items-center bg-[#141420] rounded-full border border-white/10">
+              <div className="absolute -inset-[1px] rounded-full opacity-40 group-hover:opacity-70 blur-sm transition-opacity duration-500" style={{background: 'linear-gradient(90deg, #7351EA, #9C27B0, #7351EA)'}} />
+              <div className="relative flex items-center bg-[#13111f] rounded-full border border-[#7351EA]/20">
                 <ModernSearchIcon className="ml-20 text-white/40 icon-sm" />
                 <input
                   type="text"
@@ -201,7 +288,10 @@ function HeroSection({content}: ContentProps) {
           </form>
 
           {/* CTA buttons */}
-          <div className="flex flex-wrap justify-center gap-16 mt-40">
+          <div
+            className="flex flex-wrap justify-center gap-16 mt-40"
+            style={{animation: 'fadeSlideUp 0.8s 0.6s ease-out both'}}
+          >
             <CtaButton
               item={actions.cta1}
               variant="flat"
@@ -215,7 +305,7 @@ function HeroSection({content}: ContentProps) {
               color="white"
               size="lg"
               radius="rounded-full"
-              className="border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300"
+              className="border-white/20 hover:border-[#7351EA]/50 hover:bg-[#7351EA]/5 transition-all duration-300"
             />
             <Button
               elementType="a"
@@ -225,7 +315,7 @@ function HeroSection({content}: ContentProps) {
               size="lg"
               radius="rounded-full"
               startIcon={<ModernSmartphoneIcon />}
-              className="border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300"
+              className="border-white/20 hover:border-[#7351EA]/50 hover:bg-[#7351EA]/5 transition-all duration-300"
             >
               <Trans message="Télécharger l'App" />
             </Button>
@@ -233,12 +323,10 @@ function HeroSection({content}: ContentProps) {
         </div>
 
         {/* Scroll indicator */}
-        <div className="mt-auto pb-32">
-          <div
-            className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center"
-          >
+        <div className="mt-auto pb-32" style={{animation: 'fadeSlideUp 0.8s 0.9s ease-out both'}}>
+          <div className="w-6 h-10 border-2 border-white/20 rounded-full flex justify-center">
             <div
-              className="w-1.5 h-3 bg-white/50 rounded-full mt-1"
+              className="w-1.5 h-3 bg-[#7351EA] rounded-full mt-1"
               style={{animation: 'scrollBounce 2s ease-in-out infinite'}}
             />
           </div>
@@ -258,12 +346,12 @@ function StatsBar() {
   ];
 
   return (
-    <div className="relative border-y border-white/5 bg-white/[0.02]">
-      <div className="landing-container py-32">
+    <div className="relative bg-white/[0.02]">
+      <div className="landing-container py-36">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-24">
           {stats.map(({value, label, icon: Icon}) => (
             <div key={label} className="flex items-center justify-center gap-14">
-              <div className="w-40 h-40 rounded-xl bg-[#7351EA]/10 flex items-center justify-center flex-shrink-0">
+              <div className="w-44 h-44 rounded-xl bg-[#7351EA]/10 flex items-center justify-center flex-shrink-0">
                 <Icon size={20} className="text-[#7351EA]" />
               </div>
               <div>
@@ -278,57 +366,55 @@ function StatsBar() {
   );
 }
 
-// ─── Playlist Showcase ───────────────────────────────────────
-function PlaylistShowcase(_props: ContentProps) {
+// ─── Playlist Showcase (icons only, no emojis) ──────────────
+function PlaylistShowcase() {
   const playlists = [
     {
       title: 'Ambiance Boma',
       subtitle: 'Les sons qui font vibrer Libreville',
       gradient: 'linear-gradient(135deg, #FF4500, #FF6B35)',
-      icon: '🔥',
+      icon: Flame,
     },
     {
       title: 'Chill Gaboma',
       subtitle: 'Pour les moments de détente',
       gradient: 'linear-gradient(135deg, #4ECDC4, #2C9E8F)',
-      icon: '🌊',
+      icon: Waves,
     },
     {
       title: 'Vibes Nocturnes',
       subtitle: "L'énergie de la nuit",
       gradient: 'linear-gradient(135deg, #7351EA, #9B7FF0)',
-      icon: '🌙',
+      icon: Moon,
     },
     {
       title: 'Fiers d\'être Gaboma',
       subtitle: 'Les nouveautés du 241',
       gradient: 'linear-gradient(135deg, #00E676, #00C853)',
-      icon: '🇬🇦',
+      icon: Flag,
     },
     {
       title: 'Mood Romantique',
       subtitle: 'Pour les cœurs qui battent',
       gradient: 'linear-gradient(135deg, #FF6B9D, #f093fb)',
-      icon: '💜',
+      icon: Heart,
     },
     {
       title: 'Ça chauffe',
       subtitle: 'Les titres du moment',
       gradient: 'linear-gradient(135deg, #FFD700, #FFA000)',
-      icon: '⚡',
+      icon: TrendingUp,
     },
   ];
 
   return (
     <section className="py-80 md:py-128 relative overflow-hidden">
-      {/* Subtle bg accent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.06] pointer-events-none"
         style={{background: 'radial-gradient(ellipse, #7351EA 0%, transparent 70%)'}}
       />
 
       <div className="landing-container relative z-10">
-        {/* Section header */}
         <div className="text-center mb-64">
           <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full border border-[#7351EA]/20 bg-[#7351EA]/5 text-xs font-medium text-[#7351EA] mb-16">
             <ModernDiscIcon className="icon-xs" />
@@ -342,37 +428,37 @@ function PlaylistShowcase(_props: ContentProps) {
           </p>
         </div>
 
-        {/* Playlist grid */}
         <div className="grid grid-cols-2 md:grid-cols-3 gap-16 md:gap-20">
-          {playlists.map((pl, i) => (
-            <Link
-              key={i}
-              to="/register"
-              className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
-            >
-              {/* Gradient bg */}
-              <div
-                className="absolute inset-0 transition-transform duration-500 group-hover:scale-110"
-                style={{background: pl.gradient}}
-              />
-              {/* Glass overlay */}
-              <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
-              {/* Content */}
-              <div className="relative h-full flex flex-col justify-between p-20 md:p-24">
-                <span className="text-3xl md:text-4xl">{pl.icon}</span>
-                <div>
-                  <h3 className="text-base md:text-lg font-bold text-white leading-tight">{pl.title}</h3>
-                  <p className="text-xs md:text-sm text-white/70 mt-4">{pl.subtitle}</p>
+          {playlists.map((pl, i) => {
+            const Icon = pl.icon;
+            return (
+              <Link
+                key={i}
+                to="/register"
+                className="group relative overflow-hidden rounded-2xl aspect-[4/3] cursor-pointer"
+              >
+                <div
+                  className="absolute inset-0 transition-transform duration-500 group-hover:scale-110"
+                  style={{background: pl.gradient}}
+                />
+                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/10 transition-colors duration-300" />
+                <div className="relative h-full flex flex-col justify-between p-20 md:p-24">
+                  <div className="w-40 h-40 rounded-xl bg-white/15 backdrop-blur-sm flex items-center justify-center">
+                    <Icon size={22} className="text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-base md:text-lg font-bold text-white leading-tight">{pl.title}</h3>
+                    <p className="text-xs md:text-sm text-white/70 mt-4">{pl.subtitle}</p>
+                  </div>
                 </div>
-              </div>
-              {/* Play hint on hover */}
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
-                <div className="w-48 h-48 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-                  <Play size={20} className="text-white ml-1" fill="white" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
+                  <div className="w-52 h-52 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                    <Play size={22} className="text-white ml-1" fill="white" />
+                  </div>
                 </div>
-              </div>
-            </Link>
-          ))}
+              </Link>
+            );
+          })}
         </div>
       </div>
     </section>
@@ -383,7 +469,6 @@ function PlaylistShowcase(_props: ContentProps) {
 function PlayerPreview() {
   return (
     <section className="py-80 md:py-128 relative overflow-hidden">
-      {/* Background accent */}
       <div
         className="absolute bottom-0 right-0 w-[600px] h-[600px] opacity-[0.05] pointer-events-none"
         style={{background: 'radial-gradient(circle, #FF6B9D 0%, transparent 70%)'}}
@@ -412,7 +497,6 @@ function PlayerPreview() {
               Qualité audio premium, paroles synchronisées, et une interface fluide.
             </p>
 
-            {/* Feature pills */}
             <div className="flex flex-wrap gap-10 mt-32">
               {['Audio HD', 'Hors-ligne', 'Paroles', 'Sans pub'].map(f => (
                 <span
@@ -428,14 +512,13 @@ function PlayerPreview() {
           {/* Player mockup */}
           <div className="flex-1 max-w-480">
             <div className="mood-glass-panel p-0 overflow-hidden">
-              {/* Album art area */}
               <div
                 className="aspect-square relative"
                 style={{
                   background: 'linear-gradient(135deg, #1a1028 0%, #0f1923 50%, #1a0f20 100%)',
                 }}
               >
-                {/* Decorative waveform */}
+                {/* Waveform */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="flex items-end gap-[3px] h-80">
                     {Array.from({length: 40}).map((_, i) => {
@@ -446,7 +529,7 @@ function PlayerPreview() {
                           className="w-[3px] rounded-full"
                           style={{
                             height: `${h}%`,
-                            background: `linear-gradient(to top, #7351EA, #FF6B9D)`,
+                            background: 'linear-gradient(to top, #7351EA, #FF6B9D)',
                             opacity: 0.6 + Math.random() * 0.4,
                             animation: `waveBar ${1.5 + Math.random()}s ease-in-out infinite alternate`,
                             animationDelay: `${i * 0.05}s`,
@@ -456,7 +539,6 @@ function PlayerPreview() {
                     })}
                   </div>
                 </div>
-
                 {/* Center disc */}
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div
@@ -471,23 +553,16 @@ function PlayerPreview() {
                 </div>
               </div>
 
-              {/* Controls area */}
               <div className="p-24 bg-[#0f0f18]/80 backdrop-blur-xl">
-                {/* Track info */}
                 <div className="mb-16">
                   <div className="text-white font-semibold text-base">Ambiance Nocturne</div>
                   <div className="text-white/50 text-sm">Fran-B feat. Lil Boo</div>
                 </div>
-
-                {/* Progress bar */}
                 <div className="mb-16">
                   <div className="h-[3px] rounded-full bg-white/10 relative overflow-hidden">
                     <div
                       className="absolute left-0 top-0 h-full rounded-full"
-                      style={{
-                        width: '42%',
-                        background: 'linear-gradient(90deg, #7351EA, #FF6B9D)',
-                      }}
+                      style={{width: '42%', background: 'linear-gradient(90deg, #7351EA, #FF6B9D)'}}
                     />
                   </div>
                   <div className="flex justify-between mt-6 text-[11px] text-white/40">
@@ -495,8 +570,6 @@ function PlayerPreview() {
                     <span>3:42</span>
                   </div>
                 </div>
-
-                {/* Transport controls */}
                 <div className="flex items-center justify-center gap-24">
                   <Shuffle size={16} className="text-white/40" />
                   <SkipBack size={18} className="text-white/70" />
@@ -506,8 +579,6 @@ function PlayerPreview() {
                   <SkipForward size={18} className="text-white/70" />
                   <Repeat size={16} className="text-white/40" />
                 </div>
-
-                {/* Volume */}
                 <div className="flex items-center gap-10 mt-20 justify-center">
                   <Volume2 size={14} className="text-white/30" />
                   <div className="w-80 h-[3px] rounded-full bg-white/10 relative">
@@ -523,13 +594,23 @@ function PlayerPreview() {
   );
 }
 
-// ─── Artist Spotlight ────────────────────────────────────────
+// ─── Artist Spotlight — fixed-size circles ───────────────────
 function ArtistSpotlight() {
   const {data, isLoading} = useLandingPageTrendingArtists();
 
+  const glowGradients = [
+    'linear-gradient(135deg, #7351EA, #FF6B9D)',
+    'linear-gradient(135deg, #4ECDC4, #7351EA)',
+    'linear-gradient(135deg, #FF6B9D, #FFD700)',
+    'linear-gradient(135deg, #00E676, #4ECDC4)',
+    'linear-gradient(135deg, #FF4500, #FF6B9D)',
+    'linear-gradient(135deg, #9C27B0, #7351EA)',
+    'linear-gradient(135deg, #FFD700, #FF4500)',
+    'linear-gradient(135deg, #7351EA, #4ECDC4)',
+  ];
+
   return (
     <section className="py-80 md:py-128 relative overflow-hidden">
-      {/* Background */}
       <div
         className="absolute top-1/2 left-0 w-[500px] h-[500px] -translate-y-1/2 opacity-[0.05] pointer-events-none"
         style={{background: 'radial-gradient(circle, #4ECDC4 0%, transparent 70%)'}}
@@ -556,35 +637,25 @@ function ArtistSpotlight() {
             showDescription={false}
           />
         ) : (
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-24 md:gap-32">
+          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-32 md:gap-40 max-w-900 mx-auto">
             {data?.artists.map((artist, i) => (
               <Link
                 key={artist.id}
                 to={getArtistLink(artist)}
-                className="group text-center"
+                className="group flex flex-col items-center text-center"
               >
-                <div className="relative mx-auto w-full aspect-square max-w-200 mb-16">
+                {/* Fixed-size circle container */}
+                <div className="relative w-[140px] h-[140px] md:w-[160px] md:h-[160px] mb-16 flex-shrink-0">
                   {/* Glow ring on hover */}
                   <div
                     className="absolute -inset-[3px] rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md"
-                    style={{
-                      background: [
-                        'linear-gradient(135deg, #7351EA, #FF6B9D)',
-                        'linear-gradient(135deg, #4ECDC4, #7351EA)',
-                        'linear-gradient(135deg, #FF6B9D, #FFD700)',
-                        'linear-gradient(135deg, #00E676, #4ECDC4)',
-                        'linear-gradient(135deg, #FF4500, #FF6B9D)',
-                        'linear-gradient(135deg, #9C27B0, #7351EA)',
-                        'linear-gradient(135deg, #FFD700, #FF4500)',
-                        'linear-gradient(135deg, #7351EA, #4ECDC4)',
-                      ][i % 8],
-                    }}
+                    style={{background: glowGradients[i % glowGradients.length]}}
                   />
-                  <div className="relative rounded-full overflow-hidden border-2 border-white/10 group-hover:border-white/20 transition-colors duration-300">
+                  <div className="relative w-full h-full rounded-full overflow-hidden border-2 border-white/10 group-hover:border-white/25 transition-colors duration-300">
                     <SmallArtistImage
                       artist={artist}
                       size="w-full h-full"
-                      className="rounded-full group-hover:scale-105 transition-transform duration-500"
+                      className="rounded-full object-cover group-hover:scale-105 transition-transform duration-500"
                     />
                   </div>
                 </div>
@@ -592,7 +663,9 @@ function ArtistSpotlight() {
                   {artist.name}
                 </div>
                 {artist.genres?.[0] && (
-                  <div className="text-xs text-white/40 mt-2">{artist.genres[0].display_name || artist.genres[0].name}</div>
+                  <div className="text-xs text-white/40 mt-2">
+                    {artist.genres[0].display_name || artist.genres[0].name}
+                  </div>
                 )}
               </Link>
             ))}
@@ -603,8 +676,104 @@ function ArtistSpotlight() {
   );
 }
 
+// ─── Share Section (with background image) ───────────────────
+function ShareSection({content}: ContentProps) {
+  const {footerImage} = content;
+
+  return (
+    <section className="py-80 md:py-128 relative overflow-hidden">
+      {/* Background image from admin settings */}
+      {footerImage && (
+        <img
+          src={footerImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          style={{opacity: 0.08, mixBlendMode: 'luminosity'}}
+        />
+      )}
+      <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] via-transparent to-[#0a0a0f]" />
+
+      <div className="landing-container relative z-10">
+        <div className="md:flex items-center gap-64 lg:gap-80">
+          {/* Image side — glass card with share preview */}
+          <div className="flex-1 mb-48 md:mb-0 flex justify-center">
+            <div className="mood-glass-panel p-24 max-w-360 w-full">
+              <div className="flex items-center gap-14 mb-20">
+                <div className="w-56 h-56 rounded-xl bg-gradient-to-br from-[#7351EA] to-[#9C27B0] flex items-center justify-center flex-shrink-0">
+                  <Music size={24} className="text-white" />
+                </div>
+                <div>
+                  <div className="text-white font-semibold text-sm">Ma playlist du soir</div>
+                  <div className="text-white/50 text-xs">12 titres • 45 min</div>
+                </div>
+              </div>
+              {/* Fake track list */}
+              {[
+                {name: 'Ambiance Nocturne', artist: 'Fran-B'},
+                {name: 'Boma Style', artist: 'Shan\'L'},
+                {name: 'Coupé Décalé', artist: 'DJ Mix'},
+              ].map((t, i) => (
+                <div key={i} className="flex items-center gap-12 py-10 border-t border-white/5">
+                  <div className="w-24 text-xs text-white/30 text-center">{i + 1}</div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm text-white/80 truncate">{t.name}</div>
+                    <div className="text-xs text-white/40 truncate">{t.artist}</div>
+                  </div>
+                  <Play size={14} className="text-white/30 flex-shrink-0" />
+                </div>
+              ))}
+              <div className="mt-16 flex gap-10 justify-center">
+                <div className="w-36 h-36 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Share2 size={14} className="text-[#7351EA]" />
+                </div>
+                <div className="w-36 h-36 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Heart size={14} className="text-[#FF6B9D]" />
+                </div>
+                <div className="w-36 h-36 rounded-full bg-white/5 border border-white/10 flex items-center justify-center">
+                  <Download size={14} className="text-[#4ECDC4]" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Text side */}
+          <div className="flex-1">
+            <div className="inline-flex items-center gap-8 px-14 py-6 rounded-full border border-[#9C27B0]/20 bg-[#9C27B0]/5 text-xs font-medium text-[#ce93d8] mb-16">
+              <Share2 size={14} />
+              <span>Partage</span>
+            </div>
+            <h2 className="text-3xl md:text-5xl font-bold text-white tracking-tight">
+              Partage ta
+              <span className="block" style={{
+                background: 'linear-gradient(135deg, #9C27B0, #7351EA)',
+                WebkitBackgroundClip: 'text',
+                WebkitTextFillColor: 'transparent',
+              }}>
+                musique
+              </span>
+            </h2>
+            <p className="mt-20 text-white/50 text-lg leading-relaxed max-w-440">
+              Crée tes playlists, partage-les avec tes amis et découvre ce que la communauté écoute.
+            </p>
+            <div className="flex flex-wrap gap-10 mt-32">
+              {['Playlists', 'Partage social', 'Commentaires', 'Reposts'].map(f => (
+                <span
+                  key={f}
+                  className="px-14 py-6 rounded-full bg-white/5 border border-white/10 text-sm text-white/60"
+                >
+                  {f}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 // ─── Features Grid ───────────────────────────────────────────
-function FeaturesGrid(_props: ContentProps) {
+function FeaturesGrid() {
   const features = [
     {
       icon: Music,
@@ -664,14 +833,12 @@ function FeaturesGrid(_props: ContentProps) {
           {features.map(({icon: Icon, title, description, color}) => (
             <div
               key={title}
-              className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-28 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-400"
+              className="group relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-28 hover:bg-white/[0.04] hover:border-white/[0.1] transition-all duration-300"
             >
-              {/* Subtle top glow on hover */}
               <div
                 className="absolute top-0 left-1/2 -translate-x-1/2 w-[60%] h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
                 style={{background: `linear-gradient(90deg, transparent, ${color}, transparent)`}}
               />
-
               <div
                 className="w-44 h-44 rounded-xl flex items-center justify-center mb-20"
                 style={{background: `${color}15`}}
@@ -696,7 +863,6 @@ function PricingSection({content}: ContentProps) {
 
   return (
     <section className="py-80 md:py-128 relative" id="pricing">
-      {/* Background accent */}
       <div
         className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] opacity-[0.04] pointer-events-none"
         style={{background: 'radial-gradient(ellipse, #7351EA 0%, transparent 70%)'}}
@@ -741,7 +907,6 @@ function PricingSection({content}: ContentProps) {
 function DownloadCta({content}: ContentProps) {
   return (
     <section className="py-80 md:py-128 relative overflow-hidden">
-      {/* Background gradient orbs */}
       <div className="absolute inset-0">
         <div
           className="absolute top-0 left-1/4 w-[500px] h-[500px] opacity-[0.08]"
@@ -749,7 +914,7 @@ function DownloadCta({content}: ContentProps) {
         />
         <div
           className="absolute bottom-0 right-1/4 w-[400px] h-[400px] opacity-[0.06]"
-          style={{background: 'radial-gradient(circle, #FF6B9D 0%, transparent 70%)'}}
+          style={{background: 'radial-gradient(circle, #9C27B0 0%, transparent 70%)'}}
         />
       </div>
 
@@ -780,7 +945,7 @@ function DownloadCta({content}: ContentProps) {
               size="lg"
               radius="rounded-full"
               startIcon={<ModernSmartphoneIcon />}
-              className="border-white/20 hover:border-white/40 hover:bg-white/5 transition-all duration-300"
+              className="border-white/20 hover:border-[#7351EA]/50 hover:bg-[#7351EA]/5 transition-all duration-300"
             >
               <Trans message="Télécharger l'App" />
             </Button>
