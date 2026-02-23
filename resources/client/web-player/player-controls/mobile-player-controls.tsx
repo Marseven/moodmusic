@@ -135,7 +135,7 @@ function PlayerProgressBar() {
     <ProgressBar
       size="xs"
       className="absolute left-0 right-0 bottom-0"
-      progressColor="bg-white"
+      progressColor="bg-primary"
       trackColor="bg-white/10"
       trackHeight="h-2"
       radius="rounded-none"

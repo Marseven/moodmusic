@@ -6,11 +6,15 @@ import {MediaItem} from '@common/player/media-item';
 import {Pause, Play} from 'lucide-react';
 import {toast} from '@common/ui/toast/toast';
 import {message} from '@common/i18n/message';
+import {getBootstrapData} from '@common/core/bootstrap-data/use-backend-bootstrap-data';
 
 function radioStationToMediaItem(station: RadioStation): MediaItem {
+  // Use server-side proxy to avoid CORS/SSL issues with SHOUTcast streams
+  const baseUrl = getBootstrapData().settings.base_url;
+  const proxyUrl = `${baseUrl}/api/v1/radio-stations/${station.id}/stream`;
   return {
     id: `radio-station-${station.id}`,
-    src: station.stream_url,
+    src: proxyUrl,
     provider: 'htmlAudio',
     poster: station.image || undefined,
     groupId: 'radio-stations',

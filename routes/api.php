@@ -131,6 +131,7 @@ Route::group(['prefix' => 'v1', 'middleware' => ['optionalAuth:sanctum', 'verifi
     // RADIO STATIONS (public)
     Route::get('radio-stations', [RadioStationController::class, 'index']);
     Route::get('radio-stations/{radioStation}', [RadioStationController::class, 'show']);
+    Route::get('radio-stations/{radioStation}/stream', [RadioStationController::class, 'stream']);
 
     // TAGS
     Route::get('tags/{tagName}/tracks', [TagMediaController::class, 'tracks']);

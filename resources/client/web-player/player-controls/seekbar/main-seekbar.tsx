@@ -41,8 +41,8 @@ export function MainSeekbar() {
   const progressPercentage = duration > 0 ? (currentTime / duration) * 100 : 0;
 
   const waveform = useMemo(
-    () => generateWaveform(duration > 0 ? duration : 42),
-    [duration > 0]
+    () => generateWaveform(duration > 0 && isFinite(duration) ? duration : 42),
+    [duration > 0 && isFinite(duration)]
   );
 
   const calculateValueFromPosition = useCallback(
