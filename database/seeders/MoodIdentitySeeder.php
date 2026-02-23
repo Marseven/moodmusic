@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 
 class MoodIdentitySeeder extends Seeder
@@ -15,6 +16,9 @@ class MoodIdentitySeeder extends Seeder
     {
         $this->renameChannels();
         $this->renameMenuItems();
+
+        // Clear the settings cache so changes take effect immediately
+        Cache::forget('settings.public');
     }
 
     private function renameChannels(): void
